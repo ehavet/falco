@@ -1,6 +1,6 @@
 import * as supertest from 'supertest'
-import { expect, HttpServerForTesting, newProdLikeServer } from '../../../test-utils'
-import { PropertySqlModel } from '../../../../src/properties/infrastructure/model/property-sql.model'
+import { expect, HttpServerForTesting, newProdLikeServer } from '../../../../test-utils'
+import { PropertySqlModel } from '../../../../../src/app/properties/infrastructure/model/property-sql.model'
 
 describe('Http API properties e2e', async () => {
   let httpServer: HttpServerForTesting

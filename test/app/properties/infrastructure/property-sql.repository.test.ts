@@ -1,6 +1,6 @@
-import { PropertySqlModel } from '../../../src/properties/infrastructure/model/property-sql.model'
-import { PropertySqlRepository } from '../../../src/properties/infrastructure/property-sql.repository'
-import { expect } from '../../test-utils'
+import { PropertySqlModel } from '../../../../src/app/properties/infrastructure/model/property-sql.model'
+import { PropertySqlRepository } from '../../../../src/app/properties/infrastructure/property-sql.repository'
+import { expect } from '../../../test-utils'
 
 const propertySqlRepository = new PropertySqlRepository()
 

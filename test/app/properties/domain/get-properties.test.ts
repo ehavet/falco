@@ -1,6 +1,6 @@
-import { expect, sinon } from '../../test-utils'
-import { Properties } from '../../../src/properties/domain/properties'
-import { GetProperties } from '../../../src/properties/domain/get-properties.usecase'
+import { expect, sinon } from '../../../test-utils'
+import { Properties } from '../../../../src/app/properties/domain/properties'
+import { GetProperties } from '../../../../src/app/properties/domain/get-properties.usecase'
 
 describe('Get Properties', async () => {
   it('should return the stored properties', async () => {

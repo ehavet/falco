@@ -1,6 +1,6 @@
 import * as supertest from 'supertest'
-import { expect, sinon, HttpServerForTesting, newMinimalServer } from '../../../test-utils'
-import { container, propertiesRoutes } from '../../../../src/properties/properties.container'
+import { expect, sinon, HttpServerForTesting, newMinimalServer } from '../../../../test-utils'
+import { container, propertiesRoutes } from '../../../../../src/app/properties/properties.container'
 
 describe('Http API properties integ', async () => {
   let httpServer: HttpServerForTesting

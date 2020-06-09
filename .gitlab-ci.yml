@@ -1,0 +1,68 @@
+variables:
+  NODE_VERSION: "14.4.0"
+  NODE_IMAGE: "node:$NODE_VERSION"
+  POSTGRES_VERSION: "11.7"
+  POSTGRES_IMAGE: "postgres:$POSTGRES_VERSION-alpine"
+  POSTGRES_DB: test
+  POSTGRES_USER: test
+  POSTGRES_PASSWORD: test
+  POSTGRES_HOST_AUTH_METHOD: trust
+  DATABASE_URL: "postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB"
+
+stages:
+  - install
+  - syntax
+  - sca
+  - build
+  - test
+
+default:
+  image: "$NODE_IMAGE"
+
+# Cache modules in between jobs
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .npm/
+
+before_script:
+  - npm ci --cache .npm --prefer-offline
+
+"Check Syntax":
+  stage: syntax
+  script:
+    - npm run lint
+  tags:
+    - docker
+
+"Audit Dependencies":
+  stage: sca #Software Component Analysis
+  script:
+    - npm audit --audit-level=moderate
+  tags:
+    - docker
+
+"Build Project":
+  stage: build
+  script:
+    - npm build
+  tags:
+    - docker
+
+"Run Unit & Integration Tests":
+  stage: test
+  services:
+    - "$POSTGRES_IMAGE"
+  script:
+    # No CCA step run as container are only used for test purpose
+    - npm run db:migrate
+    - npm run db:seed
+    - npm run test:ci
+  coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
+  artifacts:
+    when: always
+    paths:
+      - coverage
+    expire_in: 10 days
+  tags:
+    - docker

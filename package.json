@@ -1,0 +1,118 @@
+{
+  "name": "falco-api",
+  "version": "0.1.0",
+  "description": "API pour souscription simple et rapide à une assurance habitation",
+  "license": "",
+  "author": "Appenin",
+  "repository": "https://gitlab.com/appenin/falco-api",
+  "engines": {
+    "node": "14.4.0",
+    "npm": "6.14.5"
+  },
+  "scripts": {
+    "prebuild": "rm -rf dist",
+    "build": "tsc",
+    "lint": "eslint '{src,test}/**/*.ts'",
+    "db:migrate": "sequelize db:migrate",
+    "db:migrate:undo": "sequelize db:migrate:undo",
+    "db:seed": "sequelize db:seed:undo:all && sequelize db:seed:all",
+    "containers:db:start": "docker-compose up -d apidb && npm run db:migrate",
+    "containers:api:start": "docker-compose up -d api",
+    "containers:start": "npm run containers:db:start && npm run containers:api:start",
+    "start": "node ./dist/start-server.js",
+    "test": "NODE_ENV=test nyc mocha 'test/**/*.{js,ts}' --require ts-node/register",
+    "test:ci": "NODE_ENV=test nyc --reporter text --reporter html mocha 'test/**/*.{js,ts}' --require ts-node/register",
+    "dev:start": "npm run build && npm run start",
+    "dev": "nodemon --watch src -e ts --exec npm run dev:start"
+  },
+  "main": "server.js",
+  "nyc": {
+    "include": [
+      "src/**/*.ts"
+    ],
+    "extension": [
+      ".ts"
+    ],
+    "reporter": [
+      "text-summary",
+      "html"
+    ],
+    "sourceMap": true,
+    "instrument": true
+  },
+  "devDependencies": {
+    "@salesforce/ts-sinon": "^1.1.1",
+    "@types/chai": "^4.2.8",
+    "@types/chai-as-promised": "^7.1.2",
+    "@types/debug": "^4.1.5",
+    "@types/hapi__hapi": "^19.0.2",
+    "@types/hapi__inert": "^5.2.0",
+    "@types/hapi__joi": "^16.0.12",
+    "@types/mocha": "^7.0.1",
+    "@types/node": "^12.12.44",
+    "@types/pino": "^6.0.1",
+    "@types/sinon": "^9.0.4",
+    "@types/sinon-chai": "^3.2.4",
+    "@types/supertest": "^2.0.9",
+    "@types/uuid": "^7.0.4",
+    "@types/validator": "^13.0.0",
+    "@typescript-eslint/eslint-plugin": "^2.34.0",
+    "@typescript-eslint/parser": "^2.34.0",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "debug": "^4.1.1",
+    "eslint": "^6.8.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-chai-friendly": "^0.5.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-mocha": "^6.3.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.9",
+    "mocha": "^7.2.0",
+    "nodemon": "^2.0.4",
+    "nyc": "^15.1.0",
+    "pino-pretty": "^4.0.0",
+    "sinon": "^9.0.1",
+    "sinon-chai": "^3.4.0",
+    "supertest": "^4.0.2",
+    "ts-node": "^8.10.2",
+    "ts-node-dev": "^1.0.0-pre.44",
+    "typescript": "^3.9.5"
+  },
+  "dependencies": {
+    "@hapi/boom": "^9.1.0",
+    "@hapi/hapi": "^19.1.1",
+    "@hapi/inert": "^6.0.1",
+    "@hapi/joi": "^17.1.1",
+    "@hapi/vision": "^6.0.0",
+    "envie": "^3.0.2",
+    "hapi-swagger": "^12.1.3",
+    "pg": "^8.0.0",
+    "pg-connection-string": "^2.2.3",
+    "pino": "^6.3.2",
+    "pino-multi-stream": "^5.0.0",
+    "prom-client": "^12.0.0",
+    "reflect-metadata": "^0.1.13",
+    "sequelize": "^5.21.12",
+    "sequelize-cli": "^5.5.1",
+    "sequelize-typescript": "^1.1.0",
+    "sonic-boom": "^1.0.1",
+    "uuid": "^7.0.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint"
+    ],
+    "*.js": [
+      "eslint"
+    ]
+  }
+}

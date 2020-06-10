@@ -23,17 +23,17 @@ describe('Http API partner information integ', async () => {
           .query({ name: 'myPartner' })
       })
 
-      it('replies with status 200', async () => {
+      it('should reply with status 200', async () => {
         expect(response).to.have.property('statusCode', 200)
       })
 
-      it('returns empty object', async () => {
+      it('should return an empty object', async () => {
         expect(response.body).to.deep.equal(expectedInformation)
       })
     })
 
     describe('when the partner information is not found', () => {
-      it('replies with status 404', async () => {
+      it('should reply with status 404', async () => {
         const partnerName: string = 'myPartner'
         sinon.stub(container, 'GetPartnerInformation').withArgs({ name: partnerName }).rejects(new PartnerInformationNotFoundError(partnerName))
 
@@ -47,7 +47,7 @@ describe('Http API partner information integ', async () => {
     })
 
     describe('when there is an unknown error', () => {
-      it('replies with status 500 when unknown error', async () => {
+      it('should reply with status 500 when unknown error', async () => {
         const partnerName: string = 'myPartner'
         sinon.stub(container, 'GetPartnerInformation').withArgs({ name: partnerName }).rejects(new Error())
 
@@ -60,7 +60,7 @@ describe('Http API partner information integ', async () => {
     })
 
     describe('when there is a validation error', () => {
-      it('replies with status 400 when the name is not provided', async () => {
+      it('should reply with status 400 when the name is not provided', async () => {
         response = await httpServer.api()
           .get('/v0/partner-information')
 

@@ -10,7 +10,7 @@ describe('Http API partner-information e2e', async () => {
   describe('GET /v0/partner-information', () => {
     let response: supertest.Response
 
-    it('return requested partner information', async () => {
+    it('should return the requested partner information', async () => {
       // WHEN
       response = await httpServer.api()
         .get('/v0/partner-information')

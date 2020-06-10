@@ -78,3 +78,7 @@ npm test
 This will run all the automated tests and generate the appropriate coverage report.
 
 Ah, by the way, you need to have the database running locally before launching the automated tests !
+
+## Contributing
+
+Please refer to [CONTRIBUTING.md](./docs/CONTRIBUTING.md) for contribution guidelines.

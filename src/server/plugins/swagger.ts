@@ -7,9 +7,13 @@ const HapiSwagger = require('hapi-swagger')
 
 function swaggerOptions (config: Map<string, any>) : RegisterOptions {
   return {
-    schemes: ['https'],
+    schemes: ['https', 'http'],
     info: {
-      title: 'API Documentation'
+      title: 'Falco API Documentation',
+      contact: {
+        name: 'Appenin',
+        url: 'https://www.appenin.fr/'
+      }
     },
     basePath: `${config.get('URL_PREFIX')}`,
     grouping: 'tags'

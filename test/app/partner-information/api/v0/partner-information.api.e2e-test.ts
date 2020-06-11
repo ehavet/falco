@@ -17,7 +17,7 @@ describe('Http API partner-information e2e', async () => {
         .query({ key: 'studyo' })
 
       // THEN
-      expect(response.body).to.deep.equal({})
+      expect(response.body).to.deep.equal({ key: 'studyo' })
     })
   })
 })

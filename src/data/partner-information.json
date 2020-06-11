@@ -1,4 +1,8 @@
 {
-  "studyo": {},
-  "essca": {}
+  "studyo": {
+    "key": "studyo"
+  },
+  "essca": {
+    "key": "essca"
+  }
 }

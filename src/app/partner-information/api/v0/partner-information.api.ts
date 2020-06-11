@@ -23,7 +23,9 @@ export default function (container: Container): Array<ServerRoute> {
         },
         response: {
           status: {
-            200: Joi.object().empty().label('PartnerInformation'),
+            200: Joi.object({
+              key: Joi.string().description('Partner key').example('myPartner')
+            }).label('PartnerInformation'),
             400: HttpErrorSchema.badRequestSchema,
             404: HttpErrorSchema.notFoundSchema.description('Partner not found'),
             500: HttpErrorSchema.internalServerErrorSchema

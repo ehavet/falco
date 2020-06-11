@@ -19,7 +19,7 @@ export class PartnerInformationMapRepository implements PartnerInformationReposi
 
   async getByKey (partnerKey: string): Promise<PartnerInformation> {
     if (this.partnerMap.has(partnerKey)) {
-      return Promise.resolve(this.partnerMap.get(partnerKey) || {})
+      return Promise.resolve(this.partnerMap.get(partnerKey)!)
     }
 
     throw new PartnerInformationNotFoundError(partnerKey)

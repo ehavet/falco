@@ -3,7 +3,7 @@ import { PartnerInformationMapRepository } from '../../../../src/app/partner-inf
 import { PartnerInformationNotFoundError } from '../../../../src/app/partner-information/domain/partner-information.errors'
 import { PartnerInformation } from '../../../../src/app/partner-information/domain/partner-information'
 
-const partnerInformationJson = { partnerOne: {}, partnerTwo: {} }
+const partnerInformationJson = { partnerOne: { key: 'partnerOne' }, partnerTwo: { key: 'partnerTwo' } }
 const partnerInformationMapRepository = new PartnerInformationMapRepository(partnerInformationJson)
 
 describe('Partner information Map Repository', async () => {
@@ -13,7 +13,7 @@ describe('Partner information Map Repository', async () => {
       const partnerInformation: PartnerInformation = await partnerInformationMapRepository.getByKey('partnerOne')
 
       // THEN
-      expect(partnerInformation).to.deep.equal({})
+      expect(partnerInformation).to.deep.equal({ key: 'partnerOne' })
     })
 
     it('should thrown not found error when partner is not found', async () => {

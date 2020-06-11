@@ -13,9 +13,10 @@ describe('Http API partner information integ', async () => {
 
   describe('GET /v0/partner-information', () => {
     let response: supertest.Response
-    const expectedInformation: PartnerInformation = {}
 
     describe('when the partner information is found', () => {
+      const expectedInformation: PartnerInformation = { key: 'myPartner' }
+
       beforeEach(async () => {
         sinon.stub(container, 'GetPartnerInformation').withArgs({ partnerKey: 'myPartner' }).resolves(expectedInformation)
         response = await httpServer.api()

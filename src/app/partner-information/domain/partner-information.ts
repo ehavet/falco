@@ -1,1 +1,3 @@
-export interface PartnerInformation {}
+export interface PartnerInformation {
+    key: string
+}

@@ -5,7 +5,7 @@ import { GetPartnerInformation } from '../../../../src/app/partner-information/d
 describe('Get Partner Information', async () => {
   it('should return requested partner information', async () => {
     // GIVEN
-    const expectedInformation: PartnerInformation = {}
+    const expectedInformation: PartnerInformation = { key: 'myPartner' }
     const partnerInformationRepository = { getByKey: sinon.stub() }
     partnerInformationRepository.getByKey.withArgs('myPartner').resolves(expectedInformation)
     const getPartnerInformation : GetPartnerInformation = GetPartnerInformation.factory(partnerInformationRepository)

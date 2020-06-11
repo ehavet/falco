@@ -6,12 +6,12 @@ describe('Get Partner Information', async () => {
   it('should return requested partner information', async () => {
     // GIVEN
     const expectedInformation: PartnerInformation = {}
-    const partnerInformationRepository = { getByName: sinon.stub() }
-    partnerInformationRepository.getByName.withArgs('myPartner').resolves(expectedInformation)
+    const partnerInformationRepository = { getByKey: sinon.stub() }
+    partnerInformationRepository.getByKey.withArgs('myPartner').resolves(expectedInformation)
     const getPartnerInformation : GetPartnerInformation = GetPartnerInformation.factory(partnerInformationRepository)
 
     // WHEN
-    const information: PartnerInformation = await getPartnerInformation({ name: 'myPartner' })
+    const information: PartnerInformation = await getPartnerInformation({ partnerKey: 'myPartner' })
 
     // THEN
     expect(information).to.equal(expectedInformation)

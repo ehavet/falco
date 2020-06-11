@@ -10,7 +10,7 @@ export namespace GetPartnerInformation {
 
     export function factory (partnerInformationRepository: PartnerInformationRepository): GetPartnerInformation {
       return async (getPartnerInformationQuery: GetPartnerInformationQuery) => {
-        return await partnerInformationRepository.getByName(getPartnerInformationQuery.name)
+        return await partnerInformationRepository.getByKey(getPartnerInformationQuery.partnerKey)
       }
     }
 }

@@ -17,11 +17,11 @@ export class PartnerInformationMapRepository implements PartnerInformationReposi
     this.partnerMap = objectToMap(jsonFile)
   }
 
-  async getByName (name: string): Promise<PartnerInformation> {
-    if (this.partnerMap.has(name)) {
-      return this.partnerMap.get(name) || {}
+  async getByKey (partnerKey: string): Promise<PartnerInformation> {
+    if (this.partnerMap.has(partnerKey)) {
+      return Promise.resolve(this.partnerMap.get(partnerKey) || {})
     }
 
-    throw new PartnerInformationNotFoundError(name)
+    throw new PartnerInformationNotFoundError(partnerKey)
   }
 }

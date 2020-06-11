@@ -1,3 +1,3 @@
 export interface GetPartnerInformationQuery {
-    name: string
+    partnerKey: string
 }

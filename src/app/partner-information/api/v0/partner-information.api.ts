@@ -18,7 +18,7 @@ export default function (container: Container): Array<ServerRoute> {
         description: 'Information for a specific partner',
         validate: {
           query: Joi.object({
-            name: Joi.string().description('Name of the partner').max(50).required().example('myPartner')
+            key: Joi.string().description('Partner key').max(50).required().example('myPartner')
           })
         },
         response: {
@@ -31,7 +31,7 @@ export default function (container: Container): Array<ServerRoute> {
         }
       },
       handler: async (request) => {
-        const getPartnerInformationQuery: GetPartnerInformationQuery = { name: request.query.name.toString() }
+        const getPartnerInformationQuery: GetPartnerInformationQuery = { partnerKey: request.query.key.toString() }
         try {
           return await container.GetPartnerInformation(getPartnerInformationQuery)
         } catch (error) {

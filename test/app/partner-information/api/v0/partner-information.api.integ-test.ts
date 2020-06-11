@@ -17,10 +17,10 @@ describe('Http API partner information integ', async () => {
 
     describe('when the partner information is found', () => {
       beforeEach(async () => {
-        sinon.stub(container, 'GetPartnerInformation').withArgs({ name: 'myPartner' }).resolves(expectedInformation)
+        sinon.stub(container, 'GetPartnerInformation').withArgs({ partnerKey: 'myPartner' }).resolves(expectedInformation)
         response = await httpServer.api()
           .get('/v0/partner-information')
-          .query({ name: 'myPartner' })
+          .query({ key: 'myPartner' })
       })
 
       it('should reply with status 200', async () => {
@@ -34,33 +34,33 @@ describe('Http API partner information integ', async () => {
 
     describe('when the partner information is not found', () => {
       it('should reply with status 404', async () => {
-        const partnerName: string = 'myPartner'
-        sinon.stub(container, 'GetPartnerInformation').withArgs({ name: partnerName }).rejects(new PartnerInformationNotFoundError(partnerName))
+        const partnerKey: string = 'myPartner'
+        sinon.stub(container, 'GetPartnerInformation').withArgs({ partnerKey: partnerKey }).rejects(new PartnerInformationNotFoundError(partnerKey))
 
         response = await httpServer.api()
           .get('/v0/partner-information')
-          .query({ name: partnerName })
+          .query({ key: partnerKey })
 
         expect(response).to.have.property('statusCode', 404)
-        expect(response.body).to.have.property('message', `Could not find partner with name : ${partnerName}`)
+        expect(response.body).to.have.property('message', `Could not find partner with key : ${partnerKey}`)
       })
     })
 
     describe('when there is an unknown error', () => {
       it('should reply with status 500 when unknown error', async () => {
-        const partnerName: string = 'myPartner'
-        sinon.stub(container, 'GetPartnerInformation').withArgs({ name: partnerName }).rejects(new Error())
+        const partnerKey: string = 'myPartner'
+        sinon.stub(container, 'GetPartnerInformation').withArgs({ partnerKey: partnerKey }).rejects(new Error())
 
         response = await httpServer.api()
           .get('/v0/partner-information')
-          .query({ name: partnerName })
+          .query({ key: partnerKey })
 
         expect(response).to.have.property('statusCode', 500)
       })
     })
 
     describe('when there is a validation error', () => {
-      it('should reply with status 400 when the name is not provided', async () => {
+      it('should reply with status 400 when the key is not provided', async () => {
         response = await httpServer.api()
           .get('/v0/partner-information')
 

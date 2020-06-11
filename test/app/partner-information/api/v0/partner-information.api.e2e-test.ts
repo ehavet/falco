@@ -14,7 +14,7 @@ describe('Http API partner-information e2e', async () => {
       // WHEN
       response = await httpServer.api()
         .get('/v0/partner-information')
-        .query({ name: 'studyo' })
+        .query({ key: 'studyo' })
 
       // THEN
       expect(response.body).to.deep.equal({})

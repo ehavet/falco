@@ -7,10 +7,10 @@ const partnerInformationJson = { partnerOne: {}, partnerTwo: {} }
 const partnerInformationMapRepository = new PartnerInformationMapRepository(partnerInformationJson)
 
 describe('Partner information Map Repository', async () => {
-  describe('getByName', async () => {
-    it('should return partner information by partner name', async () => {
+  describe('getByKey', async () => {
+    it('should return partner information by partner key', async () => {
       // WHEN
-      const partnerInformation: PartnerInformation = await partnerInformationMapRepository.getByName('partnerOne')
+      const partnerInformation: PartnerInformation = await partnerInformationMapRepository.getByKey('partnerOne')
 
       // THEN
       expect(partnerInformation).to.deep.equal({})
@@ -18,7 +18,7 @@ describe('Partner information Map Repository', async () => {
 
     it('should thrown not found error when partner is not found', async () => {
       // WHEN
-      const partnerInformationPromise: Promise<PartnerInformation> = partnerInformationMapRepository.getByName('unkownPartnerName')
+      const partnerInformationPromise: Promise<PartnerInformation> = partnerInformationMapRepository.getByKey('unkownPartnerKey')
 
       // THEN
       expect(partnerInformationPromise).to.be.rejectedWith(PartnerInformationNotFoundError)

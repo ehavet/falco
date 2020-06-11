@@ -1,6 +1,6 @@
 export class PartnerInformationNotFoundError extends Error {
-  constructor (partnerName: string) {
-    const message: string = `Could not find partner with name : ${partnerName}`
+  constructor (partnerKey: string) {
+    const message: string = `Could not find partner with key : ${partnerKey}`
     super(message)
     this.name = 'PartnerInformationNotFoundError'
   }

@@ -4,7 +4,7 @@ import { ServerRoute } from '@hapi/hapi'
 import { Container } from '../../partner-information.container'
 import { GetPartnerInformationQuery } from '../../domain/get-partner-information-query'
 import { PartnerInformationNotFoundError } from '../../domain/partner-information.errors'
-import HttpErrorSchema from '../../../common-api/HttpErrorSchema'
+import * as HttpErrorSchema from '../../../common-api/HttpErrorSchema'
 
 const TAGS = ['api', 'partner-information']
 
@@ -24,8 +24,9 @@ export default function (container: Container): Array<ServerRoute> {
         response: {
           status: {
             200: Joi.object().empty().label('PartnerInformation'),
-            400: HttpErrorSchema.description('Bad Request').label('BadRequest'),
-            404: HttpErrorSchema.description('Partner not found').label('NotFound')
+            400: HttpErrorSchema.badRequestSchema,
+            404: HttpErrorSchema.notFoundSchema.description('Partner not found'),
+            500: HttpErrorSchema.internalServerErrorSchema
           }
         }
       },

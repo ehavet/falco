@@ -2,7 +2,7 @@ import { Request, ResponseToolkit, Server } from '@hapi/hapi'
 import { Boom } from '@hapi/boom'
 import { happiSwaggerPlugin } from './plugins/swagger'
 import { initSequelize } from '../libs/sequelize'
-import { partnerInformationRoutes } from '../app/partner-information/partner-information.container'
+import { partnerRoutes } from '../app/partner/partner.container'
 
 export default async (config: Map<string, any>): Promise<Server> => {
   const server = new Server({
@@ -24,7 +24,7 @@ export default async (config: Map<string, any>): Promise<Server> => {
 
   server.ext('onPreResponse', setBoomErrorDataToResponse)
   server.validator(require('@hapi/joi'))
-  server.route(partnerInformationRoutes())
+  server.route(partnerRoutes())
   await server.register(happiSwaggerPlugin(config))
   await initSequelize(config)
 

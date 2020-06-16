@@ -1,27 +1,26 @@
 import * as supertest from 'supertest'
 import { expect, sinon, HttpServerForTesting, newMinimalServer } from '../../../../test-utils'
-import { container, partnerInformationRoutes } from '../../../../../src/app/partner-information/partner-information.container'
-import { PartnerInformation } from '../../../../../src/app/partner-information/domain/partner-information'
-import { PartnerInformationNotFoundError } from '../../../../../src/app/partner-information/domain/partner-information.errors'
+import { container, partnerRoutes } from '../../../../../src/app/partner/partner.container'
+import { Partner } from '../../../../../src/app/partner/domain/partner'
+import { PartnerNotFoundError } from '../../../../../src/app/partner/domain/partner.errors'
 
-describe('Http API partner information integ', async () => {
+describe('Http API partner integ', async () => {
   let httpServer: HttpServerForTesting
 
   before(async () => {
-    httpServer = await newMinimalServer(partnerInformationRoutes())
+    httpServer = await newMinimalServer(partnerRoutes())
   })
 
-  describe('GET /v0/partner-information', () => {
+  describe('GET /internal/v0/partner/:id', () => {
     let response: supertest.Response
 
     describe('when the partner information is found', () => {
-      const expectedInformation: PartnerInformation = { key: 'myPartner' }
+      const expectedInformation: Partner = { key: 'myPartnerKey' }
 
       beforeEach(async () => {
-        sinon.stub(container, 'GetPartnerInformation').withArgs({ partnerKey: 'myPartner' }).resolves(expectedInformation)
+        sinon.stub(container, 'GetPartnerById').withArgs({ partnerId: 'myPartner' }).resolves(expectedInformation)
         response = await httpServer.api()
-          .get('/v0/partner-information')
-          .query({ key: 'myPartner' })
+          .get('/internal/v0/partner/myPartner')
       })
 
       it('should reply with status 200', async () => {
@@ -35,35 +34,33 @@ describe('Http API partner information integ', async () => {
 
     describe('when the partner information is not found', () => {
       it('should reply with status 404', async () => {
-        const partnerKey: string = 'myPartner'
-        sinon.stub(container, 'GetPartnerInformation').withArgs({ partnerKey: partnerKey }).rejects(new PartnerInformationNotFoundError(partnerKey))
+        const partnerID: string = 'myPartner'
+        sinon.stub(container, 'GetPartnerById').withArgs({ partnerId: partnerID }).rejects(new PartnerNotFoundError(partnerID))
 
         response = await httpServer.api()
-          .get('/v0/partner-information')
-          .query({ key: partnerKey })
+          .get('/internal/v0/partner/myPartner')
 
         expect(response).to.have.property('statusCode', 404)
-        expect(response.body).to.have.property('message', `Could not find partner with key : ${partnerKey}`)
+        expect(response.body).to.have.property('message', `Could not find partner with key : ${partnerID}`)
       })
     })
 
     describe('when there is an unknown error', () => {
       it('should reply with status 500 when unknown error', async () => {
         const partnerKey: string = 'myPartner'
-        sinon.stub(container, 'GetPartnerInformation').withArgs({ partnerKey: partnerKey }).rejects(new Error())
+        sinon.stub(container, 'GetPartnerById').withArgs({ partnerKey: partnerKey }).rejects(new Error())
 
         response = await httpServer.api()
-          .get('/v0/partner-information')
-          .query({ key: partnerKey })
+          .get('/internal/v0/partner/myPartner')
 
         expect(response).to.have.property('statusCode', 500)
       })
     })
 
     describe('when there is a validation error', () => {
-      it('should reply with status 400 when the key is not provided', async () => {
+      it('should reply with status 400 when id is not provided', async () => {
         response = await httpServer.api()
-          .get('/v0/partner-information')
+          .get('/internal/v0/partner/ ')
 
         expect(response).to.have.property('statusCode', 400)
       })

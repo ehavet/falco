@@ -1,17 +1,17 @@
 import { expect, sinon } from '../../../test-utils'
-import { PartnerInformation } from '../../../../src/app/partner-information/domain/partner-information'
-import { GetPartnerInformation } from '../../../../src/app/partner-information/domain/get-partner-information.usecase'
+import { Partner } from '../../../../src/app/partner/domain/partner'
+import { GetPartnerById } from '../../../../src/app/partner/domain/get-partner-by-id.usecase'
 
 describe('Get Partner Information', async () => {
   it('should return requested partner information', async () => {
     // GIVEN
-    const expectedInformation: PartnerInformation = { key: 'myPartner' }
+    const expectedInformation: Partner = { key: 'myPartner' }
     const partnerInformationRepository = { getByKey: sinon.stub() }
     partnerInformationRepository.getByKey.withArgs('myPartner').resolves(expectedInformation)
-    const getPartnerInformation : GetPartnerInformation = GetPartnerInformation.factory(partnerInformationRepository)
+    const getPartnerInformation : GetPartnerById = GetPartnerById.factory(partnerInformationRepository)
 
     // WHEN
-    const information: PartnerInformation = await getPartnerInformation({ partnerKey: 'myPartner' })
+    const information: Partner = await getPartnerInformation({ partnerId: 'myPartner' })
 
     // THEN
     expect(information).to.equal(expectedInformation)

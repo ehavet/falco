@@ -1,16 +1,16 @@
 import { expect } from '../../../test-utils'
-import { PartnerInformationMapRepository } from '../../../../src/app/partner-information/infrastructure/partner-information-map.repository'
-import { PartnerInformationNotFoundError } from '../../../../src/app/partner-information/domain/partner-information.errors'
-import { PartnerInformation } from '../../../../src/app/partner-information/domain/partner-information'
+import { PartnerMapRepository } from '../../../../src/app/partner/infrastructure/partner-map.repository'
+import { PartnerNotFoundError } from '../../../../src/app/partner/domain/partner.errors'
+import { Partner } from '../../../../src/app/partner/domain/partner'
 
 const partnerInformationJson = { partnerOne: { key: 'partnerOne' }, partnerTwo: { key: 'partnerTwo' } }
-const partnerInformationMapRepository = new PartnerInformationMapRepository(partnerInformationJson)
+const partnerInformationMapRepository = new PartnerMapRepository(partnerInformationJson)
 
 describe('Partner information Map Repository', async () => {
   describe('getByKey', async () => {
     it('should return partner information by partner key', async () => {
       // WHEN
-      const partnerInformation: PartnerInformation = await partnerInformationMapRepository.getByKey('partnerOne')
+      const partnerInformation: Partner = await partnerInformationMapRepository.getByKey('partnerOne')
 
       // THEN
       expect(partnerInformation).to.deep.equal({ key: 'partnerOne' })
@@ -18,10 +18,10 @@ describe('Partner information Map Repository', async () => {
 
     it('should thrown not found error when partner is not found', async () => {
       // WHEN
-      const partnerInformationPromise: Promise<PartnerInformation> = partnerInformationMapRepository.getByKey('unkownPartnerKey')
+      const partnerInformationPromise: Promise<Partner> = partnerInformationMapRepository.getByKey('unkownPartnerKey')
 
       // THEN
-      expect(partnerInformationPromise).to.be.rejectedWith(PartnerInformationNotFoundError)
+      expect(partnerInformationPromise).to.be.rejectedWith(PartnerNotFoundError)
     })
   })
 })

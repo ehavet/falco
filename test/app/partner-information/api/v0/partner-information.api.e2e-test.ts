@@ -1,20 +1,19 @@
 import * as supertest from 'supertest'
 import { expect, HttpServerForTesting, newProdLikeServer } from '../../../../test-utils'
 
-describe('Http API partner-information e2e', async () => {
+describe('Http API partner e2e', async () => {
   let httpServer: HttpServerForTesting
   before(async () => {
     httpServer = await newProdLikeServer()
   })
 
-  describe('GET /v0/partner-information', () => {
+  describe('GET /internal/v0/partner/:id', () => {
     let response: supertest.Response
 
-    it('should return the requested partner information', async () => {
+    it('should return the requested partner', async () => {
       // WHEN
       response = await httpServer.api()
-        .get('/v0/partner-information')
-        .query({ key: 'studyo' })
+        .get('/internal/v0/partner/studyo')
 
       // THEN
       expect(response.body).to.deep.equal({ key: 'studyo' })

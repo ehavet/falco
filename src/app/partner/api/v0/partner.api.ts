@@ -1,43 +1,44 @@
 import * as Boom from '@hapi/boom'
 import Joi from '@hapi/joi'
 import { ServerRoute } from '@hapi/hapi'
-import { Container } from '../../partner-information.container'
-import { GetPartnerInformationQuery } from '../../domain/get-partner-information-query'
-import { PartnerInformationNotFoundError } from '../../domain/partner-information.errors'
+import { Container } from '../../partner.container'
+import { GetPartnerByIdParams } from '../../domain/get-partner-by-id-params'
+import { PartnerNotFoundError } from '../../domain/partner.errors'
 import * as HttpErrorSchema from '../../../common-api/HttpErrorSchema'
 
-const TAGS = ['api', 'partner-information']
+const TAGS = ['api', 'partner']
 
 export default function (container: Container): Array<ServerRoute> {
   return [
     {
       method: 'GET',
-      path: '/v0/partner-information',
+      path: '/internal/v0/partner/{id}',
       options: {
         tags: TAGS,
         description: 'Information for a specific partner',
         validate: {
-          query: Joi.object({
-            key: Joi.string().description('Partner key').max(50).required().example('myPartner')
+          params: Joi.object({
+            id: Joi.string().min(1).max(50).not('').required()
+              .description('Partner ID').example('partner_id')
           })
         },
         response: {
           status: {
             200: Joi.object({
               key: Joi.string().description('Partner key').example('myPartner')
-            }).label('PartnerInformation'),
+            }).label('Partner'),
             400: HttpErrorSchema.badRequestSchema,
-            404: HttpErrorSchema.notFoundSchema.description('Partner not found'),
+            404: HttpErrorSchema.notFoundSchema,
             500: HttpErrorSchema.internalServerErrorSchema
           }
         }
       },
       handler: async (request) => {
-        const getPartnerInformationQuery: GetPartnerInformationQuery = { partnerKey: request.query.key.toString() }
+        const getPartnerInformationQuery: GetPartnerByIdParams = { partnerId: request.params.id.toString() }
         try {
-          return await container.GetPartnerInformation(getPartnerInformationQuery)
+          return await container.GetPartnerById(getPartnerInformationQuery)
         } catch (error) {
-          if (error instanceof PartnerInformationNotFoundError) {
+          if (error instanceof PartnerNotFoundError) {
             throw Boom.notFound(error.message)
           }
           throw Boom.internal(error)

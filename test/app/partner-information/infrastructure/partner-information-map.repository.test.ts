@@ -1,7 +1,7 @@
 import { expect } from '../../../test-utils'
-import { PartnerMapRepository } from '../../../../src/app/partner/infrastructure/partner-map.repository'
-import { PartnerNotFoundError } from '../../../../src/app/partner/domain/partner.errors'
-import { Partner } from '../../../../src/app/partner/domain/partner'
+import { PartnerMapRepository } from '../../../../src/app/partners/infrastructure/partner-map.repository'
+import { PartnerNotFoundError } from '../../../../src/app/partners/domain/partner.errors'
+import { Partner } from '../../../../src/app/partners/domain/partner'
 
 const partnerInformationJson = { partnerOne: { key: 'partnerOne' }, partnerTwo: { key: 'partnerTwo' } }
 const partnerInformationMapRepository = new PartnerMapRepository(partnerInformationJson)

@@ -2,7 +2,7 @@ import { Request, ResponseToolkit, Server } from '@hapi/hapi'
 import { Boom } from '@hapi/boom'
 import { happiSwaggerPlugin } from './plugins/swagger'
 import { initSequelize } from '../libs/sequelize'
-import { partnerRoutes } from '../app/partner/partner.container'
+import { partnerRoutes } from '../app/partners/partner.container'
 
 export default async (config: Map<string, any>): Promise<Server> => {
   const server = new Server({

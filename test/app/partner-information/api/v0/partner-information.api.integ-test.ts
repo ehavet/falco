@@ -1,8 +1,8 @@
 import * as supertest from 'supertest'
 import { expect, sinon, HttpServerForTesting, newMinimalServer } from '../../../../test-utils'
-import { container, partnerRoutes } from '../../../../../src/app/partner/partner.container'
-import { Partner } from '../../../../../src/app/partner/domain/partner'
-import { PartnerNotFoundError } from '../../../../../src/app/partner/domain/partner.errors'
+import { container, partnerRoutes } from '../../../../../src/app/partners/partner.container'
+import { Partner } from '../../../../../src/app/partners/domain/partner'
+import { PartnerNotFoundError } from '../../../../../src/app/partners/domain/partner.errors'
 
 describe('Http API partner integ', async () => {
   let httpServer: HttpServerForTesting
@@ -11,7 +11,7 @@ describe('Http API partner integ', async () => {
     httpServer = await newMinimalServer(partnerRoutes())
   })
 
-  describe('GET /internal/v0/partner/:id', () => {
+  describe('GET /internal/v0/partners/:id', () => {
     let response: supertest.Response
 
     describe('when the partner information is found', () => {
@@ -20,7 +20,7 @@ describe('Http API partner integ', async () => {
       beforeEach(async () => {
         sinon.stub(container, 'GetPartnerById').withArgs({ partnerId: 'myPartner' }).resolves(expectedInformation)
         response = await httpServer.api()
-          .get('/internal/v0/partner/myPartner')
+          .get('/internal/v0/partners/myPartner')
       })
 
       it('should reply with status 200', async () => {
@@ -38,7 +38,7 @@ describe('Http API partner integ', async () => {
         sinon.stub(container, 'GetPartnerById').withArgs({ partnerId: partnerID }).rejects(new PartnerNotFoundError(partnerID))
 
         response = await httpServer.api()
-          .get('/internal/v0/partner/myPartner')
+          .get('/internal/v0/partners/myPartner')
 
         expect(response).to.have.property('statusCode', 404)
         expect(response.body).to.have.property('message', `Could not find partner with key : ${partnerID}`)
@@ -51,7 +51,7 @@ describe('Http API partner integ', async () => {
         sinon.stub(container, 'GetPartnerById').withArgs({ partnerKey: partnerKey }).rejects(new Error())
 
         response = await httpServer.api()
-          .get('/internal/v0/partner/myPartner')
+          .get('/internal/v0/partners/myPartner')
 
         expect(response).to.have.property('statusCode', 500)
       })
@@ -60,7 +60,7 @@ describe('Http API partner integ', async () => {
     describe('when there is a validation error', () => {
       it('should reply with status 400 when id is not provided', async () => {
         response = await httpServer.api()
-          .get('/internal/v0/partner/ ')
+          .get('/internal/v0/partners')
 
         expect(response).to.have.property('statusCode', 400)
       })

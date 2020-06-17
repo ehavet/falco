@@ -1,6 +1,6 @@
 import { expect, sinon } from '../../../test-utils'
-import { Partner } from '../../../../src/app/partner/domain/partner'
-import { GetPartnerById } from '../../../../src/app/partner/domain/get-partner-by-id.usecase'
+import { Partner } from '../../../../src/app/partners/domain/partner'
+import { GetPartnerById } from '../../../../src/app/partners/domain/get-partner-by-id.usecase'
 
 describe('Get Partner Information', async () => {
   it('should return requested partner information', async () => {

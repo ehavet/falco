@@ -6,13 +6,13 @@ import { GetPartnerByIdParams } from '../../domain/get-partner-by-id-params'
 import { PartnerNotFoundError } from '../../domain/partner.errors'
 import * as HttpErrorSchema from '../../../common-api/HttpErrorSchema'
 
-const TAGS = ['api', 'partner']
+const TAGS = ['api', 'partners']
 
 export default function (container: Container): Array<ServerRoute> {
   return [
     {
       method: 'GET',
-      path: '/internal/v0/partner/{id}',
+      path: '/internal/v0/partners/{id}',
       options: {
         tags: TAGS,
         description: 'Information for a specific partner',

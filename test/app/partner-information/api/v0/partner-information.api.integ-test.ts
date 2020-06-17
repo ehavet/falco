@@ -58,9 +58,9 @@ describe('Http API partner integ', async () => {
     })
 
     describe('when there is a validation error', () => {
-      it('should reply with status 400 when id is not provided', async () => {
+      it('should reply with status 400 when id is too long', async () => {
         response = await httpServer.api()
-          .get('/internal/v0/partners')
+          .get('/internal/v0/partners/1234567891012345678910123456789101234567891012345678910')
 
         expect(response).to.have.property('statusCode', 400)
       })

@@ -4,7 +4,7 @@ const commonSchema: Joi.ObjectSchema = Joi.object().keys({
   statusCode: Joi.number(),
   error: Joi.string(),
   message: Joi.string(),
-  validation: Joi.string()
+  validation: Joi.object()
 }).description('Erreur')
   .label('Erreur')
 

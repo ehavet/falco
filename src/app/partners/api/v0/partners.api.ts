@@ -18,7 +18,7 @@ export default function (container: Container): Array<ServerRoute> {
         description: 'Information for a specific partner',
         validate: {
           params: Joi.object({
-            id: Joi.string().min(1).max(50).not('').required()
+            id: Joi.string().min(2).max(50).not('').required()
               .description('Partner ID').example('partner_id')
           })
         },

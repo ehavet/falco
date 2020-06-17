@@ -1,17 +1,17 @@
 import routes from './api/v0/partners.api'
-import partnerInformationJson from '../../data/partner.json'
-import { GetPartnerById } from './domain/get-partner-by-id.usecase'
+import partnerJson from '../../data/partner.json'
+import { GetPartnerByCode } from './domain/get-partner-by-code.usecase'
 import { PartnerMapRepository } from './infrastructure/partner-map.repository'
 
 export interface Container {
-  GetPartnerById: GetPartnerById
+  GetPartnerByCode: GetPartnerByCode
 }
 
-const partnerInformationMapRepository = new PartnerMapRepository(partnerInformationJson)
-const partner: GetPartnerById = GetPartnerById.factory(partnerInformationMapRepository)
+const partnerMapRepository = new PartnerMapRepository(partnerJson)
+const getPartnerByCode: GetPartnerByCode = GetPartnerByCode.factory(partnerMapRepository)
 
 export const container: Container = {
-  GetPartnerById: partner
+  GetPartnerByCode: getPartnerByCode
 }
 
 export function partnerRoutes () {

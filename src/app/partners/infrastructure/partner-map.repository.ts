@@ -17,11 +17,11 @@ export class PartnerMapRepository implements PartnerRepository {
     this.partnerMap = objectToMap(jsonFile)
   }
 
-  async getByKey (partnerKey: string): Promise<Partner> {
-    if (this.partnerMap.has(partnerKey)) {
-      return Promise.resolve(this.partnerMap.get(partnerKey)!)
+  async getByCode (partnerCode: string): Promise<Partner> {
+    if (this.partnerMap.has(partnerCode)) {
+      return Promise.resolve(this.partnerMap.get(partnerCode)!)
     }
 
-    throw new PartnerNotFoundError(partnerKey)
+    throw new PartnerNotFoundError(partnerCode)
   }
 }

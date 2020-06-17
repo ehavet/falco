@@ -4,7 +4,7 @@ import { container, partnerRoutes } from '../../../../../src/app/partners/partne
 import { Partner } from '../../../../../src/app/partners/domain/partner'
 import { PartnerNotFoundError } from '../../../../../src/app/partners/domain/partner.errors'
 
-describe('Http API partner integ', async () => {
+describe('Http API partners integ', async () => {
   let httpServer: HttpServerForTesting
 
   before(async () => {
@@ -14,11 +14,11 @@ describe('Http API partner integ', async () => {
   describe('GET /internal/v0/partners/:id', () => {
     let response: supertest.Response
 
-    describe('when the partner information is found', () => {
-      const expectedInformation: Partner = { key: 'myPartnerKey' }
+    describe('when the partner is found', () => {
+      const expectedPartner: Partner = { code: 'myPartnerKey', translationKey: 'myPartnerTranslationKey' }
 
       beforeEach(async () => {
-        sinon.stub(container, 'GetPartnerById').withArgs({ partnerId: 'myPartner' }).resolves(expectedInformation)
+        sinon.stub(container, 'GetPartnerByCode').withArgs({ partnerCode: 'myPartner' }).resolves(expectedPartner)
         response = await httpServer.api()
           .get('/internal/v0/partners/myPartner')
       })
@@ -28,27 +28,27 @@ describe('Http API partner integ', async () => {
       })
 
       it('should return an empty object', async () => {
-        expect(response.body).to.deep.equal(expectedInformation)
+        expect(response.body).to.deep.equal(expectedPartner)
       })
     })
 
-    describe('when the partner information is not found', () => {
+    describe('when the partner is not found', () => {
       it('should reply with status 404', async () => {
-        const partnerID: string = 'myPartner'
-        sinon.stub(container, 'GetPartnerById').withArgs({ partnerId: partnerID }).rejects(new PartnerNotFoundError(partnerID))
+        const partnerCode: string = 'myPartner'
+        sinon.stub(container, 'GetPartnerByCode').withArgs({ partnerCode: partnerCode }).rejects(new PartnerNotFoundError(partnerCode))
 
         response = await httpServer.api()
           .get('/internal/v0/partners/myPartner')
 
         expect(response).to.have.property('statusCode', 404)
-        expect(response.body).to.have.property('message', `Could not find partner with key : ${partnerID}`)
+        expect(response.body).to.have.property('message', `Could not find partner with code : ${partnerCode}`)
       })
     })
 
     describe('when there is an unknown error', () => {
       it('should reply with status 500 when unknown error', async () => {
-        const partnerKey: string = 'myPartner'
-        sinon.stub(container, 'GetPartnerById').withArgs({ partnerKey: partnerKey }).rejects(new Error())
+        const partnerCode: string = 'myPartner'
+        sinon.stub(container, 'GetPartnerByCode').withArgs({ partnerCode: partnerCode }).rejects(new Error())
 
         response = await httpServer.api()
           .get('/internal/v0/partners/myPartner')

@@ -1,8 +1,10 @@
 {
   "studyo": {
-    "key": "studyo"
+    "code": "studyo",
+    "translationKey": "studyo"
   },
   "essca": {
-    "key": "essca"
+    "code": "essca",
+    "translationKey": "essca"
   }
 }

@@ -1,3 +1,4 @@
 export interface Partner {
-    key: string
+    code: string,
+    translationKey: string
 }

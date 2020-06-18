@@ -1,6 +1,5 @@
 import { Sequelize } from 'sequelize-typescript'
 import { Logger, logger } from './logger'
-import { propertySqlModels } from '../properties/infrastructure/model'
 
 export async function initSequelize (config) {
   const sequelize: Sequelize = new Sequelize(config.get('DATABASE_URL'), {
@@ -14,7 +13,7 @@ export async function initSequelize (config) {
     }
   })
 
-  sequelize.addModels(propertySqlModels)
+  return sequelize
 }
 
 function logDbStatement (logger: Logger, db: string, databaseUrl: string) {

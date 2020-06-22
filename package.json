@@ -16,14 +16,14 @@
     "db:migrate": "sequelize db:migrate",
     "db:migrate:undo": "sequelize db:migrate:undo",
     "db:seed": "sequelize db:seed:undo:all && sequelize db:seed:all",
-    "containers:db:start": "docker-compose up -d apidb && npm run db:migrate",
+    "containers:db:start": "docker-compose up -d apidb && yarn db:migrate",
     "containers:api:start": "docker-compose up -d api",
-    "containers:start": "npm run containers:db:start && npm run containers:api:start",
+    "containers:start": "yarn containers:db:start && yarn containers:api:start",
     "start": "node ./dist/start-server.js",
     "test": "NODE_ENV=test nyc mocha 'test/**/*.{js,ts}' --require ts-node/register",
     "test:ci": "NODE_ENV=test nyc --reporter text --reporter html mocha 'test/**/*.{js,ts}' --require ts-node/register",
-    "dev:start": "npm run build && npm run start",
-    "dev": "nodemon --watch src -e ts --exec npm run dev:start"
+    "dev:start": "yarn build && yarn start",
+    "dev": "nodemon --watch src -e ts --exec yarn dev:start"
   },
   "main": "server.js",
   "nyc": {
@@ -64,7 +64,7 @@
     "eslint": "^6.8.0",
     "eslint-config-standard": "^14.1.0",
     "eslint-plugin-chai-friendly": "^0.5.0",
-    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-import": "^2.21.2",
     "eslint-plugin-mocha": "^6.3.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
@@ -79,7 +79,7 @@
     "sinon-chai": "^3.4.0",
     "supertest": "^4.0.2",
     "ts-node": "^8.10.2",
-    "ts-node-dev": "^1.0.0-pre.44",
+    "ts-node-dev": "^1.0.0-pre.49",
     "typescript": "^3.9.5"
   },
   "dependencies": {

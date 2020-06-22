@@ -10,6 +10,7 @@ Before starting to work on the API, you will first need to install the following
 * [Git](https://git-scm.com/)
 * [Node.js](https://nodejs.org/) (see [package.json](/package.json) "engine.node" field for the version to use, and we advise to manage NodeJS versions locally with [n](https://github.com/tj/n))
 * [Docker](https://docs.docker.com/get-docker/)
+* [Yarn](https://classic.yarnpkg.com/en/docs/install)
 
 And make sure that :
 
@@ -21,7 +22,7 @@ And make sure that :
 ```bash
 git clone git@gitlab.com:appenin/falco-api.git
 cd falco-api
-npm ci
+yarn install --frozen-lockfile
 ```
 
 ## Usage
@@ -31,19 +32,19 @@ npm ci
 For the API to work properly, you need to have a database running. You can run one locally in Docker with the following command :
 
 ```bash
-npm run containers:db:start
+yarn containers:db:start
 ```
 
 Then, you can launch the API :
 
 ```bash
-npm start
+yarn start
 ```
 
 Or
 
 ```
-npm run dev
+yarn dev
 ```
 
 to start with watch mode. This can be convenient in development mode to avoid restarting manually the server after each modification in the code.
@@ -56,13 +57,13 @@ For the API documentation, go to [http://localhost:8080/documentation](http://lo
 If you already have launched the database locally and need to apply newly created migrations, run :
 
 ```bash
-npm run db:migrate
+yarn db:migrate
 ```
 
 Or 
 
 ```bash
-npm run db:undo
+yarn db:undo
 ```
 
 if you need to revert the last migration
@@ -72,7 +73,7 @@ if you need to revert the last migration
 The automated tests can be launched with the command :
 
 ```bash
-npm test
+yarn test
 ```
 
 This will run all the automated tests and generate the appropriate coverage report.

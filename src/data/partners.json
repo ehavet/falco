@@ -1,0 +1,28 @@
+{
+  "studyo": {
+    "code": "studyo",
+    "translationKey": "studyo",
+    "questions": [
+      {
+        "code": "RoomCount",
+        "options": {
+          "list": [1, 2, 3]
+        },
+        "required": true
+      }
+    ]
+  },
+  "essca": {
+    "code": "essca",
+    "translationKey": "essca",
+    "questions": [
+      {
+        "code": "RoomCount",
+        "options": {
+          "list": [1, 2]
+        },
+        "required": true
+      }
+    ]
+  }
+}

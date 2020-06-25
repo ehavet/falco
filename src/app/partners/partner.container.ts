@@ -1,5 +1,5 @@
 import routes from './api/v0/partners.api'
-import partnerJson from '../../data/partner.json'
+import partnerJson from '../../data/partners.json'
 import { GetPartnerByCode } from './domain/get-partner-by-code.usecase'
 import { PartnerMapRepository } from './infrastructure/partner-map.repository'
 

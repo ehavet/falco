@@ -12,7 +12,7 @@ variables:
 stages:
   - install
   - syntax
-  - sca
+  - quality
   - build
   - test
 
@@ -23,29 +23,54 @@ default:
 cache:
   key: ${CI_COMMIT_REF_SLUG}
   paths:
-    - .npm/
+    - node_modules/
 
-before_script:
-  - npm ci --cache .npm --prefer-offline
+"Install Dependencies":
+  stage: install
+  script:
+    - yarn install
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+    policy: pull-push
+  tags:
+    - docker
 
 "Check Syntax":
   stage: syntax
   script:
-    - npm run lint
+    - yarn lint
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+    policy: pull
   tags:
     - docker
 
 "Audit Dependencies":
-  stage: sca #Software Component Analysis
+  stage: quality
   script:
-    - npm audit --audit-level=moderate
+    - yarn audit --audit-level=moderate
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+    policy: pull
   tags:
     - docker
 
 "Build Project":
   stage: build
   script:
-    - npm build
+    - yarn build
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+      - dist/
+    policy: pull-push
   tags:
     - docker
 
@@ -55,14 +80,20 @@ before_script:
     - "$POSTGRES_IMAGE"
   script:
     # No CCA step run as container are only used for test purpose
-    - npm run db:migrate
-    - npm run db:seed
-    - npm run test:ci
+    - yarn db:migrate
+    - yarn db:seed
+    - yarn test:ci
   coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
   artifacts:
     when: always
     paths:
       - coverage
     expire_in: 10 days
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+      - dist/
+    policy: pull
   tags:
     - docker

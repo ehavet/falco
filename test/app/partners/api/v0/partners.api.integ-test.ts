@@ -1,7 +1,7 @@
 import * as supertest from 'supertest'
 import { expect, sinon, HttpServerForTesting, newMinimalServer } from '../../../../test-utils'
 import { container, partnerRoutes } from '../../../../../src/app/partners/partner.container'
-import { Partner } from '../../../../../src/app/partners/domain/partner'
+import { Partner, QuestionCode } from '../../../../../src/app/partners/domain/partner'
 import { PartnerNotFoundError } from '../../../../../src/app/partners/domain/partner.errors'
 
 describe('Http API partners integ', async () => {
@@ -15,10 +15,31 @@ describe('Http API partners integ', async () => {
     let response: supertest.Response
 
     describe('when the partner is found', () => {
-      const expectedPartner: Partner = { code: 'myPartnerKey', translationKey: 'myPartnerTranslationKey' }
+      const partner: Partner = {
+        code: 'myPartnerKey',
+        translationKey: 'myPartnerTranslationKey',
+        questions: [{
+          code: QuestionCode.RoomCount,
+          required: true,
+          options: {
+            list: [1, 2]
+          }
+        }]
+      }
+
+      const expectedResourcePartner = {
+        code: 'myPartnerKey',
+        translation_key: 'myPartnerTranslationKey',
+        questions: {
+          room_count: {
+            required: true,
+            options: [1, 2]
+          }
+        }
+      }
 
       beforeEach(async () => {
-        sinon.stub(container, 'GetPartnerByCode').withArgs({ partnerCode: 'myPartner' }).resolves(expectedPartner)
+        sinon.stub(container, 'GetPartnerByCode').withArgs({ partnerCode: 'myPartner' }).resolves(partner)
         response = await httpServer.api()
           .get('/internal/v0/partners/myPartner')
       })
@@ -28,7 +49,7 @@ describe('Http API partners integ', async () => {
       })
 
       it('should return an empty object', async () => {
-        expect(response.body).to.deep.equal(expectedPartner)
+        expect(response.body).to.deep.equal(expectedResourcePartner)
       })
     })
 

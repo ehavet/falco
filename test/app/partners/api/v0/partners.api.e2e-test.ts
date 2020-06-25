@@ -16,7 +16,16 @@ describe('Http API partners e2e', async () => {
         .get('/internal/v0/partners/studyo')
 
       // THEN
-      expect(response.body).to.deep.equal({ code: 'studyo', translationKey: 'studyo' })
+      expect(response.body).to.deep.equal({
+        code: 'studyo',
+        translation_key: 'studyo',
+        questions: {
+          room_count: {
+            required: true,
+            options: [1, 2, 3]
+          }
+        }
+      })
     })
   })
 })

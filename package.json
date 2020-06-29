@@ -23,7 +23,8 @@
     "test": "NODE_ENV=test nyc mocha 'test/**/*.{js,ts}' --require ts-node/register",
     "test:ci": "NODE_ENV=test nyc --reporter text --reporter html mocha 'test/**/*.{js,ts}' --require ts-node/register",
     "dev:start": "yarn build && yarn start",
-    "dev": "nodemon --watch src -e ts --exec yarn dev:start"
+    "dev": "nodemon --watch src -e ts --exec yarn dev:start",
+    "postversion": "git push https://${APPENIN_CI_USER}:${APPENIN_CI_TOKEN}@gitlab.com/appenin/falco-api.git  && git push https://${APPENIN_CI_USER}:${APPENIN_CI_TOKEN}@gitlab.com/appenin/falco-api.git --tags"
   },
   "main": "server.js",
   "nyc": {

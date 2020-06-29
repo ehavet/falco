@@ -166,7 +166,7 @@ cache:
     - mkdir -p ~/.ssh/sockets
     - chmod -R 700 ~/.ssh
     - cp "$SSH_CONFIG" ~/.ssh/config
-    - echo "$SSH_INF_MGR_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - chmod 400 $SSH_INF_MGR_KEY && ssh-add $SSH_INF_MGR_KEY
     - gpg --import $GPG_INF_MGR_KEY
   script:
     - 'echo "Deploy API to $DEPLOY_ENVIRONMENT"'

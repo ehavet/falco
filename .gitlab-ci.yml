@@ -8,6 +8,35 @@ variables:
   POSTGRES_PASSWORD: test
   POSTGRES_HOST_AUTH_METHOD: trust
   DATABASE_URL: "postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB"
+  PYTHON_VERSION: "3.8"
+  PYTHON_IMAGE: "python:$PYTHON_VERSION"
+  APP_VERSION_COMMIT_MESSAGE_PREFIX: "Update application version"  #Be aware to change the '.trigger_build' and '.trigger_staging' rules if you change the message
+  FALCO_OPS_BRANCH: 'master'
+
+.trigger_build: &trigger_build
+  rules:
+    # Pipeline based on the commit "APP_VERSION_COMMIT_MESSAGE" does not run build jobs.
+    # Gitlab CI does not support variable inside Regex => '$CI_COMMIT_TITLE =~ /Update application version.*/' instead of '$CI_COMMIT_TITLE =~ /$$APP_VERSION_COMMIT_MESSAGE_PREFIX.*/'
+    - if: '$CI_COMMIT_TITLE =~ /Update application version.*/'
+      when: never
+    # Pipeline based on a tag does not run build jobs
+    - if: '$CI_COMMIT_TAG != null'
+      when: never
+    - when: always
+.trigger_staging: &trigger_staging
+  rules:
+    # Pipeline based on the commit "APP_VERSION_COMMIT_MESSAGE" does not run versioning and staging deployment
+    # Gitlab CI does not support variable inside Regex => '$CI_COMMIT_TITLE =~ /Update application version.*/' instead of '$CI_COMMIT_TITLE =~ /$$APP_VERSION_COMMIT_MESSAGE_PREFIX.*/'
+    - if: '$CI_COMMIT_TITLE =~ /Update application version.*/'
+      when: never
+    # Staging versioning and deployment is only triggered from CI_DEFAULT_BRANCH
+    - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
+      when: on_success
+.trigger_deployment: &trigger_deployment
+  # A deployment can be triggered by setting $DEPLOY_ENVIRONMENT (by default null) from the desire branch
+  rules:
+    - if: '$DEPLOY_ENVIRONMENT != null'
+      when: on_success
 
 stages:
   - install
@@ -15,6 +44,8 @@ stages:
   - quality
   - build
   - test
+  - track
+  - deploy
 
 default:
   image: "$NODE_IMAGE"
@@ -27,6 +58,7 @@ cache:
 
 "Install Dependencies":
   stage: install
+  extends: .trigger_build
   script:
     - yarn install
   cache:
@@ -39,6 +71,7 @@ cache:
 
 "Check Syntax":
   stage: syntax
+  extends: .trigger_build
   script:
     - yarn lint
   cache:
@@ -51,6 +84,7 @@ cache:
 
 "Audit Dependencies":
   stage: quality
+  extends: .trigger_build
   script:
     - yarn audit --audit-level=moderate
   cache:
@@ -63,6 +97,7 @@ cache:
 
 "Build Project":
   stage: build
+  extends: .trigger_build
   script:
     - yarn build
   cache:
@@ -76,6 +111,7 @@ cache:
 
 "Run Unit & Integration Tests":
   stage: test
+  extends: .trigger_build
   services:
     - "$POSTGRES_IMAGE"
   script:
@@ -97,3 +133,65 @@ cache:
     policy: pull
   tags:
     - docker
+
+"Update application version":
+  stage: track
+  extends: .trigger_staging
+  script:
+    - git config --global user.email "ci@appenin.fr"
+    - git config --global user.name "Appenin CI User"
+    - git checkout -B "$CI_COMMIT_REF_NAME" "origin/$CI_COMMIT_REF_NAME"
+    - mkdir -p vars
+    - CURRENT_APPLICATION_VERSION=$(node -p "require('./package').version")
+    - APP_VERSION_COMMIT_MESSAGE="$APP_VERSION_COMMIT_MESSAGE_PREFIX from $CURRENT_APPLICATION_VERSION to %s"
+    - npm config set tag-version-prefix ''
+    - npm --unsafe-perm version patch -m "$APP_VERSION_COMMIT_MESSAGE"
+    - node -p "require('./package').version" >> vars/application_version.txt
+  artifacts:
+    paths:
+      - vars/application_version.txt
+  tags:
+    - docker
+
+.deploy: &deploy
+  stage: deploy
+  extends: .trigger_staging
+  image: "$PYTHON_IMAGE"
+  variables:
+    APPLICATION_VERSION: ''
+  before_script:
+    - apt-get update
+    - apt-get -y install expect git make git-crypt
+    - eval $(ssh-agent -s)
+    - mkdir -p ~/.ssh/sockets
+    - chmod -R 700 ~/.ssh
+    - cp "$SSH_CONFIG" ~/.ssh/config
+    - echo "$SSH_INF_MGR_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - gpg --import $GPG_INF_MGR_KEY
+  script:
+    - 'echo "Deploy API to $DEPLOY_ENVIRONMENT"'
+    - APPLICATION_VERSION=$(eval $APPLICATION_VERSION)
+    - 'git clone --single-branch --branch "$FALCO_OPS_BRANCH"  https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/appenin/falco-ops.git'
+    - 'echo application_git_repo: "git@gitlab.com:appenin/falco-api.git" >> falco-ops/sites/ansible_extra_vars.yml'
+    - 'echo application_version: "$APPLICATION_VERSION" >> falco-ops/sites/ansible_extra_vars.yml'
+    - 'echo application_environment: "$DEPLOY_ENVIRONMENT" >> falco-ops/sites/ansible_extra_vars.yml'
+    - cd falco-ops
+    - git-crypt unlock
+    - pip install -r requirements.pip
+    - ansible-galaxy role install -r requirements.yml
+    - 'ansible-playbook -i inventory.$DEPLOY_ENVIRONMENT --tags "nodejs,app-api" --extra-vars "@sites/ansible_extra_vars.yml" sites/api.appenin.fr.yml'
+  tags:
+    - docker
+
+"Deploy API to Staging":
+  <<: *deploy
+  extends: .trigger_staging
+  variables:
+    APPLICATION_VERSION: 'cat vars/application_version.txt'
+    DEPLOY_ENVIRONMENT: 'staging'
+
+"Deploy API":
+  <<: *deploy
+  extends: .trigger_deployment
+  variables:
+    APPLICATION_VERSION: 'echo $CI_COMMIT_REF_NAME'

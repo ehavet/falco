@@ -41,7 +41,6 @@ variables:
 
 stages:
   - install
-  - syntax
   - quality
   - build
   - test
@@ -70,7 +69,7 @@ before_script:
     - yarn install --frozen-lockfile --non-interactive --production=false
 
 "Check Syntax":
-  stage: syntax
+  stage: quality
   extends: .trigger_build
   script:
     - yarn lint

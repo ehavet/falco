@@ -41,7 +41,6 @@ variables:
 
 stages:
   - install
-  - syntax
   - quality
   - build
   - test
@@ -70,7 +69,7 @@ before_script:
     - yarn install --frozen-lockfile --non-interactive --production=false
 
 "Check Syntax":
-  stage: syntax
+  stage: quality
   extends: .trigger_build
   script:
     - yarn lint
@@ -134,11 +133,12 @@ before_script:
 "Update application version":
   stage: track
   extends: .trigger_staging
-  script:
+  before_script:
     - git config --global user.email "ci@appenin.fr"
     - git config --global user.name "Appenin CI User"
-    - git checkout -B "$CI_COMMIT_REF_NAME" "origin/$CI_COMMIT_REF_NAME"
     - mkdir -p vars
+  script:
+    - git checkout -B "$CI_COMMIT_REF_NAME" "origin/$CI_COMMIT_REF_NAME"
     - CURRENT_APPLICATION_VERSION=$(node -p "require('./package').version")
     - APP_VERSION_COMMIT_MESSAGE="$APP_VERSION_COMMIT_MESSAGE_PREFIX from $CURRENT_APPLICATION_VERSION to %s"
     - npm config set tag-version-prefix ''

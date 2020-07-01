@@ -1,5 +1,5 @@
 import { expect, sinon } from '../../../test-utils'
-import { Partner, QuestionCode } from '../../../../src/app/partners/domain/partner'
+import { Partner } from '../../../../src/app/partners/domain/partner'
 import { GetPartnerByCode } from '../../../../src/app/partners/domain/get-partner-by-code.usecase'
 
 describe('Get partner by code', async () => {
@@ -9,7 +9,7 @@ describe('Get partner by code', async () => {
       code: 'myPartner',
       translationKey: 'myPartnerTranslationKey',
       questions: [{
-        code: QuestionCode.RoomCount,
+        code: Partner.Question.QuestionCode.RoomCount,
         required: true,
         options: {
           list: [1, 2]
@@ -17,7 +17,7 @@ describe('Get partner by code', async () => {
       }]
     }
 
-    const partnerRepository = { getByCode: sinon.stub() }
+    const partnerRepository = { getByCode: sinon.stub(), getOffer: sinon.stub() }
     partnerRepository.getByCode.withArgs('myPartner').resolves(expectedPartner)
     const getPartnerByCode : GetPartnerByCode = GetPartnerByCode.factory(partnerRepository)
 

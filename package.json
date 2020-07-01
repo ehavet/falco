@@ -96,12 +96,13 @@
     "pino": "^6.3.2",
     "pino-multi-stream": "^5.0.0",
     "prom-client": "^12.0.0",
+    "randomstring": "^1.1.5",
     "reflect-metadata": "^0.1.13",
     "sequelize": "^5.21.12",
     "sequelize-cli": "^5.5.1",
     "sequelize-typescript": "^1.1.0",
     "sonic-boom": "^1.0.1",
-    "uuid": "^7.0.3"
+    "uuid": "^8.2.0"
   },
   "husky": {
     "hooks": {

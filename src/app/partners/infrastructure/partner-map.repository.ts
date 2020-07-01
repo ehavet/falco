@@ -25,4 +25,10 @@ export class PartnerMapRepository implements PartnerRepository {
 
     throw new PartnerNotFoundError(partnerCode)
   }
+
+  async getOffer (partnerCode: string): Promise<Partner.Offer> {
+    const partner: Partner = await this.getByCode(partnerCode)
+    // @ts-ignore
+    return Promise.resolve(partner.offer)
+  }
 }

@@ -1,4 +1,4 @@
-import { Partner, QuestionCode } from '../../domain/partner'
+import { Partner } from '../../domain/partner'
 
 export function partnerToResource (partner: Partner) {
   const questions = _toQuestions(partner.questions)
@@ -13,7 +13,7 @@ export function partnerToResource (partner: Partner) {
 function _toQuestions (jsonQuestions: any) {
   return jsonQuestions.reduce((questions, jsonQuestion) => {
     switch (jsonQuestion.code) {
-      case QuestionCode.RoomCount:
+      case Partner.Question.QuestionCode.RoomCount:
         return Object.assign(questions, _toRoomCountQuestion(jsonQuestion))
       default:
         return questions

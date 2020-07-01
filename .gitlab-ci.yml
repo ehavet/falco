@@ -1,6 +1,7 @@
 variables:
   NODE_VERSION: "14.4.0"
   NODE_IMAGE: "node:$NODE_VERSION"
+  YARN_CACHE_FOLDER: ".yarn/"
   POSTGRES_VERSION: "11.7"
   POSTGRES_IMAGE: "postgres:$POSTGRES_VERSION-alpine"
   POSTGRES_DB: test
@@ -49,25 +50,24 @@ stages:
 
 default:
   image: "$NODE_IMAGE"
+  tags:
+    - docker
 
 # Cache modules in between jobs
 cache:
+  untracked: true
   key: ${CI_COMMIT_REF_SLUG}
   paths:
-    - node_modules/
+    - .yarn/
+
+before_script:
+  - yarn install --frozen-lockfile --non-interactive --production=false
 
 "Install Dependencies":
   stage: install
   extends: .trigger_build
   script:
-    - yarn install
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - node_modules/
-    policy: pull-push
-  tags:
-    - docker
+    - yarn install --frozen-lockfile --non-interactive --production=false
 
 "Check Syntax":
   stage: syntax
@@ -75,12 +75,11 @@ cache:
   script:
     - yarn lint
   cache:
+    untracked: true
     key: ${CI_COMMIT_REF_SLUG}
     paths:
-      - node_modules/
+      - .yarn/
     policy: pull
-  tags:
-    - docker
 
 "Audit Dependencies":
   stage: quality
@@ -88,12 +87,11 @@ cache:
   script:
     - yarn audit --audit-level=moderate
   cache:
+    untracked: true
     key: ${CI_COMMIT_REF_SLUG}
     paths:
-      - node_modules/
+      - .yarn/
     policy: pull
-  tags:
-    - docker
 
 "Build Project":
   stage: build
@@ -101,19 +99,20 @@ cache:
   script:
     - yarn build
   cache:
+    untracked: true
     key: ${CI_COMMIT_REF_SLUG}
     paths:
-      - node_modules/
-      - dist/
-    policy: pull-push
-  tags:
-    - docker
+      - .yarn/
+    policy: pull
 
 "Run Unit & Integration Tests":
   stage: test
   extends: .trigger_build
   services:
     - "$POSTGRES_IMAGE"
+  before_script:
+    - yarn install --frozen-lockfile --non-interactive --production=false
+    - yarn build
   script:
     # No CCA step run as container are only used for test purpose
     - yarn db:migrate
@@ -126,13 +125,11 @@ cache:
       - coverage
     expire_in: 10 days
   cache:
+    untracked: true
     key: ${CI_COMMIT_REF_SLUG}
     paths:
-      - node_modules/
-      - dist/
+      - .yarn/
     policy: pull
-  tags:
-    - docker
 
 "Update application version":
   stage: track
@@ -150,8 +147,7 @@ cache:
   artifacts:
     paths:
       - vars/application_version.txt
-  tags:
-    - docker
+  cache: {}
 
 .deploy: &deploy
   stage: deploy
@@ -180,8 +176,7 @@ cache:
     - pip install -r requirements.pip
     - ansible-galaxy role install -r requirements.yml
     - 'ansible-playbook -i inventory.$DEPLOY_ENVIRONMENT --tags "nodejs,app-api" --extra-vars "@sites/ansible_extra_vars.yml" sites/api.appenin.fr.yml'
-  tags:
-    - docker
+  cache: {}
 
 "Deploy API to Staging":
   <<: *deploy
@@ -189,9 +184,11 @@ cache:
   variables:
     APPLICATION_VERSION: 'cat vars/application_version.txt'
     DEPLOY_ENVIRONMENT: 'staging'
+  cache: {}
 
 "Deploy API":
   <<: *deploy
   extends: .trigger_deployment
   variables:
     APPLICATION_VERSION: 'echo $CI_COMMIT_REF_NAME'
+  cache: {}

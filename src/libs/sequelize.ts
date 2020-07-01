@@ -1,5 +1,6 @@
 import { Sequelize } from 'sequelize-typescript'
 import { Logger, logger } from './logger'
+import { quoteSqlModels } from '../app/quotes/quote.container'
 
 export async function initSequelize (config) {
   const sequelize: Sequelize = new Sequelize(config.get('DATABASE_URL'), {
@@ -12,6 +13,8 @@ export async function initSequelize (config) {
       idle: 10000
     }
   })
+
+  sequelize.addModels(quoteSqlModels)
 
   return sequelize
 }

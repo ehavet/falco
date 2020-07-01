@@ -14,5 +14,8 @@ export const badRequestSchema: Joi.ObjectSchema = commonSchema.description('Bad 
 export const notFoundSchema: Joi.ObjectSchema = commonSchema.description('Not Found')
   .label('NotFound')
 
+export const unprocessableEntitySchema: Joi.ObjectSchema = commonSchema.description('Unprocessable Entity')
+  .label('UnprocessableEntity')
+
 export const internalServerErrorSchema: Joi.ObjectSchema = commonSchema.description('Internal Server Error')
   .label('InternalServerError')

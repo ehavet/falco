@@ -1,7 +1,7 @@
 import * as supertest from 'supertest'
 import { expect, sinon, HttpServerForTesting, newMinimalServer } from '../../../../test-utils'
 import { container, partnerRoutes } from '../../../../../src/app/partners/partner.container'
-import { Partner, QuestionCode } from '../../../../../src/app/partners/domain/partner'
+import { Partner } from '../../../../../src/app/partners/domain/partner'
 import { PartnerNotFoundError } from '../../../../../src/app/partners/domain/partner.errors'
 
 describe('Http API partners integ', async () => {
@@ -19,7 +19,7 @@ describe('Http API partners integ', async () => {
         code: 'myPartnerKey',
         translationKey: 'myPartnerTranslationKey',
         questions: [{
-          code: QuestionCode.RoomCount,
+          code: Partner.Question.QuestionCode.RoomCount,
           required: true,
           options: {
             list: [1, 2]

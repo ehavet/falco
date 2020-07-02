@@ -169,7 +169,7 @@ before_script:
     - eval $(ssh-agent -s)
     - mkdir -p ~/.ssh/sockets
     - chmod -R 700 ~/.ssh
-    - cp "$SSH_CONFIG" ~/.ssh/config
+    - cp scripts/ssh.config ~/.ssh/config
     - chmod 400 $SSH_INF_MGR_KEY && ssh-add $SSH_INF_MGR_KEY
     - gpg --import $GPG_INF_MGR_KEY
     - export ANSIBLE_HOST_KEY_CHECKING=False

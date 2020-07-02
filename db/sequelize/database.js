@@ -1,6 +1,7 @@
 const { parse } = require('pg-connection-string')
-const config = require('../config')
-const FALCO_API_DATABASE_URL = config.get('FALCO_API_DATABASE_URL') || 'postgres://test:test@localhost:54334/test'
+require('dotenv').config()
+// eslint-disable-next-line no-process-env
+const FALCO_API_DATABASE_URL = process.env.FALCO_API_DATABASE_URL || 'postgres://test:test@localhost:54334/test'
 const { host, port, database, user, password } = parse(FALCO_API_DATABASE_URL)
 
 module.exports = {

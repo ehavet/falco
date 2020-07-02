@@ -3,6 +3,7 @@ import { Quote } from '../domain/quote'
 import { QuoteSqlModel } from './quote-sql.model'
 import { InsuranceSqlModel } from './insurance-sql.model'
 import { RiskSqlModel } from './risk-sql.model'
+import { sqlToQuoteMapper } from './quote-sql.mapper'
 
 export class QuoteSqlRepository implements QuoteRepository {
   async save (quote: Quote): Promise<void> {
@@ -33,6 +34,14 @@ export class QuoteSqlRepository implements QuoteRepository {
   }
 
   async get (quoteId: string): Promise<Quote> {
-    throw new Error(quoteId)
+    const quoteSql: QuoteSqlModel = await QuoteSqlModel
+      .findByPk(quoteId, {
+        include: [{ model: InsuranceSqlModel }, { model: RiskSqlModel }],
+        rejectOnEmpty: false
+      })
+    if (quoteSql) {
+      return sqlToQuoteMapper(quoteSql)
+    }
+    throw new Error()
   }
 }

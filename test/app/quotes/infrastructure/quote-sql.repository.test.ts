@@ -10,6 +10,8 @@ async function resetDb () {
 }
 
 describe('Repository - Quote', async () => {
+  const quoteRepository = new QuoteSqlRepository()
+
   describe('#save', async () => {
     afterEach(async () => {
       await resetDb()
@@ -17,7 +19,6 @@ describe('Repository - Quote', async () => {
 
     it('should save the quote into the db', async () => {
       // Given
-      const quoteRepository = new QuoteSqlRepository()
       const quote: Quote = {
         id: 'UD65X3A',
         partnerCode: 'myPartner',
@@ -74,6 +75,41 @@ describe('Repository - Quote', async () => {
       expect(savedInsurance.productVersion).to.equal('v2020-02-01')
       expect(savedInsurance.createdAt).to.be.an.instanceof(Date)
       expect(savedInsurance.updatedAt).to.be.an.instanceof(Date)
+    })
+  })
+
+  describe('#get', async () => {
+    it('should return the found quote', async () => {
+      // Given
+      const quoteId: string = 'UD65X3A'
+      const quoteInDb: Quote = {
+        id: 'UD65X3A',
+        partnerCode: 'myPartner',
+        risk: {
+          property: {
+            roomCount: 2
+          }
+        },
+        insurance: {
+          estimate: {
+            monthlyPrice: 5.82,
+            defaultDeductible: 150,
+            defaultCeiling: 7000
+          },
+          currency: 'EUR',
+          simplifiedCovers: ['ACDDE', 'ACVOL'],
+          productCode: 'MRH-Loc-Etud',
+          productVersion: 'v2020-02-01'
+        }
+      }
+
+      await quoteRepository.save(quoteInDb)
+
+      // When
+      const foundQuote: Quote = await quoteRepository.get(quoteId)
+
+      // Then
+      expect(foundQuote).to.deep.equal(quoteInDb)
     })
   })
 })

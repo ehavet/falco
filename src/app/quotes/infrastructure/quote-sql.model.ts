@@ -23,5 +23,5 @@ export class QuoteSqlModel extends Model<QuoteSqlModel> {
     riskId!: string;
 
     @BelongsTo(() => RiskSqlModel)
-    risk!: InsuranceSqlModel
+    risk!: RiskSqlModel
 }

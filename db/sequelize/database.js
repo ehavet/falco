@@ -1,6 +1,7 @@
 const { parse } = require('pg-connection-string')
-const DATABASE_URL = process.env.DATABASE_URL || 'postgres://test:test@localhost:54334/test'
-const { host, port, database, user, password } = parse(DATABASE_URL)
+const config = require('../config')
+const FALCO_API_DATABASE_URL = config.get('FALCO_API_DATABASE_URL') || 'postgres://test:test@localhost:54334/test'
+const { host, port, database, user, password } = parse(FALCO_API_DATABASE_URL)
 
 module.exports = {
   development: {

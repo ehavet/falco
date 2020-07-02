@@ -15,7 +15,7 @@ function swaggerOptions (config: Map<string, any>) : RegisterOptions {
         url: 'https://www.appenin.fr/'
       }
     },
-    basePath: `${config.get('URL_PREFIX')}`,
+    basePath: `${config.get('FALCO_API_URL_PREFIX')}`,
     grouping: 'tags'
   }
 }

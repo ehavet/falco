@@ -7,7 +7,7 @@ import { quoteRoutes } from '../app/quotes/quote.container'
 
 export default async (config: Map<string, any>): Promise<Server> => {
   const server = new Server({
-    port: config.get('PORT'),
+    port: config.get('FALCO_API_PORT'),
     routes: {
       cors: {
         exposedHeaders: ['WWW-Authenticate', 'Server-Authorization', 'Location', 'Etag']

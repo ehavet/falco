@@ -2,12 +2,12 @@
   "name": "falco-api",
   "version": "0.1.8",
   "description": "API pour souscription simple et rapide à une assurance habitation",
-  "license": "",
+  "license": "UNLICENSED",
   "author": "Appenin",
   "repository": "https://gitlab.com/appenin/falco-api",
   "engines": {
-    "node": "14.4.0",
-    "npm": "6.14.5"
+    "node": ">=14.4.0",
+    "npm": ">=6.14.5"
   },
   "scripts": {
     "prebuild": "rm -rf dist",

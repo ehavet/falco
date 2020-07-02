@@ -8,11 +8,15 @@ variables:
   POSTGRES_USER: test
   POSTGRES_PASSWORD: test
   POSTGRES_HOST_AUTH_METHOD: trust
-  FALCO_API_DATABASE_URL: "postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB"
   PYTHON_VERSION: "3.8"
   PYTHON_IMAGE: "python:$PYTHON_VERSION"
   APP_VERSION_COMMIT_MESSAGE_PREFIX: "Update application version"  #Be aware to change the '.trigger_build' and '.trigger_staging' rules if you change the message
   FALCO_OPS_BRANCH: 'master'
+  FALCO_API_DATABASE_URL: "postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB"
+  FALCO_API_APP_NAME: falco-api'
+  FALCO_API_LOG_LEVEL: 'debug'
+  FALCO_API_PORT: 8080
+  FALCO_API_URL_PREFIX: '/'
 
 .trigger_build: &trigger_build
   rules:

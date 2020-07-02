@@ -6,8 +6,8 @@
   "author": "Appenin",
   "repository": "https://gitlab.com/appenin/falco-api",
   "engines": {
-    "node": ">=14.4.0",
-    "npm": ">=6.14.5"
+    "node": "^14.4.0",
+    "npm": "^6.14.5"
   },
   "scripts": {
     "prebuild": "rm -rf dist",

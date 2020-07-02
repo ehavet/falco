@@ -172,6 +172,7 @@ before_script:
     - cp "$SSH_CONFIG" ~/.ssh/config
     - chmod 400 $SSH_INF_MGR_KEY && ssh-add $SSH_INF_MGR_KEY
     - gpg --import $GPG_INF_MGR_KEY
+    - export ANSIBLE_HOST_KEY_CHECKING=False
   script:
     - 'echo "Deploy API to $DEPLOY_ENVIRONMENT"'
     - APPLICATION_VERSION=$(eval $APPLICATION_VERSION)

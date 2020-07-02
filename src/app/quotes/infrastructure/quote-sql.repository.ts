@@ -31,4 +31,8 @@ export class QuoteSqlRepository implements QuoteRepository {
     })
     await quoteSql.save()
   }
+
+  async get (quoteId: string): Promise<Quote> {
+    throw new Error(quoteId)
+  }
 }

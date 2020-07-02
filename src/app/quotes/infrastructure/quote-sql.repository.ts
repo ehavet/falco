@@ -4,6 +4,7 @@ import { QuoteSqlModel } from './quote-sql.model'
 import { InsuranceSqlModel } from './insurance-sql.model'
 import { RiskSqlModel } from './risk-sql.model'
 import { sqlToQuoteMapper } from './quote-sql.mapper'
+import { QuoteNotFoundError } from '../domain/quote.errors'
 
 export class QuoteSqlRepository implements QuoteRepository {
   async save (quote: Quote): Promise<void> {
@@ -42,6 +43,6 @@ export class QuoteSqlRepository implements QuoteRepository {
     if (quoteSql) {
       return sqlToQuoteMapper(quoteSql)
     }
-    throw new Error()
+    throw new QuoteNotFoundError(quoteId)
   }
 }

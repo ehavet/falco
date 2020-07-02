@@ -3,9 +3,9 @@ import { Logger, logger } from './logger'
 import { quoteSqlModels } from '../app/quotes/quote.container'
 
 export async function initSequelize (config) {
-  const sequelize: Sequelize = new Sequelize(config.get('DATABASE_URL'), {
+  const sequelize: Sequelize = new Sequelize(config.get('FALCO_API_DATABASE_URL'), {
     dialect: 'postgres',
-    logging: logDbStatement(logger, config.get('APP_NAME'), config.get('DATABASE_URL')),
+    logging: logDbStatement(logger, config.get('FALCO_API_APP_NAME'), config.get('FALCO_API_DATABASE_URL')),
     pool: {
       max: config.get('SEQUELIZE_MAX_CONNECTIONS'),
       min: 0,

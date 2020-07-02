@@ -83,14 +83,18 @@ before_script:
 "Audit Dependencies":
   stage: quality
   extends: .trigger_build
+  before_script:
+    - export AUDIT_LEVEL=moderate
+    - export AUDIT_LEVEL_STATUS_CODE="4" #https://classic.yarnpkg.com/en/docs/cli/audit/#toc-yarn-audit
   script:
-    - yarn audit --audit-level=moderate
-  cache:
-    untracked: true
-    key: ${CI_COMMIT_REF_SLUG}
+    - scripts/dependency-audit.sh > yarn-audit-api.log
+    - tail -n 3 yarn-audit-api.log
+  cache: {}
+  artifacts:
+    when: always
     paths:
-      - .yarn/
-    policy: pull
+      - yarn-audit-api.log
+    expire_in: 10 days
 
 "Build Project":
   stage: build

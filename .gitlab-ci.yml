@@ -58,7 +58,6 @@ default:
 
 # Cache modules in between jobs
 cache:
-  untracked: true
   key: ${CI_COMMIT_REF_SLUG}
   paths:
     - .yarn/
@@ -78,7 +77,6 @@ before_script:
   script:
     - yarn lint
   cache:
-    untracked: true
     key: ${CI_COMMIT_REF_SLUG}
     paths:
       - .yarn/
@@ -106,7 +104,6 @@ before_script:
   script:
     - yarn build
   cache:
-    untracked: true
     key: ${CI_COMMIT_REF_SLUG}
     paths:
       - .yarn/
@@ -132,7 +129,6 @@ before_script:
       - coverage
     expire_in: 10 days
   cache:
-    untracked: true
     key: ${CI_COMMIT_REF_SLUG}
     paths:
       - .yarn/

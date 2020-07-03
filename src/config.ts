@@ -14,6 +14,20 @@ module.exports = Envie({
   FALCO_API_PORT: Joi.number().min(0)
     .description('Port on which the HTTP server will listen'),
 
-  FALCO_API_URL_PREFIX: Joi.string()
+  FALCO_API_URL_PREFIX: Joi.string(),
+
+  FALCO_URL_PREFIX: Joi.string().default('/'),
+
+  FALCO_API_CRYPTO_KEY: Joi.string().base64(),
+
+  FALCO_API_CRYPTO_IV: Joi.string(),
+
+  FALCO_API_EMAIL_VALIDATION_URL: Joi.string().uri(),
+
+  FALCO_API_EMAIL_VALIDATION_VALIDITY_PERIOD: Joi.number().min(1),
+
+  FALCO_API_APPENIN_EMAIL_ADDRESS: Joi.string().email(),
+
+  FALCO_API_EMAIL_TRANSPORT: Joi.string().valid('sendmail', 'stream')
 
 }) as Config

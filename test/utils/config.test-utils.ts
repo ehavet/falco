@@ -26,6 +26,16 @@ module.exports = Envie({
 
   FALCO_API_DEBUG: Joi
     .string()
-    .default('')
+    .default(''),
+
+  FALCO_API_CRYPTO_KEY: Joi.string().base64().default('D8xUrhp++DiNtwXA1d4MLzYSmW+8HCRk'),
+
+  FALCO_API_CRYPTO_IV: Joi.string(),
+
+  FALCO_API_EMAIL_VALIDATION_URL: Joi.string().uri().default('http://front-url/validate'),
+
+  FALCO_API_EMAIL_VALIDATION_VALIDITY_PERIOD: Joi.number().min(1).default(6),
+
+  FALCO_API_EMAIL_TRANSPORT: Joi.string().valid('sendmail', 'stream')
 
 }) as Config

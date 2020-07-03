@@ -30,6 +30,10 @@ describe('Policies - Usecase - Create policy', async () => {
             }
           ]
         }
+      },
+      contact: {
+        email: 'jeandupont@email.com',
+        phoneNumber: '+33684205510'
       }
     }
     const quoteRepository: SinonStubbedInstance<QuoteRepository> = { save: sinon.stub(), get: sinon.stub() }
@@ -65,6 +69,15 @@ describe('Policies - Usecase - Create policy', async () => {
             }
           ]
         }
+      },
+      contact: {
+        lastname: 'Dupont',
+        firstname: 'Jean',
+        address: '13 rue du loup garou',
+        postalCode: 91100,
+        city: 'Corbeil-Essones',
+        email: 'jeandupont@email.com',
+        phoneNumber: '+33684205510'
       }
     }
 
@@ -88,6 +101,17 @@ describe('Policies - Usecase - Create policy', async () => {
 
       // Then
       expect(savedPolicy.risk).to.deep.equal(expectedPolicy.risk)
+    })
+
+    it('with the contact', async () => {
+      // Given
+      quoteRepository.get.withArgs(createPolicyQuery.quoteId).resolves(quote)
+
+      // When
+      const savedPolicy: Policy = await createPolicy(createPolicyQuery)
+
+      // Then
+      expect(savedPolicy.contact).to.deep.equal(expectedPolicy.contact)
     })
   })
 })

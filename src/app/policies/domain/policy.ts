@@ -3,7 +3,8 @@ import { CreatePolicyQuery } from './create-policy-query'
 
 export interface Policy {
     insurance: Quote.Insurance,
-    risk: Policy.Risk
+    risk: Policy.Risk,
+    contact: Policy.Contact
 }
 
 export namespace Policy {
@@ -39,15 +40,45 @@ export namespace Policy {
         }
     }
 
-    export function createRisk (quoteRisk: Quote.Risk, createPolicyQueryRisk: CreatePolicyQuery.Risk): Policy.Risk {
+    export interface Contact {
+        lastname: string,
+        firstname: string,
+        address: string,
+        postalCode: number,
+        city: string,
+        email: string,
+        phoneNumber: string
+    }
+
+    export function createPolicy (createPolicyQuery: CreatePolicyQuery, quote: Quote): Policy {
+      return {
+        insurance: quote.insurance,
+        risk: _createRisk(createPolicyQuery.risk, quote.risk),
+        contact: _createContact(createPolicyQuery.contact, createPolicyQuery.risk)
+      }
+    }
+
+    function _createRisk (queryRisk: CreatePolicyQuery.Risk, quoteRisk: Quote.Risk): Policy.Risk {
       return {
         property: {
           roomCount: quoteRisk.property.roomCount,
-          address: createPolicyQueryRisk.property.address,
-          postalCode: createPolicyQueryRisk.property.postalCode,
-          city: createPolicyQueryRisk.property.city
+          address: queryRisk.property.address,
+          postalCode: queryRisk.property.postalCode,
+          city: queryRisk.property.city
         },
-        people: createPolicyQueryRisk.people
+        people: queryRisk.people
+      }
+    }
+
+    export function _createContact (queryContact: CreatePolicyQuery.Contact, queryRisk: CreatePolicyQuery.Risk): Policy.Contact {
+      return {
+        lastname: queryRisk.people.policyHolder.lastname,
+        firstname: queryRisk.people.policyHolder.firstname,
+        address: queryRisk.property.address,
+        postalCode: queryRisk.property.postalCode,
+        city: queryRisk.property.city,
+        email: queryContact.email,
+        phoneNumber: queryContact.phoneNumber
       }
     }
 }

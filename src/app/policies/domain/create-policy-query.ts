@@ -1,6 +1,7 @@
 export interface CreatePolicyQuery {
     quoteId: string,
     risk: CreatePolicyQuery.Risk,
+    contact: CreatePolicyQuery.Contact
 }
 
 export namespace CreatePolicyQuery {
@@ -32,5 +33,10 @@ export namespace CreatePolicyQuery {
                 lastname: string
             }
         }
+    }
+
+    export interface Contact {
+        email: string,
+        phoneNumber: string
     }
 }

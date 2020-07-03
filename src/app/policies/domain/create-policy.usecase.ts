@@ -12,11 +12,7 @@ export namespace CreatePolicy {
     export function factory (quoteRepository: QuoteRepository): CreatePolicy {
       return async (createPolicyQuery: CreatePolicyQuery): Promise<Policy> => {
         const quote: Quote = await quoteRepository.get(createPolicyQuery.quoteId)
-        const risk: Policy.Risk = Policy.createRisk(quote.risk, createPolicyQuery.risk)
-        return {
-          insurance: quote.insurance,
-          risk: risk
-        }
+        return Policy.createPolicy(createPolicyQuery, quote)
       }
     }
 }

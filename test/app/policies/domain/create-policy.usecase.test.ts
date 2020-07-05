@@ -1,5 +1,5 @@
 import { Policy } from '../../../../src/app/policies/domain/policy'
-import { CreatePolicyQuery } from '../../../../src/app/policies/domain/create-policy-query'
+import { CreatePolicyCommand } from '../../../../src/app/policies/domain/create-policy-command'
 import { expect, sinon } from '../../../test-utils'
 import { CreatePolicy } from '../../../../src/app/policies/domain/create-policy.usecase'
 import { Quote } from '../../../../src/app/quotes/domain/quote'
@@ -10,7 +10,7 @@ import { createQuote } from '../../quotes/fixtures/quote.fixture'
 describe('Policies - Usecase - Create policy', async () => {
   describe('should return the newly created policy', async () => {
     const quote: Quote = createQuote()
-    const createPolicyQuery: CreatePolicyQuery = {
+    const createPolicyCommand: CreatePolicyCommand = {
       quoteId: quote.id,
       risk: {
         property: {
@@ -83,10 +83,10 @@ describe('Policies - Usecase - Create policy', async () => {
 
     it('with the insurance', async () => {
       // Given
-      quoteRepository.get.withArgs(createPolicyQuery.quoteId).resolves(quote)
+      quoteRepository.get.withArgs(createPolicyCommand.quoteId).resolves(quote)
 
       // When
-      const savedPolicy: Policy = await createPolicy(createPolicyQuery)
+      const savedPolicy: Policy = await createPolicy(createPolicyCommand)
 
       // Then
       expect(savedPolicy.insurance).to.deep.equal(expectedPolicy.insurance)
@@ -94,10 +94,10 @@ describe('Policies - Usecase - Create policy', async () => {
 
     it('with the risk', async () => {
       // Given
-      quoteRepository.get.withArgs(createPolicyQuery.quoteId).resolves(quote)
+      quoteRepository.get.withArgs(createPolicyCommand.quoteId).resolves(quote)
 
       // When
-      const savedPolicy: Policy = await createPolicy(createPolicyQuery)
+      const savedPolicy: Policy = await createPolicy(createPolicyCommand)
 
       // Then
       expect(savedPolicy.risk).to.deep.equal(expectedPolicy.risk)
@@ -105,10 +105,10 @@ describe('Policies - Usecase - Create policy', async () => {
 
     it('with the contact', async () => {
       // Given
-      quoteRepository.get.withArgs(createPolicyQuery.quoteId).resolves(quote)
+      quoteRepository.get.withArgs(createPolicyCommand.quoteId).resolves(quote)
 
       // When
-      const savedPolicy: Policy = await createPolicy(createPolicyQuery)
+      const savedPolicy: Policy = await createPolicy(createPolicyCommand)
 
       // Then
       expect(savedPolicy.contact).to.deep.equal(expectedPolicy.contact)

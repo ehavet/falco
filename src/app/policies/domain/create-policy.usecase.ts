@@ -1,18 +1,18 @@
-import { CreatePolicyQuery } from './create-policy-query'
+import { CreatePolicyCommand } from './create-policy-command'
 import { QuoteRepository } from '../../quotes/domain/quote.repository'
 import { Quote } from '../../quotes/domain/quote'
-import { createPolicy, Policy } from './policy'
+import { Policy } from './policy'
 
 export interface CreatePolicy {
-    (createPolicyQuery: CreatePolicyQuery): Promise<Policy>
+    (createPolicyCommand: CreatePolicyCommand): Promise<Policy>
 }
 
 export namespace CreatePolicy {
 
     export function factory (quoteRepository: QuoteRepository): CreatePolicy {
-      return async (createPolicyQuery: CreatePolicyQuery): Promise<Policy> => {
-        const quote: Quote = await quoteRepository.get(createPolicyQuery.quoteId)
-        return createPolicy(createPolicyQuery, quote)
+      return async (createPolicyCommand: CreatePolicyCommand): Promise<Policy> => {
+        const quote: Quote = await quoteRepository.get(createPolicyCommand.quoteId)
+        return Policy.createPolicy(createPolicyCommand, quote)
       }
     }
 }

@@ -1,5 +1,5 @@
 import { Quote } from '../../quotes/domain/quote'
-import { CreatePolicyQuery } from './create-policy-query'
+import { CreatePolicyCommand } from './create-policy-command'
 
 export interface Policy {
         insurance: Quote.Insurance,
@@ -7,7 +7,7 @@ export interface Policy {
         contact: Policy.Contact
 }
 
-namespace Policy {
+export namespace Policy {
     export interface Risk {
         property: Risk.Property,
         people: Risk.People,
@@ -22,9 +22,41 @@ namespace Policy {
         email: string,
         phoneNumber: string
     }
+
+    export function createPolicy (createPolicyCommand: CreatePolicyCommand, quote: Quote): Policy {
+      return {
+        insurance: quote.insurance,
+        risk: _createRisk(createPolicyCommand.risk, quote.risk),
+        contact: _createContact(createPolicyCommand.contact, createPolicyCommand.risk)
+      }
+    }
+
+    function _createRisk (queryRisk: CreatePolicyCommand.Risk, quoteRisk: Quote.Risk): Policy.Risk {
+      return {
+        property: {
+          roomCount: quoteRisk.property.roomCount,
+          address: queryRisk.property.address,
+          postalCode: queryRisk.property.postalCode,
+          city: queryRisk.property.city
+        },
+        people: queryRisk.people
+      }
+    }
+
+    function _createContact (queryContact: CreatePolicyCommand.Contact, queryRisk: CreatePolicyCommand.Risk): Policy.Contact {
+      return {
+        lastname: queryRisk.people.policyHolder.lastname,
+        firstname: queryRisk.people.policyHolder.firstname,
+        address: queryRisk.property.address,
+        postalCode: queryRisk.property.postalCode,
+        city: queryRisk.property.city,
+        email: queryContact.email,
+        phoneNumber: queryContact.phoneNumber
+      }
+    }
 }
 
-namespace Policy.Risk {
+export namespace Policy.Risk {
     export interface Property {
         roomCount: number,
         address: string,
@@ -38,7 +70,7 @@ namespace Policy.Risk {
     }
 }
 
-namespace Policy.Risk.People {
+export namespace Policy.Risk.People {
     export interface PolicyHolder {
         firstname: string,
         lastname: string
@@ -48,36 +80,4 @@ namespace Policy.Risk.People {
         firstname: string,
         lastname: string
     }
-}
-
-export function createPolicy (createPolicyQuery: CreatePolicyQuery, quote: Quote): Policy {
-  return {
-    insurance: quote.insurance,
-    risk: _createRisk(createPolicyQuery.risk, quote.risk),
-    contact: _createContact(createPolicyQuery.contact, createPolicyQuery.risk)
-  }
-}
-
-function _createRisk (queryRisk: CreatePolicyQuery.Risk, quoteRisk: Quote.Risk): Policy.Risk {
-  return {
-    property: {
-      roomCount: quoteRisk.property.roomCount,
-      address: queryRisk.property.address,
-      postalCode: queryRisk.property.postalCode,
-      city: queryRisk.property.city
-    },
-    people: queryRisk.people
-  }
-}
-
-function _createContact (queryContact: CreatePolicyQuery.Contact, queryRisk: CreatePolicyQuery.Risk): Policy.Contact {
-  return {
-    lastname: queryRisk.people.policyHolder.lastname,
-    firstname: queryRisk.people.policyHolder.firstname,
-    address: queryRisk.property.address,
-    postalCode: queryRisk.property.postalCode,
-    city: queryRisk.property.city,
-    email: queryContact.email,
-    phoneNumber: queryContact.phoneNumber
-  }
 }

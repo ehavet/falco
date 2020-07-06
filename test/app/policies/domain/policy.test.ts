@@ -91,7 +91,7 @@ describe('Policies - Domain', async () => {
             lastname: 'Dupont',
             firstname: 'Jean'
           },
-          otherBeneficiaries: [
+          otherInsured: [
             {
               lastname: 'Doe',
               firstname: 'John'

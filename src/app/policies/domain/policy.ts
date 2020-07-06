@@ -103,7 +103,7 @@ export namespace Policy.Risk {
 
     export interface People {
         policyHolder: People.PolicyHolder,
-        otherBeneficiaries: Array<People.Beneficiary>
+        otherInsured: Array<People.OtherInsured>
     }
 }
 
@@ -113,7 +113,7 @@ export namespace Policy.Risk.People {
         lastname: string
     }
 
-    export interface Beneficiary {
+    export interface OtherInsured {
         firstname: string,
         lastname: string
     }

@@ -28,7 +28,7 @@ export function createPolicyFixture (attr: Partial<Policy> = {}): Policy {
           lastname: 'Dupont',
           firstname: 'Jean'
         },
-        otherBeneficiaries: [
+        otherInsured: [
           {
             lastname: 'Doe',
             firstname: 'John'

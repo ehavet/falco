@@ -15,7 +15,7 @@ export function createCreatePolicyCommand (attr: Partial<CreatePolicyCommand> = 
           lastname: 'Dupont',
           firstname: 'Jean'
         },
-        otherBeneficiaries: [
+        otherInsured: [
           {
             lastname: 'Doe',
             firstname: 'John'

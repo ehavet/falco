@@ -69,6 +69,70 @@ describe('Policies - Domain', async () => {
       })
     })
 
+    it('should set the insurance from the quote', async () => {
+      // When
+      const createdPolicy: Policy = await Policy.createPolicy(createPolicyCommand, quote, policyRepository)
+
+      // Then
+      expect(createdPolicy.insurance).to.deep.equal(quote.insurance)
+    })
+
+    it('should set the risk from the quote and the query', async () => {
+      // Given
+      const expectedRisk: Policy.Risk = {
+        property: {
+          roomCount: 2,
+          address: '13 rue du loup garou',
+          postalCode: 91100,
+          city: 'Corbeil-Essones'
+        },
+        people: {
+          policyHolder: {
+            lastname: 'Dupont',
+            firstname: 'Jean'
+          },
+          otherBeneficiaries: [
+            {
+              lastname: 'Doe',
+              firstname: 'John'
+            }
+          ]
+        }
+      }
+      // When
+      const createdPolicy: Policy = await Policy.createPolicy(createPolicyCommand, quote, policyRepository)
+
+      // Then
+      expect(createdPolicy.risk).to.deep.equal(expectedRisk)
+    })
+
+    it('should set the contact', async () => {
+      // Given
+      const expectedContact: Policy.Contact = {
+        lastname: 'Dupont',
+        firstname: 'Jean',
+        address: '13 rue du loup garou',
+        postalCode: 91100,
+        city: 'Corbeil-Essones',
+        email: 'jeandupont@email.com',
+        phoneNumber: '+33684205510'
+      }
+
+      // When
+      const createdPolicy: Policy = await Policy.createPolicy(createPolicyCommand, quote, policyRepository)
+
+      // Then
+      expect(createdPolicy.contact).to.deep.equal(expectedContact)
+    })
+
+    it('should set the partner code', async () => {
+      // When
+      const createdPolicy: Policy = await Policy.createPolicy(createPolicyCommand, quote, policyRepository)
+
+      // Then
+      expect(createdPolicy.partnerCode).to.deep.equal(createPolicyCommand.partnerCode)
+    })
+
     it('should set signatureDate and paymentDate to null because policy is not signed not payed yet', async () => {
       // When
       const createdPolicy: Policy = await Policy.createPolicy(createPolicyCommand, quote, policyRepository)

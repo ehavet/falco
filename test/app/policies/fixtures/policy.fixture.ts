@@ -1,0 +1,58 @@
+import { Policy } from '../../../../src/app/policies/domain/policy'
+
+export function createPolicyFixture (attr: Partial<Policy> = {}): Policy {
+  const now: Date = new Date()
+  return {
+    id: 'D9C61E',
+    partnerCode: 'myPartner',
+    insurance: {
+      estimate: {
+        monthlyPrice: 5.82,
+        defaultDeductible: 150,
+        defaultCeiling: 7000
+      },
+      currency: 'EUR',
+      simplifiedCovers: ['ACDDE', 'ACVOL'],
+      productCode: 'MRH-Loc-Etud',
+      productVersion: 'v2020-02-01'
+    },
+    risk: {
+      property: {
+        roomCount: 2,
+        address: '13 rue du loup garou',
+        postalCode: 91100,
+        city: 'Corbeil-Essones'
+      },
+      people: {
+        policyHolder: {
+          lastname: 'Dupont',
+          firstname: 'Jean'
+        },
+        otherBeneficiaries: [
+          {
+            lastname: 'Doe',
+            firstname: 'John'
+          }
+        ]
+      }
+    },
+    contact: {
+      lastname: 'Dupont',
+      firstname: 'Jean',
+      address: '13 rue du loup garou',
+      postalCode: 91100,
+      city: 'Corbeil-Essones',
+      email: 'jeandupont@email.com',
+      phoneNumber: '+33684205510'
+    },
+    nbMonthsDue: 12,
+    premium: 69.84,
+    subscriptionDate: now,
+    startDate: now,
+    termStartDate: now,
+    termEndDate: now,
+    signatureDate: null,
+    paymentDate: null,
+    ...attr
+  }
+}

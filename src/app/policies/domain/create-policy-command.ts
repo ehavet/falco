@@ -2,7 +2,8 @@ export interface CreatePolicyCommand {
     partnerCode: string,
     quoteId: string,
     risk: CreatePolicyCommand.Risk,
-    contact: CreatePolicyCommand.Contact
+    contact: CreatePolicyCommand.Contact,
+    startDate: Date | null
 }
 
 export namespace CreatePolicyCommand {

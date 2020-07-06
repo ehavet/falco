@@ -143,13 +143,26 @@ describe('Policies - Domain', async () => {
       expect(createdPolicy.paymentDate).to.be.null
     })
 
-    it('should set startDate and termStartDate by default to now', async () => {
-      // When
-      const createdPolicy: Policy = await Policy.createPolicy(createPolicyCommand, quote, policyRepository)
+    describe('should set startDate and termStartDate', async () => {
+      it('to the given start date', async () => {
+        // When
+        const createdPolicy: Policy = await Policy.createPolicy(createPolicyCommand, quote, policyRepository)
 
-      // Then
-      expect(createdPolicy.startDate).to.deep.equal(now)
-      expect(createdPolicy.termStartDate).to.deep.equal(now)
+        // Then
+        expect(createdPolicy.startDate).to.deep.equal(createPolicyCommand.startDate)
+        expect(createdPolicy.termStartDate).to.deep.equal(createPolicyCommand.startDate)
+      })
+
+      it('to now by default', async () => {
+        // When
+        const createPolicyCommandWithNoStartDate: CreatePolicyCommand =
+            createCreatePolicyCommand({ quoteId: quote.id, startDate: null })
+        const createdPolicy: Policy = await Policy.createPolicy(createPolicyCommandWithNoStartDate, quote, policyRepository)
+
+        // Then
+        expect(createdPolicy.startDate).to.deep.equal(now)
+        expect(createdPolicy.termStartDate).to.deep.equal(now)
+      })
     })
 
     it('should set termEndDate to termStartDate + 1 year - 1 day by default', async () => {

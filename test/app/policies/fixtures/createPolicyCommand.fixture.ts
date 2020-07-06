@@ -27,6 +27,7 @@ export function createCreatePolicyCommand (attr: Partial<CreatePolicyCommand> = 
       email: 'jeandupont@email.com',
       phoneNumber: '+33684205510'
     },
+    startDate: new Date('2020-04-05T10:09:08Z'),
     ...attr
   }
 }

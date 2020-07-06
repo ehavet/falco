@@ -39,9 +39,9 @@ export namespace Policy {
     }
 
     export async function createPolicy (createPolicyCommand: CreatePolicyCommand, quote: Quote, policyRepository: PolicyRepository): Promise<Policy> {
-      const generatedId = _generateId(createPolicyCommand.partnerCode)
+      const generatedId: string = _generateId(createPolicyCommand.partnerCode)
       if (await policyRepository.isIdAvailable(generatedId)) {
-        const now = new Date()
+        const startDate: Date = _getStartDate(createPolicyCommand)
         return {
           id: generatedId,
           partnerCode: createPolicyCommand.partnerCode,
@@ -50,8 +50,8 @@ export namespace Policy {
           contact: _createContact(createPolicyCommand.contact, createPolicyCommand.risk),
           nbMonthsDue: DEFAULT_NUMBER_OF_MONTHS_DUE,
           premium: DEFAULT_NUMBER_OF_MONTHS_DUE * quote.insurance.estimate.monthlyPrice,
-          startDate: now,
-          termStartDate: now,
+          startDate: startDate,
+          termStartDate: startDate,
           termEndDate: dayjs().add(1, 'year').subtract(1, 'day').toDate(),
           signatureDate: null,
           paymentDate: null,
@@ -66,6 +66,10 @@ export namespace Policy {
       const prefix: string = partnerCode.substr(0, 3).toUpperCase()
       const suffix: string = generate({ length: 9, charset: 'numeric', readable: true })
       return `${prefix}${suffix}`
+    }
+
+    function _getStartDate (createPolicyCommand: CreatePolicyCommand): Date {
+      return createPolicyCommand.startDate || new Date()
     }
 
     function _createRisk (queryRisk: CreatePolicyCommand.Risk, quoteRisk: Quote.Risk): Policy.Risk {

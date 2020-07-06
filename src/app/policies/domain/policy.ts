@@ -4,17 +4,21 @@ import { generate } from 'randomstring'
 import { PolicyRepository } from './policy.repository'
 import dayjs from 'dayjs'
 
+const DEFAULT_NUMBER_OF_MONTHS_DUE = 12
+
 export interface Policy {
     id: string,
     partnerCode: string,
     insurance: Quote.Insurance,
     risk: Policy.Risk,
-    contact: Policy.Contact
-    subscriptionDate: Date
-    startDate: Date
-    termStartDate: Date
-    termEndDate: Date
-    signatureDate: Date | null
+    contact: Policy.Contact,
+    premium: number,
+    nbMonthsDue: number,
+    subscriptionDate: Date,
+    startDate: Date,
+    termStartDate: Date,
+    termEndDate: Date,
+    signatureDate: Date | null,
     paymentDate: Date | null
 }
 
@@ -34,8 +38,7 @@ export namespace Policy {
         phoneNumber: string
     }
 
-    // @ts-ignore
-    export async function createPolicy (createPolicyCommand: CreatePolicyCommand, quote: Quote, policyRepository: PolicyRepository): Policy {
+    export async function createPolicy (createPolicyCommand: CreatePolicyCommand, quote: Quote, policyRepository: PolicyRepository): Promise<Policy> {
       const generatedId = _generateId(createPolicyCommand.partnerCode)
       if (await policyRepository.isIdAvailable(generatedId)) {
         const now = new Date()
@@ -50,7 +53,9 @@ export namespace Policy {
           termStartDate: now,
           termEndDate: dayjs().add(1, 'year').subtract(1, 'day').toDate(),
           signatureDate: null,
-          paymentDate: null
+          paymentDate: null,
+          nbMonthsDue: DEFAULT_NUMBER_OF_MONTHS_DUE,
+          premium: DEFAULT_NUMBER_OF_MONTHS_DUE * quote.insurance.estimate.monthlyPrice
         }
       }
 

@@ -61,6 +61,8 @@ describe('Policies - Usecase - Create policy', async () => {
         email: 'jeandupont@email.com',
         phoneNumber: '+33684205510'
       },
+      nbMonthsDue: 12,
+      premium: 69.84,
       subscriptionDate: now,
       startDate: now,
       termStartDate: now,
@@ -144,6 +146,18 @@ describe('Policies - Usecase - Create policy', async () => {
       expect(createdPolicy.termEndDate).to.be.a('date')
       expect(createdPolicy.signatureDate).to.be.null
       expect(createdPolicy.paymentDate).to.be.null
+    })
+
+    it('with nbMonthsDue and premium', async () => {
+      // Given
+      quoteRepository.get.withArgs(createPolicyCommand.quoteId).resolves(quote)
+
+      // When
+      const createdPolicy: Policy = await createPolicy(createPolicyCommand)
+
+      // Then
+      expect(createdPolicy.nbMonthsDue).to.equal(expectedPolicy.nbMonthsDue)
+      expect(createdPolicy.premium).to.equal(expectedPolicy.premium)
     })
   })
 })

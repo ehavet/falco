@@ -88,12 +88,28 @@ describe('Policies - Domain', async () => {
       expect(createdPolicy.termStartDate).to.deep.equal(now)
     })
 
-    it('should termEndDate to termStartDate + 1 year - 1 day by default', async () => {
+    it('should set termEndDate to termStartDate + 1 year - 1 day by default', async () => {
       // When
       const createdPolicy: Policy = await Policy.createPolicy(createPolicyCommand, quote, policyRepository)
 
       // Then
       expect(createdPolicy.termEndDate).to.deep.equal(expectedTermEndDate)
+    })
+
+    it('should set nbDueMonths to 12 by default', async () => {
+      // When
+      const createdPolicy: Policy = await Policy.createPolicy(createPolicyCommand, quote, policyRepository)
+
+      // Then
+      expect(createdPolicy.nbMonthsDue).to.equal(12)
+    })
+
+    it('should set premium to monthlyPrice * nbMonthsDue(12 by default)', async () => {
+      // When
+      const createdPolicy: Policy = await Policy.createPolicy(createPolicyCommand, quote, policyRepository)
+
+      // Then
+      expect(createdPolicy.premium).to.equal(69.84)
     })
   })
 })

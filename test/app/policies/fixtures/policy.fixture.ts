@@ -56,3 +56,7 @@ export function createPolicyFixture (attr: Partial<Policy> = {}): Policy {
     ...attr
   }
 }
+
+export function createOngoingPolicyFixture (attr: Partial<Policy> = {}): Policy {
+  return createPolicyFixture({ signatureDate: null, paymentDate: null, subscriptionDate: null, ...attr })
+}

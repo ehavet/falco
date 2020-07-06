@@ -11,7 +11,7 @@ describe('Policies - Domain', async () => {
   describe('#createPolicy', async () => {
     const now = new Date('2020-02-29T10:09:08Z')
     const expectedTermEndDate = new Date('2021-02-27T10:09:08Z')
-    const policyRepository: SinonStubbedInstance<PolicyRepository> = { isIdAvailable: sinon.stub() }
+    const policyRepository: SinonStubbedInstance<PolicyRepository> = { save: sinon.stub(), isIdAvailable: sinon.stub() }
     const quote: Quote = createQuote()
     const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({ quoteId: quote.id })
 

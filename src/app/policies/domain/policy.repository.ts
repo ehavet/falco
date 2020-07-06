@@ -1,3 +1,6 @@
+import { Policy } from './policy'
+
 export interface PolicyRepository {
-    isIdAvailable(policyId: string): Promise<boolean>,
+    save(policy: Policy): Promise<Policy>,
+    isIdAvailable(policyId: string): Promise<boolean>
 }

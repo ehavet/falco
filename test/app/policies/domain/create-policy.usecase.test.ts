@@ -1,6 +1,6 @@
 import { Policy } from '../../../../src/app/policies/domain/policy'
 import { CreatePolicyCommand } from '../../../../src/app/policies/domain/create-policy-command'
-import { expect, sinon } from '../../../test-utils'
+import { dateFaker, expect, sinon } from '../../../test-utils'
 import { CreatePolicy } from '../../../../src/app/policies/domain/create-policy.usecase'
 import { Quote } from '../../../../src/app/quotes/domain/quote'
 import { QuoteRepository } from '../../../../src/app/quotes/domain/quote.repository'
@@ -11,6 +11,7 @@ import { PolicyRepository } from '../../../../src/app/policies/domain/policy.rep
 
 describe('Policies - Usecase - Create policy', async () => {
   describe('should return the newly created policy', async () => {
+    const now = new Date('2020-01-05T10:09:08Z')
     const quote: Quote = createQuote()
     const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({ quoteId: quote.id })
     const policyRepository: SinonStubbedInstance<PolicyRepository> = { isIdAvailable: sinon.stub() }
@@ -59,8 +60,18 @@ describe('Policies - Usecase - Create policy', async () => {
         city: 'Corbeil-Essones',
         email: 'jeandupont@email.com',
         phoneNumber: '+33684205510'
-      }
+      },
+      subscriptionDate: now,
+      startDate: now,
+      termStartDate: now,
+      termEndDate: now,
+      signatureDate: null,
+      paymentDate: null
     }
+
+    beforeEach(() => {
+      dateFaker.setCurrentDate(now)
+    })
 
     it('with the insurance', async () => {
       // Given
@@ -117,6 +128,22 @@ describe('Policies - Usecase - Create policy', async () => {
       expect(createdPolicy.id).to.exist
       expect(createdPolicy.id).to.be.a.string
       expect(createdPolicy.id).to.have.lengthOf(12)
+    })
+
+    it('with different dates', async () => {
+      // Given
+      quoteRepository.get.withArgs(createPolicyCommand.quoteId).resolves(quote)
+
+      // When
+      const createdPolicy: Policy = await createPolicy(createPolicyCommand)
+
+      // Then
+      expect(createdPolicy.subscriptionDate).to.be.a('date')
+      expect(createdPolicy.startDate).to.be.a('date')
+      expect(createdPolicy.termStartDate).to.be.a('date')
+      expect(createdPolicy.termEndDate).to.be.a('date')
+      expect(createdPolicy.signatureDate).to.be.null
+      expect(createdPolicy.paymentDate).to.be.null
     })
   })
 })

@@ -1,4 +1,4 @@
-import { expect, sinon } from '../../../test-utils'
+import { dateFaker, expect, sinon } from '../../../test-utils'
 import { Policy } from '../../../../src/app/policies/domain/policy'
 import { Quote } from '../../../../src/app/quotes/domain/quote'
 import { createQuote } from '../../quotes/fixtures/quote.fixture'
@@ -9,19 +9,22 @@ import { SinonStubbedInstance } from 'sinon'
 
 describe('Policies - Domain', async () => {
   describe('#createPolicy', async () => {
+    const now = new Date('2020-02-29T10:09:08Z')
+    const expectedTermEndDate = new Date('2021-02-27T10:09:08Z')
+    const policyRepository: SinonStubbedInstance<PolicyRepository> = { isIdAvailable: sinon.stub() }
+    const quote: Quote = createQuote()
+    const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({ quoteId: quote.id })
+
+    beforeEach(() => {
+      dateFaker.setCurrentDate(now)
+      policyRepository.isIdAvailable.resolves(true)
+    })
+
+    afterEach(() => {
+      policyRepository.isIdAvailable.reset()
+    })
+
     describe('should generate an id', async () => {
-      const policyRepository: SinonStubbedInstance<PolicyRepository> = { isIdAvailable: sinon.stub() }
-      const quote: Quote = createQuote()
-      const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({ quoteId: quote.id })
-
-      beforeEach(() => {
-        policyRepository.isIdAvailable.resolves(true)
-      })
-
-      afterEach(() => {
-        policyRepository.isIdAvailable.reset()
-      })
-
       it('which is a string with 12 characters', async () => {
         // When
         const createdPolicy: Policy = await Policy.createPolicy(createPolicyCommand, quote, policyRepository)
@@ -64,6 +67,33 @@ describe('Policies - Domain', async () => {
         expect(createdPolicy.id).to.not.equal(existingPolicyId)
         expect(createdPolicy.id).to.equal(nonExistingPolicyId)
       })
+    })
+
+    it('should set signatureDate and paymentDate to null because policy is not signed not payed yet', async () => {
+      // When
+      const createdPolicy: Policy = await Policy.createPolicy(createPolicyCommand, quote, policyRepository)
+
+      // Then
+      expect(createdPolicy.signatureDate).to.be.null
+      expect(createdPolicy.paymentDate).to.be.null
+    })
+
+    it('should set subscriptionDate, startDate and termStartDate by default to now', async () => {
+      // When
+      const createdPolicy: Policy = await Policy.createPolicy(createPolicyCommand, quote, policyRepository)
+
+      // Then
+      expect(createdPolicy.subscriptionDate).to.deep.equal(now)
+      expect(createdPolicy.startDate).to.deep.equal(now)
+      expect(createdPolicy.termStartDate).to.deep.equal(now)
+    })
+
+    it('should termEndDate to termStartDate + 1 year - 1 day by default', async () => {
+      // When
+      const createdPolicy: Policy = await Policy.createPolicy(createPolicyCommand, quote, policyRepository)
+
+      // Then
+      expect(createdPolicy.termEndDate).to.deep.equal(expectedTermEndDate)
     })
   })
 })

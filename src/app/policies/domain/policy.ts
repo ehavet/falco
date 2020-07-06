@@ -2,6 +2,7 @@ import { Quote } from '../../quotes/domain/quote'
 import { CreatePolicyCommand } from './create-policy-command'
 import { generate } from 'randomstring'
 import { PolicyRepository } from './policy.repository'
+import dayjs from 'dayjs'
 
 export interface Policy {
     id: string,
@@ -9,6 +10,12 @@ export interface Policy {
     insurance: Quote.Insurance,
     risk: Policy.Risk,
     contact: Policy.Contact
+    subscriptionDate: Date
+    startDate: Date
+    termStartDate: Date
+    termEndDate: Date
+    signatureDate: Date | null
+    paymentDate: Date | null
 }
 
 export namespace Policy {
@@ -31,12 +38,19 @@ export namespace Policy {
     export async function createPolicy (createPolicyCommand: CreatePolicyCommand, quote: Quote, policyRepository: PolicyRepository): Policy {
       const generatedId = _generateId(createPolicyCommand.partnerCode)
       if (await policyRepository.isIdAvailable(generatedId)) {
+        const now = new Date()
         return {
           id: generatedId,
           partnerCode: createPolicyCommand.partnerCode,
           insurance: quote.insurance,
           risk: _createRisk(createPolicyCommand.risk, quote.risk),
-          contact: _createContact(createPolicyCommand.contact, createPolicyCommand.risk)
+          contact: _createContact(createPolicyCommand.contact, createPolicyCommand.risk),
+          subscriptionDate: now,
+          startDate: now,
+          termStartDate: now,
+          termEndDate: dayjs().add(1, 'year').subtract(1, 'day').toDate(),
+          signatureDate: null,
+          paymentDate: null
         }
       }
 

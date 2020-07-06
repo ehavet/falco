@@ -1,7 +1,9 @@
 import { Quote } from '../../quotes/domain/quote'
 import { CreatePolicyCommand } from './create-policy-command'
+import { generate } from 'randomstring'
 
 export interface Policy {
+    id: string,
     partnerCode: string,
     insurance: Quote.Insurance,
     risk: Policy.Risk,
@@ -26,11 +28,18 @@ export namespace Policy {
 
     export function createPolicy (createPolicyCommand: CreatePolicyCommand, quote: Quote): Policy {
       return {
+        id: _generateId(createPolicyCommand.partnerCode),
         partnerCode: createPolicyCommand.partnerCode,
         insurance: quote.insurance,
         risk: _createRisk(createPolicyCommand.risk, quote.risk),
         contact: _createContact(createPolicyCommand.contact, createPolicyCommand.risk)
       }
+    }
+
+    function _generateId (partnerCode: string): string {
+      const prefix: string = partnerCode.substr(0, 3).toUpperCase()
+      const suffix: string = generate({ length: 9, charset: 'numeric', readable: true })
+      return `${prefix}${suffix}`
     }
 
     function _createRisk (queryRisk: CreatePolicyCommand.Risk, quoteRisk: Quote.Risk): Policy.Risk {

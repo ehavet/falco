@@ -7,13 +7,16 @@ import { QuoteRepository } from '../../../../src/app/quotes/domain/quote.reposit
 import { SinonStubbedInstance } from 'sinon'
 import { createQuote } from '../../quotes/fixtures/quote.fixture'
 import { createCreatePolicyCommand } from '../fixtures/createPolicyCommand.fixture'
+import { PolicyRepository } from '../../../../src/app/policies/domain/policy.repository'
 
 describe('Policies - Usecase - Create policy', async () => {
   describe('should return the newly created policy', async () => {
     const quote: Quote = createQuote()
     const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({ quoteId: quote.id })
+    const policyRepository: SinonStubbedInstance<PolicyRepository> = { isIdAvailable: sinon.stub() }
+    policyRepository.isIdAvailable.resolves(true)
     const quoteRepository: SinonStubbedInstance<QuoteRepository> = { save: sinon.stub(), get: sinon.stub() }
-    const createPolicy: CreatePolicy = CreatePolicy.factory(quoteRepository)
+    const createPolicy: CreatePolicy = CreatePolicy.factory(policyRepository, quoteRepository)
     const expectedPolicy: Policy = {
       id: '',
       partnerCode: 'myPartner',

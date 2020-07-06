@@ -1,6 +1,7 @@
 import { Quote } from '../../quotes/domain/quote'
 import { CreatePolicyCommand } from './create-policy-command'
 import { generate } from 'randomstring'
+import { PolicyRepository } from './policy.repository'
 
 export interface Policy {
     id: string,
@@ -26,14 +27,20 @@ export namespace Policy {
         phoneNumber: string
     }
 
-    export function createPolicy (createPolicyCommand: CreatePolicyCommand, quote: Quote): Policy {
-      return {
-        id: _generateId(createPolicyCommand.partnerCode),
-        partnerCode: createPolicyCommand.partnerCode,
-        insurance: quote.insurance,
-        risk: _createRisk(createPolicyCommand.risk, quote.risk),
-        contact: _createContact(createPolicyCommand.contact, createPolicyCommand.risk)
+    // @ts-ignore
+    export async function createPolicy (createPolicyCommand: CreatePolicyCommand, quote: Quote, policyRepository: PolicyRepository): Policy {
+      const generatedId = _generateId(createPolicyCommand.partnerCode)
+      if (await policyRepository.isIdAvailable(generatedId)) {
+        return {
+          id: generatedId,
+          partnerCode: createPolicyCommand.partnerCode,
+          insurance: quote.insurance,
+          risk: _createRisk(createPolicyCommand.risk, quote.risk),
+          contact: _createContact(createPolicyCommand.contact, createPolicyCommand.risk)
+        }
       }
+
+      return createPolicy(createPolicyCommand, quote, policyRepository)
     }
 
     function _generateId (partnerCode: string): string {

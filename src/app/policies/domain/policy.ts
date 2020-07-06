@@ -14,12 +14,12 @@ export interface Policy {
     contact: Policy.Contact,
     premium: number,
     nbMonthsDue: number,
-    subscriptionDate: Date,
     startDate: Date,
     termStartDate: Date,
     termEndDate: Date,
     signatureDate: Date | null,
     paymentDate: Date | null
+    subscriptionDate: Date | null,
 }
 
 export namespace Policy {
@@ -48,14 +48,14 @@ export namespace Policy {
           insurance: quote.insurance,
           risk: _createRisk(createPolicyCommand.risk, quote.risk),
           contact: _createContact(createPolicyCommand.contact, createPolicyCommand.risk),
-          subscriptionDate: now,
+          nbMonthsDue: DEFAULT_NUMBER_OF_MONTHS_DUE,
+          premium: DEFAULT_NUMBER_OF_MONTHS_DUE * quote.insurance.estimate.monthlyPrice,
           startDate: now,
           termStartDate: now,
           termEndDate: dayjs().add(1, 'year').subtract(1, 'day').toDate(),
           signatureDate: null,
           paymentDate: null,
-          nbMonthsDue: DEFAULT_NUMBER_OF_MONTHS_DUE,
-          premium: DEFAULT_NUMBER_OF_MONTHS_DUE * quote.insurance.estimate.monthlyPrice
+          subscriptionDate: null
         }
       }
 

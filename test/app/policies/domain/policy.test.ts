@@ -133,21 +133,21 @@ describe('Policies - Domain', async () => {
       expect(createdPolicy.partnerCode).to.deep.equal(createPolicyCommand.partnerCode)
     })
 
-    it('should set signatureDate and paymentDate to null because policy is not signed not payed yet', async () => {
+    it('should set signatureDate, subscription and paymentDate to null because policy is not signed not payed yet', async () => {
       // When
       const createdPolicy: Policy = await Policy.createPolicy(createPolicyCommand, quote, policyRepository)
 
       // Then
       expect(createdPolicy.signatureDate).to.be.null
+      expect(createdPolicy.subscriptionDate).to.be.null
       expect(createdPolicy.paymentDate).to.be.null
     })
 
-    it('should set subscriptionDate, startDate and termStartDate by default to now', async () => {
+    it('should set startDate and termStartDate by default to now', async () => {
       // When
       const createdPolicy: Policy = await Policy.createPolicy(createPolicyCommand, quote, policyRepository)
 
       // Then
-      expect(createdPolicy.subscriptionDate).to.deep.equal(now)
       expect(createdPolicy.startDate).to.deep.equal(now)
       expect(createdPolicy.termStartDate).to.deep.equal(now)
     })

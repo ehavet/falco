@@ -11,6 +11,7 @@ describe('Policies - Usecase - Create policy', async () => {
   describe('should return the newly created policy', async () => {
     const quote: Quote = createQuote()
     const createPolicyCommand: CreatePolicyCommand = {
+      partnerCode: 'my partner',
       quoteId: quote.id,
       risk: {
         property: {
@@ -39,6 +40,7 @@ describe('Policies - Usecase - Create policy', async () => {
     const quoteRepository: SinonStubbedInstance<QuoteRepository> = { save: sinon.stub(), get: sinon.stub() }
     const createPolicy: CreatePolicy = CreatePolicy.factory(quoteRepository)
     const expectedPolicy: Policy = {
+      partnerCode: 'my partner',
       insurance: {
         estimate: {
           monthlyPrice: 5.82,
@@ -86,10 +88,10 @@ describe('Policies - Usecase - Create policy', async () => {
       quoteRepository.get.withArgs(createPolicyCommand.quoteId).resolves(quote)
 
       // When
-      const savedPolicy: Policy = await createPolicy(createPolicyCommand)
+      const createdPolicy: Policy = await createPolicy(createPolicyCommand)
 
       // Then
-      expect(savedPolicy.insurance).to.deep.equal(expectedPolicy.insurance)
+      expect(createdPolicy.insurance).to.deep.equal(expectedPolicy.insurance)
     })
 
     it('with the risk', async () => {
@@ -97,10 +99,10 @@ describe('Policies - Usecase - Create policy', async () => {
       quoteRepository.get.withArgs(createPolicyCommand.quoteId).resolves(quote)
 
       // When
-      const savedPolicy: Policy = await createPolicy(createPolicyCommand)
+      const createdPolicy: Policy = await createPolicy(createPolicyCommand)
 
       // Then
-      expect(savedPolicy.risk).to.deep.equal(expectedPolicy.risk)
+      expect(createdPolicy.risk).to.deep.equal(expectedPolicy.risk)
     })
 
     it('with the contact', async () => {
@@ -108,10 +110,21 @@ describe('Policies - Usecase - Create policy', async () => {
       quoteRepository.get.withArgs(createPolicyCommand.quoteId).resolves(quote)
 
       // When
-      const savedPolicy: Policy = await createPolicy(createPolicyCommand)
+      const createdPolicy: Policy = await createPolicy(createPolicyCommand)
 
       // Then
-      expect(savedPolicy.contact).to.deep.equal(expectedPolicy.contact)
+      expect(createdPolicy.contact).to.deep.equal(expectedPolicy.contact)
+    })
+
+    it('with the partner code', async () => {
+      // Given
+      quoteRepository.get.withArgs(createPolicyCommand.quoteId).resolves(quote)
+
+      // When
+      const createdPolicy: Policy = await createPolicy(createPolicyCommand)
+
+      // Then
+      expect(createdPolicy.partnerCode).to.equal(expectedPolicy.partnerCode)
     })
   })
 })

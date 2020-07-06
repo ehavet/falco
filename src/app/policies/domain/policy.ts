@@ -2,9 +2,10 @@ import { Quote } from '../../quotes/domain/quote'
 import { CreatePolicyCommand } from './create-policy-command'
 
 export interface Policy {
-        insurance: Quote.Insurance,
-        risk: Policy.Risk,
-        contact: Policy.Contact
+    partnerCode: string,
+    insurance: Quote.Insurance,
+    risk: Policy.Risk,
+    contact: Policy.Contact
 }
 
 export namespace Policy {
@@ -25,6 +26,7 @@ export namespace Policy {
 
     export function createPolicy (createPolicyCommand: CreatePolicyCommand, quote: Quote): Policy {
       return {
+        partnerCode: createPolicyCommand.partnerCode,
         insurance: quote.insurance,
         risk: _createRisk(createPolicyCommand.risk, quote.risk),
         contact: _createContact(createPolicyCommand.contact, createPolicyCommand.risk)

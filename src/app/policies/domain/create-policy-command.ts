@@ -1,4 +1,5 @@
 export interface CreatePolicyCommand {
+    partnerCode: string,
     quoteId: string,
     risk: CreatePolicyCommand.Risk,
     contact: CreatePolicyCommand.Contact

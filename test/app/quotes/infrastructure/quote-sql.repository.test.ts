@@ -4,53 +4,38 @@ import { QuoteSqlModel } from '../../../../src/app/quotes/infrastructure/quote-s
 import { expect } from '../../../test-utils'
 import { InsuranceSqlModel } from '../../../../src/app/quotes/infrastructure/insurance-sql.model'
 import { RiskSqlModel } from '../../../../src/app/quotes/infrastructure/risk-sql.model'
+import { createQuote } from '../fixtures/quote.fixture'
+import { QuoteNotFoundError } from '../../../../src/app/quotes/domain/quote.errors'
+import { PropertySqlModel } from '../../../../src/app/quotes/infrastructure/property-sql.model'
 
 async function resetDb () {
   await QuoteSqlModel.destroy({ truncate: true, cascade: true })
 }
 
 describe('Repository - Quote', async () => {
-  describe('#save', async () => {
-    afterEach(async () => {
-      await resetDb()
-    })
+  const quoteRepository = new QuoteSqlRepository()
 
+  afterEach(async () => {
+    await resetDb()
+  })
+
+  describe('#save', async () => {
     it('should save the quote into the db', async () => {
       // Given
-      const quoteRepository = new QuoteSqlRepository()
-      const quote: Quote = {
-        id: 'UD65X3A',
-        partnerCode: 'myPartner',
-        risk: {
-          property: {
-            roomCount: 2
-          }
-        },
-        insurance: {
-          estimate: {
-            monthlyPrice: 5.82,
-            defaultDeductible: 150,
-            defaultCeiling: 7000
-          },
-          currency: 'EUR',
-          simplifiedCovers: ['ACDDE', 'ACVOL'],
-          productCode: 'MRH-Loc-Etud',
-          productVersion: 'v2020-02-01'
-        }
-      }
+      const quote: Quote = createQuote({ id: 'RF85D4S' })
 
       // When
       await quoteRepository.save(quote)
 
       // Then
       const result = await QuoteSqlModel.findAll({
-        include: [{ model: InsuranceSqlModel }, { model: RiskSqlModel }]
+        include: [{ model: InsuranceSqlModel }, { model: RiskSqlModel, include: [{ model: PropertySqlModel }] }]
       })
 
       expect(result).to.have.lengthOf(1)
 
       const savedQuote = result[0]
-      expect(savedQuote.id).to.equal('UD65X3A')
+      expect(savedQuote.id).to.equal('RF85D4S')
       expect(savedQuote.partnerCode).to.equal('myPartner')
       expect(savedQuote.createdAt).to.be.an.instanceof(Date)
       expect(savedQuote.updatedAt).to.be.an.instanceof(Date)
@@ -58,7 +43,7 @@ describe('Repository - Quote', async () => {
       const savedRisk = savedQuote.risk
       expect(savedRisk).not.to.be.undefined
       expect(savedRisk.id).to.be.a('string')
-      expect(savedRisk.propertyRoomCount).to.equal(2)
+      expect(savedRisk.property.roomCount).to.equal(2)
       expect(savedRisk.createdAt).to.be.an.instanceof(Date)
       expect(savedRisk.updatedAt).to.be.an.instanceof(Date)
 
@@ -74,6 +59,31 @@ describe('Repository - Quote', async () => {
       expect(savedInsurance.productVersion).to.equal('v2020-02-01')
       expect(savedInsurance.createdAt).to.be.an.instanceof(Date)
       expect(savedInsurance.updatedAt).to.be.an.instanceof(Date)
+    })
+  })
+
+  describe('#get', async () => {
+    it('should return the found quote', async () => {
+      // Given
+      const quoteInDb: Quote = createQuote({ id: 'DC82S0V' })
+
+      await quoteRepository.save(quoteInDb)
+
+      // When
+      const foundQuote: Quote = await quoteRepository.get(quoteInDb.id)
+
+      // Then
+      expect(foundQuote).to.deep.equal(quoteInDb)
+    })
+
+    it('should throw an error if the quote does not exist', async () => {
+      // Given
+      const quoteId: string = 'JC7D89S'
+      // When
+      const getQuotePromise = quoteRepository.get(quoteId)
+
+      // Then
+      return expect(getQuotePromise).to.be.rejectedWith(QuoteNotFoundError, 'Quote with id JC7D89S cannot be found')
     })
   })
 })

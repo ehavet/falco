@@ -10,22 +10,6 @@ export interface Partner {
 export namespace Partner {
 
     export type Question = Question.RoomCountQuestion
-    export namespace Question {
-        export interface RoomCountQuestion {
-            code: QuestionCode.RoomCount,
-            options: ListOptions<RoomCount>,
-            required: boolean,
-        }
-
-        export enum QuestionCode {
-            RoomCount = 'RoomCount'
-        }
-
-        export interface ListOptions<T> {
-            list: Array<T>,
-        }
-
-    }
 
     export interface Offer {
         pricingMatrix: Map<RoomCount, Quote.Insurance.Estimate>
@@ -35,5 +19,22 @@ export namespace Partner {
     }
 
     export type RoomCount = number
+
+}
+
+export namespace Partner.Question {
+    export interface RoomCountQuestion {
+        code: QuestionCode.RoomCount,
+        options: ListOptions<RoomCount>,
+        required: boolean,
+    }
+
+    export enum QuestionCode {
+        RoomCount = 'RoomCount'
+    }
+
+    export interface ListOptions<T> {
+        list: Array<T>,
+    }
 
 }

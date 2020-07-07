@@ -14,12 +14,6 @@ export namespace Quote {
     export interface Risk {
         property: Risk.Property
     }
-    export namespace Risk {
-        export interface Property {
-            roomCount: number
-        }
-
-    }
 
     export interface Insurance {
         estimate: Insurance.Estimate
@@ -27,15 +21,6 @@ export namespace Quote {
         simplifiedCovers: Array<Insurance.SimplifiedCover>,
         productCode: string,
         productVersion: string
-    }
-    export namespace Insurance {
-        export interface Estimate {
-            monthlyPrice: number,
-            defaultDeductible: number,
-            defaultCeiling: number,
-        }
-
-        export type SimplifiedCover = string
     }
 
     export function getInsurance (risk: Risk, partnerOffer: Partner.Offer, partnerCode: string): Insurance {
@@ -58,4 +43,20 @@ export namespace Quote {
       return generate({ length: 7, charset: 'alphanumeric', readable: true, capitalization: 'uppercase' })
     }
 
+}
+
+export namespace Quote.Risk {
+    export interface Property {
+        roomCount: number
+    }
+}
+
+export namespace Quote.Insurance {
+    export interface Estimate {
+        monthlyPrice: number,
+        defaultDeductible: number,
+        defaultCeiling: number,
+    }
+
+    export type SimplifiedCover = string
 }

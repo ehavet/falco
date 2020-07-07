@@ -7,3 +7,11 @@ export class NoPartnerInsuranceForRiskError extends Error {
     this.name = 'NoPartnerInsuranceForRiskError'
   }
 }
+
+export class QuoteNotFoundError extends Error {
+  constructor (quoteId: string) {
+    const message: string = `Quote with id ${quoteId} cannot be found`
+    super(message)
+    this.name = 'QuoteNotFoundError'
+  }
+}

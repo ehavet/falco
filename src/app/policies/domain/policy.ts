@@ -17,9 +17,9 @@ export interface Policy {
     startDate: Date,
     termStartDate: Date,
     termEndDate: Date,
-    signatureDate: Date | null,
-    paymentDate: Date | null
-    subscriptionDate: Date | null,
+    signatureDate?: Date,
+    paymentDate?: Date,
+    subscriptionDate?: Date
 }
 
 export namespace Policy {
@@ -53,9 +53,9 @@ export namespace Policy {
           startDate: startDate,
           termStartDate: startDate,
           termEndDate: dayjs().add(1, 'year').subtract(1, 'day').toDate(),
-          signatureDate: null,
-          paymentDate: null,
-          subscriptionDate: null
+          signatureDate: undefined,
+          paymentDate: undefined,
+          subscriptionDate: undefined
         }
       }
 

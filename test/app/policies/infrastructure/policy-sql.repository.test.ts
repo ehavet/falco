@@ -8,6 +8,7 @@ import { InsuranceSqlModel } from '../../../../src/app/quotes/infrastructure/ins
 import { RiskSqlModel } from '../../../../src/app/quotes/infrastructure/risk-sql.model'
 import { OtherInsuredSqlModel } from '../../../../src/app/quotes/infrastructure/other-insured-sql.model'
 import { ContactSqlModel } from '../../../../src/app/policies/infrastructure/contact-sql.model'
+import { Quote } from '../../../../src/app/quotes/domain/quote'
 
 async function resetDb () {
   await PolicySqlModel.destroy({ truncate: true, cascade: true })
@@ -103,6 +104,63 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
       expect(savedContact.phoneNumber).to.equal('+33684205510')
       expect(savedContact.createdAt).to.be.an.instanceof(Date)
       expect(savedContact.updatedAt).to.be.an.instanceof(Date)
+    })
+
+    it('should return the created policy', async () => {
+      // Given
+      const now: Date = new Date('2020-01-05T10:09:08Z')
+      const policy: Policy = createPolicyFixture()
+
+      // When
+      const createdPolicy: Policy = await policyRepository.save(policy)
+
+      // Then
+      expect(createdPolicy.id).to.equal('D9C61E')
+      expect(createdPolicy.partnerCode).to.equal('myPartner')
+      expect(createdPolicy.premium).to.equal(69.84)
+      expect(createdPolicy.nbMonthsDue).to.equal(12)
+      expect(createdPolicy.startDate).to.deep.equals(new Date('2020-01-05'))
+      expect(createdPolicy.termStartDate).to.deep.equals(new Date('2020-01-05'))
+      expect(createdPolicy.termEndDate).to.deep.equals(new Date('2020-01-05'))
+      expect(createdPolicy.signatureDate).to.deep.equals(now)
+      expect(createdPolicy.paymentDate).to.deep.equals(now)
+      expect(createdPolicy.subscriptionDate).to.deep.equals(now)
+
+      const risk: Policy.Risk = createdPolicy.risk
+      expect(risk).not.to.be.undefined
+
+      expect(risk.property.roomCount).to.equal(2)
+      expect(risk.property.address).to.equal('13 rue du loup garou')
+      expect(risk.property.postalCode).to.equal(91100)
+      expect(risk.property.city).to.equal('Corbeil-Essones')
+
+      expect(risk.people.policyHolder.firstname).to.equal('Jean')
+      expect(risk.people.policyHolder.lastname).to.equal('Dupont')
+
+      expect(risk.people.otherInsured).to.have.lengthOf(1)
+      const otherInsured : Policy.Risk.People.OtherInsured = risk.people.otherInsured[0]
+      expect(otherInsured.firstname).to.equal('John')
+      expect(otherInsured.lastname).to.equal('Doe')
+
+      const insurance: Quote.Insurance = createdPolicy.insurance
+      expect(insurance).not.to.be.undefined
+      expect(insurance.estimate.monthlyPrice).to.equal(5.82)
+      expect(insurance.estimate.defaultDeductible).to.equal(150)
+      expect(insurance.estimate.defaultCeiling).to.equal(7000)
+      expect(insurance.currency).to.equal('EUR')
+      expect(insurance.simplifiedCovers).to.include('ACDDE', 'ACVOL')
+      expect(insurance.productCode).to.equal('MRH-Loc-Etud')
+      expect(insurance.productVersion).to.equal('v2020-02-01')
+
+      const contact: Policy.Contact = createdPolicy.contact
+      expect(contact).not.to.be.undefined
+      expect(contact.firstname).to.equal('Jean')
+      expect(contact.lastname).to.equal('Dupont')
+      expect(contact.address).to.equal('13 rue du loup garou')
+      expect(contact.postalCode).to.equal(91100)
+      expect(contact.city).to.equal('Corbeil-Essones')
+      expect(contact.email).to.equal('jeandupont@email.com')
+      expect(contact.phoneNumber).to.equal('+33684205510')
     })
   })
 })

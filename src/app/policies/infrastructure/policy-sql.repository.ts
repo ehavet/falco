@@ -2,9 +2,10 @@ import { PolicyRepository } from '../../../../src/app/policies/domain/policy.rep
 import { Policy } from '../domain/policy'
 import { PolicySqlModel } from './policy-sql.model'
 import { RiskSqlModel } from '../../quotes/infrastructure/risk-sql.model'
+import { sqlToPolicyMapper } from './policy-sql.mapper'
 
 export class PolicySqlRepository implements PolicyRepository {
-  save (policy: Policy): Promise<Policy> {
+  async save (policy: Policy): Promise<Policy> {
     const policySql = PolicySqlModel.build({
       id: policy.id,
       partnerCode: policy.partnerCode,
@@ -35,7 +36,8 @@ export class PolicySqlRepository implements PolicyRepository {
       include: [{ all: true }, { model: RiskSqlModel, include: [{ all: true }] }]
     })
 
-    return policySql.save()
+    const savedPolicy: PolicySqlModel = await policySql.save()
+    return sqlToPolicyMapper(savedPolicy)
   }
 
   isIdAvailable (policyId: string): Promise<boolean> {

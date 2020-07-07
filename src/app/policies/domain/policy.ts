@@ -38,7 +38,7 @@ export namespace Policy {
         phoneNumber: string
     }
 
-    export async function createPolicy (createPolicyCommand: CreatePolicyCommand, quote: Quote, policyRepository: PolicyRepository): Promise<Policy> {
+    export async function create (createPolicyCommand: CreatePolicyCommand, quote: Quote, policyRepository: PolicyRepository): Promise<Policy> {
       const generatedId: string = _generateId(createPolicyCommand.partnerCode)
       if (await policyRepository.isIdAvailable(generatedId)) {
         const startDate: Date = _getStartDate(createPolicyCommand)
@@ -59,7 +59,7 @@ export namespace Policy {
         }
       }
 
-      return createPolicy(createPolicyCommand, quote, policyRepository)
+      return create(createPolicyCommand, quote, policyRepository)
     }
 
     function _generateId (partnerCode: string): string {

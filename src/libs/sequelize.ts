@@ -1,7 +1,7 @@
 import { Sequelize } from 'sequelize-typescript'
 import { Logger, logger } from './logger'
 import { quoteSqlModels } from '../app/quotes/quote.container'
-import { policySqlModels } from '../app/policies/policy.container'
+import { policySqlModels } from '../app/policies/policies.container'
 
 export async function initSequelize (config) {
   const sequelize: Sequelize = new Sequelize(config.get('FALCO_API_DATABASE_URL'), {

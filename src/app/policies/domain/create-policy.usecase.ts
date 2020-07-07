@@ -13,7 +13,7 @@ export namespace CreatePolicy {
     export function factory (policyRepository: PolicyRepository, quoteRepository: QuoteRepository): CreatePolicy {
       return async (createPolicyCommand: CreatePolicyCommand): Promise<Policy> => {
         const quote: Quote = await quoteRepository.get(createPolicyCommand.quoteId)
-        const newPolicy: Policy = await Policy.createPolicy(createPolicyCommand, quote, policyRepository)
+        const newPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository)
         return await policyRepository.save(newPolicy)
       }
     }

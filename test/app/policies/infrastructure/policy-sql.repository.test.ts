@@ -163,4 +163,32 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
       expect(contact.phoneNumber).to.equal('+33684205510')
     })
   })
+
+  describe('#isIdAvailable', async () => {
+    it('should return true is there is no policy in database with the same id', async () => {
+      // Given
+      const availableId: string = 'APP487539219'
+      const policyInDb: Policy = createPolicyFixture()
+      await policyRepository.save(policyInDb)
+
+      // When
+      const isIdAvailable: boolean = await policyRepository.isIdAvailable(availableId)
+
+      // Then
+      expect(isIdAvailable).to.be.true
+    })
+
+    it('should return false is there is a policy in database with the same id', async () => {
+      // Given
+      const nonAvailableId: string = 'APP487539219'
+      const policyInDb: Policy = createPolicyFixture({ id: nonAvailableId })
+      await policyRepository.save(policyInDb)
+
+      // When
+      const isIdAvailable: boolean = await policyRepository.isIdAvailable(nonAvailableId)
+
+      // Then
+      expect(isIdAvailable).to.be.false
+    })
+  })
 })

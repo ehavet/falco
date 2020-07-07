@@ -40,7 +40,9 @@ export class PolicySqlRepository implements PolicyRepository {
     return sqlToPolicyMapper(savedPolicy)
   }
 
-  isIdAvailable (policyId: string): Promise<boolean> {
-    return Promise.reject(new Error(`Not implemented yet ${policyId}`))
+  async isIdAvailable (policyId: string): Promise<boolean> {
+    const foundPolicy: PolicySqlModel = await PolicySqlModel.findByPk(policyId, { rejectOnEmpty: false })
+    if (foundPolicy) return false
+    return true
   }
 }

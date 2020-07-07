@@ -10,28 +10,22 @@ import Sequelize from 'sequelize'
 import { v4 as uuidv4 } from 'uuid'
 import { RiskSqlModel } from './risk-sql.model'
 
-@Table({ timestamps: true, tableName: 'property', underscored: true })
-export class PropertySqlModel extends Model<PropertySqlModel> {
+@Table({ timestamps: true, tableName: 'other_insured', underscored: true })
+export class OtherInsuredSqlModel extends Model<OtherInsuredSqlModel> {
     @PrimaryKey
     @Default(uuidv4)
     @Column(Sequelize.UUIDV4)
     id!: string
 
     @Column
-    roomCount!: number
+    firstname!: string
 
     @Column
-    address!: string
-
-    @Column
-    postalCode!: number
-
-    @Column
-    city!: string
+    lastname!: string
 
     @ForeignKey(() => RiskSqlModel)
     @Column
-    riskId!: string;
+    riskId!: string
 
     @BelongsTo(() => RiskSqlModel)
     risk!: RiskSqlModel

@@ -10,24 +10,18 @@ import Sequelize from 'sequelize'
 import { v4 as uuidv4 } from 'uuid'
 import { RiskSqlModel } from './risk-sql.model'
 
-@Table({ timestamps: true, tableName: 'property', underscored: true })
-export class PropertySqlModel extends Model<PropertySqlModel> {
+@Table({ timestamps: true, tableName: 'policy_holder', underscored: true })
+export class PolicyHolderSqlModel extends Model<PolicyHolderSqlModel> {
     @PrimaryKey
     @Default(uuidv4)
     @Column(Sequelize.UUIDV4)
     id!: string
 
     @Column
-    roomCount!: number
+    firstname!: string
 
     @Column
-    address!: string
-
-    @Column
-    postalCode!: number
-
-    @Column
-    city!: string
+    lastname!: string
 
     @ForeignKey(() => RiskSqlModel)
     @Column

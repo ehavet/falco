@@ -1,6 +1,7 @@
 import { Sequelize } from 'sequelize-typescript'
 import { Logger, logger } from './logger'
 import { quoteSqlModels } from '../app/quotes/quote.container'
+import { policySqlModels } from '../app/policies/policy.container'
 
 export async function initSequelize (config) {
   const sequelize: Sequelize = new Sequelize(config.get('FALCO_API_DATABASE_URL'), {
@@ -15,6 +16,7 @@ export async function initSequelize (config) {
   })
 
   sequelize.addModels(quoteSqlModels)
+  sequelize.addModels(policySqlModels)
 
   return sequelize
 }

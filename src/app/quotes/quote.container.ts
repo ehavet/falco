@@ -7,6 +7,7 @@ import { QuoteSqlRepository } from './infrastructure/quote-sql.repository'
 import { QuoteRepository } from './domain/quote.repository'
 import { PartnerRepository } from '../partners/domain/partner.repository'
 import { container as partnerContainer } from '../partners/partner.container'
+import { PropertySqlModel } from './infrastructure/property-sql.model'
 
 export interface Container {
   GetQuote: GetQuote
@@ -20,7 +21,9 @@ export const container: Container = {
   GetQuote: getQuote
 }
 
-export const quoteSqlModels: Array<any> = [QuoteSqlModel, InsuranceSqlModel, RiskSqlModel]
+export const quoteSqlModels: Array<any> = [
+  QuoteSqlModel, InsuranceSqlModel, RiskSqlModel, PropertySqlModel
+]
 
 export function quoteRoutes () {
   return routes(container)

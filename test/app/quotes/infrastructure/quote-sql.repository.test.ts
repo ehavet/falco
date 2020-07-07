@@ -6,6 +6,7 @@ import { InsuranceSqlModel } from '../../../../src/app/quotes/infrastructure/ins
 import { RiskSqlModel } from '../../../../src/app/quotes/infrastructure/risk-sql.model'
 import { createQuote } from '../fixtures/quote.fixture'
 import { QuoteNotFoundError } from '../../../../src/app/quotes/domain/quote.errors'
+import { PropertySqlModel } from '../../../../src/app/quotes/infrastructure/property-sql.model'
 
 async function resetDb () {
   await QuoteSqlModel.destroy({ truncate: true, cascade: true })
@@ -28,7 +29,7 @@ describe('Repository - Quote', async () => {
 
       // Then
       const result = await QuoteSqlModel.findAll({
-        include: [{ model: InsuranceSqlModel }, { model: RiskSqlModel }]
+        include: [{ model: InsuranceSqlModel }, { model: RiskSqlModel, include: [{ model: PropertySqlModel }] }]
       })
 
       expect(result).to.have.lengthOf(1)
@@ -42,7 +43,7 @@ describe('Repository - Quote', async () => {
       const savedRisk = savedQuote.risk
       expect(savedRisk).not.to.be.undefined
       expect(savedRisk.id).to.be.a('string')
-      expect(savedRisk.propertyRoomCount).to.equal(2)
+      expect(savedRisk.property.roomCount).to.equal(2)
       expect(savedRisk.createdAt).to.be.an.instanceof(Date)
       expect(savedRisk.updatedAt).to.be.an.instanceof(Date)
 

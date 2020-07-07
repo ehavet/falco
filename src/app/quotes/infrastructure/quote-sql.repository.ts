@@ -5,6 +5,7 @@ import { InsuranceSqlModel } from './insurance-sql.model'
 import { RiskSqlModel } from './risk-sql.model'
 import { sqlToQuoteMapper } from './quote-sql.mapper'
 import { QuoteNotFoundError } from '../domain/quote.errors'
+import { PropertySqlModel } from './property-sql.model'
 
 export class QuoteSqlRepository implements QuoteRepository {
   async save (quote: Quote): Promise<void> {
@@ -12,7 +13,9 @@ export class QuoteSqlRepository implements QuoteRepository {
       id: quote.id,
       partnerCode: quote.partnerCode,
       risk: {
-        propertyRoomCount: quote.risk.property.roomCount
+        property: {
+          roomCount: quote.risk.property.roomCount
+        }
       },
       insurance: {
         monthlyPrice: quote.insurance.estimate.monthlyPrice,
@@ -28,16 +31,18 @@ export class QuoteSqlRepository implements QuoteRepository {
         model: InsuranceSqlModel
       },
       {
-        model: RiskSqlModel
+        model: RiskSqlModel,
+        include: [{ model: PropertySqlModel }]
       }]
     })
+
     await quoteSql.save()
   }
 
   async get (quoteId: string): Promise<Quote> {
     const quoteSql: QuoteSqlModel = await QuoteSqlModel
       .findByPk(quoteId, {
-        include: [{ model: InsuranceSqlModel }, { model: RiskSqlModel }],
+        include: [{ model: InsuranceSqlModel }, { model: RiskSqlModel, include: [{ model: PropertySqlModel }] }],
         rejectOnEmpty: false
       })
     if (quoteSql) {

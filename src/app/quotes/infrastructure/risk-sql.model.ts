@@ -1,14 +1,13 @@
 import {
   Column,
-  Default,
-  HasOne,
+  Default, HasOne,
   Model,
   PrimaryKey,
   Table
 } from 'sequelize-typescript'
-import { QuoteSqlModel } from './quote-sql.model'
 import Sequelize from 'sequelize'
 import { v4 as uuidv4 } from 'uuid'
+import { PropertySqlModel } from './property-sql.model'
 
 @Table({ timestamps: true, tableName: 'risk', underscored: true })
 export class RiskSqlModel extends Model<RiskSqlModel> {
@@ -17,9 +16,12 @@ export class RiskSqlModel extends Model<RiskSqlModel> {
     @Column(Sequelize.UUIDV4)
     id!: string
 
-    @Column
-    propertyRoomCount!: number
+    @HasOne(() => PropertySqlModel)
+    property!: PropertySqlModel
 
-    @HasOne(() => QuoteSqlModel)
-    quote!: QuoteSqlModel
+  /* @HasOne(() => PolicyHolderSqlModel)
+    policyHolder!: PolicyHolderSqlModel
+
+    @HasMany(() => OtherInsuredSqlModel)
+    otherInsured!: OtherInsuredSqlModel[] */
 }

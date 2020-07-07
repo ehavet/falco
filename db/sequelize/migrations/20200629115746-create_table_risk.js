@@ -8,7 +8,6 @@ module.exports = {
         primaryKey: true,
         allowNull: false
       },
-      property_room_count: Sequelize.INTEGER,
       created_at: Sequelize.DATE,
       updated_at: Sequelize.DATE
     })

@@ -13,7 +13,7 @@ export function sqlToQuoteMapper (quoteSql: QuoteSqlModel): Quote {
 function _sqlToRiskMapper (quoteSql: QuoteSqlModel) {
   return {
     property: {
-      roomCount: quoteSql.risk.propertyRoomCount
+      roomCount: quoteSql.risk.property.roomCount
     }
   }
 }

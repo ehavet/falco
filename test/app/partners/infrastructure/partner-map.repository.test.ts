@@ -3,11 +3,13 @@ import { PartnerMapRepository } from '../../../../src/app/partners/infrastructur
 import { PartnerNotFoundError } from '../../../../src/app/partners/domain/partner.errors'
 import { Partner } from '../../../../src/app/partners/domain/partner'
 import { Quote } from '../../../../src/app/quotes/domain/quote'
+import { PartnerRepository } from '../../../../src/app/partners/domain/partner.repository'
 
 const partnerJson = {
   partnerOne: {
     code: 'partnerOne',
     translationKey: 'translationKey',
+    callbackUrl: 'http://partner1-callback.com',
     questions: [
       {
         code: Partner.Question.QuestionCode.RoomCount,
@@ -29,6 +31,7 @@ const partnerJson = {
   partnerTwo: {
     code: 'partnerTwo',
     translationKey: 'translationKey',
+    callbackUrl: 'http://partner2-callback.com',
     questions: [
       {
         code: Partner.Question.QuestionCode.RoomCount,
@@ -50,9 +53,13 @@ const partnerJson = {
   }
 }
 
-const partnerMapRepository = new PartnerMapRepository(partnerJson)
-
 describe('Partner Map Repository', async () => {
+  let partnerMapRepository: PartnerRepository
+
+  beforeEach(() => {
+    partnerMapRepository = new PartnerMapRepository(partnerJson)
+  })
+
   describe('#getByCode', async () => {
     it('should return partner by partner code', async () => {
       // WHEN
@@ -63,6 +70,7 @@ describe('Partner Map Repository', async () => {
         {
           code: 'partnerOne',
           translationKey: 'translationKey',
+          callbackUrl: 'http://partner1-callback.com',
           questions: [
             {
               code: Partner.Question.QuestionCode.RoomCount,
@@ -117,6 +125,24 @@ describe('Partner Map Repository', async () => {
       expect(partnerOffer.simplifiedCovers).to.include('ACDDE', 'ACVOL')
       expect(partnerOffer.pricingMatrix.get(1)).to.deep.equal(propertyRoomCount1Estimate)
       expect(partnerOffer.pricingMatrix.get(2)).to.deep.equal(propertyRoomCount2Estimate)
+    })
+  })
+
+  describe('#getCallbackUrl', async () => {
+    it('should return the partner callback url', async () => {
+      // When
+      const callbackUrl: string = await partnerMapRepository.getCallbackUrl('partnerTwo')
+
+      // Then
+      expect(callbackUrl).to.equal('http://partner2-callback.com')
+    })
+
+    it('should throw an error if partner does not exist', async () => {
+      // When
+      const promise = partnerMapRepository.getCallbackUrl('unknownPartner')
+
+      // Then
+      return expect(promise).to.be.rejectedWith(PartnerNotFoundError)
     })
   })
 })

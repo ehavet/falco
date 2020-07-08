@@ -3,6 +3,7 @@ import { Quote } from '../../quotes/domain/quote'
 export interface Partner {
     code: string,
     translationKey: string
+    callbackUrl: string
     questions: Array<Partner.Question>
     offer?: Partner.Offer
 }

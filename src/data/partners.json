@@ -2,6 +2,7 @@
   "studyo": {
     "code": "studyo",
     "translationKey": "studyo",
+    "callbackUrl": "https://assurance.appenin.fr/fr/studyo/synthese?id=",
     "questions": [
       {
         "code": "RoomCount",
@@ -25,6 +26,7 @@
   "essca": {
     "code": "essca",
     "translationKey": "essca",
+    "callbackUrl": "https://assurance.appenin.fr/fr/studyo/synthese?id=",
     "questions": [
       {
         "code": "RoomCount",

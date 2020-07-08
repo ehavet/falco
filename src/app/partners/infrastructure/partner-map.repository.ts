@@ -31,4 +31,9 @@ export class PartnerMapRepository implements PartnerRepository {
     // @ts-ignore
     return Promise.resolve(partner.offer)
   }
+
+  async getCallbackUrl (partnerCode: string): Promise<string> {
+    const partner: Partner = await this.getByCode(partnerCode)
+    return Promise.resolve(partner.callbackUrl)
+  }
 }

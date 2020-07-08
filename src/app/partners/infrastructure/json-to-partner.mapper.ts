@@ -26,6 +26,7 @@ export function toPartner (partnerJson: any) : Partner {
   return {
     code: partnerJson.code,
     translationKey: partnerJson.translationKey,
+    callbackUrl: partnerJson.callbackUrl,
     questions: questions,
     offer: offer
   }

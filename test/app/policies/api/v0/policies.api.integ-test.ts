@@ -146,8 +146,10 @@ describe('Partners - API - Integration', async () => {
           term_end_date: '2020-01-05',
           subscription_date: null,
           signature_date: null,
-          payment_date: null
+          payment_date: null,
+          status: 'INITIATED'
         }
+
         expect(response.body).to.deep.equal(expectedResourcePolicy)
       })
     })

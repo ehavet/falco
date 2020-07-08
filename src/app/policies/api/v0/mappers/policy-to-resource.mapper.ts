@@ -16,7 +16,8 @@ export function policyToResource (policy: Policy) {
     term_end_date: dayjs(policy.termEndDate).format('YYYY-MM-DD'),
     subscription_date: policy.subscriptionDate ? policy.subscriptionDate : null,
     signature_date: policy.signatureDate ? policy.signatureDate : null,
-    payment_date: policy.paymentDate ? policy.paymentDate : null
+    payment_date: policy.paymentDate ? policy.paymentDate : null,
+    status: policy.status
   }
 }
 

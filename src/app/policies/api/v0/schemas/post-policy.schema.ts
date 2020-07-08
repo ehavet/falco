@@ -1,4 +1,5 @@
 import Joi from '@hapi/joi'
+import { Policy } from '../../../domain/policy'
 
 const insuranceSchema: Joi.ObjectSchema = Joi.object({
   monthly_price: Joi.number().precision(2).description('Monthly price').example(5.43),
@@ -56,6 +57,7 @@ export const policySchema: Joi.ObjectSchema = Joi.object({
   signature_date: Joi.date().optional().allow(null).description('Signature date').example('2020-04-25T10:09:08.000'),
   payment_date: Joi.date().optional().allow(null).description('Payment date').example('2020-04-25T10:09:09.000'),
   subscription_date: Joi.date().optional().allow(null).description('Subscription date').example('2020-04-25T10:09:08.000'),
+  status: Joi.string().valid(...Object.keys(Policy.Status).map(key => Policy.Status[key])).required().description('Policy status').example('INITIATED'),
   risk: riskSchema.required().description('Policy Risks').label('Policy.Risks'),
   insurance: insuranceSchema.required().description('Policy Insurance').label('Policy.Insurance'),
   contact: contactSchema.required().description('Policy Contact').label('Policy.Contact')

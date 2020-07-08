@@ -8,7 +8,7 @@ import { createOngoingPolicyFixture } from '../../fixtures/policy.fixture'
 import { createPolicyApiRequestFixture } from '../../fixtures/createPolicyApiRequest.fixture'
 import { QuoteNotFoundError } from '../../../../../src/app/quotes/domain/quote.errors'
 
-describe('Partners - API - Integration', async () => {
+describe('Policies - API - Integration', async () => {
   let httpServer: HttpServerForTesting
 
   before(async () => {
@@ -146,8 +146,10 @@ describe('Partners - API - Integration', async () => {
           term_end_date: '2020-01-05',
           subscription_date: null,
           signature_date: null,
-          payment_date: null
+          payment_date: null,
+          status: 'INITIATED'
         }
+
         expect(response.body).to.deep.equal(expectedResourcePolicy)
       })
     })

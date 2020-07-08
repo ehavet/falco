@@ -17,6 +17,7 @@ export class PolicySqlRepository implements PolicyRepository {
       signatureDate: policy.signatureDate,
       paymentDate: policy.paymentDate,
       subscriptionDate: policy.subscriptionDate,
+      status: policy.status,
       risk: {
         property: policy.risk.property,
         policyHolder: policy.risk.people.policyHolder,

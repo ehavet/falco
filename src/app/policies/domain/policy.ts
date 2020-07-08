@@ -19,7 +19,8 @@ export interface Policy {
     termEndDate: Date,
     signatureDate?: Date,
     paymentDate?: Date,
-    subscriptionDate?: Date
+    subscriptionDate?: Date,
+    status: Policy.Status
 }
 
 export namespace Policy {
@@ -36,6 +37,13 @@ export namespace Policy {
         city: string,
         email: string,
         phoneNumber: string
+    }
+
+    export enum Status {
+        Initiated = 'INITIATED',
+        Signed = 'SIGNED',
+        Paid = 'PAID',
+        Applicable = 'APPLICABLE'
     }
 
     export async function create (createPolicyCommand: CreatePolicyCommand, quote: Quote, policyRepository: PolicyRepository): Promise<Policy> {
@@ -55,7 +63,8 @@ export namespace Policy {
           termEndDate: dayjs(startDate).add(1, 'year').subtract(1, 'day').toDate(),
           signatureDate: undefined,
           paymentDate: undefined,
-          subscriptionDate: undefined
+          subscriptionDate: undefined,
+          status: Policy.Status.Initiated
         }
       }
 

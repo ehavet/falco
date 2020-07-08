@@ -53,6 +53,7 @@ export function createPolicyFixture (attr: Partial<Policy> = {}): Policy {
     termEndDate: now,
     signatureDate: now,
     paymentDate: now,
+    status: Policy.Status.Initiated,
     ...attr
   }
 }

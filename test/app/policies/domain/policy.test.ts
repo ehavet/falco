@@ -188,5 +188,13 @@ describe('Policies - Domain', async () => {
       // Then
       expect(createdPolicy.premium).to.equal(69.84)
     })
+
+    it('should set the policy status to INITIATED', async () => {
+      // When
+      const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository)
+
+      // Then
+      expect(createdPolicy.status).to.equal(Policy.Status.Initiated)
+    })
   })
 })

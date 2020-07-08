@@ -38,7 +38,7 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
       expect(result).to.have.lengthOf(1)
 
       const savedPolicy: PolicySqlModel = result[0]
-      expect(savedPolicy.id).to.equal('D9C61E')
+      expect(savedPolicy.id).to.equal('APP753210859')
       expect(savedPolicy.partnerCode).to.equal('myPartner')
       expect(savedPolicy.premium).to.equal(69.84)
       expect(savedPolicy.nbMonthsDue).to.equal(12)
@@ -115,7 +115,7 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
       const createdPolicy: Policy = await policyRepository.save(policy)
 
       // Then
-      expect(createdPolicy.id).to.equal('D9C61E')
+      expect(createdPolicy.id).to.equal('APP753210859')
       expect(createdPolicy.partnerCode).to.equal('myPartner')
       expect(createdPolicy.premium).to.equal(69.84)
       expect(createdPolicy.nbMonthsDue).to.equal(12)

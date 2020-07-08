@@ -52,7 +52,7 @@ export namespace Policy {
           premium: DEFAULT_NUMBER_OF_MONTHS_DUE * quote.insurance.estimate.monthlyPrice,
           startDate: startDate,
           termStartDate: startDate,
-          termEndDate: dayjs().add(1, 'year').subtract(1, 'day').toDate(),
+          termEndDate: dayjs(startDate).add(1, 'year').subtract(1, 'day').toDate(),
           signatureDate: undefined,
           paymentDate: undefined,
           subscriptionDate: undefined

@@ -3,15 +3,19 @@ import { container, policiesRoutes } from '../../../../../src/app/policies/polic
 import * as supertest from 'supertest'
 import { expect, sinon } from '../../../../test-utils'
 import { PolicyNotFoundError } from '../../../../../src/app/policies/domain/policies.errors'
+import { Policy } from '../../../../../src/app/policies/domain/policy'
+import { createOngoingPolicyFixture } from '../../fixtures/policy.fixture'
+import { createPolicyApiRequestFixture } from '../../fixtures/createPolicyApiRequest.fixture'
+import { QuoteNotFoundError } from '../../../../../src/app/quotes/domain/quote.errors'
 
-describe('Http API integration - Policies', async () => {
+describe('Partners - API - Integration', async () => {
   let httpServer: HttpServerForTesting
 
   before(async () => {
     httpServer = await newMinimalServer(policiesRoutes())
   })
 
-  describe('POST /v0/policies/:id/payment-intents', () => {
+  describe('POST /v0/policies/:id/payment-intents', async () => {
     let response: supertest.Response
 
     describe('when success', () => {
@@ -72,6 +76,364 @@ describe('Http API integration - Policies', async () => {
               '01234567890123456789_T00_L0NG_1D/payment-intents')
 
         expect(response).to.have.property('statusCode', 400)
+      })
+    })
+  })
+
+  describe('POST /v0/policies', async () => {
+    let response: supertest.Response
+    const requestParams: any = createPolicyApiRequestFixture()
+
+    describe('when the policy is created', async () => {
+      const policy: Policy = createOngoingPolicyFixture()
+
+      beforeEach(async () => {
+        // Given
+        sinon.stub(container, 'CreatePolicy').resolves(policy)
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies')
+          .send(requestParams)
+          .set('X-Consumer-Username', 'myPartner')
+      })
+
+      it('should reply with status 200', async () => {
+        expect(response).to.have.property('statusCode', 201)
+      })
+
+      it('should return the created quote', async () => {
+        const expectedResourcePolicy = {
+          id: 'APP753210859',
+          code: 'myPartner',
+          insurance: {
+            monthly_price: 5.82,
+            default_deductible: 150,
+            default_ceiling: 7000,
+            currency: 'EUR',
+            simplified_covers: ['ACDDE', 'ACVOL'],
+            product_code: 'MRH-Loc-Etud',
+            product_version: 'v2020-02-01'
+          },
+          risk: {
+            property: {
+              room_count: 2,
+              address: '13 rue du loup garou',
+              postal_code: 91100,
+              city: 'Corbeil-Essones'
+            },
+            people: {
+              policy_holder: {
+                firstname: 'Jean',
+                lastname: 'Dupont'
+              },
+              other_insured: [{ firstname: 'John', lastname: 'Doe' }]
+            }
+          },
+          contact: {
+            lastname: 'Dupont',
+            firstname: 'Jean',
+            address: '13 rue du loup garou',
+            postal_code: 91100,
+            city: 'Corbeil-Essones',
+            email: 'jeandupont@email.com',
+            phone_number: '+33684205510'
+          },
+          nb_months_due: 12,
+          premium: 69.84,
+          start_date: '2020-01-05',
+          term_start_date: '2020-01-05',
+          term_end_date: '2020-01-05',
+          subscription_date: null,
+          signature_date: null,
+          payment_date: null
+        }
+        expect(response.body).to.deep.equal(expectedResourcePolicy)
+      })
+    })
+
+    describe('when the quote is not found', async () => {
+      it('should return a 404', async () => {
+        // Given
+        sinon.stub(container, 'CreatePolicy').rejects(new QuoteNotFoundError(requestParams.quote_id))
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies')
+          .send(requestParams)
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 404)
+        expect(response.body).to.have.property('message', 'Quote with id 3E76DJ2 cannot be found')
+      })
+    })
+
+    describe('when there is an internal error', async () => {
+      it('should return a 500', async () => {
+        // Given
+        sinon.stub(container, 'CreatePolicy').rejects(new Error())
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies')
+          .send(requestParams)
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 500)
+      })
+    })
+
+    describe('when there is a validation error', () => {
+      let requestParams: any
+
+      beforeEach(() => {
+        requestParams = createPolicyApiRequestFixture()
+      })
+
+      it('should reply with status 400 when there is no code', async () => {
+        // Given
+        delete requestParams.code
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies')
+          .send(requestParams)
+          .set('X-Consumer-Username', 'myPartner')
+
+        expect(response).to.have.property('statusCode', 400)
+      })
+
+      it('should reply with status 400 when there is no quote_id', async () => {
+        // Given
+        delete requestParams.quote_id
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies')
+          .send(requestParams)
+          .set('X-Consumer-Username', 'myPartner')
+
+        expect(response).to.have.property('statusCode', 400)
+      })
+
+      it('should reply with status 400 when start_date is not a date', async () => {
+        // Given
+        requestParams.start_date = 'not a date'
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies')
+          .send(requestParams)
+          .set('X-Consumer-Username', 'myPartner')
+
+        expect(response).to.have.property('statusCode', 400)
+      })
+
+      it('should reply with status 400 when there is no contact', async () => {
+        // Given
+        delete requestParams.contact
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies')
+          .send(requestParams)
+          .set('X-Consumer-Username', 'myPartner')
+
+        expect(response).to.have.property('statusCode', 400)
+      })
+
+      describe('should reply with status 400 when there is a contact but', async () => {
+        it('no email', async () => {
+          // Given
+          delete requestParams.contact.email
+
+          // When
+          response = await httpServer.api()
+            .post('/v0/policies')
+            .send(requestParams)
+            .set('X-Consumer-Username', 'myPartner')
+
+          expect(response).to.have.property('statusCode', 400)
+        })
+
+        it('no phone_number', async () => {
+          // Given
+          delete requestParams.contact.phone_number
+
+          // When
+          response = await httpServer.api()
+            .post('/v0/policies')
+            .send(requestParams)
+            .set('X-Consumer-Username', 'myPartner')
+
+          expect(response).to.have.property('statusCode', 400)
+        })
+      })
+
+      it('should reply with status 400 when there is no risk', async () => {
+        // Given
+        delete requestParams.risk
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies')
+          .send(requestParams)
+          .set('X-Consumer-Username', 'myPartner')
+
+        expect(response).to.have.property('statusCode', 400)
+      })
+
+      describe('should reply with status 400 when there is a risk', async () => {
+        it('but no people', async () => {
+          // Given
+          delete requestParams.risk.people
+
+          // When
+          response = await httpServer.api()
+            .post('/v0/policies')
+            .send(requestParams)
+            .set('X-Consumer-Username', 'myPartner')
+
+          expect(response).to.have.property('statusCode', 400)
+        })
+
+        it('but no property', async () => {
+          // Given
+          delete requestParams.risk.property
+
+          // When
+          response = await httpServer.api()
+            .post('/v0/policies')
+            .send(requestParams)
+            .set('X-Consumer-Username', 'myPartner')
+
+          expect(response).to.have.property('statusCode', 400)
+        })
+
+        describe('and a property but', async () => {
+          it('but no address', async () => {
+            // Given
+            delete requestParams.risk.property.address
+
+            // When
+            response = await httpServer.api()
+              .post('/v0/policies')
+              .send(requestParams)
+              .set('X-Consumer-Username', 'myPartner')
+
+            expect(response).to.have.property('statusCode', 400)
+          })
+
+          it('but no postal_code', async () => {
+            // Given
+            delete requestParams.risk.property.postal_code
+
+            // When
+            response = await httpServer.api()
+              .post('/v0/policies')
+              .send(requestParams)
+              .set('X-Consumer-Username', 'myPartner')
+
+            expect(response).to.have.property('statusCode', 400)
+          })
+
+          it('but no city', async () => {
+            // Given
+            delete requestParams.risk.property.city
+
+            // When
+            response = await httpServer.api()
+              .post('/v0/policies')
+              .send(requestParams)
+              .set('X-Consumer-Username', 'myPartner')
+
+            expect(response).to.have.property('statusCode', 400)
+          })
+        })
+
+        it('but no policy holder', async () => {
+          // Given
+          delete requestParams.risk.people.policy_holder
+
+          // When
+          response = await httpServer.api()
+            .post('/v0/policies')
+            .send(requestParams)
+            .set('X-Consumer-Username', 'myPartner')
+
+          expect(response).to.have.property('statusCode', 400)
+        })
+
+        describe('and a policy holder but', async () => {
+          it('but no firstname', async () => {
+            // Given
+            delete requestParams.risk.people.policy_holder.firstname
+
+            // When
+            response = await httpServer.api()
+              .post('/v0/policies')
+              .send(requestParams)
+              .set('X-Consumer-Username', 'myPartner')
+
+            expect(response).to.have.property('statusCode', 400)
+          })
+
+          it('but no lastname', async () => {
+            // Given
+            delete requestParams.risk.people.policy_holder.lastname
+
+            // When
+            response = await httpServer.api()
+              .post('/v0/policies')
+              .send(requestParams)
+              .set('X-Consumer-Username', 'myPartner')
+
+            expect(response).to.have.property('statusCode', 400)
+          })
+        })
+
+        describe('and an other insured but', async () => {
+          it('but no firstname', async () => {
+            // Given
+            delete requestParams.risk.people.other_insured[0].firstname
+
+            // When
+            response = await httpServer.api()
+              .post('/v0/policies')
+              .send(requestParams)
+              .set('X-Consumer-Username', 'myPartner')
+
+            expect(response).to.have.property('statusCode', 400)
+          })
+
+          it('but no lastname', async () => {
+            // Given
+            delete requestParams.risk.people.other_insured[0].lastname
+
+            // When
+            response = await httpServer.api()
+              .post('/v0/policies')
+              .send(requestParams)
+              .set('X-Consumer-Username', 'myPartner')
+
+            expect(response).to.have.property('statusCode', 400)
+          })
+        })
+
+        it('no phone_number', async () => {
+          // Given
+          delete requestParams.contact.phone_number
+
+          // When
+          response = await httpServer.api()
+            .post('/v0/policies')
+            .send(requestParams)
+            .set('X-Consumer-Username', 'myPartner')
+
+          expect(response).to.have.property('statusCode', 400)
+        })
       })
     })
   })

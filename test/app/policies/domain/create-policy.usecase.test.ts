@@ -19,7 +19,7 @@ describe('Policies - Usecase - Create policy', async () => {
   const policyRepository: SinonStubbedInstance<PolicyRepository> = { save: sinon.stub(), isIdAvailable: sinon.stub(), get: sinon.stub }
   const quoteRepository: SinonStubbedInstance<QuoteRepository> = { save: sinon.stub(), get: sinon.stub() }
   const partnerRepository: SinonStubbedInstance<PartnerRepository> = { getByCode: sinon.stub(), getOffer: sinon.stub(), getCallbackUrl: sinon.stub() }
-  const sendValidationLinkToEmailAddress = sinon.mock()
+  const sendValidationLinkToEmailAddress = sinon.stub()
   const createPolicy: CreatePolicy = CreatePolicy.factory(policyRepository, quoteRepository, partnerRepository, sendValidationLinkToEmailAddress)
 
   beforeEach(() => {
@@ -69,13 +69,23 @@ describe('Policies - Usecase - Create policy', async () => {
     const callbackUrl: string = 'http://callback-url.com'
     partnerRepository.getCallbackUrl.withArgs(expectedPolicy.partnerCode).resolves(callbackUrl)
 
-    const emailValidationQuery: EmailValidationQuery = { email: expectedPolicy.contact.email, callbackUrl: callbackUrl }
-    sendValidationLinkToEmailAddress.withArgs(emailValidationQuery).resolves()
+    const emailValidationQuery: EmailValidationQuery = {
+      email: expectedPolicy.contact.email,
+      callbackUrl: callbackUrl,
+      partnerCode: expectedPolicy.partnerCode,
+      policyId: expectedPolicy.id
+    }
+    sendValidationLinkToEmailAddress.resolves()
 
     // When
     await createPolicy(createPolicyCommand)
 
     // Then
-    return sendValidationLinkToEmailAddress.verify()
+    const sendEmailSpy = sendValidationLinkToEmailAddress.getCall(0)
+    const actualEmailValidationQuery: EmailValidationQuery = sendEmailSpy.args[0]
+    expect(actualEmailValidationQuery.email).to.equal(emailValidationQuery.email)
+    expect(actualEmailValidationQuery.callbackUrl).to.equal(emailValidationQuery.callbackUrl)
+    expect(actualEmailValidationQuery.partnerCode).to.equal(emailValidationQuery.partnerCode)
+    expect(actualEmailValidationQuery.email).to.exist
   })
 })

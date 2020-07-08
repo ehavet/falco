@@ -1,4 +1,6 @@
 export interface EmailValidationQuery {
     email: string,
-    callbackUrl: string
+    callbackUrl: string,
+    partnerCode: string,
+    policyId: string
 }

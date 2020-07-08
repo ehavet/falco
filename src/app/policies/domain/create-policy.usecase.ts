@@ -24,6 +24,11 @@ export namespace CreatePolicy {
 
     async function sendValidationEmail (partnerRepository, newPolicy, sendValidationLinkToEmailAddress) {
       const partnerCallbackUrl: string = await partnerRepository.getCallbackUrl(newPolicy.partnerCode)
-      await sendValidationLinkToEmailAddress({ email: newPolicy.contact.email, callbackUrl: partnerCallbackUrl })
+      await sendValidationLinkToEmailAddress({
+        email: newPolicy.contact.email,
+        callbackUrl: partnerCallbackUrl,
+        partnerCode: newPolicy.partnerCode,
+        policyId: newPolicy.id
+      })
     }
 }

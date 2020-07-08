@@ -30,6 +30,10 @@ module.exports = Envie({
 
   FALCO_API_EMAIL_TRANSPORT: Joi.string().valid('sendmail', 'stream'),
 
-  FALCO_API_STRIPE_PRIVATE_KEY: Joi.string()
+  FALCO_API_STRIPE_PRIVATE_KEY: Joi.string(),
+
+  FALCO_API_EMAIL_VALIDATION_APPENIN_CALLBACK_PAGE_ROUTE: Joi.string(),
+
+  FALCO_API_FALCO_FRONT_URL: Joi.string()
 
 }) as Config

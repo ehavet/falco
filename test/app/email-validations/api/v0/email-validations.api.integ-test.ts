@@ -40,7 +40,7 @@ describe('Http API - email validations intégration', async () => {
     describe('when there is an unknown error', () => {
       it('should reply with status 500 when unknown error', async () => {
         sinon.stub(container, 'SendValidationLinkToEmailAddress')
-          .withArgs({ email: 'test@email.com', callbackUrl: 'http://url.com' })
+          .withArgs({ email: 'test@email.com', callbackUrl: 'http://url.com', partnerCode: undefined, policyId: undefined })
           .rejects(new Error())
 
         response = await httpServer.api()

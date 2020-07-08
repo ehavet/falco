@@ -39,7 +39,9 @@ export default function (container: Container): Array<ServerRoute> {
 
         const emailValidationQuery: EmailValidationQuery = {
           email: parsedJsonPayload.email,
-          callbackUrl: parsedJsonPayload.callback_url
+          callbackUrl: parsedJsonPayload.callback_url,
+          partnerCode: parsedJsonPayload.code,
+          policyId: parsedJsonPayload.policy_id
         }
 
         try {

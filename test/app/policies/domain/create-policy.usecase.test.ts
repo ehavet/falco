@@ -86,6 +86,6 @@ describe('Policies - Usecase - Create policy', async () => {
     expect(actualEmailValidationQuery.email).to.equal(emailValidationQuery.email)
     expect(actualEmailValidationQuery.callbackUrl).to.equal(emailValidationQuery.callbackUrl)
     expect(actualEmailValidationQuery.partnerCode).to.equal(emailValidationQuery.partnerCode)
-    expect(actualEmailValidationQuery.email).to.exist
+    expect(actualEmailValidationQuery.policyId).to.exist
   })
 })

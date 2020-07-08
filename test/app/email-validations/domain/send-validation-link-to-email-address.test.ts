@@ -21,7 +21,7 @@ describe('Usecase - Send a validation link to an email address', async () => {
 
   afterEach(() => {
     encrypter.encrypt.reset()
-    encrypter.encrypt.reset()
+    encrypter.decrypt.reset()
   })
 
   it('should build a validation link and send it to a provided email address', async () => {

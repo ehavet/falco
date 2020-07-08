@@ -8,7 +8,7 @@ import { createOngoingPolicyFixture } from '../../fixtures/policy.fixture'
 import { createPolicyApiRequestFixture } from '../../fixtures/createPolicyApiRequest.fixture'
 import { QuoteNotFoundError } from '../../../../../src/app/quotes/domain/quote.errors'
 
-describe('Partners - API - Integration', async () => {
+describe('Policies - API - Integration', async () => {
   let httpServer: HttpServerForTesting
 
   before(async () => {

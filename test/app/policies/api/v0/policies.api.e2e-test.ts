@@ -52,7 +52,7 @@ describe('Policies - API - E2E', async () => {
   describe('POST /v0/policies', async () => {
     let response: supertest.Response
     const now = new Date('2020-04-18T10:09:08Z')
-    const requestParams: any = createPolicyApiRequestFixture()
+    const requestParams: any = createPolicyApiRequestFixture({ code: 'studyo' })
 
     beforeEach(async () => {
       // Given
@@ -80,7 +80,7 @@ describe('Policies - API - E2E', async () => {
       // Given
       const expectedPolicy = {
         id: 'MYP936794823',
-        code: 'myPartner',
+        code: 'studyo',
         insurance: {
           monthly_price: 7.5,
           default_deductible: 120,

@@ -9,18 +9,26 @@ import { createQuote } from '../../quotes/fixtures/quote.fixture'
 import { createCreatePolicyCommand } from '../fixtures/createPolicyCommand.fixture'
 import { PolicyRepository } from '../../../../src/app/policies/domain/policy.repository'
 import { createOngoingPolicyFixture } from '../fixtures/policy.fixture'
+import { EmailValidationQuery } from '../../../../src/app/email-validations/domain/email-validation-query'
+import { PartnerRepository } from '../../../../src/app/partners/domain/partner.repository'
 
 describe('Policies - Usecase - Create policy', async () => {
   const now = new Date('2020-01-05T10:09:08Z')
   const quote: Quote = createQuote()
   const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({ quoteId: quote.id, startDate: null })
   const policyRepository: SinonStubbedInstance<PolicyRepository> = { save: sinon.stub(), isIdAvailable: sinon.stub(), get: sinon.stub }
-  policyRepository.isIdAvailable.resolves(true)
   const quoteRepository: SinonStubbedInstance<QuoteRepository> = { save: sinon.stub(), get: sinon.stub() }
-  const createPolicy: CreatePolicy = CreatePolicy.factory(policyRepository, quoteRepository)
+  const partnerRepository: SinonStubbedInstance<PartnerRepository> = { getByCode: sinon.stub(), getOffer: sinon.stub(), getCallbackUrl: sinon.stub() }
+  const sendValidationLinkToEmailAddress = sinon.mock()
+  const createPolicy: CreatePolicy = CreatePolicy.factory(policyRepository, quoteRepository, partnerRepository, sendValidationLinkToEmailAddress)
 
   beforeEach(() => {
     dateFaker.setCurrentDate(now)
+    policyRepository.isIdAvailable.resolves(true)
+  })
+
+  afterEach(() => {
+    sendValidationLinkToEmailAddress.reset()
   })
 
   it('should save the created policy', async () => {
@@ -50,5 +58,24 @@ describe('Policies - Usecase - Create policy', async () => {
 
     // Then
     expect(createdPolicy).to.deep.equal(expectedPolicy)
+  })
+
+  it('should send an email to the contact to validate the email', async () => {
+    // Given
+    const expectedPolicy = createOngoingPolicyFixture()
+    quoteRepository.get.withArgs(createPolicyCommand.quoteId).resolves(quote)
+    policyRepository.save.resolves(expectedPolicy)
+
+    const callbackUrl: string = 'http://callback-url.com'
+    partnerRepository.getCallbackUrl.withArgs(expectedPolicy.partnerCode).resolves(callbackUrl)
+
+    const emailValidationQuery: EmailValidationQuery = { email: expectedPolicy.contact.email, callbackUrl: callbackUrl }
+    sendValidationLinkToEmailAddress.withArgs(emailValidationQuery).resolves()
+
+    // When
+    await createPolicy(createPolicyCommand)
+
+    // Then
+    return sendValidationLinkToEmailAddress.verify()
   })
 })

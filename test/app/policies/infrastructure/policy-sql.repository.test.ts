@@ -50,6 +50,7 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
       expect(savedPolicy.subscriptionDate).to.deep.equals(now)
       expect(savedPolicy.createdAt).to.be.an.instanceof(Date)
       expect(savedPolicy.updatedAt).to.be.an.instanceof(Date)
+      expect(savedPolicy.status).to.equal('INITIATED')
 
       const savedRisk: RiskSqlModel = savedPolicy.risk
       expect(savedRisk).not.to.be.undefined
@@ -125,6 +126,7 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
       expect(createdPolicy.signatureDate).to.deep.equals(now)
       expect(createdPolicy.paymentDate).to.deep.equals(now)
       expect(createdPolicy.subscriptionDate).to.deep.equals(now)
+      expect(createdPolicy.status).to.equal(Policy.Status.Initiated)
 
       const risk: Policy.Risk = createdPolicy.risk
       expect(risk).not.to.be.undefined

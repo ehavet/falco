@@ -13,6 +13,7 @@ import { PropertySqlModel } from './infrastructure/property-sql.model'
 
 export interface Container {
   GetQuote: GetQuote
+  quoteRepository: QuoteRepository
 }
 
 const partnerRepository: PartnerRepository = partnerContainer.partnerRepository
@@ -20,7 +21,8 @@ const quoteRepository: QuoteRepository = new QuoteSqlRepository()
 const getQuote: GetQuote = GetQuote.factory(quoteRepository, partnerRepository)
 
 export const container: Container = {
-  GetQuote: getQuote
+  GetQuote: getQuote,
+  quoteRepository
 }
 
 export const quoteSqlModels: Array<any> = [

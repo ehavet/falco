@@ -3,7 +3,7 @@ import { Policy } from '../../../../src/app/policies/domain/policy'
 export function createPolicyFixture (attr: Partial<Policy> = {}): Policy {
   const now: Date = new Date('2020-01-05T10:09:08Z')
   return {
-    id: 'D9C61E',
+    id: 'APP753210859',
     partnerCode: 'myPartner',
     insurance: {
       estimate: {

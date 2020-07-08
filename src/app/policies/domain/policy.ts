@@ -42,7 +42,7 @@ export namespace Policy {
     export enum Status {
         Initiated = 'INITIATED',
         Signed = 'SIGNED',
-        Payed = 'PAYED',
+        Paid = 'PAID',
         Applicable = 'APPLICABLE'
     }
 

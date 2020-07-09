@@ -22,6 +22,7 @@ describe('Usecase - Get a validation callback url from a validation token', asyn
     const validationTokenPayloadString: ValidationTokenPayload = {
       email: 'albert.hofmann@science.org',
       callbackUrl: 'http://bicycle-day.com',
+      policyId: 'APP746312047',
       expiredAt: new Date()
     }
     const validationToken: ValidationToken = {
@@ -42,6 +43,7 @@ describe('Usecase - Get a validation callback url from a validation token', asyn
     const validationTokenPayload: ValidationTokenPayload = {
       email: 'albert.hofmann@science.org',
       callbackUrl: 'http://bicycle-day.com',
+      policyId: 'APP746312047',
       expiredAt: new Date('2000-01-30T00:00:00.000Z')
     }
     const validationTokenPayloadString: string = JSON.stringify(validationTokenPayload)

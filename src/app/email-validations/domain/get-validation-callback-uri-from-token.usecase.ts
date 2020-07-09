@@ -42,6 +42,7 @@ function _buildValidationTokenPayload (validationTokenPayloadString: string): Va
   return {
     email: validationTokenPayloadJson.email,
     callbackUrl: validationTokenPayloadJson.callbackUrl,
+    policyId: validationTokenPayloadJson.policyId,
     expiredAt: new Date(validationTokenPayloadJson.expiredAt)
   }
 }

@@ -46,6 +46,7 @@ function _buildValidationTokenPayload (
   return {
     email: emailValidationQuery.email,
     callbackUrl: _getCallbackUrl(emailValidationQuery.callbackUrl, emailValidationQuery.partnerCode, emailValidationQuery.policyId, config),
+    policyId: emailValidationQuery.policyId,
     expiredAt: _getExpirationDate(config.validityPeriodinMonth)
   }
 }

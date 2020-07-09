@@ -2,6 +2,7 @@
   "studyo": {
     "code": "studyo",
     "translationKey": "studyo",
+    "callbackUrl": "",
     "questions": [
       {
         "code": "RoomCount",
@@ -25,6 +26,7 @@
   "essca": {
     "code": "essca",
     "translationKey": "essca",
+    "callbackUrl": "",
     "questions": [
       {
         "code": "RoomCount",

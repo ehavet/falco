@@ -7,23 +7,6 @@ describe('Http API email validations e2e', async () => {
     httpServer = await newProdLikeServer()
   })
 
-  describe('POST /v0/email-validations', async () => {
-    let response: supertest.Response
-
-    it('should return an empty object', async () => {
-      // WHEN
-      response = await httpServer.api()
-        .post('/v0/email-validations')
-        .send({
-          email: 'test@email.com',
-          callback_url: 'http://url.com'
-        })
-
-      // THEN
-      expect(response.body).to.deep.equal({})
-    })
-  })
-
   describe('POST /internal/v0/email-validation/validate', async () => {
     let response: supertest.Response
 

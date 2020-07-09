@@ -18,6 +18,7 @@ describe('Http API partners integ', async () => {
       const partner: Partner = {
         code: 'myPartnerKey',
         translationKey: 'myPartnerTranslationKey',
+        callbackUrl: 'http://myPartner-callback.com',
         questions: [{
           code: Partner.Question.QuestionCode.RoomCount,
           required: true,

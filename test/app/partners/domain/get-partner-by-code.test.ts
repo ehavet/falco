@@ -8,6 +8,7 @@ describe('Get partner by code', async () => {
     const expectedPartner: Partner = {
       code: 'myPartner',
       translationKey: 'myPartnerTranslationKey',
+      callbackUrl: 'http://myPartner-callback.com',
       questions: [{
         code: Partner.Question.QuestionCode.RoomCount,
         required: true,
@@ -17,7 +18,7 @@ describe('Get partner by code', async () => {
       }]
     }
 
-    const partnerRepository = { getByCode: sinon.stub(), getOffer: sinon.stub() }
+    const partnerRepository = { getByCode: sinon.stub(), getOffer: sinon.stub(), getCallbackUrl: sinon.stub() }
     partnerRepository.getByCode.withArgs('myPartner').resolves(expectedPartner)
     const getPartnerByCode : GetPartnerByCode = GetPartnerByCode.factory(partnerRepository)
 

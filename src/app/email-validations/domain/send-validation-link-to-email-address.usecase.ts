@@ -17,7 +17,7 @@ export namespace SendValidationLinkToEmailAddress {
     ): SendValidationLinkToEmailAddress {
       return async (emailValidationQuery: EmailValidationQuery) => {
         const validationTokenPayload: ValidationTokenPayload =
-            _buildValidationTokenPayload(emailValidationQuery, config.validityPeriodinMonth)
+            _buildValidationTokenPayload(emailValidationQuery, config)
         const validationToken: string = encrypter.encrypt(JSON.stringify(validationTokenPayload))
         const emailValidationUri: string = _getEmailValidationUri(config.baseUrl, validationToken)
         await mailer.send(_buildValidationEmail(validationTokenPayload.email, emailValidationUri, config.emailSender))
@@ -41,13 +41,20 @@ function _getEmailValidationUri (url: string, validationToken: string): string {
 
 function _buildValidationTokenPayload (
   emailValidationQuery: EmailValidationQuery,
-  validityPeriodInMonth: number
+  config: ValidationLinkConfig
 ): ValidationTokenPayload {
   return {
     email: emailValidationQuery.email,
-    callbackUrl: emailValidationQuery.callbackUrl,
-    expiredAt: _getExpirationDate(validityPeriodInMonth)
+    callbackUrl: _getCallbackUrl(emailValidationQuery.callbackUrl, emailValidationQuery.partnerCode, emailValidationQuery.policyId, config),
+    expiredAt: _getExpirationDate(config.validityPeriodinMonth)
   }
+}
+
+function _getCallbackUrl (callbackUrl: string, partnerCode: string, policyId: string, config: ValidationLinkConfig) : string {
+  if (callbackUrl && callbackUrl.length > 0) {
+    return callbackUrl
+  }
+  return `${config.frontUrl}/${partnerCode}/${config.frontCallbackPageRoute}?policy_id=${policyId}`
 }
 
 function _buildValidationEmail (recipientAddress: string, emailValidationUri: string, senderAddress: string): Email {

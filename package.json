@@ -108,6 +108,7 @@
     "sequelize-cli": "^5.5.1",
     "sequelize-typescript": "^1.1.0",
     "sonic-boom": "^1.0.1",
+    "stripe": "^8.68.0",
     "uuid": "^8.2.0"
   },
   "husky": {

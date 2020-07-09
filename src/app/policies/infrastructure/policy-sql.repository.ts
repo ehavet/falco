@@ -1,8 +1,9 @@
-import { PolicyRepository } from '../../../../src/app/policies/domain/policy.repository'
+import { PolicyRepository } from '../domain/policy.repository'
 import { Policy } from '../domain/policy'
 import { PolicySqlModel } from './policy-sql.model'
 import { RiskSqlModel } from '../../quotes/infrastructure/risk-sql.model'
 import { sqlToPolicyMapper } from './policy-sql.mapper'
+import { PolicyNotFoundError } from '../domain/policies.errors'
 
 export class PolicySqlRepository implements PolicyRepository {
   async save (policy: Policy): Promise<Policy> {
@@ -39,6 +40,17 @@ export class PolicySqlRepository implements PolicyRepository {
 
     const savedPolicy: PolicySqlModel = await policySql.save()
     return sqlToPolicyMapper(savedPolicy)
+  }
+
+  async get (policyId: string): Promise<Policy> {
+    const policy: PolicySqlModel = await PolicySqlModel
+      .findByPk(policyId, {
+        rejectOnEmpty: false, include: [{ all: true }, { model: RiskSqlModel, include: [{ all: true }] }]
+      })
+    if (policy) {
+      return sqlToPolicyMapper(policy)
+    }
+    throw new PolicyNotFoundError(policyId)
   }
 
   async isIdAvailable (policyId: string): Promise<boolean> {

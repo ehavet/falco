@@ -25,32 +25,32 @@ export function createPolicyFixture (attr: Partial<Policy> = {}): Policy {
       },
       people: {
         policyHolder: {
-          lastname: 'Dupont',
-          firstname: 'Jean'
+          firstname: 'Jean',
+          lastname: 'Dupont'
         },
         otherInsured: [
           {
-            lastname: 'Doe',
-            firstname: 'John'
+            firstname: 'John',
+            lastname: 'Doe'
           }
         ]
       }
     },
     contact: {
-      lastname: 'Dupont',
       firstname: 'Jean',
+      lastname: 'Dupont',
       address: '13 rue du loup garou',
       postalCode: 91100,
       city: 'Corbeil-Essones',
       email: 'jeandupont@email.com',
       phoneNumber: '+33684205510'
     },
-    nbMonthsDue: 12,
     premium: 69.84,
-    subscriptionDate: now,
+    nbMonthsDue: 12,
     startDate: now,
     termStartDate: now,
     termEndDate: now,
+    subscriptionDate: now,
     signatureDate: now,
     paymentDate: now,
     status: Policy.Status.Initiated,

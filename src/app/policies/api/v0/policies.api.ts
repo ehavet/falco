@@ -30,9 +30,10 @@ export default function (container: Container): Array<ServerRoute> {
         },
         response: {
           status: {
-            200: Joi.object({
-              id: Joi.string()
-                .description('Payment intent id').example('pi_1GqKZZB099cSJ3oRvAiocs5r')
+            201: Joi.object({
+              id: Joi.string().description('Payment intent id').example('pi_1GqKZZB099cSJ3oRvAiocs5r'),
+              amount: Joi.number().description('Payment intent amount').example(99.99),
+              currency: Joi.string().description('Payment intent currency').example('eur')
             }),
             400: HttpErrorSchema.badRequestSchema,
             404: HttpErrorSchema.notFoundSchema,
@@ -46,11 +47,15 @@ export default function (container: Container): Array<ServerRoute> {
         }
 
         try {
-          const paymentIntent = await container.CreatePaymentIntent(paymentIntentQuery)
+          const paymentIntent = await container.CreatePaymentIntentForPolicy(paymentIntentQuery)
 
           return h
-            .response({ id: paymentIntent.id })
-            .code(200)
+            .response({
+              id: paymentIntent.id,
+              amount: paymentIntent.amount,
+              currency: paymentIntent.currency
+            })
+            .code(201)
         } catch (error) {
           if (error instanceof PolicyNotFoundError) {
             throw Boom.notFound(error.message)

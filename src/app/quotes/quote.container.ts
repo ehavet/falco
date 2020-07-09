@@ -22,7 +22,7 @@ const getQuote: GetQuote = GetQuote.factory(quoteRepository, partnerRepository)
 
 export const container: Container = {
   GetQuote: getQuote,
-  quoteRepository
+  quoteRepository: quoteRepository
 }
 
 export const quoteSqlModels: Array<any> = [

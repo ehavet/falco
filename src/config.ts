@@ -28,6 +28,8 @@ module.exports = Envie({
 
   FALCO_API_APPENIN_EMAIL_ADDRESS: Joi.string().email(),
 
-  FALCO_API_EMAIL_TRANSPORT: Joi.string().valid('sendmail', 'stream')
+  FALCO_API_EMAIL_TRANSPORT: Joi.string().valid('sendmail', 'stream'),
+
+  FALCO_API_STRIPE_PRIVATE_KEY: Joi.string()
 
 }) as Config

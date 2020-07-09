@@ -58,4 +58,8 @@ export class PolicySqlRepository implements PolicyRepository {
     if (foundPolicy) return false
     return true
   }
+
+  async setEmailValidationDate (date: Date): Promise<void> {
+    throw new Error(JSON.stringify(date))
+  }
 }

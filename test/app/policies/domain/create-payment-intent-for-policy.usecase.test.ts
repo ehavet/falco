@@ -20,7 +20,7 @@ describe('Usecase - Create payment intent for policy', async () => {
       currency: 'eur'
     }
 
-    const policyRepository = { get: sinon.mock(), save: sinon.stub, isIdAvailable: sinon.stub }
+    const policyRepository = { get: sinon.mock(), save: sinon.stub(), isIdAvailable: sinon.stub(), setEmailValidationDate: sinon.stub() }
     const paymentProcessor = { createIntent: sinon.mock() }
 
     policyRepository.get.withArgs('p0l1cy1d').resolves(policy)
@@ -44,7 +44,7 @@ describe('Usecase - Create payment intent for policy', async () => {
       policyId: 'unexistingP0l1cy1d'
     }
     const paymentProcessor = { createIntent: sinon.stub }
-    const policyRepository = { get: sinon.mock(), save: sinon.stub, isIdAvailable: sinon.stub }
+    const policyRepository = { get: sinon.mock(), save: sinon.stub(), isIdAvailable: sinon.stub(), setEmailValidationDate: sinon.stub() }
     policyRepository.get.withArgs('unexistingP0l1cy1d').throws(new PolicyNotFoundError(paymentIntentQuery.policyId))
     const createPaymentIntentForPolicy: CreatePaymentIntentForPolicy =
         CreatePaymentIntentForPolicy.factory(paymentProcessor, policyRepository)

@@ -6,6 +6,7 @@ import { Container } from '../../email-validations.container'
 import { ValidationToken } from '../../domain/validation-token'
 import { ValidationCallbackUri } from '../../domain/validation-callback-uri'
 import { ExpiredEmailValidationTokenError, BadEmailValidationToken } from '../../domain/email-validation.errors'
+import { PolicyNotFoundError } from '../../../policies/domain/policies.errors'
 
 const TAGS = ['api', 'email-validations']
 
@@ -43,7 +44,8 @@ export default function (container: Container): Array<ServerRoute> {
         return h.response({ callback_url: validationCallbackUrl.callbackUrl }).code(200)
       } catch (error) {
         if (error instanceof BadEmailValidationToken ||
-              error instanceof ExpiredEmailValidationTokenError) {
+            error instanceof ExpiredEmailValidationTokenError ||
+            error instanceof PolicyNotFoundError) {
           throw Boom.badData(error.message)
         }
         throw Boom.internal(error)

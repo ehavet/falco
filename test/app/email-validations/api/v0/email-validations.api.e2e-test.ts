@@ -1,7 +1,7 @@
 import * as supertest from 'supertest'
 import { expect, HttpServerForTesting, newProdLikeServer } from '../../../../test-utils'
 
-describe('Http API email validations e2e', async () => {
+describe('Email Validations - API - E2E', async () => {
   let httpServer: HttpServerForTesting
   before(async () => {
     httpServer = await newProdLikeServer()

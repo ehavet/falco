@@ -3,8 +3,9 @@ import { expect, sinon, HttpServerForTesting, newMinimalServer } from '../../../
 import { container, emailValidationsRoutes } from '../../../../../src/app/email-validations/email-validations.container'
 import { ValidationCallbackUri } from '../../../../../src/app/email-validations/domain/validation-callback-uri'
 import { ExpiredEmailValidationTokenError } from '../../../../../src/app/email-validations/domain/email-validation.errors'
+import { PolicyNotFoundError } from '../../../../../src/app/policies/domain/policies.errors'
 
-describe('Http API - email validations intégration', async () => {
+describe('Email Validations - API - Integ', async () => {
   let httpServer: HttpServerForTesting
 
   before(async () => {
@@ -74,6 +75,25 @@ describe('Http API - email validations intégration', async () => {
         response = await httpServer.api()
           .post('/internal/v0/email-validations/validate')
           .send({ token: corruptedToken })
+        expect(response).to.have.property('statusCode', 422)
+      })
+    })
+
+    describe('when the policy associated to the validation does not exists', () => {
+      it('should reply with status 422', async () => {
+        // Given
+        sinon.stub(container, 'GetValidationCallbackUriFromToken')
+          .withArgs({ token: 'Yofl0qsXdbJ3dgZXzSFLV5/3v/nbeGqPWns/Q==' })
+          .rejects(new PolicyNotFoundError('APP374522902'))
+
+        // When
+        response = await httpServer.api()
+          .post('/internal/v0/email-validations/validate')
+          .send({
+            token: 'Yofl0qsXdbJ3dgZXzSFLV5/3v/nbeGqPWns/Q=='
+          })
+
+        // Then
         expect(response).to.have.property('statusCode', 422)
       })
     })

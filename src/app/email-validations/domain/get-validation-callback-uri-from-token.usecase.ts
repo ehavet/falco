@@ -31,7 +31,7 @@ export namespace GetValidationCallbackUriFromToken {
         throw new ExpiredEmailValidationTokenError(validationToken.token)
       }
 
-      await policyRepository.setEmailValidationDate(new Date())
+      await policyRepository.setEmailValidationDate(validationTokenPayload.policyId, new Date())
 
       return { callbackUrl: validationTokenPayload.callbackUrl }
     }

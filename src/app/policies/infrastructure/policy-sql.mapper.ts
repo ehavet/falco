@@ -26,6 +26,7 @@ export function sqlToPolicyMapper (policySql: PolicySqlModel): Policy {
     signatureDate: policySql.signatureDate,
     paymentDate: policySql.paymentDate,
     subscriptionDate: policySql.subscriptionDate,
+    emailValidationDate: policySql.emailValidationDate,
     status: policySql.status
   }
 }

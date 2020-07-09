@@ -20,6 +20,7 @@ export interface Policy {
     signatureDate?: Date,
     paymentDate?: Date,
     subscriptionDate?: Date,
+    emailValidationDate?: Date,
     status: Policy.Status
 }
 
@@ -64,6 +65,7 @@ export namespace Policy {
           signatureDate: undefined,
           paymentDate: undefined,
           subscriptionDate: undefined,
+          emailValidationDate: undefined,
           status: Policy.Status.Initiated
         }
       }

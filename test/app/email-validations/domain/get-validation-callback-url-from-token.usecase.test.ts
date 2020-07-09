@@ -58,7 +58,7 @@ describe('Usecase - Get a validation callback url from a validation token', asyn
     const getValidationCallbackUriFromToken: GetValidationCallbackUriFromToken =
         GetValidationCallbackUriFromToken.factory(decrypter, policyRepository)
 
-    policyRepository.setEmailValidationDate.withExactArgs(now).resolves()
+    policyRepository.setEmailValidationDate.withExactArgs(validationTokenPayloadString.policyId, now).resolves()
 
     // WHEN
     await getValidationCallbackUriFromToken(validationToken)

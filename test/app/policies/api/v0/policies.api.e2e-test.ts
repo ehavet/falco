@@ -1,8 +1,11 @@
 import * as supertest from 'supertest'
+import { createPolicyFixture } from '../../fixtures/policy.fixture'
+import { Policy } from '../../../../../src/app/policies/domain/policy'
 import { dateFaker, expect, HttpServerForTesting, newProdLikeServer } from '../../../../test-utils'
 import { PolicySqlModel } from '../../../../../src/app/policies/infrastructure/policy-sql.model'
 import { createPolicyApiRequestFixture } from '../../fixtures/createPolicyApiRequest.fixture'
 import { QuoteSqlModel } from '../../../../../src/app/quotes/infrastructure/quote-sql.model'
+import { PolicySqlRepository } from '../../../../../src/app/policies/infrastructure/policy-sql.repository'
 
 async function resetDb () {
   await PolicySqlModel.destroy({ truncate: true, cascade: true })
@@ -12,11 +15,41 @@ async function resetDb () {
 describe('Policies - API - E2E', async () => {
   let httpServer: HttpServerForTesting
 
-  before(async () => {
-    httpServer = await newProdLikeServer()
+  describe('POST /v0/policies/:id/payment-intents', async () => {
+    let response: supertest.Response
+    let policyRepository: PolicySqlRepository
+
+    before(async () => {
+      policyRepository = new PolicySqlRepository()
+      const policy: Policy = createPolicyFixture(
+        {
+          id: 'P0l1CY1D',
+          premium: 99.99
+        }
+      )
+      await policyRepository.save(policy)
+      httpServer = await newProdLikeServer()
+    })
+
+    afterEach(async () => {
+      await resetDb()
+    })
+
+    it('should return a payment intent id', async () => {
+      response = await httpServer.api()
+        .post('/v0/policies/P0l1CY1D/payment-intents')
+
+      // THEN
+      expect(response.body)
+        .to.include({ amount: 99.99, currency: 'eur' })
+        .to.have.property('id')
+      expect(response.body.id)
+        .to.include('pi_')
+        .to.include('_secret_')
+    }).timeout(10000)
   })
 
-  describe('POST /v0/policies/', () => {
+  describe('POST /v0/policies', async () => {
     let response: supertest.Response
     const now = new Date('2020-04-18T10:09:08Z')
     const requestParams: any = createPolicyApiRequestFixture()

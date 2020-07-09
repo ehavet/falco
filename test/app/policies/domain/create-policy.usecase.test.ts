@@ -14,7 +14,7 @@ describe('Policies - Usecase - Create policy', async () => {
   const now = new Date('2020-01-05T10:09:08Z')
   const quote: Quote = createQuote()
   const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({ quoteId: quote.id, startDate: null })
-  const policyRepository: SinonStubbedInstance<PolicyRepository> = { save: sinon.stub(), isIdAvailable: sinon.stub() }
+  const policyRepository: SinonStubbedInstance<PolicyRepository> = { save: sinon.stub(), isIdAvailable: sinon.stub(), get: sinon.stub }
   policyRepository.isIdAvailable.resolves(true)
   const quoteRepository: SinonStubbedInstance<QuoteRepository> = { save: sinon.stub(), get: sinon.stub() }
   const createPolicy: CreatePolicy = CreatePolicy.factory(policyRepository, quoteRepository)

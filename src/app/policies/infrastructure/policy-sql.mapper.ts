@@ -9,7 +9,15 @@ export function sqlToPolicyMapper (policySql: PolicySqlModel): Policy {
     partnerCode: policySql.partnerCode,
     insurance: _sqlToInsuranceMapper(policySql.insurance),
     risk: _sqlToRiskMapper(policySql.risk),
-    contact: policySql.contact,
+    contact: {
+      firstname: policySql.contact.firstname,
+      lastname: policySql.contact.lastname,
+      address: policySql.contact.address,
+      postalCode: policySql.contact.postalCode,
+      city: policySql.contact.city,
+      email: policySql.contact.email,
+      phoneNumber: policySql.contact.phoneNumber
+    },
     premium: policySql.premium,
     nbMonthsDue: policySql.nbMonthsDue,
     startDate: new Date(policySql.startDate),
@@ -24,10 +32,20 @@ export function sqlToPolicyMapper (policySql: PolicySqlModel): Policy {
 
 function _sqlToRiskMapper (riskSql: RiskSqlModel) {
   return {
-    property: riskSql.property,
+    property: {
+      roomCount: riskSql.property.roomCount,
+      address: riskSql.property.address,
+      postalCode: riskSql.property.postalCode,
+      city: riskSql.property.city
+    },
     people: {
-      policyHolder: riskSql.policyHolder,
-      otherInsured: riskSql.otherInsured
+      policyHolder: {
+        firstname: riskSql.policyHolder.firstname,
+        lastname: riskSql.policyHolder.lastname
+      },
+      otherInsured: riskSql.otherInsured.map((insured) => {
+        return { firstname: insured.firstname, lastname: insured.lastname }
+      })
     }
   }
 }

@@ -22,6 +22,7 @@ variables:
   FALCO_API_EMAIL_VALIDATION_URL: 'http://front-url/validate'
   FALCO_API_EMAIL_VALIDATION_VALIDITY_PERIOD: 6
   FALCO_API_APPENIN_EMAIL_ADDRESS: test-ci@appenin.fr
+  FALCO_API_STRIPE_PRIVATE_KEY: 'sk_test_51GqKYGB099cSJ3oRcsTo6QpE9S6jzlolPcWxeL1Xu8stadcCsdHDK5Wis6MrSw6ApjV0UMZK4u8uJcxIGeNQHOSs00SL7BvJfG'
 
 .trigger_build: &trigger_build
   rules:

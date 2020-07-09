@@ -19,10 +19,14 @@ describe('Policies - API - Integration', async () => {
     let response: supertest.Response
 
     describe('when success', () => {
-      const expectedPaymentIntent = { id: 'pi_P4Ym3NtInT3nt1d' }
+      const expectedPaymentIntent = {
+        id: 'pi_P4Ym3NtInT3nt1d',
+        amount: 66.66,
+        currency: 'eur'
+      }
 
       beforeEach(async () => {
-        sinon.stub(container, 'CreatePaymentIntent')
+        sinon.stub(container, 'CreatePaymentIntentForPolicy')
           .withArgs({ policyId: 'p0l1cy1d' })
           .resolves(expectedPaymentIntent)
 
@@ -31,7 +35,7 @@ describe('Policies - API - Integration', async () => {
       })
 
       it('should reply with status 200', async () => {
-        expect(response).to.have.property('statusCode', 200)
+        expect(response).to.have.property('statusCode', 201)
       })
 
       it('should return a payment intent id', async () => {
@@ -42,7 +46,7 @@ describe('Policies - API - Integration', async () => {
     describe('when the policy is not found', () => {
       it('should reply with status 404', async () => {
         const policyId: string = 'p0l1cy1d'
-        sinon.stub(container, 'CreatePaymentIntent')
+        sinon.stub(container, 'CreatePaymentIntentForPolicy')
           .withArgs({ policyId: policyId })
           .rejects(new PolicyNotFoundError(policyId))
 
@@ -56,7 +60,7 @@ describe('Policies - API - Integration', async () => {
 
     describe('when there is an unknown error', () => {
       it('should reply with status 500 when unknown error', async () => {
-        sinon.stub(container, 'CreatePaymentIntent')
+        sinon.stub(container, 'CreatePaymentIntentForPolicy')
           .withArgs({ policyId: 'p0l1cy1d' })
           .rejects(new Error())
 

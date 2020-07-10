@@ -11,6 +11,7 @@ import { requestToCreatePolicyCommand } from './mappers/create-policy-command.ma
 import { policyToResource } from './mappers/policy-to-resource.mapper'
 import { Policy } from '../../domain/policy'
 import { createPolicyRequestSchema, policySchema } from './schemas/post-policy.schema'
+import { GetPolicyQuery } from '../../domain/get-policy-query'
 
 const TAGS = ['api', 'policies']
 
@@ -90,6 +91,32 @@ export default function (container: Container): Array<ServerRoute> {
           return h.response(policyToResource(createdPolicy)).code(201)
         } catch (error) {
           if (error instanceof QuoteNotFoundError) {
+            throw Boom.notFound(error.message)
+          }
+          throw Boom.internal(error)
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/v0/policies/{id}',
+      options: {
+        tags: TAGS,
+        description: 'Gets a policy',
+        response: {
+          status: {
+            200: policySchema,
+            500: HttpErrorSchema.internalServerErrorSchema
+          }
+        }
+      },
+      handler: async (request, h) => {
+        const getPolicyQuery: GetPolicyQuery = { policyId: request.params.id }
+        try {
+          const createdPolicy: Policy = await container.GetPolicy(getPolicyQuery)
+          return h.response(policyToResource(createdPolicy)).code(201)
+        } catch (error) {
+          if (error instanceof PolicyNotFoundError) {
             throw Boom.notFound(error.message)
           }
           throw Boom.internal(error)

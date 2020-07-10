@@ -11,7 +11,8 @@ describe('Policies - Usecase - Get policy', async () => {
   const policyRepository: SinonStubbedInstance<PolicyRepository> = {
     get: sinon.stub(),
     save: sinon.stub(),
-    isIdAvailable: sinon.stub()
+    isIdAvailable: sinon.stub(),
+    setEmailValidationDate: sinon.stub()
   }
   const getPolicy: GetPolicy = GetPolicy.factory(policyRepository)
 

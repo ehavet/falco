@@ -19,8 +19,8 @@
         [2, { "monthlyPrice": 7.50, "defaultDeductible": 120, "defaultCeiling": 5000 }],
         [3, { "monthlyPrice": 10.00, "defaultDeductible": 120, "defaultCeiling": 7000 }]
       ],
-      "productCode": "MRH_Etudiant",
-      "productVersion": "1.0"
+      "productCode": "APP658",
+      "productVersion": "2020-07-15"
     }
   },
   "essca": {
@@ -42,8 +42,8 @@
         [1, { "monthlyPrice": 6.34, "defaultDeductible": 120, "defaultCeiling": 3000 }],
         [2, { "monthlyPrice": 8.00, "defaultDeductible": 120, "defaultCeiling": 3000 }]
       ],
-      "productCode": "MRH_Etudiant",
-      "productVersion": "1.0"
+      "productCode": "APP658",
+      "productVersion": "2020-07-15"
     }
   }
 }

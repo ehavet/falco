@@ -87,8 +87,8 @@ describe('Policies - API - E2E', async () => {
           default_ceiling: 5000,
           currency: 'EUR',
           simplified_covers: ['ACDDE', 'ACINCEX', 'ACVOL', 'ACASSHE', 'ACDEFJU', 'ACRC'],
-          product_code: 'MRH_Etudiant',
-          product_version: '1.0'
+          product_code: 'APP658',
+          product_version: '2020-07-15'
         },
         risk: {
           property: {

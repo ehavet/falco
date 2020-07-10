@@ -35,6 +35,7 @@ describe('Usecase - Send a validation link to an email address', async () => {
     const validationTokenPayload: ValidationTokenPayload = {
       email: 'albert.hofmann@science.org',
       callbackUrl: 'http://bicycle-day.com',
+      policyId: 'APP746312047',
       expiredAt: new Date('2021-02-12T00:00:00.000Z')
     }
     const encryptedValidationToken = '3NCRYPT3DB4+S364STR1NG=='
@@ -63,6 +64,7 @@ describe('Usecase - Send a validation link to an email address', async () => {
     const validationTokenPayload: ValidationTokenPayload = {
       email: 'albert.hofmann@science.org',
       callbackUrl: 'http://front-ulr.fr/partnerCode/synthese?policy_id=APP746312047',
+      policyId: 'APP746312047',
       expiredAt: new Date('2021-02-12T00:00:00.000Z')
     }
     const encryptedValidationToken = '3NCRYPT3DB4+S364STR1NG=='

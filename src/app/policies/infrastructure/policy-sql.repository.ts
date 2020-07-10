@@ -18,6 +18,7 @@ export class PolicySqlRepository implements PolicyRepository {
       signatureDate: policy.signatureDate,
       paymentDate: policy.paymentDate,
       subscriptionDate: policy.subscriptionDate,
+      emailValidationDate: policy.emailValidationDate,
       status: policy.status,
       risk: {
         property: policy.risk.property,
@@ -57,5 +58,15 @@ export class PolicySqlRepository implements PolicyRepository {
     const foundPolicy: PolicySqlModel = await PolicySqlModel.findByPk(policyId, { rejectOnEmpty: false })
     if (foundPolicy) return false
     return true
+  }
+
+  async setEmailValidationDate (policyId: string, date: Date): Promise<void> {
+    const policy: PolicySqlModel = await PolicySqlModel.findByPk(policyId, { rejectOnEmpty: false })
+    if (policy) {
+      policy.emailValidationDate = date
+      await policy.save()
+      return Promise.resolve()
+    }
+    throw new PolicyNotFoundError(policyId)
   }
 }

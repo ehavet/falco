@@ -29,6 +29,9 @@ export class PolicySqlModel extends Model<PolicySqlModel> {
     termEndDate!: Date
 
     @Column
+    emailValidationDate?: Date
+
+    @Column
     signatureDate?: Date
 
     @Column

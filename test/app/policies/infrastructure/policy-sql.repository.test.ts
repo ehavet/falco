@@ -98,4 +98,33 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
         .to.be.rejectedWith(PolicyNotFoundError)
     })
   })
+
+  describe('#setEmailValidationDate', async () => {
+    it('should update the policy email validation date', async () => {
+      // Given
+      const emailValidationDate: Date = new Date('2020-01-05T10:38:19Z')
+      const policyInDb: Policy = createPolicyFixture({ emailValidationDate: undefined })
+      await policyRepository.save(policyInDb)
+
+      // When
+      await policyRepository.setEmailValidationDate(policyInDb.id, emailValidationDate)
+
+      // Then
+      const updatedPolicy: Policy = await policyRepository.get(policyInDb.id)
+      expect(updatedPolicy.emailValidationDate).to.deep.equal(emailValidationDate)
+    })
+
+    it('should throw an error if the policy is not found', async () => {
+      // Given
+      const emailValidationDate: Date = new Date('2020-01-05T10:38:19Z')
+      const policyInDb: Policy = createPolicyFixture({ emailValidationDate: undefined })
+      await policyRepository.save(policyInDb)
+
+      // When
+      const promise = policyRepository.setEmailValidationDate('UNKNOWN_ID', emailValidationDate)
+
+      // Then
+      return expect(promise).to.be.rejectedWith(PolicyNotFoundError)
+    })
+  })
 })

@@ -53,11 +53,18 @@ export function createPolicyFixture (attr: Partial<Policy> = {}): Policy {
     subscriptionDate: now,
     signatureDate: now,
     paymentDate: now,
+    emailValidationDate: now,
     status: Policy.Status.Initiated,
     ...attr
   }
 }
 
 export function createOngoingPolicyFixture (attr: Partial<Policy> = {}): Policy {
-  return createPolicyFixture({ signatureDate: undefined, paymentDate: undefined, subscriptionDate: undefined, ...attr })
+  return createPolicyFixture({
+    signatureDate: undefined,
+    paymentDate: undefined,
+    subscriptionDate: undefined,
+    emailValidationDate: undefined,
+    ...attr
+  })
 }

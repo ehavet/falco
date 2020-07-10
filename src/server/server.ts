@@ -32,7 +32,11 @@ export default async (config: Map<string, any>): Promise<Server> => {
   server.route(quoteRoutes())
   server.route(policiesRoutes())
   await server.register(happiSwaggerPlugin(config))
-  await initSequelize(config)
+  const sequelize = await initSequelize(config)
+
+  server.events.on('stop', () => {
+    sequelize.close()
+  })
 
   return server
 }

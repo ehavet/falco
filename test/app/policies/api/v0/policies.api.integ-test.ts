@@ -446,64 +446,90 @@ describe('Policies - API - Integration', async () => {
   })
 
   describe('GET /v0/policies/:id', async () => {
-    it('should return the policy', async () => {
-      // Given
-      const policyId: string = 'APP105944294'
-      const expectedPolicy: Policy = createPolicyFixture({ id: policyId })
-      const getPolicyQuery: GetPolicyQuery = { policyId }
-      sinon.stub(container, 'GetPolicy').withArgs(getPolicyQuery).resolves(expectedPolicy)
+    let response: supertest.Response
 
-      // When
-      const response = await httpServer.api().get(`/v0/policies/${policyId}`)
+    describe('when the policy is found', async () => {
+      before(async () => {
+        // Given
+        const policyId: string = 'APP105944294'
+        const expectedPolicy: Policy = createPolicyFixture({ id: policyId })
+        const getPolicyQuery: GetPolicyQuery = { policyId }
+        sinon.stub(container, 'GetPolicy').withArgs(getPolicyQuery).resolves(expectedPolicy)
 
-      // Then
-      const expectedResourcePolicy = {
-        id: 'APP105944294',
-        code: 'myPartner',
-        insurance: {
-          monthly_price: 5.82,
-          default_deductible: 150,
-          default_ceiling: 7000,
-          currency: 'EUR',
-          simplified_covers: ['ACDDE', 'ACVOL'],
-          product_code: 'MRH-Loc-Etud',
-          product_version: 'v2020-02-01'
-        },
-        risk: {
-          property: {
-            room_count: 2,
+        // When
+        response = await httpServer.api().get(`/v0/policies/${policyId}`).set('X-Consumer-Username', 'myPartner')
+      })
+
+      it('should reply with status 200', async () => {
+        // Then
+        expect(response).to.have.property('statusCode', 200)
+      })
+
+      it('should return the policy', async () => {
+        // Then
+        const expectedResourcePolicy = {
+          id: 'APP105944294',
+          code: 'myPartner',
+          insurance: {
+            monthly_price: 5.82,
+            default_deductible: 150,
+            default_ceiling: 7000,
+            currency: 'EUR',
+            simplified_covers: ['ACDDE', 'ACVOL'],
+            product_code: 'MRH-Loc-Etud',
+            product_version: 'v2020-02-01'
+          },
+          risk: {
+            property: {
+              room_count: 2,
+              address: '13 rue du loup garou',
+              postal_code: 91100,
+              city: 'Corbeil-Essones'
+            },
+            people: {
+              policy_holder: {
+                firstname: 'Jean',
+                lastname: 'Dupont'
+              },
+              other_insured: [{ firstname: 'John', lastname: 'Doe' }]
+            }
+          },
+          contact: {
+            lastname: 'Dupont',
+            firstname: 'Jean',
             address: '13 rue du loup garou',
             postal_code: 91100,
-            city: 'Corbeil-Essones'
+            city: 'Corbeil-Essones',
+            email: 'jeandupont@email.com',
+            phone_number: '+33684205510'
           },
-          people: {
-            policy_holder: {
-              firstname: 'Jean',
-              lastname: 'Dupont'
-            },
-            other_insured: [{ firstname: 'John', lastname: 'Doe' }]
-          }
-        },
-        contact: {
-          lastname: 'Dupont',
-          firstname: 'Jean',
-          address: '13 rue du loup garou',
-          postal_code: 91100,
-          city: 'Corbeil-Essones',
-          email: 'jeandupont@email.com',
-          phone_number: '+33684205510'
-        },
-        nb_months_due: 12,
-        premium: 69.84,
-        start_date: '2020-01-05',
-        term_start_date: '2020-01-05',
-        term_end_date: '2020-01-05',
-        subscription_date: '2020-01-05T10:09:08.000Z',
-        signature_date: '2020-01-05T10:09:08.000Z',
-        payment_date: '2020-01-05T10:09:08.000Z',
-        status: 'INITIATED'
-      }
-      expect(response.body).to.deep.equal(expectedResourcePolicy)
+          nb_months_due: 12,
+          premium: 69.84,
+          start_date: '2020-01-05',
+          term_start_date: '2020-01-05',
+          term_end_date: '2020-01-05',
+          subscription_date: '2020-01-05T10:09:08.000Z',
+          signature_date: '2020-01-05T10:09:08.000Z',
+          payment_date: '2020-01-05T10:09:08.000Z',
+          status: 'INITIATED'
+        }
+        expect(response.body).to.deep.equal(expectedResourcePolicy)
+      })
+    })
+
+    describe('when there is an internal error', async () => {
+      it('should reply with status 500', async () => {
+        // Given
+        const policyId: string = 'APP105944294'
+        const getPolicyQuery: GetPolicyQuery = { policyId }
+        sinon.stub(container, 'GetPolicy').withArgs(getPolicyQuery).rejects(new Error())
+
+        // When
+        const response = await httpServer.api().get(`/v0/policies/${policyId}`).set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 500)
+      })
     })
 
     describe('when the policy is not found', () => {
@@ -514,11 +540,20 @@ describe('Policies - API - Integration', async () => {
         sinon.stub(container, 'GetPolicy').withArgs(getPolicyQuery).rejects(new PolicyNotFoundError(policyId))
 
         // When
-        const response = await httpServer.api().get(`/v0/policies/${policyId}`)
+        const response = await httpServer.api().get(`/v0/policies/${policyId}`).set('X-Consumer-Username', 'myPartner')
 
         // Then
         expect(response).to.have.property('statusCode', 404)
         expect(response.body).to.have.property('message', `Could not find policy with id : ${policyId}`)
+      })
+    })
+
+    describe('when there is a validation error', () => {
+      it('should reply with status 400 when the policy id is not 12 characters', async () => {
+        // When
+        const response = await httpServer.api().get('/v0/policies/WRONG').set('X-Consumer-Username', 'myPartner')
+
+        expect(response).to.have.property('statusCode', 400)
       })
     })
   })

@@ -151,7 +151,7 @@ describe('Policies - API - E2E', async () => {
       await policyRepository.save(expectedPolicy)
 
       // When
-      const response = await httpServer.api().get(`/v0/policies/${policyId}`)
+      const response = await httpServer.api().get(`/v0/policies/${policyId}`).set('X-Consumer-Username', 'myPartner')
 
       // Then
       const expectedResourcePolicy = {

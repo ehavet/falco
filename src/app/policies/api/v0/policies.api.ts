@@ -103,9 +103,15 @@ export default function (container: Container): Array<ServerRoute> {
       options: {
         tags: TAGS,
         description: 'Gets a policy',
+        validate: {
+          params: Joi.object({
+            id: Joi.string().min(12).max(12).required().description('Policy id').example('APP365094241')
+          })
+        },
         response: {
           status: {
             200: policySchema,
+            404: HttpErrorSchema.notFoundSchema,
             500: HttpErrorSchema.internalServerErrorSchema
           }
         }
@@ -114,7 +120,7 @@ export default function (container: Container): Array<ServerRoute> {
         const getPolicyQuery: GetPolicyQuery = { policyId: request.params.id }
         try {
           const createdPolicy: Policy = await container.GetPolicy(getPolicyQuery)
-          return h.response(policyToResource(createdPolicy)).code(201)
+          return h.response(policyToResource(createdPolicy)).code(200)
         } catch (error) {
           if (error instanceof PolicyNotFoundError) {
             throw Boom.notFound(error.message)

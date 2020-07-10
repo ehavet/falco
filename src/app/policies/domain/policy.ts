@@ -47,6 +47,10 @@ export namespace Policy {
         Applicable = 'APPLICABLE'
     }
 
+    export function emailNotValidatedYet (policy: Policy): boolean {
+      return policy.emailValidationDate === undefined || policy.emailValidationDate === null
+    }
+
     export async function create (createPolicyCommand: CreatePolicyCommand, quote: Quote, policyRepository: PolicyRepository): Promise<Policy> {
       const generatedId: string = _generateId(createPolicyCommand.partnerCode)
       if (await policyRepository.isIdAvailable(generatedId)) {

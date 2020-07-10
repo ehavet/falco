@@ -6,11 +6,13 @@ import { ValidationTokenPayload } from '../../../../src/app/email-validations/do
 import { ValidationCallbackUri } from '../../../../src/app/email-validations/domain/validation-callback-uri'
 import { ExpiredEmailValidationTokenError, BadEmailValidationToken } from '../../../../src/app/email-validations/domain/email-validation.errors'
 import { BadDecryptError } from '../../../../src/app/email-validations/infrastructure/crypto.crypter'
+import { createPolicyFixture } from '../../policies/fixtures/policy.fixture'
+import { Policy } from '../../../../src/app/policies/domain/policy'
 
 describe('Usecase - Get a validation callback url from a validation token', async () => {
   const now: Date = new Date('2020-02-12T00:00:00.000Z')
   const decrypter = { encrypt: sinon.mock(), decrypt: sinon.mock() }
-  const policyRepository = { save: sinon.stub(), isIdAvailable: sinon.stub(), get: sinon.stub(), setEmailValidationDate: sinon.mock() }
+  const policyRepository = { save: sinon.stub(), isIdAvailable: sinon.stub(), get: sinon.mock(), setEmailValidationDate: sinon.mock() }
   const validationToken: ValidationToken = {
     token: '3NCRYPT3DB4S364STR1NG=='
   }
@@ -21,6 +23,7 @@ describe('Usecase - Get a validation callback url from a validation token', asyn
 
   afterEach(() => {
     policyRepository.setEmailValidationDate.reset()
+    policyRepository.get.reset()
     decrypter.encrypt.reset()
     decrypter.decrypt.reset()
   })
@@ -33,10 +36,13 @@ describe('Usecase - Get a validation callback url from a validation token', asyn
       policyId: 'APP746312047',
       expiredAt: new Date()
     }
+    const policy: Policy = createPolicyFixture()
 
     decrypter.decrypt.withExactArgs(validationToken.token).returns(JSON.stringify(validationTokenPayloadString))
     const getValidationCallbackUriFromToken: GetValidationCallbackUriFromToken =
         GetValidationCallbackUriFromToken.factory(decrypter, policyRepository)
+
+    policyRepository.get.withExactArgs(validationTokenPayloadString.policyId).resolves(policy)
 
     // WHEN
     const validationCallbackUrl: ValidationCallbackUri = await getValidationCallbackUriFromToken(validationToken)
@@ -47,18 +53,47 @@ describe('Usecase - Get a validation callback url from a validation token', asyn
 
   it('should update the policy with the date of the email validation', async () => {
     // GIVEN
+    const policyId: string = 'APP746312047'
     const validationTokenPayloadString: ValidationTokenPayload = {
       email: 'albert.hofmann@science.org',
       callbackUrl: 'http://bicycle-day.com',
-      policyId: 'APP746312047',
+      policyId,
       expiredAt: new Date()
     }
+
+    const policyNotAlreadyValidated: Policy = createPolicyFixture({ id: policyId, emailValidationDate: undefined })
 
     decrypter.decrypt.withExactArgs(validationToken.token).returns(JSON.stringify(validationTokenPayloadString))
     const getValidationCallbackUriFromToken: GetValidationCallbackUriFromToken =
         GetValidationCallbackUriFromToken.factory(decrypter, policyRepository)
 
-    policyRepository.setEmailValidationDate.withExactArgs(validationTokenPayloadString.policyId, now).resolves()
+    policyRepository.get.withExactArgs(policyId).resolves(policyNotAlreadyValidated)
+    policyRepository.setEmailValidationDate.withExactArgs(policyId, now).resolves()
+
+    // WHEN
+    await getValidationCallbackUriFromToken(validationToken)
+
+    // THEN
+    policyRepository.setEmailValidationDate.verify()
+  })
+
+  it('should not update the policy with the date of the email validation if already validated', async () => {
+    // GIVEN
+    const policyId: string = 'APP746312047'
+    const validationTokenPayloadString: ValidationTokenPayload = {
+      email: 'albert.hofmann@science.org',
+      callbackUrl: 'http://bicycle-day.com',
+      policyId,
+      expiredAt: new Date()
+    }
+    const policyWithEmailAlreadyValidated: Policy = createPolicyFixture({ id: policyId, emailValidationDate: new Date() })
+
+    decrypter.decrypt.withExactArgs(validationToken.token).returns(JSON.stringify(validationTokenPayloadString))
+    const getValidationCallbackUriFromToken: GetValidationCallbackUriFromToken =
+        GetValidationCallbackUriFromToken.factory(decrypter, policyRepository)
+
+    policyRepository.get.withExactArgs(policyId).resolves(policyWithEmailAlreadyValidated)
+    policyRepository.setEmailValidationDate.withExactArgs(policyId, now).never()
 
     // WHEN
     await getValidationCallbackUriFromToken(validationToken)

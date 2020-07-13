@@ -1,9 +1,9 @@
-import { CertificateRepository } from '../../../../src/app/policies/domain/certificate.repository'
+import { CertificateRepository } from '../../../../src/app/policies/domain/certificate/certificate.repository'
 import { CertificatePdfRepository } from '../../../../src/app/policies/infrastructure/certificate-pdf/certificate-pdf.repository'
 import { createPolicyFixture } from '../fixtures/policy.fixture'
 import { Policy } from '../../../../src/app/policies/domain/policy'
 import { expect } from '../../../test-utils'
-import { Certificate } from '../../../../src/app/policies/domain/certificate'
+import { Certificate } from '../../../../src/app/policies/domain/certificate/certificate'
 
 describe('Policies - Infra - Certificate PDF Repository', async () => {
   it('should generate a new certificate', async () => {

@@ -1,8 +1,8 @@
-import { CertificateRepository } from '../../domain/certificate.repository'
+import { CertificateRepository } from '../../domain/certificate/certificate.repository'
 import pdftk from 'node-pdftk'
 import replace from 'buffer-replace'
 import { Policy } from '../../domain/policy'
-import { Certificate } from '../../domain/certificate'
+import { Certificate } from '../../domain/certificate/certificate'
 
 function _encodeForPdf (value: string): string {
   const dict = {

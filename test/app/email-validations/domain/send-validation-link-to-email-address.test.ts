@@ -10,7 +10,6 @@ describe('Usecase - Send a validation link to an email address', async () => {
   const config: ValidationLinkConfig = {
     baseUrl: 'http://front-url/validate',
     validityPeriodinMonth: 6,
-    emailSender: 'sender@email.com',
     frontCallbackPageRoute: 'synthese',
     frontUrl: 'http://front-ulr.fr'
   }
@@ -46,7 +45,7 @@ describe('Usecase - Send a validation link to an email address', async () => {
     await sendValidationLinkToEmailAddress(emailValidationQuery)
     // THEN
     sinon.assert.calledOnceWithExactly(mailer.send, {
-      sender: config.emailSender,
+      sender: 'test-ci@appenin.fr',
       recipient: 'albert.hofmann@science.org',
       subject: 'valider votre email',
       message: 'http://front-url/validate?token=3NCRYPT3DB4%2BS364STR1NG%3D%3D'

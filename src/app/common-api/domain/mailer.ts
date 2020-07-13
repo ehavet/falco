@@ -3,10 +3,10 @@ export interface MailerResponse {
 }
 
 export interface Email {
-    sender: string
-    recipient: string,
-    subject: string,
-    message: string
+    readonly sender: string
+    readonly recipient: string,
+    readonly subject: string,
+    readonly message: string
 }
 
 export interface Mailer {

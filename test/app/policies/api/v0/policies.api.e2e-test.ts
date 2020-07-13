@@ -6,6 +6,7 @@ import { PolicySqlModel } from '../../../../../src/app/policies/infrastructure/p
 import { createPolicyApiRequestFixture } from '../../fixtures/createPolicyApiRequest.fixture'
 import { QuoteSqlModel } from '../../../../../src/app/quotes/infrastructure/quote-sql.model'
 import { PolicySqlRepository } from '../../../../../src/app/policies/infrastructure/policy-sql.repository'
+import { PolicyRepository } from '../../../../../src/app/policies/domain/policy.repository'
 
 async function resetDb () {
   await PolicySqlModel.destroy({ truncate: true, cascade: true })
@@ -14,6 +15,14 @@ async function resetDb () {
 
 describe('Policies - API - E2E', async () => {
   let httpServer: HttpServerForTesting
+
+  before(async () => {
+    httpServer = await newProdLikeServer()
+  })
+
+  afterEach(async () => {
+    await resetDb()
+  })
 
   describe('POST /v0/policies/:id/payment-intents', async () => {
     let response: supertest.Response
@@ -28,11 +37,6 @@ describe('Policies - API - E2E', async () => {
         }
       )
       await policyRepository.save(policy)
-      httpServer = await newProdLikeServer()
-    })
-
-    afterEach(async () => {
-      await resetDb()
     })
 
     it('should return a payment intent id', async () => {
@@ -72,10 +76,6 @@ describe('Policies - API - E2E', async () => {
         .set('X-Consumer-Username', 'myPartner')
     })
 
-    afterEach(async () => {
-      await resetDb()
-    })
-
     it('should return the policy', async () => {
       // Given
       const expectedPolicy = {
@@ -87,8 +87,8 @@ describe('Policies - API - E2E', async () => {
           default_ceiling: 5000,
           currency: 'EUR',
           simplified_covers: ['ACDDE', 'ACINCEX', 'ACVOL', 'ACASSHE', 'ACDEFJU', 'ACRC'],
-          product_code: 'MRH_Etudiant',
-          product_version: '1.0'
+          product_code: 'APP658',
+          product_version: '2020-07-15'
         },
         risk: {
           property: {
@@ -139,6 +139,68 @@ describe('Policies - API - E2E', async () => {
       // Then
       const savedPolicy = await PolicySqlModel.findByPk(response.body.id)
       expect(savedPolicy).to.be.instanceOf(PolicySqlModel)
+    })
+  })
+
+  describe('GET /v0/policies/:id', async () => {
+    it('should return the found policy', async () => {
+      // Given
+      const policyId: string = 'APP105944294'
+      const policyRepository: PolicyRepository = new PolicySqlRepository()
+      const expectedPolicy: Policy = createPolicyFixture({ id: policyId })
+      await policyRepository.save(expectedPolicy)
+
+      // When
+      const response = await httpServer.api().get(`/v0/policies/${policyId}`).set('X-Consumer-Username', 'myPartner')
+
+      // Then
+      const expectedResourcePolicy = {
+        id: 'APP105944294',
+        code: 'myPartner',
+        insurance: {
+          monthly_price: 5.82,
+          default_deductible: 150,
+          default_ceiling: 7000,
+          currency: 'EUR',
+          simplified_covers: ['ACDDE', 'ACVOL'],
+          product_code: 'MRH-Loc-Etud',
+          product_version: 'v2020-02-01'
+        },
+        risk: {
+          property: {
+            room_count: 2,
+            address: '13 rue du loup garou',
+            postal_code: 91100,
+            city: 'Corbeil-Essones'
+          },
+          people: {
+            policy_holder: {
+              firstname: 'Jean',
+              lastname: 'Dupont'
+            },
+            other_insured: [{ firstname: 'John', lastname: 'Doe' }]
+          }
+        },
+        contact: {
+          lastname: 'Dupont',
+          firstname: 'Jean',
+          address: '13 rue du loup garou',
+          postal_code: 91100,
+          city: 'Corbeil-Essones',
+          email: 'jeandupont@email.com',
+          phone_number: '+33684205510'
+        },
+        nb_months_due: 12,
+        premium: 69.84,
+        start_date: '2020-01-05',
+        term_start_date: '2020-01-05',
+        term_end_date: '2020-01-05',
+        subscription_date: '2020-01-05T10:09:08.000Z',
+        signature_date: '2020-01-05T10:09:08.000Z',
+        payment_date: '2020-01-05T10:09:08.000Z',
+        status: 'INITIATED'
+      }
+      expect(response.body).to.deep.equal(expectedResourcePolicy)
     })
   })
 })

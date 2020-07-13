@@ -13,10 +13,12 @@ import { container as partnerContainer } from '../partners/partner.container'
 import { QuoteRepository } from '../quotes/domain/quote.repository'
 import { SendValidationLinkToEmailAddress } from '../email-validations/domain/send-validation-link-to-email-address.usecase'
 import { PartnerRepository } from '../partners/domain/partner.repository'
+import { GetPolicy } from './domain/get-policy.usecase'
 
 export interface Container {
     CreatePaymentIntentForPolicy: CreatePaymentIntentForPolicy
-    CreatePolicy: CreatePolicy
+    CreatePolicy: CreatePolicy,
+    GetPolicy: GetPolicy
 }
 
 const policyRepository: PolicyRepository = new PolicySqlRepository()
@@ -28,10 +30,12 @@ const createPaymentIntentForPolicy: CreatePaymentIntentForPolicy =
     CreatePaymentIntentForPolicy.factory(paymentProcessor, policyRepository)
 const sendValidationLinkToEmailAddress: SendValidationLinkToEmailAddress = emailValidationContainer.SendValidationLinkToEmailAddress
 const createPolicy: CreatePolicy = CreatePolicy.factory(policyRepository, quoteRepository, partnerRepository, sendValidationLinkToEmailAddress)
+const getPolicy: GetPolicy = GetPolicy.factory(policyRepository)
 
 export const container: Container = {
   CreatePaymentIntentForPolicy: createPaymentIntentForPolicy,
-  CreatePolicy: createPolicy
+  CreatePolicy: createPolicy,
+  GetPolicy: getPolicy
 }
 
 export const policySqlModels: Array<any> = [PolicySqlModel, ContactSqlModel]

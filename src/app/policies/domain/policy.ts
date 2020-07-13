@@ -3,6 +3,7 @@ import { CreatePolicyCommand } from './create-policy-command'
 import { generate } from 'randomstring'
 import { PolicyRepository } from './policy.repository'
 import dayjs from 'dayjs'
+import { CannotGeneratePolicyNotApplicable } from './certificate/certificate.errors'
 
 const DEFAULT_NUMBER_OF_MONTHS_DUE = 12
 
@@ -49,6 +50,12 @@ export namespace Policy {
 
     export function emailNotValidatedYet (policy: Policy): boolean {
       return policy.emailValidationDate === undefined || policy.emailValidationDate === null
+    }
+
+    export function checkCanGenerateCertificate (policy: Policy): void {
+      if (Policy.Status.Applicable !== policy.status) {
+        throw new CannotGeneratePolicyNotApplicable()
+      }
     }
 
     export async function create (createPolicyCommand: CreatePolicyCommand, quote: Quote, policyRepository: PolicyRepository): Promise<Policy> {

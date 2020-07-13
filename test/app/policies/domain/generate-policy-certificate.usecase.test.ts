@@ -7,6 +7,7 @@ import { CertificateRepository } from '../../../../src/app/policies/domain/certi
 import { Certificate } from '../../../../src/app/policies/domain/certificate/certificate'
 import { GeneratePolicyCertificate } from '../../../../src/app/policies/domain/certificate/generate-policy-certificate.usecase'
 import { GeneratePolicyCertificateQuery } from '../../../../src/app/policies/domain/certificate/generate-policy-certificate-query'
+import { CannotGeneratePolicyNotApplicable } from '../../../../src/app/policies/domain/certificate/certificate.errors'
 
 describe('Policies - Usecase - Generate policy certificate', async () => {
   const policyRepository: SinonStubbedInstance<PolicyRepository> = {
@@ -20,10 +21,14 @@ describe('Policies - Usecase - Generate policy certificate', async () => {
 
   const generatePolicyCertificate: GeneratePolicyCertificate = GeneratePolicyCertificate.factory(policyRepository, certificateRepository)
 
+  afterEach(() => {
+    certificateRepository.generate.reset()
+  })
+
   it('should return the certificate generated', async () => {
     // Given
     const policyId: string = 'APP854732084'
-    const policyFromDb: Policy = createPolicyFixture({ id: policyId })
+    const policyFromDb: Policy = createPolicyFixture({ id: policyId, status: Policy.Status.Applicable })
     const generatePolicyCertificateQuery: GeneratePolicyCertificateQuery = { policyId }
     policyRepository.get.withArgs(policyId).resolves(policyFromDb)
 
@@ -35,5 +40,19 @@ describe('Policies - Usecase - Generate policy certificate', async () => {
 
     // Then
     expect(generatedCertificate).to.deep.equal(expectedGeneratedCertificate)
+  })
+
+  it('should throw an error if the policy status is different than applicable', async () => {
+    // Given
+    const policyId: string = 'APP854732084'
+    const policyFromDb: Policy = createPolicyFixture({ id: policyId, status: Policy.Status.Signed })
+    const generatePolicyCertificateQuery: GeneratePolicyCertificateQuery = { policyId }
+    policyRepository.get.withArgs(policyId).resolves(policyFromDb)
+
+    // When
+    const promise = generatePolicyCertificate(generatePolicyCertificateQuery)
+
+    // Then
+    return expect(promise).to.be.rejectedWith(CannotGeneratePolicyNotApplicable)
   })
 })

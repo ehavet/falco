@@ -13,6 +13,7 @@ export namespace GeneratePolicyCertificate {
     export function factory (policyRepository: PolicyRepository, certificateRepository: CertificateRepository): GeneratePolicyCertificate {
       return async (generatePolicyCertificateQuery: GeneratePolicyCertificateQuery): Promise<Certificate> => {
         const policy: Policy = await policyRepository.get(generatePolicyCertificateQuery.policyId)
+        Policy.checkCanGenerateCertificate(policy)
         return certificateRepository.generate(policy)
       }
     }

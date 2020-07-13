@@ -1,9 +1,10 @@
 import { EmailValidationQuery } from './email-validation-query'
 import { ValidationTokenPayload } from './validation-token-payload'
 import { Crypter } from './crypter'
-import { Email, Mailer } from './mailer'
+import { Mailer } from '../../common-api/domain/mailer'
 import { ValidationLinkConfig } from '../../../configs/validation-link.config'
 import * as querystring from 'querystring'
+import { buildValidationLinkEmail } from './validation-link.email'
 
 export interface SendValidationLinkToEmailAddress {
     (emailValidationQuery: EmailValidationQuery): Promise<void>
@@ -20,7 +21,7 @@ export namespace SendValidationLinkToEmailAddress {
             _buildValidationTokenPayload(emailValidationQuery, config)
         const validationToken: string = encrypter.encrypt(JSON.stringify(validationTokenPayload))
         const emailValidationUri: string = _getEmailValidationUri(config.baseUrl, validationToken)
-        await mailer.send(_buildValidationEmail(validationTokenPayload.email, emailValidationUri, config.emailSender))
+        await mailer.send(buildValidationLinkEmail(validationTokenPayload.email, emailValidationUri))
       }
     }
 }
@@ -56,13 +57,4 @@ function _getCallbackUrl (callbackUrl: string, partnerCode: string, policyId: st
     return callbackUrl
   }
   return `${config.frontUrl}/${partnerCode}/${config.frontCallbackPageRoute}?policy_id=${policyId}`
-}
-
-function _buildValidationEmail (recipientAddress: string, emailValidationUri: string, senderAddress: string): Email {
-  return {
-    sender: senderAddress,
-    recipient: recipientAddress,
-    subject: 'valider votre email',
-    message: emailValidationUri
-  }
 }

@@ -1,7 +1,7 @@
-import { Nodemailer } from '../../../../src/app/email-validations/infrastructure/nodemailer.mailer'
-import { Email, MailerResponse } from '../../../../src/app/email-validations/domain/mailer'
+import { Nodemailer } from '../../../../src/app/common-api/infrastructure/nodemailer.mailer'
+import { Email, MailerResponse } from '../../../../src/app/common-api/domain/mailer'
 import { expect, sinon } from '../../../test-utils'
-import { MailDeliveryFailureError } from '../../../../src/app/email-validations/domain/mailer.errors'
+import { MailDeliveryFailureError } from '../../../../src/app/common-api/domain/mailer.errors'
 
 describe('Nodemailer', async () => {
   let mailer: Nodemailer

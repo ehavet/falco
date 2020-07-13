@@ -62,7 +62,7 @@ function _sqlToInsuranceMapper (insuranceSql: InsuranceSqlModel) {
     simplifiedCovers: insuranceSql.simplifiedCovers,
     productCode: insuranceSql.productCode,
     productVersion: insuranceSql.productVersion,
-    contractualTerms: '',
-    ipid: ''
+    contractualTerms: insuranceSql.contractualTerms,
+    ipid: insuranceSql.ipid
   }
 }

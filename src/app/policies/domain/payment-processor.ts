@@ -1,3 +1,3 @@
 export interface PaymentProcessor {
-    createIntent(amount: number, currency: string)
+    createIntent(policyId: string, amount: number, currency: string)
 }

@@ -15,7 +15,7 @@ export namespace CreatePaymentIntentForPolicy {
     ): CreatePaymentIntentForPolicy {
       return async (paymentIntentQuery: PaymentIntentQuery) => {
         const policy: Policy = await policyRepository.get(paymentIntentQuery.policyId)
-        const intent = await paymentProcessor.createIntent(_toZeroDecimal(policy.premium), policy.insurance.currency)
+        const intent = await paymentProcessor.createIntent(policy.id, _toZeroDecimal(policy.premium), policy.insurance.currency)
         return {
           id: intent.id,
           amount: _toTwoDecimal(intent.amount),

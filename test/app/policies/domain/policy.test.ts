@@ -196,5 +196,14 @@ describe('Policies - Domain', async () => {
       // Then
       expect(createdPolicy.status).to.equal(Policy.Status.Initiated)
     })
+
+    it('should set the contractual terms and ipid document links', async () => {
+      // When
+      const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository)
+
+      // Then
+      expect(createdPolicy.insurance.contractualTerms).to.equal(quote.insurance.contractualTerms)
+      expect(createdPolicy.insurance.ipid).to.equal(quote.insurance.ipid)
+    })
   })
 })

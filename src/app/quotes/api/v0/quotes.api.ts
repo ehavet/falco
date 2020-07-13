@@ -44,8 +44,10 @@ export default function (container: Container): Array<ServerRoute> {
                 default_ceiling: Joi.number().precision(2).description('Default ceiling').example(5000),
                 currency: Joi.string().description('Monthly price currency').example('EUR'),
                 simplified_covers: Joi.array().items(Joi.string()).description('Simplified covers').example(['ACDDE', 'ACVOL']),
-                product_code: Joi.string().allow('').description('Product code').example('MRH-Loc-Etud'),
-                product_version: Joi.string().allow('').description('Number of encounters for the day').example('v2020-02-01')
+                product_code: Joi.string().description('Product code').example('MRH-Loc-Etud'),
+                product_version: Joi.string().description('Date of the product').example('v2020-02-01'),
+                contractual_terms: Joi.string().description('Link to the Contractual Terms document').example('http://link/to.ct'),
+                ipid: Joi.string().description('Link to the IPID document').example('http://link/to.ipid')
               }).description('Insurance').label('Quote.Insurance')
             }).label('Quote'),
             400: HttpErrorSchema.badRequestSchema,

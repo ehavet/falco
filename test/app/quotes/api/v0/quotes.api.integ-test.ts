@@ -33,7 +33,9 @@ describe('Http API - Quotes - Integ', async () => {
           currency: 'EUR',
           simplifiedCovers: ['ACDDE', 'ACVOL'],
           productCode: '',
-          productVersion: ''
+          productVersion: '',
+          contractualTerms: '/path/to/contractual/terms',
+          ipid: '/path/to/ipid'
         }
       }
 

@@ -37,7 +37,9 @@ describe('Usecase - Get Quote', async () => {
       currency: 'EUR',
       simplifiedCovers: ['ACDDE', 'ACVOL'],
       productCode: 'MRH_Etudiant',
-      productVersion: '1.0'
+      productVersion: '1.0',
+      contractualTerms: '/path/to/contractual/terms',
+      ipid: '/path/to/ipid'
     }
   }
 

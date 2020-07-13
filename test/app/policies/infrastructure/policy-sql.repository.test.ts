@@ -42,6 +42,10 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
           termEndDate: new Date('2021-01-05T00:00:00Z')
         }
       )
+      // TODO should return the right values once the policy has contractual terms and ipid
+      expectedPolicy.insurance.contractualTerms = ''
+      expectedPolicy.insurance.ipid = ''
+
       // When
       const createdPolicy: Policy = await policyRepository.save(expectedPolicy)
       // Then
@@ -83,6 +87,10 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
         termStartDate: new Date('2020-01-05T00:00:00Z'),
         termEndDate: new Date('2021-01-05T00:00:00Z')
       })
+      // TODO should return the right values once the policy has contractual terms and ipid
+      expectedPolicy.insurance.contractualTerms = ''
+      expectedPolicy.insurance.ipid = ''
+
       await policyRepository.save(expectedPolicy)
       // When
       const result: Policy = await policyRepository.get(policyId)

@@ -20,7 +20,9 @@ export namespace Quote {
         currency: string,
         simplifiedCovers: Array<Insurance.SimplifiedCover>,
         productCode: string,
-        productVersion: string
+        productVersion: string,
+        contractualTerms: string,
+        ipid: string
     }
 
     export function getInsurance (risk: Risk, partnerOffer: Partner.Offer, partnerCode: string): Insurance {
@@ -35,7 +37,9 @@ export namespace Quote {
         simplifiedCovers: partnerOffer.simplifiedCovers,
         currency: 'EUR',
         productCode: partnerOffer.productCode,
-        productVersion: partnerOffer.productVersion
+        productVersion: partnerOffer.productVersion,
+        contractualTerms: partnerOffer.contractualTerms,
+        ipid: partnerOffer.ipid
       }
     }
 

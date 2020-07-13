@@ -14,7 +14,9 @@ export function createPolicyFixture (attr: Partial<Policy> = {}): Policy {
       currency: 'EUR',
       simplifiedCovers: ['ACDDE', 'ACVOL'],
       productCode: 'MRH-Loc-Etud',
-      productVersion: 'v2020-02-01'
+      productVersion: 'v2020-02-01',
+      contractualTerms: '/path/to/contractual/terms',
+      ipid: '/path/to/ipid'
     },
     risk: {
       property: {

@@ -25,7 +25,9 @@ const partnerJson = {
         [1, { monthlyPrice: 3.30, defaultDeductible: 120, defaultCeiling: 5000 }]
       ],
       productCode: 'MRH_Etudiant',
-      productVersion: '1.0'
+      productVersion: '1.0',
+      contractualTerms: '/path/to/contractual/terms',
+      ipid: '/path/to/ipid'
     }
   },
   partnerTwo: {
@@ -48,7 +50,9 @@ const partnerJson = {
         [2, { monthlyPrice: 6.95, defaultDeductible: 150, defaultCeiling: 7000 }]
       ],
       productCode: 'MRH_Etudiant',
-      productVersion: '1.0'
+      productVersion: '1.0',
+      contractualTerms: '/path/to/contractual/terms',
+      ipid: '/path/to/ipid'
     }
   }
 }
@@ -86,7 +90,9 @@ describe('Partner Map Repository', async () => {
               [1, { monthlyPrice: 3.30, defaultDeductible: 120, defaultCeiling: 5000 }]
             ]),
             productCode: 'MRH_Etudiant',
-            productVersion: '1.0'
+            productVersion: '1.0',
+            contractualTerms: '/path/to/contractual/terms',
+            ipid: '/path/to/ipid'
           }
         })
     })
@@ -122,6 +128,8 @@ describe('Partner Map Repository', async () => {
       expect(partnerOffer.simplifiedCovers).to.include('ACDDE', 'ACVOL')
       expect(partnerOffer.productCode).to.equal('MRH_Etudiant')
       expect(partnerOffer.productVersion).to.equal('1.0')
+      expect(partnerOffer.contractualTerms).to.equal('/path/to/contractual/terms')
+      expect(partnerOffer.ipid).to.equal('/path/to/ipid')
       expect(partnerOffer.simplifiedCovers).to.include('ACDDE', 'ACVOL')
       expect(partnerOffer.pricingMatrix.get(1)).to.deep.equal(propertyRoomCount1Estimate)
       expect(partnerOffer.pricingMatrix.get(2)).to.deep.equal(propertyRoomCount2Estimate)

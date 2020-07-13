@@ -8,14 +8,18 @@ function _toOffer (offer: any) : Partner.Offer {
       simplifiedCovers: [],
       pricingMatrix: new Map<RoomCount, Quote.Insurance.Estimate>(),
       productCode: '',
-      productVersion: ''
+      productVersion: '',
+      contractualTerms: '',
+      ipid: ''
     }
   }
   return {
     simplifiedCovers: offer.simplifiedCovers,
     pricingMatrix: new Map<RoomCount, Quote.Insurance.Estimate>(offer.pricingMatrix),
     productCode: offer.productCode,
-    productVersion: offer.productVersion
+    productVersion: offer.productVersion,
+    contractualTerms: offer.contractualTerms,
+    ipid: offer.ipid
   }
 }
 

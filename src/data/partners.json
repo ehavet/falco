@@ -20,7 +20,9 @@
         [3, { "monthlyPrice": 10.00, "defaultDeductible": 120, "defaultCeiling": 7000 }]
       ],
       "productCode": "APP658",
-      "productVersion": "2020-07-15"
+      "productVersion": "2020-07-15",
+      "contractualTerms": "/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf",
+      "ipid": "/docs/Appenin_Conditions_Generales_assurance_habitation_APP658.pdf"
     }
   },
   "essca": {
@@ -43,7 +45,9 @@
         [2, { "monthlyPrice": 8.00, "defaultDeductible": 120, "defaultCeiling": 3000 }]
       ],
       "productCode": "APP658",
-      "productVersion": "2020-07-15"
+      "productVersion": "2020-07-15",
+      "contractualTerms": "/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf",
+      "ipid": "/docs/Appenin_Conditions_Generales_assurance_habitation_APP658.pdf"
     }
   }
 }

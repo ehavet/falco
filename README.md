@@ -11,11 +11,14 @@ Before starting to work on the API, you will first need to install the following
 * [Node.js](https://nodejs.org/) (see [package.json](/package.json) "engine.node" field for the version to use, and we advise to manage NodeJS versions locally with [n](https://github.com/tj/n))
 * [Docker](https://docs.docker.com/get-docker/)
 * [Yarn](https://classic.yarnpkg.com/en/docs/install)
+* [PDFtk](https://www.pdflabs.com/tools/pdftk-server/)
+    * For MacOS either download and install [the last pkg](https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/pdftk_server-2.02-mac_osx-10.11-setup.pkg) or do the install via [homebrew](https://github.com/turforlag/homebrew-cervezas)
 
 And make sure that :
 
 * You have been granted an access to the [Appenin falco-api gitlab repository](https://gitlab.com/appenin/falco-api)  
 * You have [added your ssh key to gitlab](https://docs.gitlab.com/ee/ssh/)
+* You have a `.env` file at the root of the project (you can take the `.env.example` as an example)
 
 ## Installation
 

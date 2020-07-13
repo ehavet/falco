@@ -12,7 +12,7 @@ import { Policy } from '../../../../src/app/policies/domain/policy'
 describe('Usecase - Get a validation callback url from a validation token', async () => {
   const now: Date = new Date('2020-02-12T00:00:00.000Z')
   const decrypter = { encrypt: sinon.mock(), decrypt: sinon.mock() }
-  const policyRepository = { save: sinon.stub(), isIdAvailable: sinon.stub(), get: sinon.mock(), setEmailValidationDate: sinon.mock() }
+  const policyRepository = { save: sinon.stub(), isIdAvailable: sinon.stub(), get: sinon.mock(), setEmailValidationDate: sinon.mock(), updateAfterPayment: sinon.mock() }
   const validationToken: ValidationToken = {
     token: '3NCRYPT3DB4S364STR1NG=='
   }

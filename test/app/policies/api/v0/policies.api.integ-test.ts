@@ -35,7 +35,7 @@ describe('Policies - API - Integration', async () => {
           .post('/v0/policies/p0l1cy1d/payment-intents')
       })
 
-      it('should reply with status 200', async () => {
+      it('should reply with status 201', async () => {
         expect(response).to.have.property('statusCode', 201)
       })
 

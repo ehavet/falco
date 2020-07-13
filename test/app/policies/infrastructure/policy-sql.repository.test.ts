@@ -6,6 +6,7 @@ import { expect } from '../../../test-utils'
 import { PolicySqlModel } from '../../../../src/app/policies/infrastructure/policy-sql.model'
 import { RiskSqlModel } from '../../../../src/app/quotes/infrastructure/risk-sql.model'
 import { PolicyNotFoundError } from '../../../../src/app/policies/domain/policies.errors'
+
 async function resetDb () {
   await PolicySqlModel.destroy({ truncate: true, cascade: true })
 }
@@ -20,7 +21,7 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
   describe('#save', async () => {
     it('should save the policy into the db', async () => {
       // Given
-      const policy: Policy = createPolicyFixture({ id: 'P0l1CY1D' })
+      const policy: Policy = createPolicyFixture({ id: 'APP463109486' })
       // When
       await policyRepository.save(policy)
       // Then
@@ -29,7 +30,7 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
       })
       expect(result).to.have.lengthOf(1)
       const savedPolicy: PolicySqlModel = result[0]
-      expect(savedPolicy.id).to.equal('P0l1CY1D')
+      expect(savedPolicy.id).to.equal('APP463109486')
     })
 
     it('should return the created policy', async () => {
@@ -75,7 +76,7 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
   describe('#get', async () => {
     it('should return a Policy for a given existing id', async () => {
       // Given
-      const policyId: string = 'P0L1CY1D'
+      const policyId: string = 'APP463109486'
       const expectedPolicy: Policy = createPolicyFixture({
         id: policyId,
         startDate: new Date('2020-01-05T00:00:00Z'),
@@ -122,6 +123,39 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
 
       // When
       const promise = policyRepository.setEmailValidationDate('UNKNOWN_ID', emailValidationDate)
+
+      // Then
+      return expect(promise).to.be.rejectedWith(PolicyNotFoundError)
+    })
+  })
+
+  describe('#updateAfterPayment', async () => {
+    it('should update policy payment date subscription date and status', async () => {
+      // Given
+      const currentDate: Date = new Date('2020-01-05T10:38:19Z')
+      const policyInDb: Policy = createPolicyFixture({ paymentDate: undefined, subscriptionDate: undefined })
+      await policyRepository.save(policyInDb)
+
+      // When
+      await policyRepository
+        .updateAfterPayment(policyInDb.id, currentDate, currentDate, Policy.Status.Applicable)
+
+      // Then
+      const updatedPolicy: Policy = await policyRepository.get(policyInDb.id)
+      expect(updatedPolicy.paymentDate).to.deep.equal(currentDate)
+      expect(updatedPolicy.subscriptionDate).to.deep.equal(currentDate)
+      expect(updatedPolicy.status).to.deep.equal(Policy.Status.Applicable)
+    })
+
+    it('should throw an error if the policy is not found', async () => {
+      // Given
+      const currentDate: Date = new Date('2020-01-05T10:38:19Z')
+      const policyInDb: Policy = createPolicyFixture()
+      await policyRepository.save(policyInDb)
+
+      // When
+      const promise = policyRepository
+        .updateAfterPayment('UNKNOWN_ID', currentDate, currentDate, Policy.Status.Applicable)
 
       // Then
       return expect(promise).to.be.rejectedWith(PolicyNotFoundError)

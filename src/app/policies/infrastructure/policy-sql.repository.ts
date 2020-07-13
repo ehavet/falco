@@ -69,4 +69,16 @@ export class PolicySqlRepository implements PolicyRepository {
     }
     throw new PolicyNotFoundError(policyId)
   }
+
+  async updateAfterPayment (policyId: string, paymentDate: Date, subscriptionDate: Date, status: Policy.Status): Promise<void> {
+    const policy: PolicySqlModel = await PolicySqlModel.findByPk(policyId, { rejectOnEmpty: false })
+    if (policy) {
+      policy.paymentDate = paymentDate
+      policy.subscriptionDate = subscriptionDate
+      policy.status = status
+      await policy.save()
+      return Promise.resolve()
+    }
+    throw new PolicyNotFoundError(policyId)
+  }
 }

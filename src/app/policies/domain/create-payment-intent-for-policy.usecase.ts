@@ -2,6 +2,7 @@ import { PaymentIntentQuery } from './payment-intent-query'
 import { PaymentIntent } from './payment-intent'
 import { PaymentProcessor } from './payment-processor'
 import { PolicyRepository } from './policy.repository'
+import { Policy } from './policy'
 
 export interface CreatePaymentIntentForPolicy {
     (paymentIntentQuery: PaymentIntentQuery): Promise<PaymentIntent>
@@ -13,8 +14,8 @@ export namespace CreatePaymentIntentForPolicy {
       policyRepository: PolicyRepository
     ): CreatePaymentIntentForPolicy {
       return async (paymentIntentQuery: PaymentIntentQuery) => {
-        const policy = await policyRepository.get(paymentIntentQuery.policyId)
-        const intent = await paymentProcessor.createIntent(_toZeroDecimal(policy.premium), 'eur')
+        const policy: Policy = await policyRepository.get(paymentIntentQuery.policyId)
+        const intent = await paymentProcessor.createIntent(_toZeroDecimal(policy.premium), policy.insurance.currency)
         return {
           id: intent.id,
           amount: _toTwoDecimal(intent.amount),

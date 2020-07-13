@@ -32,7 +32,7 @@ describe('Policies - API - E2E', async () => {
       policyRepository = new PolicySqlRepository()
       const policy: Policy = createPolicyFixture(
         {
-          id: 'P0l1CY1D',
+          id: 'APP463109486',
           premium: 99.99
         }
       )
@@ -41,7 +41,7 @@ describe('Policies - API - E2E', async () => {
 
     it('should return a payment intent id', async () => {
       response = await httpServer.api()
-        .post('/v0/policies/P0l1CY1D/payment-intents')
+        .post('/v0/policies/APP463109486/payment-intents')
 
       // THEN
       expect(response.body)

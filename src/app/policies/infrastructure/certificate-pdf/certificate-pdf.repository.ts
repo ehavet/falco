@@ -29,6 +29,10 @@ function _formatDate (date: Date): string {
   return date ? new Intl.DateTimeFormat('fr-FR').format(date) : ''
 }
 
+function _generateFileName (policyId: string): string {
+  return `Appenin_Attestation_assurance_habitation_${policyId}.pdf`
+}
+
 export class CertificatePdfRepository implements CertificateRepository {
   async generate (policy: Policy): Promise<Certificate> {
     let buffer = await pdftk
@@ -44,6 +48,6 @@ export class CertificatePdfRepository implements CertificateRepository {
     buffer = replace(buffer, '[[term_end_date]]', _encodeForPdf(_formatDate(policy.termEndDate)))
     buffer = replace(buffer, '[[date_today]]', _encodeForPdf(_formatDate(new Date())))
     buffer = replace(buffer, '[[policy_id]]', _encodeForPdf(_formatPolicyId(policy.id)))
-    return { buffer }
+    return { name: _generateFileName(policy.id), buffer }
   }
 }

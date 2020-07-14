@@ -15,6 +15,7 @@ describe('Policies - Infra - Certificate PDF Repository', async () => {
     const certificate: Certificate = await certificatePdfRepository.generate(policy)
 
     // Then
+    expect(certificate.name).to.equal('Appenin_Attestation_assurance_habitation_APP753210859.pdf')
     expect(certificate.buffer.includes('Jean Dupont')).to.be.true
     expect(certificate.buffer.includes('13 rue du loup garou')).to.be.true
     expect(certificate.buffer.includes('91100 Corbeil\\055Essones')).to.be.true

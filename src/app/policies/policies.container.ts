@@ -16,6 +16,9 @@ import { ConfirmPaymentIntentForPolicy } from './domain/confirm-payment-intent-f
 import { SendValidationLinkToEmailAddress } from '../email-validations/domain/send-validation-link-to-email-address.usecase'
 import { PartnerRepository } from '../partners/domain/partner.repository'
 import { GetPolicy } from './domain/get-policy.usecase'
+import { CertificatePdfRepository } from './infrastructure/certificate-pdf/certificate-pdf.repository'
+import { CertificateRepository } from './domain/certificate/certificate.repository'
+import { GeneratePolicyCertificate } from './domain/certificate/generate-policy-certificate.usecase'
 import { StripeEventAuthenticator } from './infrastructure/stripe.event-authenticator'
 import { stripeConfig } from '../../configs/stripe.config'
 import { PaymentEventAuthenticator } from './domain/payment-event-authenticator'
@@ -26,6 +29,7 @@ export interface Container {
     ConfirmPaymentIntentForPolicy: ConfirmPaymentIntentForPolicy
     GetPolicy: GetPolicy
     PaymentEventAuthenticator: PaymentEventAuthenticator
+    GeneragePolicyCertificate: GeneratePolicyCertificate
 }
 
 const policyRepository: PolicyRepository = new PolicySqlRepository()
@@ -33,6 +37,7 @@ const quoteRepository: QuoteRepository = quoteContainer.quoteRepository
 const paymentProcessor: StripePaymentProcessor = new StripePaymentProcessor(stripe)
 const paymentEventAuthenticator: StripeEventAuthenticator = new StripeEventAuthenticator(stripeConfig)
 const partnerRepository: PartnerRepository = partnerContainer.partnerRepository
+const certificateRepository: CertificateRepository = new CertificatePdfRepository()
 
 const createPaymentIntentForPolicy: CreatePaymentIntentForPolicy =
     CreatePaymentIntentForPolicy.factory(paymentProcessor, policyRepository)
@@ -41,13 +46,15 @@ const createPolicy: CreatePolicy = CreatePolicy.factory(policyRepository, quoteR
 const confirmPaymentIntentForPolicy: ConfirmPaymentIntentForPolicy =
     ConfirmPaymentIntentForPolicy.factory(policyRepository)
 const getPolicy: GetPolicy = GetPolicy.factory(policyRepository)
+const generatePolicyCertificate: GeneratePolicyCertificate = GeneratePolicyCertificate.factory(policyRepository, certificateRepository)
 
 export const container: Container = {
   CreatePaymentIntentForPolicy: createPaymentIntentForPolicy,
   CreatePolicy: createPolicy,
   GetPolicy: getPolicy,
   ConfirmPaymentIntentForPolicy: confirmPaymentIntentForPolicy,
-  PaymentEventAuthenticator: paymentEventAuthenticator
+  PaymentEventAuthenticator: paymentEventAuthenticator,
+  GeneragePolicyCertificate: generatePolicyCertificate
 }
 
 export const policySqlModels: Array<any> = [PolicySqlModel, ContactSqlModel]

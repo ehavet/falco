@@ -14,7 +14,8 @@ describe('Policies - Usecase - Generate policy certificate', async () => {
     get: sinon.stub(),
     save: sinon.stub(),
     isIdAvailable: sinon.stub(),
-    setEmailValidationDate: sinon.stub()
+    setEmailValidationDate: sinon.stub(),
+    updateAfterPayment: sinon.stub()
   }
 
   const certificateRepository: SinonStubbedInstance<CertificateRepository> = { generate: sinon.mock() }
@@ -32,7 +33,10 @@ describe('Policies - Usecase - Generate policy certificate', async () => {
     const generatePolicyCertificateQuery: GeneratePolicyCertificateQuery = { policyId }
     policyRepository.get.withArgs(policyId).resolves(policyFromDb)
 
-    const expectedGeneratedCertificate: Certificate = { buffer: Buffer.from('certificate') }
+    const expectedGeneratedCertificate: Certificate = {
+      name: '`Appenin_Attestation_assurance_habitation_APP854732084.pdf`',
+      buffer: Buffer.from('certificate')
+    }
     certificateRepository.generate.withArgs(policyFromDb).resolves(expectedGeneratedCertificate)
 
     // When

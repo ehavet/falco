@@ -9,12 +9,15 @@ export class StripePaymentProcessor implements PaymentProcessor {
       this.stripe = stripe
     }
 
-    async createIntent (amount, currency) {
+    async createIntent (policyId, amount, currency) {
       let paymentIntent
       try {
         paymentIntent = await this.stripe.paymentIntents.create({
           amount: amount,
-          currency: currency
+          currency: currency,
+          metadata: {
+            policy_id: policyId
+          }
         })
       } catch (error) {
         logger.error(error)

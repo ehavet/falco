@@ -22,7 +22,7 @@ describe('Usecase - Create payment intent for policy', async () => {
     const paymentProcessor = { createIntent: sinon.mock() }
 
     policyRepository.get.withArgs('APP463109486').resolves(policy)
-    paymentProcessor.createIntent.withArgs(2450, 'EUR').resolves(paymentIntent)
+    paymentProcessor.createIntent.withArgs('APP463109486', 2450, 'EUR').resolves(paymentIntent)
 
     const createPaymentIntentForPolicy: CreatePaymentIntentForPolicy =
             CreatePaymentIntentForPolicy.factory(paymentProcessor, policyRepository)

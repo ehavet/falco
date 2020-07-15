@@ -24,7 +24,9 @@ export class QuoteSqlRepository implements QuoteRepository {
         defaultCeiling: quote.insurance.estimate.defaultCeiling,
         simplifiedCovers: quote.insurance.simplifiedCovers,
         productCode: quote.insurance.productCode,
-        productVersion: quote.insurance.productVersion
+        productVersion: quote.insurance.productVersion,
+        contractualTerms: quote.insurance.contractualTerms,
+        ipid: quote.insurance.ipid
       }
     }, {
       include: [{

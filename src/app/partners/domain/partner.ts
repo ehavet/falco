@@ -16,7 +16,9 @@ export namespace Partner {
         pricingMatrix: Map<RoomCount, Quote.Insurance.Estimate>
         simplifiedCovers: Array<Quote.Insurance.SimplifiedCover>
         productCode: string
-        productVersion: string
+        productVersion: string,
+        contractualTerms: string,
+        ipid: string
     }
 
     export type RoomCount = number

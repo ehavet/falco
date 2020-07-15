@@ -57,6 +57,8 @@ describe('Repository - Quote', async () => {
       expect(savedInsurance.simplifiedCovers).to.include('ACDDE', 'ACVOL')
       expect(savedInsurance.productCode).to.equal('MRH-Loc-Etud')
       expect(savedInsurance.productVersion).to.equal('v2020-02-01')
+      expect(savedInsurance.contractualTerms).to.equal('/path/to/contractual/terms')
+      expect(savedInsurance.ipid).to.equal('/path/to/ipid')
       expect(savedInsurance.createdAt).to.be.an.instanceof(Date)
       expect(savedInsurance.updatedAt).to.be.an.instanceof(Date)
     })

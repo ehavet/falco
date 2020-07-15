@@ -32,8 +32,10 @@ describe('Http API - Quotes - Integ', async () => {
           },
           currency: 'EUR',
           simplifiedCovers: ['ACDDE', 'ACVOL'],
-          productCode: '',
-          productVersion: ''
+          productCode: 'APP658',
+          productVersion: '2020-07-15',
+          contractualTerms: '/path/to/contractual/terms',
+          ipid: '/path/to/ipid'
         }
       }
 
@@ -50,8 +52,10 @@ describe('Http API - Quotes - Integ', async () => {
           default_ceiling: 7000,
           currency: 'EUR',
           simplified_covers: ['ACDDE', 'ACVOL'],
-          product_code: '',
-          product_version: ''
+          product_code: 'APP658',
+          product_version: '2020-07-15',
+          contractual_terms: '/path/to/contractual/terms',
+          ipid: '/path/to/ipid'
         },
         code: 'myPartner'
       }

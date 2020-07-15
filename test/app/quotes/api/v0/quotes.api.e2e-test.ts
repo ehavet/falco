@@ -47,7 +47,9 @@ describe('Http API quotes e2e', async () => {
           default_ceiling: 5000,
           simplified_covers: ['ACDDE', 'ACINCEX', 'ACVOL', 'ACASSHE', 'ACDEFJU', 'ACRC'],
           product_code: 'APP658',
-          product_version: '2020-07-15'
+          product_version: '2020-07-15',
+          contractual_terms: '/docs/Appenin_Conditions_Generales_assurance_habitation_APP658.pdf',
+          ipid: '/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf'
         },
         code: 'studyo'
       })

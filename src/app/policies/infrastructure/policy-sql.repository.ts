@@ -32,7 +32,9 @@ export class PolicySqlRepository implements PolicyRepository {
         defaultCeiling: policy.insurance.estimate.defaultCeiling,
         simplifiedCovers: policy.insurance.simplifiedCovers,
         productCode: policy.insurance.productCode,
-        productVersion: policy.insurance.productVersion
+        productVersion: policy.insurance.productVersion,
+        contractualTerms: policy.insurance.contractualTerms,
+        ipid: policy.insurance.ipid
       },
       contact: policy.contact
     }, {

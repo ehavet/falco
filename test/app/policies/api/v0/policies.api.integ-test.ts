@@ -118,7 +118,9 @@ describe('Policies - API - Integration', async () => {
             currency: 'EUR',
             simplified_covers: ['ACDDE', 'ACVOL'],
             product_code: 'MRH-Loc-Etud',
-            product_version: 'v2020-02-01'
+            product_version: 'v2020-02-01',
+            contractual_terms: '/path/to/contractual/terms',
+            ipid: '/path/to/ipid'
           },
           risk: {
             property: {
@@ -477,7 +479,9 @@ describe('Policies - API - Integration', async () => {
             currency: 'EUR',
             simplified_covers: ['ACDDE', 'ACVOL'],
             product_code: 'MRH-Loc-Etud',
-            product_version: 'v2020-02-01'
+            product_version: 'v2020-02-01',
+            contractual_terms: '/path/to/contractual/terms',
+            ipid: '/path/to/ipid'
           },
           risk: {
             property: {

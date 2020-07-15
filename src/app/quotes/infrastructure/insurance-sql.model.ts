@@ -39,6 +39,12 @@ export class InsuranceSqlModel extends Model<InsuranceSqlModel> {
     @Column
     productVersion!: string
 
+    @Column
+    contractualTerms!: string
+
+    @Column
+    ipid!: string
+
     @HasOne(() => QuoteSqlModel)
     quote!: QuoteSqlModel
 }

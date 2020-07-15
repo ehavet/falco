@@ -28,6 +28,8 @@ function _sqlToInsuranceMapper (quoteSql: QuoteSqlModel) {
     currency: quoteSql.insurance.currency,
     simplifiedCovers: quoteSql.insurance.simplifiedCovers,
     productCode: quoteSql.insurance.productCode,
-    productVersion: quoteSql.insurance.productVersion
+    productVersion: quoteSql.insurance.productVersion,
+    contractualTerms: quoteSql.insurance.contractualTerms,
+    ipid: quoteSql.insurance.ipid
   }
 }

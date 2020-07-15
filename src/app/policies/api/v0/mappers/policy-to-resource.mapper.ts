@@ -29,7 +29,9 @@ function _toInsurance (insurance: Quote.Insurance) {
     currency: insurance.currency,
     simplified_covers: insurance.simplifiedCovers,
     product_code: insurance.productCode,
-    product_version: insurance.productVersion
+    product_version: insurance.productVersion,
+    contractual_terms: insurance.contractualTerms,
+    ipid: insurance.ipid
   }
 }
 

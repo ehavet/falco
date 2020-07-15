@@ -8,7 +8,9 @@ const insuranceSchema: Joi.ObjectSchema = Joi.object({
   currency: Joi.string().description('Monthly price currency').example('EUR'),
   simplified_covers: Joi.array().items(Joi.string()).description('Simplified covers').example(['ACDDE', 'ACVOL']),
   product_code: Joi.string().allow('').description('Product code').example('MRH-Loc-Etud'),
-  product_version: Joi.string().allow('').description('Number of encounters for the day').example('v2020-02-01')
+  product_version: Joi.string().allow('').description('Number of encounters for the day').example('v2020-02-01'),
+  contractual_terms: Joi.string().description('Link to the Contractual Terms document').example('http://link/to.ct'),
+  ipid: Joi.string().description('Link to the IPID document').example('http://link/to.ipid')
 })
 
 const propertyRisksSchema: Joi.ObjectSchema = Joi.object({

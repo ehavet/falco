@@ -42,6 +42,7 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
           termEndDate: new Date('2021-01-05T00:00:00Z')
         }
       )
+
       // When
       const createdPolicy: Policy = await policyRepository.save(expectedPolicy)
       // Then
@@ -83,6 +84,7 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
         termStartDate: new Date('2020-01-05T00:00:00Z'),
         termEndDate: new Date('2021-01-05T00:00:00Z')
       })
+
       await policyRepository.save(expectedPolicy)
       // When
       const result: Policy = await policyRepository.get(policyId)

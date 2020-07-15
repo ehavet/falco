@@ -18,7 +18,9 @@ export function createQuote (attr:Partial<Quote> = {}): Quote {
       currency: 'EUR',
       simplifiedCovers: ['ACDDE', 'ACVOL'],
       productCode: 'MRH-Loc-Etud',
-      productVersion: 'v2020-02-01'
+      productVersion: 'v2020-02-01',
+      contractualTerms: '/path/to/contractual/terms',
+      ipid: '/path/to/ipid'
     },
     ...attr
   }

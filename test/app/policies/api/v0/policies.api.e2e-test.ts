@@ -88,7 +88,9 @@ describe('Policies - API - E2E', async () => {
           currency: 'EUR',
           simplified_covers: ['ACDDE', 'ACINCEX', 'ACVOL', 'ACASSHE', 'ACDEFJU', 'ACRC'],
           product_code: 'APP658',
-          product_version: '2020-07-15'
+          product_version: '2020-07-15',
+          contractual_terms: '/docs/Appenin_Conditions_Generales_assurance_habitation_APP658.pdf',
+          ipid: '/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf'
         },
         risk: {
           property: {
@@ -164,7 +166,9 @@ describe('Policies - API - E2E', async () => {
           currency: 'EUR',
           simplified_covers: ['ACDDE', 'ACVOL'],
           product_code: 'MRH-Loc-Etud',
-          product_version: 'v2020-02-01'
+          product_version: 'v2020-02-01',
+          contractual_terms: '/path/to/contractual/terms',
+          ipid: '/path/to/ipid'
         },
         risk: {
           property: {

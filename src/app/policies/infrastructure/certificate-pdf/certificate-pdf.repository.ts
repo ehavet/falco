@@ -3,6 +3,7 @@ import pdftk from 'node-pdftk'
 import replace from 'buffer-replace'
 import { Policy } from '../../domain/policy'
 import { Certificate } from '../../domain/certificate/certificate'
+import * as path from 'path'
 
 function _encodeForPdf (value: string): string {
   const dict = {
@@ -36,7 +37,7 @@ function _generateFileName (policyId: string): string {
 export class CertificatePdfRepository implements CertificateRepository {
   async generate (policy: Policy): Promise<Certificate> {
     let buffer = await pdftk
-      .input('/Users/mathieu.laurent/Workspace/Appenin/falco-api/src/app/policies/infrastructure/certificate-pdf/certificate-template.pdf')
+      .input(path.join(__dirname, 'certificate-template.pdf'))
       .uncompress()
       .output()
     buffer = replace(buffer, '[[firstname]]', _encodeForPdf(policy.contact.firstname))

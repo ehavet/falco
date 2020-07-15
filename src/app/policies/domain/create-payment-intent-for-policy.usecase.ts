@@ -30,15 +30,9 @@ export namespace CreatePaymentIntentForPolicy {
 }
 
 function _toZeroDecimal (amount: number): number {
-  if ((amount - Math.floor(amount)) !== 0) {
-    return amount * 100
-  }
-  return amount
+  return amount * 100
 }
 
 function _toTwoDecimal (amount: number): number {
-  if ((amount - Math.floor(amount)) !== 0) {
-    return amount
-  }
   return parseFloat((amount / 100).toFixed(2))
 }

@@ -147,6 +147,23 @@ export default function (container: Container): Array<ServerRoute> {
           params: Joi.object({
             id: Joi.string().min(12).max(12).required().description('Policy id').example('APP365094241')
           })
+        },
+        response: {
+          status: {
+            400: HttpErrorSchema.badRequestSchema,
+            404: HttpErrorSchema.notFoundSchema,
+            500: HttpErrorSchema.internalServerErrorSchema
+          }
+        },
+        plugins: {
+          'hapi-swagger': {
+            responses: {
+              201: {
+                description: 'Certificate',
+                schema: Joi.binary().label('Certificate ')
+              }
+            }
+          }
         }
       },
       handler: async (request, h) => {
@@ -155,9 +172,10 @@ export default function (container: Container): Array<ServerRoute> {
           const certificate: Certificate = await container.GeneragePolicyCertificate(generatePolicyCertificateQuery)
           return h.response(certificate.buffer).bytes(certificate.buffer.length)
             .header('Content-Disposition', `attachment; filename=${certificate.name}`)
-            .code(201)
+            .encoding('binary').code(201)
         } catch (error) {
-          if (error instanceof CannotGeneratePolicyNotApplicable) {
+          if (error instanceof CannotGeneratePolicyNotApplicable ||
+              error instanceof PolicyNotFoundError) {
             throw Boom.badData(error.message)
           }
           throw Boom.internal(error)

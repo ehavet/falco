@@ -123,6 +123,8 @@ before_script:
   services:
     - "$POSTGRES_IMAGE"
   before_script:
+    - apt-get update
+    - apt-get -y install pdftk
     - yarn install --frozen-lockfile --non-interactive --production=false
     - yarn build
   script:

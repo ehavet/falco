@@ -5,3 +5,11 @@ export class PolicyNotFoundError extends Error {
     this.name = 'PolicyNotFoundError'
   }
 }
+
+export class PolicyAlreadyPaidError extends Error {
+  constructor (policyId: string) {
+    const message: string = `Policy ${policyId} has already been paid`
+    super(message)
+    this.name = 'PolicyAlreadyPaidError'
+  }
+}

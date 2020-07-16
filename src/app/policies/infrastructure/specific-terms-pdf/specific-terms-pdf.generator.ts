@@ -13,13 +13,13 @@ import { SpecificTermsGenerator } from '../../domain/specific-terms/specific-ter
 
 export class SpecificTermsPdfGenerator implements SpecificTermsGenerator {
   async generate (policy: Policy): Promise<SpecificTerms> {
-    const specificTermsName: string = this.generateFileName(policy.id)
+    const specificTermsName: string = this.getNameFor(policy.id)
     const buffer = await this.fillupSpecificTermsTemplate(policy)
 
     return { name: specificTermsName, buffer }
   }
 
-  private generateFileName (policyId: string): string {
+  getNameFor (policyId: string): string {
     return `Appenin_Condition_Particulieres_assurance_habitation_${policyId}.pdf`
   }
 

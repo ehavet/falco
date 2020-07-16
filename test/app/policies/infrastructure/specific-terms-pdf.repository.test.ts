@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 import fs from 'fs'
+import fsx from 'fs-extra'
 import path from 'path'
 import { createPolicyFixture } from '../fixtures/policy.fixture'
 import { Policy } from '../../../../src/app/policies/domain/policy'
@@ -7,22 +8,31 @@ import { config, expect } from '../../../test-utils'
 import { SpecificTermsPdfRepository } from '../../../../src/app/policies/infrastructure/specific-terms-pdf/specific-terms-pdf.repository'
 import { SpecificTermsRepository } from '../../../../src/app/policies/domain/specific-terms/specific-terms.repository'
 import { SpecificTerms } from '../../../../src/app/policies/domain/specific-terms/specific-terms'
+import { SpecificTermsAlreadyCreatedError } from '../../../../src/app/policies/domain/specific-terms/specific-terms.errors'
 
 describe('Policies - Infra - Specific terms PDF Repository', async () => {
+  const specificTermsFolderPath: string = config.get('FALCO_API_SPECIFIC_TERMS_STORAGE_FOLDER')
+  let specificTermsPdfRepository : SpecificTermsRepository
   let specificTerms: SpecificTerms
+  let policy: Policy
 
   beforeEach(async () => {
     // Given
-    const policy: Policy = createPolicyFixture({ partnerCode: 'essca' })
+    await fsx.emptyDir(specificTermsFolderPath)
+    policy = createPolicyFixture({ partnerCode: 'essca' })
     policy.termEndDate = dayjs(policy.termStartDate).add(1, 'month').toDate()
     policy.insurance.productCode = 'APP1234'
-    const specificTermsPdfRepository : SpecificTermsRepository = new SpecificTermsPdfRepository(config)
+    specificTermsPdfRepository = new SpecificTermsPdfRepository(config)
 
     // When
     specificTerms = await specificTermsPdfRepository.create(policy)
   })
 
-  it('should generate a new specific terms document', () => {
+  afterEach(async () => {
+    await fsx.emptyDir(specificTermsFolderPath)
+  })
+
+  it('should generate a new specific terms document', async () => {
     // Then
     expect(specificTerms.name).to.equal('Appenin_Condition_Particulieres_assurance_habitation_APP753210859.pdf')
     expect(specificTerms.buffer.includes('\\300 EFFET DU 05\\05701\\0572020')).to.be.true
@@ -42,8 +52,13 @@ describe('Policies - Infra - Specific terms PDF Repository', async () => {
 
   it('should save the generated specific terms', async () => {
     // Then
-    const folderPath: string = config.get('FALCO_API_SPECIFIC_TERMS_STORAGE_FOLDER')
-    const specificTermsFilePath: string = path.join(folderPath, 'Appenin_Condition_Particulieres_assurance_habitation_APP753210859.pdf')
+    const specificTermsFilePath: string = path.join(specificTermsFolderPath, 'Appenin_Condition_Particulieres_assurance_habitation_APP753210859.pdf')
     expect(fs.existsSync(specificTermsFilePath)).to.be.true
+  })
+
+  it('should throw and error if the specific terms have already been created', async () => {
+    // When
+    const promise = specificTermsPdfRepository.create(policy)
+    return expect(promise).to.be.rejectedWith(SpecificTermsAlreadyCreatedError)
   })
 })

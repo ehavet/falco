@@ -2,7 +2,6 @@ import pdftk from 'node-pdftk'
 import replace from 'buffer-replace'
 import path from 'path'
 import { Policy } from '../../domain/policy'
-import { SpecificTermsRepository } from '../../domain/specific-terms/specific-terms.repository'
 import { SpecificTerms } from '../../domain/specific-terms/specific-terms'
 import {
   _encodeForPdf,
@@ -10,31 +9,18 @@ import {
   _formatNumber, _formatOtherInsured,
   _formatPolicyId
 } from '../../../common-api/infrastructure/pdf-formatter'
-import { Config } from '../../../../config'
-import fs from 'fs'
-import { SpecificTermsAlreadyCreatedError } from '../../domain/specific-terms/specific-terms.errors'
+import { SpecificTermsGenerator } from '../../domain/specific-terms/specific-terms.generator'
 
-export class SpecificTermsPdfRepository implements SpecificTermsRepository {
-  constructor (private config: Config) {}
-
-  async create (policy: Policy): Promise<SpecificTerms> {
+export class SpecificTermsPdfGenerator implements SpecificTermsGenerator {
+  async generate (policy: Policy): Promise<SpecificTerms> {
     const specificTermsName: string = this.generateFileName(policy.id)
-    const specificTermsFilePath: string = path.join(this.config.get('FALCO_API_SPECIFIC_TERMS_STORAGE_FOLDER'), specificTermsName)
-    this.checkSpecificTermsNotAlreadyGenerated(specificTermsFilePath, policy.id)
     const buffer = await this.fillupSpecificTermsTemplate(policy)
-    await this.saveSpecificTerms(buffer, specificTermsFilePath)
 
     return { name: specificTermsName, buffer }
   }
 
   private generateFileName (policyId: string): string {
     return `Appenin_Condition_Particulieres_assurance_habitation_${policyId}.pdf`
-  }
-
-  private checkSpecificTermsNotAlreadyGenerated (specificTermsFilePath: string, policyId: string): void {
-    if (fs.existsSync(specificTermsFilePath)) {
-      throw new SpecificTermsAlreadyCreatedError(policyId)
-    }
   }
 
   private async fillupSpecificTermsTemplate (policy: Policy) {
@@ -60,12 +46,5 @@ export class SpecificTermsPdfRepository implements SpecificTermsRepository {
     buffer = replace(buffer, '[default_deduction]', _formatNumber(policy.insurance.estimate.defaultDeductible))
     buffer = replace(buffer, '[subscribtion_date]', _encodeForPdf(_formatDate(policy.subscriptionDate!)))
     return buffer
-  }
-
-  private async saveSpecificTerms (buffer, specificTermsFilePath: string) {
-    await pdftk
-      .input(buffer)
-      .compress()
-      .output(specificTermsFilePath)
   }
 }

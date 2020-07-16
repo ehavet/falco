@@ -8,7 +8,10 @@ import { config, expect } from '../../../test-utils'
 import { SpecificTermsPdfGenerator } from '../../../../src/app/policies/infrastructure/specific-terms-pdf/specific-terms-pdf.generator'
 import { SpecificTermsRepository } from '../../../../src/app/policies/domain/specific-terms/specific-terms.repository'
 import { SpecificTerms } from '../../../../src/app/policies/domain/specific-terms/specific-terms'
-import { SpecificTermsAlreadyCreatedError } from '../../../../src/app/policies/domain/specific-terms/specific-terms.errors'
+import {
+  SpecificTermsAlreadyCreatedError,
+  SpecificTermsNotFoundError
+} from '../../../../src/app/policies/domain/specific-terms/specific-terms.errors'
 import { SpecificTermsGenerator } from '../../../../src/app/policies/domain/specific-terms/specific-terms.generator'
 import { SpecificTermsFSRepository } from '../../../../src/app/policies/infrastructure/specific-terms-pdf/specific-terms-fs.repository'
 
@@ -27,24 +30,51 @@ describe('Policies - Infra - Specific terms FS Repository', async () => {
     policy.insurance.productCode = 'APP1234'
     specificTermsToSave = await specificTermsGenerator.generate(policy)
     specificTermsPdfRepository = new SpecificTermsFSRepository(config)
-
-    // When
-    await specificTermsPdfRepository.save(specificTermsToSave, policy.id)
   })
 
   afterEach(async () => {
     await fsx.emptyDir(specificTermsFolderPath)
   })
 
-  it('should save the given specific terms', async () => {
-    // Then
-    const specificTermsFilePath: string = path.join(specificTermsFolderPath, 'Appenin_Condition_Particulieres_assurance_habitation_APP753210859.pdf')
-    expect(fs.existsSync(specificTermsFilePath)).to.be.true
+  describe('#save', async () => {
+    it('should save the given specific terms', async () => {
+      // When
+      await specificTermsPdfRepository.save(specificTermsToSave, policy.id)
+
+      // Then
+      const specificTermsFilePath: string = path.join(specificTermsFolderPath, 'Appenin_Condition_Particulieres_assurance_habitation_APP753210859.pdf')
+      expect(fs.existsSync(specificTermsFilePath)).to.be.true
+    })
+
+    it('should throw and error if the given specific terms have already been saved', async () => {
+      // When
+      await specificTermsPdfRepository.save(specificTermsToSave, policy.id)
+
+      // When
+      const promise = specificTermsPdfRepository.save(specificTermsToSave, policy.id)
+      return expect(promise).to.be.rejectedWith(SpecificTermsAlreadyCreatedError)
+    })
   })
 
-  it('should throw and error if the given specific terms have already been saved', async () => {
-    // When
-    const promise = specificTermsPdfRepository.save(specificTermsToSave, policy.id)
-    return expect(promise).to.be.rejectedWith(SpecificTermsAlreadyCreatedError)
+  describe('#get', async () => {
+    it('should return the found specific terms', async () => {
+      // Given
+      await specificTermsPdfRepository.save(specificTermsToSave, policy.id)
+
+      // When
+      const specificTermsFound: SpecificTerms = await specificTermsPdfRepository.get('Appenin_Condition_Particulieres_assurance_habitation_APP753210859.pdf')
+
+      // Then
+      expect(specificTermsFound.name).to.equal('Appenin_Condition_Particulieres_assurance_habitation_APP753210859.pdf')
+      expect(specificTermsFound.buffer.includes('n\\260APP 753 210 859')).to.be.true
+    })
+
+    it('should throw a not found error if no specific terms found', async () => {
+      // When
+      const promise = specificTermsPdfRepository.get('Appenin_Condition_Particulieres_assurance_habitation_APP753210859.pdf')
+
+      // Then
+      return expect(promise).to.be.rejectedWith(SpecificTermsNotFoundError)
+    })
   })
 })

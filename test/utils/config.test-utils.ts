@@ -58,6 +58,8 @@ module.exports = Envie({
 
   FALCO_API_FALCO_FRONT_URL: Joi.string().default('http://front-url'),
 
-  FALCO_API_DOCUMENTS_STORAGE_FOLDER: Joi.string().default(_getSpecificTermsStorageFolder())
+  FALCO_API_DOCUMENTS_STORAGE_FOLDER: Joi.string().default(_getSpecificTermsStorageFolder()),
+
+  FALCO_API_HELLO_SIGN_PRIVATE_KEY: Joi.string().default('589cf524fffd6f47c33c3e4cabab20a2044ba45c095f242ee97a17dfd701565c')
 
 }) as Config

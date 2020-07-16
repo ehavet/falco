@@ -12,6 +12,8 @@ import { policyToResource } from './mappers/policy-to-resource.mapper'
 import { Policy } from '../../domain/policy'
 import { createPolicyRequestSchema, policySchema } from './schemas/post-policy.schema'
 import { GetPolicyQuery } from '../../domain/get-policy-query'
+import { HelloSignSignatureRequester } from '../../infrastructure/hello-sign.signature-requester'
+import { helloSignConfig } from '../../../../configs/hello-sign.config'
 import { GeneratePolicyCertificateQuery } from '../../domain/certificate/generate-policy-certificate-query'
 import { Certificate } from '../../domain/certificate/certificate'
 import { CannotGeneratePolicyNotApplicableError } from '../../domain/certificate/certificate.errors'
@@ -226,6 +228,41 @@ export default function (container: Container): Array<ServerRoute> {
             throw Boom.notFound(error.message)
           }
           throw Boom.internal(error)
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/v0/policies/{id}/signature-request',
+      options: {
+        tags: TAGS,
+        description: 'Create a signature request',
+        validate: {
+          params: Joi.object({
+            id: Joi.string().min(12).max(12).required().description('Policy id').example('APP365094241')
+          })
+        },
+        response: {
+          status: {
+            201: Joi.object({
+              url: Joi.string().uri().description('signature request url')
+                .example('https://app.hellosign.com/editor/embeddedSign?signature_id=857915c9ca596')
+            }),
+            400: HttpErrorSchema.badRequestSchema,
+            404: HttpErrorSchema.notFoundSchema,
+            500: HttpErrorSchema.internalServerErrorSchema
+          }
+        }
+      },
+      handler: async () => {
+        try {
+          const hello = new HelloSignSignatureRequester(helloSignConfig)
+          const response = await hello.create('test')
+          return { sign_url: response.url }
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.log(error)
+          throw new Error(error.message)
         }
       }
     }

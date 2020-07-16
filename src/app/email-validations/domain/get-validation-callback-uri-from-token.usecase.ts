@@ -24,7 +24,6 @@ export namespace GetValidationCallbackUriFromToken {
         }
         throw error
       }
-
       const validationTokenPayload: ValidationTokenPayload =
             _buildValidationTokenPayload(validationTokenPayloadString)
 

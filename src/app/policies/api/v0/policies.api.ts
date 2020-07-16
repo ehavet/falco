@@ -12,14 +12,13 @@ import { policyToResource } from './mappers/policy-to-resource.mapper'
 import { Policy } from '../../domain/policy'
 import { createPolicyRequestSchema, policySchema } from './schemas/post-policy.schema'
 import { GetPolicyQuery } from '../../domain/get-policy-query'
-import { HelloSignSignatureRequester } from '../../infrastructure/hello-sign.signature-requester'
-import { helloSignConfig } from '../../../../configs/hello-sign.config'
 import { GeneratePolicyCertificateQuery } from '../../domain/certificate/generate-policy-certificate-query'
 import { Certificate } from '../../domain/certificate/certificate'
 import { CannotGeneratePolicyNotApplicableError } from '../../domain/certificate/certificate.errors'
 import { GetPolicySpecificTermsQuery } from '../../domain/specific-terms/get-policy-specific-terms-query'
 import { SpecificTerms } from '../../domain/specific-terms/specific-terms'
 import { SpecificTermsNotFoundError } from '../../domain/specific-terms/specific-terms.errors'
+import { SignatureRequestCreationFailureError } from '../../domain/signature-request.errors'
 
 const TAGS = ['api', 'policies']
 
@@ -250,19 +249,24 @@ export default function (container: Container): Array<ServerRoute> {
             }),
             400: HttpErrorSchema.badRequestSchema,
             404: HttpErrorSchema.notFoundSchema,
+            422: HttpErrorSchema.unprocessableEntitySchema,
             500: HttpErrorSchema.internalServerErrorSchema
           }
         }
       },
-      handler: async () => {
+      handler: async (request, h) => {
         try {
-          const hello = new HelloSignSignatureRequester(helloSignConfig)
-          const response = await hello.create('test')
-          return { sign_url: response.url }
+          const response = await container.CreateSignatureRequestForPolicy(request.params.id)
+          return h.response(response).code(201)
         } catch (error) {
-          // eslint-disable-next-line no-console
-          console.log(error)
-          throw new Error(error.message)
+          switch (true) {
+            case error instanceof SignatureRequestCreationFailureError:
+              throw Boom.badData(error.message)
+            case error instanceof PolicyNotFoundError:
+              throw Boom.notFound(error.message)
+            default:
+              throw Boom.internal()
+          }
         }
       }
     }

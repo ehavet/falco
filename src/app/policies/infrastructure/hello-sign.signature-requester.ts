@@ -1,5 +1,5 @@
 import { SignatureRequester } from '../domain/signature-requester'
-import { SignatureRequestUrl } from '../domain/signature-request-url'
+import { SignatureRequest } from '../domain/signature-request'
 import { HelloSignConfig } from '../../../configs/hello-sign.config'
 import { logger } from '../../../libs/logger'
 
@@ -10,7 +10,7 @@ export class HelloSignSignatureRequester implements SignatureRequester {
       this.config = config
     }
 
-    async create (docPath: string): Promise<SignatureRequestUrl> {
+    async create (docPath: string): Promise<SignatureRequest> {
       const options = {
         test_mode: 1,
         clientId: '91c073e7562d88f96d40d013c7b493ef',
@@ -39,7 +39,6 @@ export class HelloSignSignatureRequester implements SignatureRequester {
             }
           ]
         ],
-        // files: ['/Users/eha/Projects/falco-api/src/app/policies/api/v0/sample.pdf']
         files: [docPath]
       }
       try {

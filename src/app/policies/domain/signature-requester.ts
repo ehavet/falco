@@ -1,5 +1,5 @@
-import { SignatureRequestUrl } from './signature-request-url'
+import { SignatureRequest } from './signature-request'
 
 export interface SignatureRequester {
-    create(docToSignPath: string): Promise<SignatureRequestUrl>
+    create(docToSignPath: string): Promise<SignatureRequest>
 }

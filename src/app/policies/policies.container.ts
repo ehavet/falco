@@ -27,6 +27,10 @@ import { SpecificTermsRepository } from './domain/specific-terms/specific-terms.
 import { SpecificTermsFSRepository } from './infrastructure/specific-terms-pdf/specific-terms-fs.repository'
 import { SpecificTermsGenerator } from './domain/specific-terms/specific-terms.generator'
 import { SpecificTermsPdfGenerator } from './infrastructure/specific-terms-pdf/specific-terms-pdf.generator'
+import { CreateSignatureRequestForPolicy } from './domain/create-signature-request-for-policy.usecase'
+import { SignatureRequester } from './domain/signature-requester'
+import { HelloSignSignatureRequester } from './infrastructure/hello-sign.signature-requester'
+import { helloSignConfig } from '../../configs/hello-sign.config'
 const config = require('../../config')
 
 export interface Container {
@@ -36,6 +40,7 @@ export interface Container {
     GetPolicy: GetPolicy
     PaymentEventAuthenticator: PaymentEventAuthenticator
     GeneragePolicyCertificate: GeneratePolicyCertificate
+    CreateSignatureRequestForPolicy: CreateSignatureRequestForPolicy
     GetPolicySpecificTerms: GetPolicySpecificTerms
 }
 
@@ -45,6 +50,7 @@ const paymentProcessor: StripePaymentProcessor = new StripePaymentProcessor(stri
 const paymentEventAuthenticator: StripeEventAuthenticator = new StripeEventAuthenticator(stripeConfig)
 const partnerRepository: PartnerRepository = partnerContainer.partnerRepository
 const certificateRepository: CertificateRepository = new CertificatePdfRepository()
+const signatureRequester: SignatureRequester = new HelloSignSignatureRequester(helloSignConfig)
 const specificTermsRepository: SpecificTermsRepository = new SpecificTermsFSRepository(config)
 const specificTermsGenerator: SpecificTermsGenerator = new SpecificTermsPdfGenerator()
 
@@ -57,6 +63,7 @@ const confirmPaymentIntentForPolicy: ConfirmPaymentIntentForPolicy =
 const getPolicy: GetPolicy = GetPolicy.factory(policyRepository)
 const generatePolicyCertificate: GeneratePolicyCertificate = GeneratePolicyCertificate.factory(policyRepository, certificateRepository)
 const getPolicySpecificTerms: GetPolicySpecificTerms = GetPolicySpecificTerms.factory(specificTermsRepository, specificTermsGenerator)
+const createSignatureRequestForPolicy: CreateSignatureRequestForPolicy = CreateSignatureRequestForPolicy.factory(policyRepository, signatureRequester)
 
 export const container: Container = {
   CreatePaymentIntentForPolicy: createPaymentIntentForPolicy,
@@ -65,7 +72,8 @@ export const container: Container = {
   ConfirmPaymentIntentForPolicy: confirmPaymentIntentForPolicy,
   PaymentEventAuthenticator: paymentEventAuthenticator,
   GeneragePolicyCertificate: generatePolicyCertificate,
-  GetPolicySpecificTerms: getPolicySpecificTerms
+  GetPolicySpecificTerms: getPolicySpecificTerms,
+  CreateSignatureRequestForPolicy: createSignatureRequestForPolicy
 }
 
 export const policySqlModels: Array<any> = [PolicySqlModel, ContactSqlModel]

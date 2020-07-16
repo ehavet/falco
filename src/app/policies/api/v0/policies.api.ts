@@ -15,6 +15,9 @@ import { GetPolicyQuery } from '../../domain/get-policy-query'
 import { GeneratePolicyCertificateQuery } from '../../domain/certificate/generate-policy-certificate-query'
 import { Certificate } from '../../domain/certificate/certificate'
 import { CannotGeneratePolicyNotApplicableError } from '../../domain/certificate/certificate.errors'
+import { GetPolicySpecificTermsQuery } from '../../domain/specific-terms/get-policy-specific-terms-query'
+import { SpecificTerms } from '../../domain/specific-terms/specific-terms'
+import { SpecificTermsNotFoundError } from '../../domain/specific-terms/specific-terms.errors'
 
 const TAGS = ['api', 'policies']
 
@@ -151,7 +154,7 @@ export default function (container: Container): Array<ServerRoute> {
         response: {
           status: {
             400: HttpErrorSchema.badRequestSchema,
-            404: HttpErrorSchema.notFoundSchema,
+            422: HttpErrorSchema.unprocessableEntitySchema,
             500: HttpErrorSchema.internalServerErrorSchema
           }
         },
@@ -177,6 +180,50 @@ export default function (container: Container): Array<ServerRoute> {
           if (error instanceof CannotGeneratePolicyNotApplicableError ||
               error instanceof PolicyNotFoundError) {
             throw Boom.badData(error.message)
+          }
+          throw Boom.internal(error)
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/v0/policies/{id}/specific-terms',
+      options: {
+        tags: TAGS,
+        description: 'Retrieves the policy specific terms',
+        validate: {
+          params: Joi.object({
+            id: Joi.string().min(12).max(12).required().description('Policy id').example('APP365094241')
+          })
+        },
+        response: {
+          status: {
+            400: HttpErrorSchema.badRequestSchema,
+            404: HttpErrorSchema.notFoundSchema,
+            500: HttpErrorSchema.internalServerErrorSchema
+          }
+        },
+        plugins: {
+          'hapi-swagger': {
+            responses: {
+              201: {
+                description: 'Specific Terms document',
+                schema: Joi.binary().label('SpecificTerms ')
+              }
+            }
+          }
+        }
+      },
+      handler: async (request, h) => {
+        const getPolicySpecificTermsQuery : GetPolicySpecificTermsQuery = { policyId: request.params.id }
+        try {
+          const specificTerms: SpecificTerms = await container.GetPolicySpecificTerms(getPolicySpecificTermsQuery)
+          return h.response(specificTerms.buffer).bytes(specificTerms.buffer.length)
+            .header('Content-Disposition', `attachment; filename=${specificTerms.name}`)
+            .encoding('binary').code(200)
+        } catch (error) {
+          if (error instanceof SpecificTermsNotFoundError) {
+            throw Boom.notFound(error.message)
           }
           throw Boom.internal(error)
         }

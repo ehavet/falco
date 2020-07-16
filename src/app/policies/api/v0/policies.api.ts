@@ -12,6 +12,9 @@ import { policyToResource } from './mappers/policy-to-resource.mapper'
 import { Policy } from '../../domain/policy'
 import { createPolicyRequestSchema, policySchema } from './schemas/post-policy.schema'
 import { GetPolicyQuery } from '../../domain/get-policy-query'
+import { GeneratePolicyCertificateQuery } from '../../domain/certificate/generate-policy-certificate-query'
+import { Certificate } from '../../domain/certificate/certificate'
+import { CannotGeneratePolicyNotApplicableError } from '../../domain/certificate/certificate.errors'
 
 const TAGS = ['api', 'policies']
 
@@ -111,6 +114,7 @@ export default function (container: Container): Array<ServerRoute> {
         response: {
           status: {
             200: policySchema,
+            400: HttpErrorSchema.badRequestSchema,
             404: HttpErrorSchema.notFoundSchema,
             500: HttpErrorSchema.internalServerErrorSchema
           }
@@ -124,6 +128,55 @@ export default function (container: Container): Array<ServerRoute> {
         } catch (error) {
           if (error instanceof PolicyNotFoundError) {
             throw Boom.notFound(error.message)
+          }
+          throw Boom.internal(error)
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/v0/policies/{id}/certificates',
+      options: {
+        tags: TAGS,
+        description: 'Creates a policy certificate',
+        payload: {
+          output: 'stream',
+          defaultContentType: 'application/octet-stream'
+        },
+        validate: {
+          params: Joi.object({
+            id: Joi.string().min(12).max(12).required().description('Policy id').example('APP365094241')
+          })
+        },
+        response: {
+          status: {
+            400: HttpErrorSchema.badRequestSchema,
+            404: HttpErrorSchema.notFoundSchema,
+            500: HttpErrorSchema.internalServerErrorSchema
+          }
+        },
+        plugins: {
+          'hapi-swagger': {
+            responses: {
+              201: {
+                description: 'Certificate',
+                schema: Joi.binary().label('Certificate ')
+              }
+            }
+          }
+        }
+      },
+      handler: async (request, h) => {
+        const generatePolicyCertificateQuery : GeneratePolicyCertificateQuery = { policyId: request.params.id }
+        try {
+          const certificate: Certificate = await container.GeneragePolicyCertificate(generatePolicyCertificateQuery)
+          return h.response(certificate.buffer).bytes(certificate.buffer.length)
+            .header('Content-Disposition', `attachment; filename=${certificate.name}`)
+            .encoding('binary').code(201)
+        } catch (error) {
+          if (error instanceof CannotGeneratePolicyNotApplicableError ||
+              error instanceof PolicyNotFoundError) {
+            throw Boom.badData(error.message)
           }
           throw Boom.internal(error)
         }

@@ -207,4 +207,29 @@ describe('Policies - API - E2E', async () => {
       expect(response.body).to.deep.equal(expectedResourcePolicy)
     })
   })
+
+  describe('POST /v0/policies/:id/certificates', async () => {
+    let response: supertest.Response
+    const now = new Date('2020-04-18T10:09:08Z')
+    const policy: Policy = createPolicyFixture({ status: Policy.Status.Applicable })
+    const policyRepository: PolicyRepository = new PolicySqlRepository()
+
+    beforeEach(async () => {
+      dateFaker.setCurrentDate(now)
+      await policyRepository.save(policy)
+    })
+
+    it('should return certificate', async () => {
+      // When
+      response = await httpServer.api()
+        .post(`/v0/policies/${policy.id}/certificates`)
+        .send()
+        .set('X-Consumer-Username', 'myPartner')
+
+      // Then
+      expect(response.header['content-length']).to.equal('196013')
+      expect(response.header['content-disposition']).to.includes('Appenin_Attestation_assurance_habitation_APP753210859.pdf')
+      expect(response.body).to.be.instanceOf(Buffer)
+    })
+  })
 })

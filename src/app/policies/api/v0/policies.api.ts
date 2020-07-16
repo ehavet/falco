@@ -14,7 +14,7 @@ import { createPolicyRequestSchema, policySchema } from './schemas/post-policy.s
 import { GetPolicyQuery } from '../../domain/get-policy-query'
 import { GeneratePolicyCertificateQuery } from '../../domain/certificate/generate-policy-certificate-query'
 import { Certificate } from '../../domain/certificate/certificate'
-import { CannotGeneratePolicyNotApplicable } from '../../domain/certificate/certificate.errors'
+import { CannotGeneratePolicyNotApplicableError } from '../../domain/certificate/certificate.errors'
 
 const TAGS = ['api', 'policies']
 
@@ -174,7 +174,7 @@ export default function (container: Container): Array<ServerRoute> {
             .header('Content-Disposition', `attachment; filename=${certificate.name}`)
             .encoding('binary').code(201)
         } catch (error) {
-          if (error instanceof CannotGeneratePolicyNotApplicable ||
+          if (error instanceof CannotGeneratePolicyNotApplicableError ||
               error instanceof PolicyNotFoundError) {
             throw Boom.badData(error.message)
           }

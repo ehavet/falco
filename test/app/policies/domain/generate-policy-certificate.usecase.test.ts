@@ -7,7 +7,7 @@ import { CertificateRepository } from '../../../../src/app/policies/domain/certi
 import { Certificate } from '../../../../src/app/policies/domain/certificate/certificate'
 import { GeneratePolicyCertificate } from '../../../../src/app/policies/domain/certificate/generate-policy-certificate.usecase'
 import { GeneratePolicyCertificateQuery } from '../../../../src/app/policies/domain/certificate/generate-policy-certificate-query'
-import { CannotGeneratePolicyNotApplicable } from '../../../../src/app/policies/domain/certificate/certificate.errors'
+import { CannotGeneratePolicyNotApplicableError } from '../../../../src/app/policies/domain/certificate/certificate.errors'
 
 describe('Policies - Usecase - Generate policy certificate', async () => {
   const policyRepository: SinonStubbedInstance<PolicyRepository> = {
@@ -57,6 +57,6 @@ describe('Policies - Usecase - Generate policy certificate', async () => {
     const promise = generatePolicyCertificate(generatePolicyCertificateQuery)
 
     // Then
-    return expect(promise).to.be.rejectedWith(CannotGeneratePolicyNotApplicable)
+    return expect(promise).to.be.rejectedWith(CannotGeneratePolicyNotApplicableError)
   })
 })

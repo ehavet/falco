@@ -9,7 +9,7 @@ import { createPolicyApiRequestFixture } from '../../fixtures/createPolicyApiReq
 import { QuoteNotFoundError } from '../../../../../src/app/quotes/domain/quote.errors'
 import { GetPolicyQuery } from '../../../../../src/app/policies/domain/get-policy-query'
 import { Certificate } from '../../../../../src/app/policies/domain/certificate/certificate'
-import { CannotGeneratePolicyNotApplicable } from '../../../../../src/app/policies/domain/certificate/certificate.errors'
+import { CannotGeneratePolicyNotApplicableError } from '../../../../../src/app/policies/domain/certificate/certificate.errors'
 
 describe('Policies - API - Integration', async () => {
   let httpServer: HttpServerForTesting
@@ -618,7 +618,7 @@ describe('Policies - API - Integration', async () => {
     describe('when the policy is not applicable yet', async () => {
       it('should return a 422', async () => {
         // Given
-        sinon.stub(container, 'GeneragePolicyCertificate').rejects(new CannotGeneratePolicyNotApplicable())
+        sinon.stub(container, 'GeneragePolicyCertificate').rejects(new CannotGeneratePolicyNotApplicableError())
 
         // When
         response = await httpServer.api()

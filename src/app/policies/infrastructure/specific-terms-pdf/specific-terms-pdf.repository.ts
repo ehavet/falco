@@ -1,7 +1,7 @@
 import pdftk from 'node-pdftk'
 import replace from 'buffer-replace'
+import path from 'path'
 import { Policy } from '../../domain/policy'
-import * as path from 'path'
 import { SpecificTermsRepository } from '../../domain/specific-terms/specific-terms.repository'
 import { SpecificTerms } from '../../domain/specific-terms/specific-terms'
 import {
@@ -10,8 +10,11 @@ import {
   _formatNumber, _formatOtherInsured,
   _formatPolicyId
 } from '../../../common-api/infrastructure/pdf-formatter'
+import { Config } from '../../../../config'
 
 export class SpecificTermsPdfRepository implements SpecificTermsRepository {
+  constructor (private config: Config) {}
+
   async create (policy: Policy): Promise<SpecificTerms> {
     const partnerCode: string = policy.partnerCode
     const templateName: string = `specific-terms-template-${partnerCode}.pdf`
@@ -35,7 +38,14 @@ export class SpecificTermsPdfRepository implements SpecificTermsRepository {
     buffer = replace(buffer, '[default_ceiling]', _formatNumber(policy.insurance.estimate.defaultCeiling))
     buffer = replace(buffer, '[default_deduction]', _formatNumber(policy.insurance.estimate.defaultDeductible))
     buffer = replace(buffer, '[subscribtion_date]', _encodeForPdf(_formatDate(policy.subscriptionDate!)))
-    return { name: this.generateFileName(policy.id), buffer }
+
+    const filename: string = this.generateFileName(policy.id)
+    await pdftk
+      .input(buffer)
+      .compress()
+      .output(path.join(this.config.get('FALCO_API_SPECIFIC_TERMS_STORAGE_FOLDER'), filename))
+
+    return { name: filename, buffer }
   }
 
   private generateFileName (policyId: string): string {

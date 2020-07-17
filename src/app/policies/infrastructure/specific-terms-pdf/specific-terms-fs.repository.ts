@@ -40,7 +40,7 @@ export class SpecificTermsFSRepository implements SpecificTermsRepository {
   }
 
   private getSpecificTermsFilePath (specificTermsName: string) {
-    return path.join(this.config.get('FALCO_API_SPECIFIC_TERMS_STORAGE_FOLDER'), specificTermsName)
+    return path.join(this.config.get('FALCO_API_DOCUMENTS_STORAGE_FOLDER'), specificTermsName)
   }
 
   private checkSpecificTermsNotAlreadyGenerated (specificTermsFilePath: string, policyId: string): void {

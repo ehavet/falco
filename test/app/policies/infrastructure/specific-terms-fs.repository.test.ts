@@ -16,7 +16,7 @@ import { SpecificTermsGenerator } from '../../../../src/app/policies/domain/spec
 import { SpecificTermsFSRepository } from '../../../../src/app/policies/infrastructure/specific-terms-pdf/specific-terms-fs.repository'
 
 describe('Policies - Infra - Specific terms FS Repository', async () => {
-  const specificTermsFolderPath: string = config.get('FALCO_API_SPECIFIC_TERMS_STORAGE_FOLDER')
+  const specificTermsFolderPath: string = config.get('FALCO_API_DOCUMENTS_STORAGE_FOLDER')
   const specificTermsGenerator: SpecificTermsGenerator = new SpecificTermsPdfGenerator()
   let specificTermsPdfRepository : SpecificTermsRepository
   let specificTermsToSave: SpecificTerms

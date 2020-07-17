@@ -56,4 +56,23 @@ describe('Policies - Infra - Contract FS Repository', async () => {
       expect(tempContractPath).to.equal(specificTermsFilePath)
     })
   })
+
+  describe('#saveSignedContract', async () => {
+    it('should save the signed contract', async () => {
+      // When
+      await contractPdfRepository.saveSignedContract(contractToSave)
+
+      // Then
+      const signedContractsFilePath: string = path.join(documentsFolderPath, 'Appenin_Contrat_assurance_habitation_APP753210859.pdf')
+      expect(fs.existsSync(signedContractsFilePath)).to.be.true
+    })
+
+    it('should return the contract', async () => {
+      // When
+      const savedContract: Contract = await contractPdfRepository.saveSignedContract(contractToSave)
+
+      // Then
+      expect(savedContract).to.equal(contractToSave)
+    })
+  })
 })

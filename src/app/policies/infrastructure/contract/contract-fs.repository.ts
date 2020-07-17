@@ -6,24 +6,40 @@ import { ContractRepository } from '../../domain/contract/contract.repository'
 import { Contract } from '../../domain/contract/contract'
 
 export class ContractFsRepository implements ContractRepository {
-  private contractTempFolderPath: string
+  private tempContractsFolderPath: string
+  private signedContractsFolderPath: string
 
   constructor (private config: Config) {
-    this.contractTempFolderPath = path.join(this.config.get('FALCO_API_DOCUMENTS_STORAGE_FOLDER'), 'tmp')
-    fsx.ensureDirSync(this.contractTempFolderPath)
+    this.tempContractsFolderPath = path.join(this.config.get('FALCO_API_DOCUMENTS_STORAGE_FOLDER'), 'tmp')
+    this.signedContractsFolderPath = this.config.get('FALCO_API_DOCUMENTS_STORAGE_FOLDER')
+    fsx.ensureDirSync(this.tempContractsFolderPath)
   }
 
   async saveTempContract (contract: Contract): Promise<string> {
-    const specificTermsFilePath: string = this.getContractTempFilePath(contract.name)
+    const tempContractFilePath: string = this.getTempContractsFilePath(contract.name)
     await pdftk
       .input(contract.buffer)
       .compress()
-      .output(specificTermsFilePath)
+      .output(tempContractFilePath)
 
-    return specificTermsFilePath
+    return tempContractFilePath
   }
 
-  private getContractTempFilePath (specificTermsName: string) {
-    return path.join(this.contractTempFolderPath, specificTermsName)
+  async saveSignedContract (contract: Contract): Promise<Contract> {
+    const signedContractFilePath: string = this.getSignedContractsFilePath(contract.name)
+    await pdftk
+      .input(contract.buffer)
+      .compress()
+      .output(signedContractFilePath)
+
+    return contract
+  }
+
+  private getTempContractsFilePath (contractName: string) {
+    return path.join(this.tempContractsFolderPath, contractName)
+  }
+
+  private getSignedContractsFilePath (contractName: string) {
+    return path.join(this.signedContractsFolderPath, contractName)
   }
 }

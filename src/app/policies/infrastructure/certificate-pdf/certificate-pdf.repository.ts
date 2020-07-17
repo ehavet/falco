@@ -4,35 +4,7 @@ import replace from 'buffer-replace'
 import { Policy } from '../../domain/policy'
 import { Certificate } from '../../domain/certificate/certificate'
 import * as path from 'path'
-
-function _encodeForPdf (value: string): string {
-  const dict = {
-    '€': '\\200',
-    Š: '\\212',
-    Ž: '\\216',
-    š: '\\232',
-    ž: '\\236',
-    Ÿ: '\\237'
-  }
-  return value.replace(/[^\w ]/g,
-    char => dict[char] || '\\' + ('000' + char.charCodeAt(0).toString(8)).slice(-3))
-}
-
-function _formatPolicyId (policyId: string): string {
-  const sub1 = policyId.substr(0, 3)
-  const sub2 = policyId.substr(3, 3)
-  const sub3 = policyId.substr(6, 3)
-  const sub4 = policyId.substr(9, 3)
-  return `${sub1} ${sub2} ${sub3} ${sub4}`
-}
-
-function _formatDate (date: Date): string {
-  return date ? new Intl.DateTimeFormat('fr-FR').format(date) : ''
-}
-
-function _generateFileName (policyId: string): string {
-  return `Appenin_Attestation_assurance_habitation_${policyId}.pdf`
-}
+import { _encodeForPdf, _formatDate, _formatPolicyId } from '../../../common-api/infrastructure/pdf-formatter'
 
 export class CertificatePdfRepository implements CertificateRepository {
   async generate (policy: Policy): Promise<Certificate> {
@@ -49,6 +21,10 @@ export class CertificatePdfRepository implements CertificateRepository {
     buffer = replace(buffer, '[[term_end_date]]', _encodeForPdf(_formatDate(policy.termEndDate)))
     buffer = replace(buffer, '[[date_today]]', _encodeForPdf(_formatDate(new Date())))
     buffer = replace(buffer, '[[policy_id]]', _encodeForPdf(_formatPolicyId(policy.id)))
-    return { name: _generateFileName(policy.id), buffer }
+    return { name: this.generateFileName(policy.id), buffer }
+  }
+
+  private generateFileName (policyId: string): string {
+    return `Appenin_Attestation_assurance_habitation_${policyId}.pdf`
   }
 }

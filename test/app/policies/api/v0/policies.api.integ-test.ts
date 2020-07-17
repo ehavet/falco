@@ -10,6 +10,8 @@ import { QuoteNotFoundError } from '../../../../../src/app/quotes/domain/quote.e
 import { GetPolicyQuery } from '../../../../../src/app/policies/domain/get-policy-query'
 import { Certificate } from '../../../../../src/app/policies/domain/certificate/certificate'
 import { CannotGeneratePolicyNotApplicableError } from '../../../../../src/app/policies/domain/certificate/certificate.errors'
+import { SpecificTerms } from '../../../../../src/app/policies/domain/specific-terms/specific-terms'
+import { SpecificTermsNotFoundError } from '../../../../../src/app/policies/domain/specific-terms/specific-terms.errors'
 
 describe('Policies - API - Integration', async () => {
   let httpServer: HttpServerForTesting
@@ -650,6 +652,84 @@ describe('Policies - API - Integration', async () => {
         // When
         response = await httpServer.api()
           .post('/v0/policies/APP753210859/certificates')
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 500)
+      })
+    })
+  })
+
+  describe('GET /v0/policies/id/specific-terms', async () => {
+    let response: supertest.Response
+
+    describe('when the specific terms are found', async () => {
+      const specificTerms: SpecificTerms = {
+        name: 'Appenin_Conditions_Particulieres_assurance_habitation_APP753210859.pdf',
+        buffer: Buffer.from('specific terms')
+      }
+
+      beforeEach(async () => {
+        // Given
+        sinon.stub(container, 'GetPolicySpecificTerms').resolves(specificTerms)
+
+        // When
+        response = await httpServer.api()
+          .get('/v0/policies/APP753210859/specific-terms')
+          .set('X-Consumer-Username', 'myPartner')
+      })
+
+      it('should reply with status 200', () => {
+        expect(response).to.have.property('statusCode', 200)
+        expect(response.type).to.equal('application/octet-stream')
+      })
+
+      it('should returns headers about the stream', () => {
+        expect(response.header['content-type']).to.equal('application/octet-stream')
+        expect(response.header['content-length']).to.equal('14')
+        expect(response.header['content-disposition']).to.equal('attachment; filename=Appenin_Conditions_Particulieres_assurance_habitation_APP753210859.pdf')
+      })
+
+      it('should return the certificate as a buffer', () => {
+        expect(response.body).to.deep.equal(specificTerms.buffer)
+      })
+    })
+
+    describe('when the specific terms are not found', async () => {
+      it('should return a 422', async () => {
+        // Given
+        sinon.stub(container, 'GetPolicySpecificTerms').rejects(new SpecificTermsNotFoundError('name'))
+
+        // When
+        response = await httpServer.api()
+          .get('/v0/policies/APP753210859/specific-terms')
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 404)
+        expect(response.body).to.have.property('message', 'Specific terms name not found')
+      })
+    })
+
+    describe('when there is a validation error', () => {
+      it('should reply with status 400 when the policy id has not 12 chars', async () => {
+        // When
+        response = await httpServer.api()
+          .get('/v0/policies/APP7532159/specific-terms')
+          .set('X-Consumer-Username', 'myPartner')
+
+        expect(response).to.have.property('statusCode', 400)
+      })
+    })
+
+    describe('when there is an internal error', async () => {
+      it('should return a 500', async () => {
+        // Given
+        sinon.stub(container, 'GetPolicySpecificTerms').rejects(new Error())
+
+        // When
+        response = await httpServer.api()
+          .get('/v0/policies/APP753210859/specific-terms')
           .set('X-Consumer-Username', 'myPartner')
 
         // Then

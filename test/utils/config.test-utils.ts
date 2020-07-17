@@ -1,6 +1,16 @@
 import { Envie, Joi } from 'envie'
+import * as fs from 'fs'
+import * as path from 'path'
 
 export type Config = Map<string, any>
+
+function _getSpecificTermsStorageFolder () {
+  const folderPath = path.join(process.cwd(), 'tmp')
+  if (!fs.existsSync(folderPath)) {
+    fs.mkdirSync(folderPath)
+  }
+  return folderPath
+}
 
 module.exports = Envie({
   FALCO_API_LOG_LEVEL: Joi
@@ -46,6 +56,8 @@ module.exports = Envie({
 
   FALCO_API_EMAIL_VALIDATION_APPENIN_CALLBACK_PAGE_ROUTE: Joi.string().default('synthese'),
 
-  FALCO_API_FALCO_FRONT_URL: Joi.string().default('http://front-url')
+  FALCO_API_FALCO_FRONT_URL: Joi.string().default('http://front-url'),
+
+  FALCO_API_DOCUMENTS_STORAGE_FOLDER: Joi.string().default(_getSpecificTermsStorageFolder())
 
 }) as Config

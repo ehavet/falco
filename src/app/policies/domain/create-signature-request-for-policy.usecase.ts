@@ -1,8 +1,14 @@
 import { SignatureRequest } from './signature-request'
 import { PolicyRepository } from './policy.repository'
 import { SignatureRequester } from './signature-requester'
+import { ContractGenerationFailureError, SignatureRequestCreationFailureError, SpecificTermsGenerationFailureError } from './signature-request.errors'
+import { ContractGenerator } from './contract/contract.generator'
+import { ContractRepository } from './contract/contract.repository'
+import { SpecificTermsGenerator } from './specific-terms/specific-terms.generator'
+import { SpecificTermsRepository } from './specific-terms/specific-terms.repository'
 import { Policy } from './policy'
-import { SignatureRequestCreationFailureError } from './signature-request.errors'
+import { SpecificTerms } from './specific-terms/specific-terms'
+import { Contract } from './contract/contract'
 
 export interface CreateSignatureRequestForPolicy {
     (policyId: string): Promise<SignatureRequest>
@@ -10,16 +16,31 @@ export interface CreateSignatureRequestForPolicy {
 
 export namespace CreateSignatureRequestForPolicy {
     export function factory (
+      specificTermsGenerator: SpecificTermsGenerator,
+      specificTermsRepository: SpecificTermsRepository,
+      contractGenerator: ContractGenerator,
+      contractRepository: ContractRepository,
       policyRepository: PolicyRepository,
       signatureRequester: SignatureRequester
     ): CreateSignatureRequestForPolicy {
       return async (policyId: string): Promise<SignatureRequest> => {
         const policy: Policy = await policyRepository.get(policyId)
-        // eslint-disable-next-line no-console
-        console.log(policy)
+        let specificTerms: SpecificTerms
+        let contract: Contract
         try {
-          const signatureRequest: SignatureRequest = await signatureRequester.create('/Users/eha/Projects/falco-api/tmp/Appenin_Condition_Particulieres_assurance_habitation_APP753210859.pdf')
-          return signatureRequest
+          specificTerms = await specificTermsGenerator.generate(policy)
+        } catch (error) {
+          throw new SpecificTermsGenerationFailureError(policy.id)
+        }
+        await specificTermsRepository.save(specificTerms, policyId)
+        try {
+          contract = await contractGenerator.generate(policyId, specificTerms)
+        } catch (error) {
+          throw new ContractGenerationFailureError(policyId)
+        }
+        const contractFilePath = await contractRepository.saveTempContract(contract)
+        try {
+          return await signatureRequester.create(contractFilePath)
         } catch (error) {
           throw new SignatureRequestCreationFailureError(policyId)
         }

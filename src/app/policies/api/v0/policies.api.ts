@@ -17,8 +17,8 @@ import { Certificate } from '../../domain/certificate/certificate'
 import { CannotGeneratePolicyNotApplicableError } from '../../domain/certificate/certificate.errors'
 import { GetPolicySpecificTermsQuery } from '../../domain/specific-terms/get-policy-specific-terms-query'
 import { SpecificTerms } from '../../domain/specific-terms/specific-terms'
-import { SpecificTermsNotFoundError } from '../../domain/specific-terms/specific-terms.errors'
-import { SignatureRequestCreationFailureError } from '../../domain/signature-request.errors'
+import { SpecificTermsAlreadyCreatedError, SpecificTermsNotFoundError } from '../../domain/specific-terms/specific-terms.errors'
+import { ContractGenerationFailureError, SignatureRequestCreationFailureError, SpecificTermsGenerationFailureError } from '../../domain/signature-request.errors'
 
 const TAGS = ['api', 'policies']
 
@@ -249,7 +249,7 @@ export default function (container: Container): Array<ServerRoute> {
             }),
             400: HttpErrorSchema.badRequestSchema,
             404: HttpErrorSchema.notFoundSchema,
-            422: HttpErrorSchema.unprocessableEntitySchema,
+            409: HttpErrorSchema.conflictSchema,
             500: HttpErrorSchema.internalServerErrorSchema
           }
         }
@@ -261,9 +261,14 @@ export default function (container: Container): Array<ServerRoute> {
         } catch (error) {
           switch (true) {
             case error instanceof SignatureRequestCreationFailureError:
-              throw Boom.badData(error.message)
+            case error instanceof SpecificTermsGenerationFailureError:
+            case error instanceof ContractGenerationFailureError:
+              throw Boom.internal()
             case error instanceof PolicyNotFoundError:
+            case error instanceof SpecificTermsNotFoundError:
               throw Boom.notFound(error.message)
+            case error instanceof SpecificTermsAlreadyCreatedError:
+              throw Boom.conflict(error.message)
             default:
               throw Boom.internal()
           }

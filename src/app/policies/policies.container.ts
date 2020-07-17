@@ -31,6 +31,10 @@ import { CreateSignatureRequestForPolicy } from './domain/create-signature-reque
 import { SignatureRequester } from './domain/signature-requester'
 import { HelloSignSignatureRequester } from './infrastructure/hello-sign.signature-requester'
 import { helloSignConfig } from '../../configs/hello-sign.config'
+import { ContractRepository } from './domain/contract/contract.repository'
+import { ContractGenerator } from './domain/contract/contract.generator'
+import { ContractFsRepository } from './infrastructure/contract/contract-fs.repository'
+import { ContractPdfGenerator } from './infrastructure/contract/contract-pdf.generator'
 const config = require('../../config')
 
 export interface Container {
@@ -53,6 +57,8 @@ const certificateRepository: CertificateRepository = new CertificatePdfRepositor
 const signatureRequester: SignatureRequester = new HelloSignSignatureRequester(helloSignConfig)
 const specificTermsRepository: SpecificTermsRepository = new SpecificTermsFSRepository(config)
 const specificTermsGenerator: SpecificTermsGenerator = new SpecificTermsPdfGenerator()
+const contractRepository: ContractRepository = new ContractFsRepository(config)
+const contractGenerator: ContractGenerator = new ContractPdfGenerator()
 
 const createPaymentIntentForPolicy: CreatePaymentIntentForPolicy =
     CreatePaymentIntentForPolicy.factory(paymentProcessor, policyRepository)
@@ -63,7 +69,15 @@ const confirmPaymentIntentForPolicy: ConfirmPaymentIntentForPolicy =
 const getPolicy: GetPolicy = GetPolicy.factory(policyRepository)
 const generatePolicyCertificate: GeneratePolicyCertificate = GeneratePolicyCertificate.factory(policyRepository, certificateRepository)
 const getPolicySpecificTerms: GetPolicySpecificTerms = GetPolicySpecificTerms.factory(specificTermsRepository, specificTermsGenerator)
-const createSignatureRequestForPolicy: CreateSignatureRequestForPolicy = CreateSignatureRequestForPolicy.factory(policyRepository, signatureRequester)
+const createSignatureRequestForPolicy: CreateSignatureRequestForPolicy = CreateSignatureRequestForPolicy
+  .factory(
+    specificTermsGenerator,
+    specificTermsRepository,
+    contractGenerator,
+    contractRepository,
+    policyRepository,
+    signatureRequester
+  )
 
 export const container: Container = {
   CreatePaymentIntentForPolicy: createPaymentIntentForPolicy,

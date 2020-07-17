@@ -11,9 +11,9 @@ import { GetPolicyQuery } from '../../../../../src/app/policies/domain/get-polic
 import { Certificate } from '../../../../../src/app/policies/domain/certificate/certificate'
 import { CannotGeneratePolicyNotApplicableError } from '../../../../../src/app/policies/domain/certificate/certificate.errors'
 import { SignatureRequest } from '../../../../../src/app/policies/domain/signature-request'
-import { SignatureRequestCreationFailureError } from '../../../../../src/app/policies/domain/signature-request.errors'
+import { ContractGenerationFailureError, SignatureRequestCreationFailureError, SpecificTermsGenerationFailureError } from '../../../../../src/app/policies/domain/signature-request.errors'
 import { SpecificTerms } from '../../../../../src/app/policies/domain/specific-terms/specific-terms'
-import { SpecificTermsNotFoundError } from '../../../../../src/app/policies/domain/specific-terms/specific-terms.errors'
+import { SpecificTermsAlreadyCreatedError, SpecificTermsNotFoundError } from '../../../../../src/app/policies/domain/specific-terms/specific-terms.errors'
 
 describe('Policies - API - Integration', async () => {
   let httpServer: HttpServerForTesting
@@ -860,7 +860,7 @@ describe('Policies - API - Integration', async () => {
     })
 
     describe('when the signature request creation failed', async () => {
-      it('should return a 422', async () => {
+      it('should return a 500', async () => {
         // Given
         sinon.stub(container, 'CreateSignatureRequestForPolicy').rejects(new SignatureRequestCreationFailureError('APP753210859'))
 
@@ -870,8 +870,69 @@ describe('Policies - API - Integration', async () => {
           .set('X-Consumer-Username', 'myPartner')
 
         // Then
-        expect(response).to.have.property('statusCode', 422)
-        expect(response.body).to.have.property('message', 'Could not create signature request for policy: APP753210859')
+        expect(response).to.have.property('statusCode', 500)
+      })
+    })
+
+    describe('when the terms generatioon failed', async () => {
+      it('should return a 500', async () => {
+        // Given
+        sinon.stub(container, 'CreateSignatureRequestForPolicy').rejects(new SpecificTermsGenerationFailureError('APP753210859'))
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies/APP753210859/signature-request')
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 500)
+      })
+    })
+
+    describe('when the contract generation failed', async () => {
+      it('should return a 500', async () => {
+        // Given
+        sinon.stub(container, 'CreateSignatureRequestForPolicy').rejects(new ContractGenerationFailureError('APP753210859'))
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies/APP753210859/signature-request')
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 500)
+      })
+    })
+
+    describe('when terms are not found failed', async () => {
+      it('should return a 404', async () => {
+        // Given
+        sinon.stub(container, 'CreateSignatureRequestForPolicy').rejects(new SpecificTermsNotFoundError('specificTermsName'))
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies/APP753210859/signature-request')
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 404)
+        expect(response.body).to.have.property('message', 'Specific terms specificTermsName not found')
+      })
+    })
+
+    describe('when terms are already created failed', async () => {
+      it('should return a 409', async () => {
+        // Given
+        sinon.stub(container, 'CreateSignatureRequestForPolicy').rejects(new SpecificTermsAlreadyCreatedError('APP753210859'))
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies/APP753210859/signature-request')
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 409)
+        expect(response.body).to.have.property('message', 'Specific terms for the policy APP753210859 have already been generated')
       })
     })
 

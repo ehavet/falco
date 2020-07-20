@@ -12,7 +12,8 @@ describe('PaymentProcessor - Usecase - confirm payment intent for policy', async
     isIdAvailable: sinon.stub(),
     get: sinon.stub(),
     setEmailValidationDate: sinon.stub(),
-    updateAfterPayment: sinon.stub()
+    updateAfterPayment: sinon.stub(),
+    updateAfterSignature: sinon.stub()
   }
 
   const confirmPaymentIntentForPolicy: ConfirmPaymentIntentForPolicy = ConfirmPaymentIntentForPolicy.factory(policyRepository)

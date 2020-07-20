@@ -15,7 +15,8 @@ describe('Policies - Usecase - Generate policy certificate', async () => {
     save: sinon.stub(),
     isIdAvailable: sinon.stub(),
     setEmailValidationDate: sinon.stub(),
-    updateAfterPayment: sinon.stub()
+    updateAfterPayment: sinon.stub(),
+    updateAfterSignature: sinon.stub()
   }
 
   const certificateRepository: SinonStubbedInstance<CertificateRepository> = { generate: sinon.mock() }

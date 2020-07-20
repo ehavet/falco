@@ -9,7 +9,8 @@ describe('HelloSignSignatureRequester', async () => {
       embedded: { getSignUrl: sinon.mock() }
     },
     clientId: 'Cl13nt1D',
-    testMode: true
+    testMode: true,
+    key: 'fakeKey'
   }
 
   const helloSignSignatureRequester: HelloSignSignatureRequester = new HelloSignSignatureRequester(config)

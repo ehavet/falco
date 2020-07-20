@@ -1,5 +1,6 @@
 import routes from './api/v0/policies.api'
 import paymentProcessorEventHandler from './api/v0/payment-processor.api'
+import signatureProcessorEventHandler from './api/v0/signature-processor.api'
 import { CreatePaymentIntentForPolicy } from './domain/create-payment-intent-for-policy.usecase'
 import { PolicySqlModel } from './infrastructure/policy-sql.model'
 import { ContactSqlModel } from './infrastructure/contact-sql.model'
@@ -35,6 +36,10 @@ import { ContractRepository } from './domain/contract/contract.repository'
 import { ContractGenerator } from './domain/contract/contract.generator'
 import { ContractFsRepository } from './infrastructure/contract/contract-fs.repository'
 import { ContractPdfGenerator } from './infrastructure/contract/contract-pdf.generator'
+import { ManageSignatureEvent } from './domain/signature/manage-signature-event.usecase'
+import { SignatureEventValidator } from './domain/signature/signature-event-validator'
+import { HelloSignEventValidator } from './infrastructure/signature/hello-sign-event.validator'
+import { logger } from '../../libs/logger'
 const config = require('../../config')
 
 export interface Container {
@@ -45,7 +50,8 @@ export interface Container {
     PaymentEventAuthenticator: PaymentEventAuthenticator
     GeneragePolicyCertificate: GeneratePolicyCertificate
     CreateSignatureRequestForPolicy: CreateSignatureRequestForPolicy
-    GetPolicySpecificTerms: GetPolicySpecificTerms
+    GetPolicySpecificTerms: GetPolicySpecificTerms,
+    ManageSignatureEvent: ManageSignatureEvent
 }
 
 const policyRepository: PolicyRepository = new PolicySqlRepository()
@@ -59,6 +65,7 @@ const specificTermsRepository: SpecificTermsRepository = new SpecificTermsFSRepo
 const specificTermsGenerator: SpecificTermsGenerator = new SpecificTermsPdfGenerator()
 const contractRepository: ContractRepository = new ContractFsRepository(config)
 const contractGenerator: ContractGenerator = new ContractPdfGenerator()
+const signatureEventValidator: SignatureEventValidator = new HelloSignEventValidator(helloSignConfig)
 
 const createPaymentIntentForPolicy: CreatePaymentIntentForPolicy =
     CreatePaymentIntentForPolicy.factory(paymentProcessor, policyRepository)
@@ -78,6 +85,7 @@ const createSignatureRequestForPolicy: CreateSignatureRequestForPolicy = CreateS
     policyRepository,
     signatureRequester
   )
+const manageSignatureEvent: ManageSignatureEvent = ManageSignatureEvent.factory(signatureEventValidator, policyRepository, logger)
 
 export const container: Container = {
   CreatePaymentIntentForPolicy: createPaymentIntentForPolicy,
@@ -87,11 +95,14 @@ export const container: Container = {
   PaymentEventAuthenticator: paymentEventAuthenticator,
   GeneragePolicyCertificate: generatePolicyCertificate,
   GetPolicySpecificTerms: getPolicySpecificTerms,
-  CreateSignatureRequestForPolicy: createSignatureRequestForPolicy
+  CreateSignatureRequestForPolicy: createSignatureRequestForPolicy,
+  ManageSignatureEvent: manageSignatureEvent
 }
 
 export const policySqlModels: Array<any> = [PolicySqlModel, ContactSqlModel]
 
 export function policiesRoutes () {
-  return routes(container).concat(paymentProcessorEventHandler(container))
+  return routes(container)
+    .concat(paymentProcessorEventHandler(container))
+    .concat(signatureProcessorEventHandler(container))
 }

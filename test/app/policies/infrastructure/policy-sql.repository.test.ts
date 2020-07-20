@@ -163,4 +163,36 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
       return expect(promise).to.be.rejectedWith(PolicyNotFoundError)
     })
   })
+
+  describe('#updateAfterSignature', async () => {
+    it('should update policy signature date subscription date and status', async () => {
+      // Given
+      const currentDate: Date = new Date('2020-01-05T10:38:19Z')
+      const policyInDb: Policy = createPolicyFixture({ paymentDate: undefined, subscriptionDate: undefined })
+      await policyRepository.save(policyInDb)
+
+      // When
+      await policyRepository
+        .updateAfterSignature(policyInDb.id, currentDate, Policy.Status.Signed)
+
+      // Then
+      const updatedPolicy: Policy = await policyRepository.get(policyInDb.id)
+      expect(updatedPolicy.signatureDate).to.deep.equal(currentDate)
+      expect(updatedPolicy.status).to.deep.equal(Policy.Status.Signed)
+    })
+
+    it('should throw an error if the policy is not found', async () => {
+      // Given
+      const currentDate: Date = new Date('2020-01-05T10:38:19Z')
+      const policyInDb: Policy = createPolicyFixture()
+      await policyRepository.save(policyInDb)
+
+      // When
+      const promise = policyRepository
+        .updateAfterSignature('UNKNOWN_ID', currentDate, Policy.Status.Signed)
+
+      // Then
+      return expect(promise).to.be.rejectedWith(PolicyNotFoundError)
+    })
+  })
 })

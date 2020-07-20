@@ -23,13 +23,15 @@ describe('Nodemailer', async () => {
         sender: 'sender@email.com',
         recipient: 'recipient@email.com',
         subject: 'a subject',
-        message: 'a message'
+        messageText: 'a message',
+        messageHtml: '<b>a message</b>'
       }
       nodemailerTransporterMock.sendMail.withExactArgs({
         from: email.sender,
         to: email.recipient,
         subject: email.subject,
-        text: email.message
+        text: email.messageText,
+        html: email.messageHtml
       }).resolves({ messageId: 'messageId' })
       // WHEN
       const response = await mailer.send(email)
@@ -43,7 +45,7 @@ describe('Nodemailer', async () => {
         sender: 'sender@email.com',
         recipient: 'recipient@email.com',
         subject: 'a subject',
-        message: 'a message'
+        messageText: 'a message'
       }
       nodemailerTransporterMock.sendMail.rejects(Error)
       // WHEN

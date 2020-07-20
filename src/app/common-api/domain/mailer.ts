@@ -6,7 +6,8 @@ export interface Email {
     readonly sender: string
     readonly recipient: string,
     readonly subject: string,
-    readonly message: string
+    readonly messageText?: string,
+    readonly messageHtml?: string
 }
 
 export interface Mailer {

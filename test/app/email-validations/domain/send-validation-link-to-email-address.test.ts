@@ -49,7 +49,7 @@ describe('Usecase - Send a validation link to an email address', async () => {
       sender: 'test-ci@appenin.fr',
       recipient: 'albert.hofmann@science.org',
       subject: 'valider votre email',
-      message: expectedValidationEmailMessage
+      messageHtml: expectedValidationEmailMessage
     })
   })
 

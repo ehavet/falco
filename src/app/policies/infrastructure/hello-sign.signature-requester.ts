@@ -40,6 +40,7 @@ export class HelloSignSignatureRequester implements SignatureRequester {
             }
           ]
         ],
+        metadata: { policyId: signer.policyId },
         files: [docPath]
       }
       try {

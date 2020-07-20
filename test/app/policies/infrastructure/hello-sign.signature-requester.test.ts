@@ -19,6 +19,7 @@ describe('HelloSignSignatureRequester', async () => {
     let expectedSignUrl
     let options
     let docToSignPath
+    let signer
 
     beforeEach(async () => {
       docToSignPath = '/path/here/doc.pdf'
@@ -52,8 +53,10 @@ describe('HelloSignSignatureRequester', async () => {
             }
           ]
         ],
+        metadata: { policyId: 'APP854732084' },
         files: [docToSignPath]
       }
+      signer = { emailAdress: 'signer@example.com', name: 'jean jean', policyId: 'APP854732084' }
     })
 
     it('should return sign url when signature request is created', async () => {
@@ -65,7 +68,7 @@ describe('HelloSignSignatureRequester', async () => {
         embedded: { sign_url: expectedSignUrl }
       })
       // When
-      const response = await helloSignSignatureRequester.create(docToSignPath, { emailAdress: 'signer@example.com', name: 'jean jean' })
+      const response = await helloSignSignatureRequester.create(docToSignPath, signer)
       // Then
       expect(response).to.deep.equal({ url: expectedSignUrl })
     })
@@ -75,7 +78,7 @@ describe('HelloSignSignatureRequester', async () => {
       config.hellosign.signatureRequest.createEmbedded.withExactArgs(options)
         .rejects(new Error())
       // When
-      await expect(helloSignSignatureRequester.create(docToSignPath, { emailAdress: 'signer@example.com', name: 'jean jean' }))
+      await expect(helloSignSignatureRequester.create(docToSignPath, signer))
       // Then
         .to.be.rejectedWith(Error)
     })

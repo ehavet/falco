@@ -6,6 +6,7 @@ import { Contract } from '../../../../src/app/policies/domain/contract/contract'
 import { SignatureRequest } from '../../../../src/app/policies/domain/signature-request'
 import { ContractGenerationFailureError, SignatureRequestCreationFailureError, SpecificTermsGenerationFailureError } from '../../../../src/app/policies/domain/signature-request.errors'
 import { Policy } from '../../../../src/app/policies/domain/policy'
+import { Signer } from '../../../../src/app/policies/domain/signer'
 
 describe('Policies - Usecase - Create signature request for policy', async () => {
   let specificTermsGenerator
@@ -21,6 +22,7 @@ describe('Policies - Usecase - Create signature request for policy', async () =>
   let contractFilePath: string
   let expectedSignatureRequest: SignatureRequest
   let usecase: CreateSignatureRequestForPolicy
+  let signer: Signer
 
   beforeEach(() => {
     specificTermsGenerator = { generate: sinon.mock(), getNameFor: sinon.stub() }
@@ -29,12 +31,13 @@ describe('Policies - Usecase - Create signature request for policy', async () =>
     contractRepository = { saveTempContract: sinon.mock(), saveSignedContract: sinon.stub() }
     policyRepository = { save: sinon.stub(), isIdAvailable: sinon.stub(), get: sinon.mock(), setEmailValidationDate: sinon.stub(), updateAfterPayment: sinon.mock() }
     signatureRequester = { create: sinon.mock() }
-    policyId = 'APP123456789'
     specificTerms = { name: 'terms', buffer: Buffer.alloc(1) }
-    policy = createPolicyFixture()
+    policy = createPolicyFixture({ id: 'APP123456789' })
+    policyId = policy.id
     contract = { name: 'contract', buffer: Buffer.alloc(2) }
     contractFilePath = '/file/path/pdf.pdf'
     expectedSignatureRequest = { url: 'http://url.com' }
+    signer = { emailAdress: 'jeandupont@email.com', name: 'Jean Dupont', policyId: policy.id }
 
     usecase = CreateSignatureRequestForPolicy.factory(
       specificTermsGenerator,
@@ -52,7 +55,7 @@ describe('Policies - Usecase - Create signature request for policy', async () =>
     specificTermsGenerator.generate.withExactArgs(policy).resolves(specificTerms)
     contractGenerator.generate.withExactArgs(policyId, specificTerms).resolves(contract)
     contractRepository.saveTempContract.withExactArgs(contract).resolves(contractFilePath)
-    signatureRequester.create.withExactArgs(contractFilePath, { emailAdress: 'jeandupont@email.com', name: 'Jean Dupont' })
+    signatureRequester.create.withExactArgs(contractFilePath, signer)
       .resolves(expectedSignatureRequest)
     // When
     const result: SignatureRequest = await usecase(policyId)
@@ -90,7 +93,7 @@ describe('Policies - Usecase - Create signature request for policy', async () =>
     specificTermsGenerator.generate.withExactArgs(policy).resolves(specificTerms)
     contractGenerator.generate.withExactArgs(policyId, specificTerms).resolves(contract)
     contractRepository.saveTempContract.withExactArgs(contract).resolves(contractFilePath)
-    signatureRequester.create.withExactArgs(contractFilePath, { emailAdress: 'jeandupont@email.com', name: 'Jean Dupont' })
+    signatureRequester.create.withExactArgs(contractFilePath, signer)
       .rejects(SignatureRequestCreationFailureError)
     // When
     const result: Promise<SignatureRequest> = usecase(policyId)

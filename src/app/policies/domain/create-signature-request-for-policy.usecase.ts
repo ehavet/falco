@@ -43,7 +43,8 @@ export namespace CreateSignatureRequestForPolicy {
         try {
           const signer: Signer = {
             emailAdress: policy.contact.email,
-            name: `${policy.contact.firstname} ${policy.contact.lastname}`
+            name: `${policy.contact.firstname} ${policy.contact.lastname}`,
+            policyId: policy.id
           }
           return await signatureRequester.create(contractFilePath, signer)
         } catch (error) {

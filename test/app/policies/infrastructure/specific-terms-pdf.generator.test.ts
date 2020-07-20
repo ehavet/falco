@@ -28,7 +28,7 @@ describe('Policies - Infra - Specific terms PDF Generator', async () => {
     expect(specificTerms.buffer.includes('13 rue du loup garou')).to.be.true
     expect(specificTerms.buffer.includes('91100 Corbeil\\055Essones')).to.be.true
     expect(specificTerms.buffer.includes('Votre logement est compos\\351 de 2 pi\\350ce\\(s\\) principale\\(s\\)')).to.be.true
-    expect(specificTerms.buffer.includes('valeur mobili\\350re par \\351v\\351nement : 7 000 \\20')).to.be.true
+    expect(specificTerms.buffer.includes('valeur mobili\\350re par \\351v\\351nement : 7 000 \\200')).to.be.true
     expect(specificTerms.buffer.includes('pour les autres garanties de protection de vos biens : 150 \\200')).to.be.true
     expect(specificTerms.buffer.includes('Fait \\340 Paris, le 05\\05701\\0572020')).to.be.true
   })

@@ -12,7 +12,8 @@ export class Nodemailer implements Mailer {
         from: email.sender,
         to: email.recipient,
         subject: email.subject,
-        text: email.message
+        text: email.messageText,
+        html: email.messageHtml
       })
       return { messageId: response.messageId }
     } catch (error) {

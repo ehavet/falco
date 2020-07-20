@@ -6,7 +6,7 @@ export function buildValidationLinkEmail (recipient, uri): Email {
     sender: config.get('FALCO_API_APPENIN_EMAIL_ADDRESS'),
     recipient: recipient,
     subject: 'valider votre email',
-    message: _buildValidationMessage(uri)
+    messageHtml: _buildValidationMessage(uri)
   }
 }
 

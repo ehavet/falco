@@ -26,7 +26,12 @@ export function _formatDate (date: Date): string {
 }
 
 export function _formatNumber (number: number): string {
-  return number ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 }).format(number) : ''
+  if (number) {
+    const formattedNumber = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 }).format(number)
+    // Replacing non breaking spaces
+    return formattedNumber.replace(/\s/g, ' ')
+  }
+  return ''
 }
 
 export function _formatOtherInsured (otherInsured: Policy.Risk.People.OtherInsured[]): string {

@@ -248,7 +248,7 @@ function _buildValidationMessage (uri: string): string {
       '                <!-- Hero Image, Flush : BEGIN -->\n' +
       '                <tr>\n' +
       '                    <td style="background-color: #ffffff;">\n' +
-      '                        <img src="assets/header-validation.png" width="600" height="" alt="alt_text" border="0" style="width: 100%; max-width: 600px; height: auto; background: #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; color: #555555; margin: auto; display: block;" class="g-img">\n' +
+      '                        <img src="https://assurance.appenin.fr/assets/header-validation.png" width="600" height="" alt="alt_text" border="0" style="width: 100%; max-width: 600px; height: auto; background: #000000; font-family: sans-serif; font-size: 15px; line-height: 15px; color: #555555; margin: auto; display: block;" class="g-img">\n' +
       '                    </td>\n' +
       '                </tr>\n' +
       '                <!-- Hero Image, Flush : END -->\n' +

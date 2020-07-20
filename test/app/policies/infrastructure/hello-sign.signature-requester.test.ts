@@ -28,9 +28,6 @@ describe('HelloSignSignatureRequester', async () => {
       options = {
         test_mode: 1,
         clientId: 'Cl13nt1D',
-        title: 'Titre de la signature',
-        subject: 'Le sujet de la signature.',
-        message: 'Merci de bien vouloir signer ce document',
         signers: [
           {
             email_address: 'signer@example.com',

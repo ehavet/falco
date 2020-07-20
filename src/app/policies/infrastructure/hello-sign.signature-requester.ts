@@ -15,9 +15,6 @@ export class HelloSignSignatureRequester implements SignatureRequester {
       const options = {
         test_mode: this.config.testMode ? 1 : 0,
         clientId: this.config.clientId,
-        title: 'Titre de la signature',
-        subject: 'Le sujet de la signature.',
-        message: 'Merci de bien vouloir signer ce document',
         signers: [
           {
             email_address: signer.emailAdress,

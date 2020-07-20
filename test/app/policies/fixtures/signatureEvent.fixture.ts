@@ -13,6 +13,15 @@ export function signatureEventFixture (attr = {}) {
       }
     },
     signature_request: {
+      signature_request_id: '21bb8f947df4ad622c103f662543b230b713d',
+      test_mode: false,
+      title: 'Signature Request Title',
+      original_title: 'Original Signature Request Title',
+      subject: null,
+      message: 'Please sign this document.',
+      metadata: {
+        policyId: 'APP453627845'
+      }
     },
     ...attr
   }

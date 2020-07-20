@@ -5,10 +5,12 @@ export interface HelloSignConfig {
     hellosign
     clientId: string
     testMode: boolean
+    key
 }
 
 export const helloSignConfig: HelloSignConfig = {
   hellosign: hellosignSdk({ key: config.get('FALCO_API_HELLO_SIGN_PRIVATE_KEY') }),
   clientId: config.get('FALCO_API_HELLO_SIGN_CLIENT_ID'),
-  testMode: config.get('FALCO_API_HELLO_SIGN_TEST_MODE')
+  testMode: config.get('FALCO_API_HELLO_SIGN_TEST_MODE'),
+  key: config.get('FALCO_API_HELLO_SIGN_PRIVATE_KEY')
 }

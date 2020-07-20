@@ -6,4 +6,5 @@ export interface PolicyRepository {
     get(id: string): Promise<Policy>,
     setEmailValidationDate(policyId: string, date: Date): Promise<void>
     updateAfterPayment(policyId: string, paymentDate: Date, subscriptionDate: Date, status: Policy.Status): Promise<void>
+    updateAfterSignature(policyId: string, signatureDate: Date, status: Policy.Status): Promise<void>
 }

@@ -83,4 +83,15 @@ export class PolicySqlRepository implements PolicyRepository {
     }
     throw new PolicyNotFoundError(policyId)
   }
+
+  async updateAfterSignature (policyId: string, signatureDate: Date, status: Policy.Status): Promise<void> {
+    const policy: PolicySqlModel = await PolicySqlModel.findByPk(policyId, { rejectOnEmpty: false })
+    if (policy) {
+      policy.signatureDate = signatureDate
+      policy.status = status
+      await policy.save()
+      return Promise.resolve()
+    }
+    throw new PolicyNotFoundError(policyId)
+  }
 }

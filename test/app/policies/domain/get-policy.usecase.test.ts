@@ -13,7 +13,8 @@ describe('Policies - Usecase - Get policy', async () => {
     save: sinon.stub(),
     isIdAvailable: sinon.stub(),
     setEmailValidationDate: sinon.stub(),
-    updateAfterPayment: sinon.stub()
+    updateAfterPayment: sinon.stub(),
+    updateAfterSignature: sinon.stub()
   }
 
   const getPolicy: GetPolicy = GetPolicy.factory(policyRepository)

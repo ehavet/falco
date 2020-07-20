@@ -2,6 +2,7 @@ import { SignatureRequester } from '../domain/signature-requester'
 import { SignatureRequest } from '../domain/signature-request'
 import { HelloSignConfig } from '../../../configs/hello-sign.config'
 import { logger } from '../../../libs/logger'
+import { Signer } from '../domain/signer'
 
 export class HelloSignSignatureRequester implements SignatureRequester {
     config: HelloSignConfig
@@ -10,17 +11,17 @@ export class HelloSignSignatureRequester implements SignatureRequester {
       this.config = config
     }
 
-    async create (docPath: string): Promise<SignatureRequest> {
+    async create (docPath: string, signer: Signer): Promise<SignatureRequest> {
       const options = {
-        test_mode: 1,
-        clientId: '91c073e7562d88f96d40d013c7b493ef',
+        test_mode: this.config.testMode ? 1 : 0,
+        clientId: this.config.clientId,
         title: 'Titre de la signature',
         subject: 'Le sujet de la signature.',
         message: 'Merci de bien vouloir signer ce document',
         signers: [
           {
-            email_address: 'signer@example.com',
-            name: 'Syn Gneur'
+            email_address: signer.emailAdress,
+            name: signer.name
           }
         ],
         form_fields_per_document: [

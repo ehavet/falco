@@ -52,7 +52,8 @@ describe('Policies - Usecase - Create signature request for policy', async () =>
     specificTermsGenerator.generate.withExactArgs(policy).resolves(specificTerms)
     contractGenerator.generate.withExactArgs(policyId, specificTerms).resolves(contract)
     contractRepository.saveTempContract.withExactArgs(contract).resolves(contractFilePath)
-    signatureRequester.create.withExactArgs(contractFilePath).resolves(expectedSignatureRequest)
+    signatureRequester.create.withExactArgs(contractFilePath, { emailAdress: 'jeandupont@email.com', name: 'Jean Dupont' })
+      .resolves(expectedSignatureRequest)
     // When
     const result: SignatureRequest = await usecase(policyId)
     // Then
@@ -64,9 +65,6 @@ describe('Policies - Usecase - Create signature request for policy', async () =>
     // Given
     policyRepository.get.withExactArgs(policyId).resolves(policy)
     specificTermsGenerator.generate.withExactArgs(policy).rejects(SpecificTermsGenerationFailureError)
-    contractGenerator.generate.withExactArgs(policyId, specificTerms).resolves(contract)
-    contractRepository.saveTempContract.withExactArgs(contract).resolves(contractFilePath)
-    signatureRequester.create.withExactArgs(contractFilePath).resolves(expectedSignatureRequest)
     // When
     const result: Promise<SignatureRequest> = usecase(policyId)
     // Then
@@ -79,8 +77,6 @@ describe('Policies - Usecase - Create signature request for policy', async () =>
     policyRepository.get.withExactArgs(policyId).resolves(policy)
     specificTermsGenerator.generate.withExactArgs(policy).resolves(specificTerms)
     contractGenerator.generate.withExactArgs(policyId, specificTerms).rejects(ContractGenerationFailureError)
-    contractRepository.saveTempContract.withExactArgs(contract).resolves(contractFilePath)
-    signatureRequester.create.withExactArgs(contractFilePath).resolves(expectedSignatureRequest)
     // When
     const result: Promise<SignatureRequest> = usecase(policyId)
     // Then
@@ -94,7 +90,8 @@ describe('Policies - Usecase - Create signature request for policy', async () =>
     specificTermsGenerator.generate.withExactArgs(policy).resolves(specificTerms)
     contractGenerator.generate.withExactArgs(policyId, specificTerms).resolves(contract)
     contractRepository.saveTempContract.withExactArgs(contract).resolves(contractFilePath)
-    signatureRequester.create.withExactArgs(contractFilePath).rejects(SignatureRequestCreationFailureError)
+    signatureRequester.create.withExactArgs(contractFilePath, { emailAdress: 'jeandupont@email.com', name: 'Jean Dupont' })
+      .rejects(SignatureRequestCreationFailureError)
     // When
     const result: Promise<SignatureRequest> = usecase(policyId)
     // Then

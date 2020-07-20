@@ -7,7 +7,9 @@ describe('HelloSignSignatureRequester', async () => {
     hellosign: {
       signatureRequest: { createEmbedded: sinon.mock() },
       embedded: { getSignUrl: sinon.mock() }
-    }
+    },
+    clientId: 'Cl13nt1D',
+    testMode: true
   }
 
   const helloSignSignatureRequester: HelloSignSignatureRequester = new HelloSignSignatureRequester(config)
@@ -24,14 +26,14 @@ describe('HelloSignSignatureRequester', async () => {
       expectedSignUrl = 'http://sign.url'
       options = {
         test_mode: 1,
-        clientId: '91c073e7562d88f96d40d013c7b493ef',
+        clientId: 'Cl13nt1D',
         title: 'Titre de la signature',
         subject: 'Le sujet de la signature.',
         message: 'Merci de bien vouloir signer ce document',
         signers: [
           {
             email_address: 'signer@example.com',
-            name: 'Syn Gneur'
+            name: 'jean jean'
           }
         ],
         form_fields_per_document: [
@@ -63,7 +65,7 @@ describe('HelloSignSignatureRequester', async () => {
         embedded: { sign_url: expectedSignUrl }
       })
       // When
-      const response = await helloSignSignatureRequester.create(docToSignPath)
+      const response = await helloSignSignatureRequester.create(docToSignPath, { emailAdress: 'signer@example.com', name: 'jean jean' })
       // Then
       expect(response).to.deep.equal({ url: expectedSignUrl })
     })
@@ -73,7 +75,7 @@ describe('HelloSignSignatureRequester', async () => {
       config.hellosign.signatureRequest.createEmbedded.withExactArgs(options)
         .rejects(new Error())
       // When
-      await expect(helloSignSignatureRequester.create(docToSignPath))
+      await expect(helloSignSignatureRequester.create(docToSignPath, { emailAdress: 'signer@example.com', name: 'jean jean' }))
       // Then
         .to.be.rejectedWith(Error)
     })

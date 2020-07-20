@@ -9,6 +9,7 @@ import { SpecificTermsRepository } from './specific-terms/specific-terms.reposit
 import { Policy } from './policy'
 import { SpecificTerms } from './specific-terms/specific-terms'
 import { Contract } from './contract/contract'
+import { Signer } from './signer'
 
 export interface CreateSignatureRequestForPolicy {
     (policyId: string): Promise<SignatureRequest>
@@ -40,7 +41,11 @@ export namespace CreateSignatureRequestForPolicy {
         }
         const contractFilePath = await contractRepository.saveTempContract(contract)
         try {
-          return await signatureRequester.create(contractFilePath)
+          const signer: Signer = {
+            emailAdress: policy.contact.email,
+            name: `${policy.contact.firstname} ${policy.contact.lastname}`
+          }
+          return await signatureRequester.create(contractFilePath, signer)
         } catch (error) {
           throw new SignatureRequestCreationFailureError(policyId)
         }

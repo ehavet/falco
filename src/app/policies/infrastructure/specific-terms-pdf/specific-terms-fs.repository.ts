@@ -21,7 +21,7 @@ export class SpecificTermsFSRepository implements SpecificTermsRepository {
         .output()
       return { name: specificTermsName, buffer }
     } catch (error) {
-      if (error === 'Error: Unable to find file.') {
+      if (error.includes('Error: Unable to find file.')) {
         throw new SpecificTermsNotFoundError(specificTermsName)
       }
       throw error

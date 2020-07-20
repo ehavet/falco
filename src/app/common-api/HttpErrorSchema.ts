@@ -20,5 +20,8 @@ export const unprocessableEntitySchema: Joi.ObjectSchema = commonSchema.descript
 export const internalServerErrorSchema: Joi.ObjectSchema = commonSchema.description('Internal Server Error')
   .label('InternalServerError')
 
+export const conflictSchema: Joi.ObjectSchema = commonSchema.description('Conflict')
+  .label('Conflict')
+
 export const forbiddenSchema: Joi.ObjectSchema = commonSchema.description('Forbidden')
   .label('Forbidden')

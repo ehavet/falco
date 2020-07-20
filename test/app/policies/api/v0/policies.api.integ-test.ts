@@ -10,8 +10,10 @@ import { QuoteNotFoundError } from '../../../../../src/app/quotes/domain/quote.e
 import { GetPolicyQuery } from '../../../../../src/app/policies/domain/get-policy-query'
 import { Certificate } from '../../../../../src/app/policies/domain/certificate/certificate'
 import { CannotGeneratePolicyNotApplicableError } from '../../../../../src/app/policies/domain/certificate/certificate.errors'
+import { SignatureRequest } from '../../../../../src/app/policies/domain/signature-request'
+import { ContractGenerationFailureError, SignatureRequestCreationFailureError, SpecificTermsGenerationFailureError } from '../../../../../src/app/policies/domain/signature-request.errors'
 import { SpecificTerms } from '../../../../../src/app/policies/domain/specific-terms/specific-terms'
-import { SpecificTermsNotFoundError } from '../../../../../src/app/policies/domain/specific-terms/specific-terms.errors'
+import { SpecificTermsAlreadyCreatedError, SpecificTermsNotFoundError } from '../../../../../src/app/policies/domain/specific-terms/specific-terms.errors'
 
 describe('Policies - API - Integration', async () => {
   let httpServer: HttpServerForTesting
@@ -730,6 +732,229 @@ describe('Policies - API - Integration', async () => {
         // When
         response = await httpServer.api()
           .get('/v0/policies/APP753210859/specific-terms')
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 500)
+      })
+    })
+  })
+
+  describe('GET /v0/policies/id/specific-terms', async () => {
+    let response: supertest.Response
+
+    describe('when the specific terms are found', async () => {
+      const specificTerms: SpecificTerms = {
+        name: 'Appenin_Conditions_Particulieres_assurance_habitation_APP753210859.pdf',
+        buffer: Buffer.from('specific terms')
+      }
+
+      beforeEach(async () => {
+        // Given
+        sinon.stub(container, 'GetPolicySpecificTerms').resolves(specificTerms)
+
+        // When
+        response = await httpServer.api()
+          .get('/v0/policies/APP753210859/specific-terms')
+          .set('X-Consumer-Username', 'myPartner')
+      })
+
+      it('should reply with status 200', () => {
+        expect(response).to.have.property('statusCode', 200)
+        expect(response.type).to.equal('application/octet-stream')
+      })
+
+      it('should returns headers about the stream', () => {
+        expect(response.header['content-type']).to.equal('application/octet-stream')
+        expect(response.header['content-length']).to.equal('14')
+        expect(response.header['content-disposition']).to.equal('attachment; filename=Appenin_Conditions_Particulieres_assurance_habitation_APP753210859.pdf')
+      })
+
+      it('should return the certificate as a buffer', () => {
+        expect(response.body).to.deep.equal(specificTerms.buffer)
+      })
+    })
+
+    describe('when the specific terms are not found', async () => {
+      it('should return a 422', async () => {
+        // Given
+        sinon.stub(container, 'GetPolicySpecificTerms').rejects(new SpecificTermsNotFoundError('name'))
+
+        // When
+        response = await httpServer.api()
+          .get('/v0/policies/APP753210859/specific-terms')
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 404)
+        expect(response.body).to.have.property('message', 'Specific terms name not found')
+      })
+    })
+
+    describe('when there is a validation error', () => {
+      it('should reply with status 400 when the policy id has not 12 chars', async () => {
+        // When
+        response = await httpServer.api()
+          .get('/v0/policies/APP7532159/specific-terms')
+          .set('X-Consumer-Username', 'myPartner')
+
+        expect(response).to.have.property('statusCode', 400)
+      })
+    })
+
+    describe('when there is an internal error', async () => {
+      it('should return a 500', async () => {
+        // Given
+        sinon.stub(container, 'GetPolicySpecificTerms').rejects(new Error())
+
+        // When
+        response = await httpServer.api()
+          .get('/v0/policies/APP753210859/specific-terms')
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 500)
+      })
+    })
+  })
+
+  describe('POST /v0/policies/id/signature-request', async () => {
+    let response: supertest.Response
+
+    describe('when success', async () => {
+      const signatureRequest: SignatureRequest = {
+        url: 'http://signature.url.com'
+      }
+
+      beforeEach(async () => {
+        // Given
+        sinon.stub(container, 'CreateSignatureRequestForPolicy')
+          .withArgs('APP753210859').resolves(signatureRequest)
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies/APP753210859/signature-request')
+          .set('X-Consumer-Username', 'myPartner')
+      })
+
+      it('should reply with status 201', () => {
+        expect(response).to.have.property('statusCode', 201)
+        expect(response.body).to.deep.equal(signatureRequest)
+      })
+    })
+
+    describe('when the policy is not found', async () => {
+      it('should return a 404', async () => {
+        // Given
+        sinon.stub(container, 'CreateSignatureRequestForPolicy').rejects(new PolicyNotFoundError('APP753210859'))
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies/APP753210859/signature-request')
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 404)
+        expect(response.body).to.have.property('message', 'Could not find policy with id : APP753210859')
+      })
+    })
+
+    describe('when the signature request creation failed', async () => {
+      it('should return a 500', async () => {
+        // Given
+        sinon.stub(container, 'CreateSignatureRequestForPolicy').rejects(new SignatureRequestCreationFailureError('APP753210859'))
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies/APP753210859/signature-request')
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 500)
+      })
+    })
+
+    describe('when the terms generatioon failed', async () => {
+      it('should return a 500', async () => {
+        // Given
+        sinon.stub(container, 'CreateSignatureRequestForPolicy').rejects(new SpecificTermsGenerationFailureError('APP753210859'))
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies/APP753210859/signature-request')
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 500)
+      })
+    })
+
+    describe('when the contract generation failed', async () => {
+      it('should return a 500', async () => {
+        // Given
+        sinon.stub(container, 'CreateSignatureRequestForPolicy').rejects(new ContractGenerationFailureError('APP753210859'))
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies/APP753210859/signature-request')
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 500)
+      })
+    })
+
+    describe('when terms are not found failed', async () => {
+      it('should return a 404', async () => {
+        // Given
+        sinon.stub(container, 'CreateSignatureRequestForPolicy').rejects(new SpecificTermsNotFoundError('specificTermsName'))
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies/APP753210859/signature-request')
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 404)
+        expect(response.body).to.have.property('message', 'Specific terms specificTermsName not found')
+      })
+    })
+
+    describe('when terms are already created failed', async () => {
+      it('should return a 409', async () => {
+        // Given
+        sinon.stub(container, 'CreateSignatureRequestForPolicy').rejects(new SpecificTermsAlreadyCreatedError('APP753210859'))
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies/APP753210859/signature-request')
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 409)
+        expect(response.body).to.have.property('message', 'Specific terms for the policy APP753210859 have already been generated')
+      })
+    })
+
+    describe('when there is a validation error', () => {
+      it('should reply with status 400 when the policy id has not 12 chars', async () => {
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies/APP02/signature-request')
+          .set('X-Consumer-Username', 'myPartner')
+
+        expect(response).to.have.property('statusCode', 400)
+      })
+    })
+
+    describe('when there is an internal error', async () => {
+      it('should return a 500', async () => {
+        // Given
+        sinon.stub(container, 'CreateSignatureRequestForPolicy').rejects(new Error())
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies/APP753210859/signature-request')
           .set('X-Consumer-Username', 'myPartner')
 
         // Then

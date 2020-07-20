@@ -17,7 +17,8 @@ import { Certificate } from '../../domain/certificate/certificate'
 import { CannotGeneratePolicyNotApplicableError } from '../../domain/certificate/certificate.errors'
 import { GetPolicySpecificTermsQuery } from '../../domain/specific-terms/get-policy-specific-terms-query'
 import { SpecificTerms } from '../../domain/specific-terms/specific-terms'
-import { SpecificTermsNotFoundError } from '../../domain/specific-terms/specific-terms.errors'
+import { SpecificTermsAlreadyCreatedError, SpecificTermsNotFoundError } from '../../domain/specific-terms/specific-terms.errors'
+import { ContractGenerationFailureError, SignatureRequestCreationFailureError, SpecificTermsGenerationFailureError } from '../../domain/signature-request.errors'
 
 const TAGS = ['api', 'policies']
 
@@ -226,6 +227,51 @@ export default function (container: Container): Array<ServerRoute> {
             throw Boom.notFound(error.message)
           }
           throw Boom.internal(error)
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/v0/policies/{id}/signature-request',
+      options: {
+        tags: TAGS,
+        description: 'Create a signature request',
+        validate: {
+          params: Joi.object({
+            id: Joi.string().min(12).max(12).required().description('Policy id').example('APP365094241')
+          })
+        },
+        response: {
+          status: {
+            201: Joi.object({
+              url: Joi.string().uri().description('signature request url')
+                .example('https://app.hellosign.com/editor/embeddedSign?signature_id=857915c9ca596')
+            }),
+            400: HttpErrorSchema.badRequestSchema,
+            404: HttpErrorSchema.notFoundSchema,
+            409: HttpErrorSchema.conflictSchema,
+            500: HttpErrorSchema.internalServerErrorSchema
+          }
+        }
+      },
+      handler: async (request, h) => {
+        try {
+          const response = await container.CreateSignatureRequestForPolicy(request.params.id)
+          return h.response(response).code(201)
+        } catch (error) {
+          switch (true) {
+            case error instanceof SignatureRequestCreationFailureError:
+            case error instanceof SpecificTermsGenerationFailureError:
+            case error instanceof ContractGenerationFailureError:
+              throw Boom.internal()
+            case error instanceof PolicyNotFoundError:
+            case error instanceof SpecificTermsNotFoundError:
+              throw Boom.notFound(error.message)
+            case error instanceof SpecificTermsAlreadyCreatedError:
+              throw Boom.conflict(error.message)
+            default:
+              throw Boom.internal()
+          }
         }
       }
     }

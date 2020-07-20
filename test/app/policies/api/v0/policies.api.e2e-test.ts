@@ -1,12 +1,13 @@
 import * as supertest from 'supertest'
 import { createPolicyFixture } from '../../fixtures/policy.fixture'
 import { Policy } from '../../../../../src/app/policies/domain/policy'
-import { dateFaker, expect, HttpServerForTesting, newProdLikeServer } from '../../../../test-utils'
+import { config, dateFaker, expect, HttpServerForTesting, newProdLikeServer } from '../../../../test-utils'
 import { PolicySqlModel } from '../../../../../src/app/policies/infrastructure/policy-sql.model'
 import { createPolicyApiRequestFixture } from '../../fixtures/createPolicyApiRequest.fixture'
 import { QuoteSqlModel } from '../../../../../src/app/quotes/infrastructure/quote-sql.model'
 import { PolicySqlRepository } from '../../../../../src/app/policies/infrastructure/policy-sql.repository'
 import { PolicyRepository } from '../../../../../src/app/policies/domain/policy.repository'
+import fsx from 'fs-extra'
 
 async function resetDb () {
   await PolicySqlModel.destroy({ truncate: true, cascade: true })
@@ -231,5 +232,29 @@ describe('Policies - API - E2E', async () => {
       expect(response.header['content-disposition']).to.includes('Appenin_Attestation_assurance_habitation_APP753210859.pdf')
       expect(response.body).to.be.instanceOf(Buffer)
     })
+  })
+
+  describe('POST /v0/policies/:id/signature-request', async () => {
+    let response: supertest.Response
+    const policy: Policy = createPolicyFixture({ status: Policy.Status.Applicable, partnerCode: 'studyo' })
+    const policyRepository: PolicyRepository = new PolicySqlRepository()
+
+    beforeEach(async () => {
+      await policyRepository.save(policy)
+    })
+
+    afterEach(async () => {
+      await fsx.emptyDir(config.get('FALCO_API_DOCUMENTS_STORAGE_FOLDER'))
+    })
+
+    it('should return signature request url', async () => {
+      // When
+      response = await httpServer.api()
+        .post(`/v0/policies/${policy.id}/signature-request`)
+        .send()
+        .set('X-Consumer-Username', 'studyo')
+      // Then
+      expect(response.body.url).to.include(('https://app.hellosign.com/editor/embeddedSign?signature_id='))
+    }).timeout(10000)
   })
 })

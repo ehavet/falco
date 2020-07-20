@@ -236,7 +236,7 @@ describe('Policies - API - E2E', async () => {
 
   describe('POST /v0/policies/:id/signature-request', async () => {
     let response: supertest.Response
-    const policy: Policy = createPolicyFixture({ status: Policy.Status.Applicable, partnerCode: 'studyo' })
+    const policy: Policy = createPolicyFixture({ status: Policy.Status.Initiated, partnerCode: 'studyo' })
     const policyRepository: PolicyRepository = new PolicySqlRepository()
 
     beforeEach(async () => {

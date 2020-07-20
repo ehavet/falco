@@ -58,6 +58,12 @@ export namespace Policy {
       }
     }
 
+    export function isSigned (policy: Policy): boolean {
+      return policy.status === Policy.Status.Signed ||
+            policy.status === Policy.Status.Paid ||
+            policy.status === Policy.Status.Applicable
+    }
+
     export async function create (createPolicyCommand: CreatePolicyCommand, quote: Quote, policyRepository: PolicyRepository): Promise<Policy> {
       const generatedId: string = _generateId(createPolicyCommand.partnerCode)
       if (await policyRepository.isIdAvailable(generatedId)) {

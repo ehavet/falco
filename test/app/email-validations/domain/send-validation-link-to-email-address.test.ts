@@ -3,6 +3,7 @@ import { SendValidationLinkToEmailAddress } from '../../../../src/app/email-vali
 import { dateFaker, sinon } from '../../../test-utils'
 import { ValidationTokenPayload } from '../../../../src/app/email-validations/domain/validation-token-payload'
 import { ValidationLinkConfig } from '../../../../src/configs/validation-link.config'
+import { expectedValidationEmailMessage } from '../expectations/expected-validation-email-message'
 
 describe('Usecase - Send a validation link to an email address', async () => {
   const encrypter = { encrypt: sinon.mock(), decrypt: sinon.mock() }
@@ -48,7 +49,7 @@ describe('Usecase - Send a validation link to an email address', async () => {
       sender: 'test-ci@appenin.fr',
       recipient: 'albert.hofmann@science.org',
       subject: 'valider votre email',
-      message: 'http://front-url/validate?token=3NCRYPT3DB4%2BS364STR1NG%3D%3D'
+      message: expectedValidationEmailMessage
     })
   })
 

@@ -5,6 +5,8 @@ import { signatureEventFixture } from '../fixtures/signatureEvent.fixture'
 
 describe('Signature - Infra - Hello Sign event validator', () => {
   const config: HelloSignConfig = {
+    clientId: '',
+    testMode: true,
     hellosign: {},
     key: 'fakeKey'
   }

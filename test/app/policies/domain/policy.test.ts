@@ -14,6 +14,7 @@ describe('Policies - Domain', async () => {
     const policyRepository: SinonStubbedInstance<PolicyRepository> = { save: sinon.stub(), isIdAvailable: sinon.stub(), get: sinon.stub(), setEmailValidationDate: sinon.stub(), updateAfterPayment: sinon.mock(), updateAfterSignature: sinon.stub() }
     const quote: Quote = createQuote()
     const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({ quoteId: quote.id })
+    const productCode = 'MYP321'
 
     beforeEach(() => {
       dateFaker.setCurrentDate(now)
@@ -27,7 +28,7 @@ describe('Policies - Domain', async () => {
     describe('should generate an id', async () => {
       it('which is a string with 12 characters', async () => {
         // When
-        const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository)
+        const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository, productCode)
 
         // Then
         expect(createdPolicy.id).to.be.a.string
@@ -36,7 +37,7 @@ describe('Policies - Domain', async () => {
 
       it('with three first characters are uppercase letters from partner code', async () => {
         // When
-        const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository)
+        const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository, productCode)
 
         // Then
         const idPrefix: string = createdPolicy.id.substring(0, 3)
@@ -45,33 +46,34 @@ describe('Policies - Domain', async () => {
 
       it('with 9 last characters are random numbers', async () => {
         // When
-        const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository)
+        const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository, productCode)
 
         // Then
         const idSuffix: string = createdPolicy.id.substring(3, 12)
         expect(idSuffix).to.match(/^[1-9]{9}/)
       })
 
-      it('which does not already exists', async () => {
+      it('which does not already exists',
+        async () => {
         // Given
-        policyRepository.isIdAvailable.onFirstCall().resolves(false)
-        policyRepository.isIdAvailable.onSecondCall().resolves(true)
+          policyRepository.isIdAvailable.onFirstCall().resolves(false)
+          policyRepository.isIdAvailable.onSecondCall().resolves(true)
 
-        // When
-        const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository)
+          // When
+          const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository, productCode)
 
-        // Then
-        const existingPolicyId = policyRepository.isIdAvailable.getCall(0).args[0]
-        const nonExistingPolicyId = policyRepository.isIdAvailable.getCall(1).args[0]
-        expect(policyRepository.isIdAvailable).to.have.been.calledTwice
-        expect(createdPolicy.id).to.not.equal(existingPolicyId)
-        expect(createdPolicy.id).to.equal(nonExistingPolicyId)
-      })
+          // Then
+          const existingPolicyId = policyRepository.isIdAvailable.getCall(0).args[0]
+          const nonExistingPolicyId = policyRepository.isIdAvailable.getCall(1).args[0]
+          expect(policyRepository.isIdAvailable).to.have.been.calledTwice
+          expect(createdPolicy.id).to.not.equal(existingPolicyId)
+          expect(createdPolicy.id).to.equal(nonExistingPolicyId)
+        })
     })
 
     it('should set the insurance from the quote', async () => {
       // When
-      const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository)
+      const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository, productCode)
 
       // Then
       expect(createdPolicy.insurance).to.deep.equal(quote.insurance)
@@ -100,7 +102,7 @@ describe('Policies - Domain', async () => {
         }
       }
       // When
-      const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository)
+      const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository, productCode)
 
       // Then
       expect(createdPolicy.risk).to.deep.equal(expectedRisk)
@@ -119,7 +121,7 @@ describe('Policies - Domain', async () => {
       }
 
       // When
-      const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository)
+      const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository, productCode)
 
       // Then
       expect(createdPolicy.contact).to.deep.equal(expectedContact)
@@ -127,7 +129,7 @@ describe('Policies - Domain', async () => {
 
     it('should set the partner code', async () => {
       // When
-      const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository)
+      const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository, productCode)
 
       // Then
       expect(createdPolicy.partnerCode).to.deep.equal(createPolicyCommand.partnerCode)
@@ -135,7 +137,7 @@ describe('Policies - Domain', async () => {
 
     it('should set signatureDate, subscription and paymentDate to undefined because policy is not signed not payed yet', async () => {
       // When
-      const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository)
+      const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository, productCode)
 
       // Then
       expect(createdPolicy.signatureDate).to.be.undefined
@@ -146,7 +148,7 @@ describe('Policies - Domain', async () => {
     describe('should set startDate and termStartDate', async () => {
       it('to the given start date', async () => {
         // When
-        const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository)
+        const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository, productCode)
 
         // Then
         expect(createdPolicy.startDate).to.deep.equal(createPolicyCommand.startDate)
@@ -157,7 +159,7 @@ describe('Policies - Domain', async () => {
         // When
         const createPolicyCommandWithNoStartDate: CreatePolicyCommand =
             createCreatePolicyCommand({ quoteId: quote.id, startDate: null })
-        const createdPolicy: Policy = await Policy.create(createPolicyCommandWithNoStartDate, quote, policyRepository)
+        const createdPolicy: Policy = await Policy.create(createPolicyCommandWithNoStartDate, quote, policyRepository, productCode)
 
         // Then
         expect(createdPolicy.startDate).to.deep.equal(now)
@@ -167,7 +169,7 @@ describe('Policies - Domain', async () => {
 
     it('should set termEndDate to startDate + 1 year - 1 day by default', async () => {
       // When
-      const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository)
+      const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository, productCode)
 
       // Then
       expect(createdPolicy.termEndDate).to.deep.equal(expectedTermEndDate)
@@ -175,7 +177,7 @@ describe('Policies - Domain', async () => {
 
     it('should set nbDueMonths to 12 by default', async () => {
       // When
-      const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository)
+      const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository, productCode)
 
       // Then
       expect(createdPolicy.nbMonthsDue).to.equal(12)
@@ -183,7 +185,7 @@ describe('Policies - Domain', async () => {
 
     it('should set premium to monthlyPrice * nbMonthsDue(12 by default)', async () => {
       // When
-      const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository)
+      const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository, productCode)
 
       // Then
       expect(createdPolicy.premium).to.equal(69.84)
@@ -191,7 +193,7 @@ describe('Policies - Domain', async () => {
 
     it('should set the policy status to INITIATED', async () => {
       // When
-      const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository)
+      const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository, productCode)
 
       // Then
       expect(createdPolicy.status).to.equal(Policy.Status.Initiated)
@@ -199,7 +201,7 @@ describe('Policies - Domain', async () => {
 
     it('should set the contractual terms and ipid document links', async () => {
       // When
-      const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository)
+      const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository, productCode)
 
       // Then
       expect(createdPolicy.insurance.contractualTerms).to.equal(quote.insurance.contractualTerms)

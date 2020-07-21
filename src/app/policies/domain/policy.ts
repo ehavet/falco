@@ -64,8 +64,9 @@ export namespace Policy {
             policy.status === Policy.Status.Applicable
     }
 
-    export async function create (createPolicyCommand: CreatePolicyCommand, quote: Quote, policyRepository: PolicyRepository): Promise<Policy> {
-      const generatedId: string = _generateId(createPolicyCommand.partnerCode)
+    export async function
+    create (createPolicyCommand: CreatePolicyCommand, quote: Quote, policyRepository: PolicyRepository, productCode: string): Promise<Policy> {
+      const generatedId: string = _generateId(createPolicyCommand.partnerCode, productCode)
       if (await policyRepository.isIdAvailable(generatedId)) {
         const startDate: Date = _getStartDate(createPolicyCommand)
         return {
@@ -87,13 +88,14 @@ export namespace Policy {
         }
       }
 
-      return create(createPolicyCommand, quote, policyRepository)
+      return create(createPolicyCommand, quote, policyRepository, productCode)
     }
 
-    function _generateId (partnerCode: string): string {
-      const prefix: string = partnerCode.substr(0, 3).toUpperCase()
-      const suffix: string = generate({ length: 9, charset: 'numeric', readable: true })
-      return `${prefix}${suffix}`
+    function _generateId (partnerCode: string, productCode: string): string {
+      const partner: string = partnerCode.substr(0, 3).toUpperCase()
+      const product: string = productCode.replace(/[^0-9]/g, '')
+      const random: string = generate({ length: 6, charset: 'numeric', readable: true })
+      return `${partner}${product}${random}`
     }
 
     function _getStartDate (createPolicyCommand: CreatePolicyCommand): Date {

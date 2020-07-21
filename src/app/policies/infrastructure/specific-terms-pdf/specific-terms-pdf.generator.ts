@@ -44,7 +44,7 @@ export class SpecificTermsPdfGenerator implements SpecificTermsGenerator {
     buffer = replace(buffer, '[room_count]', _encodeForPdf(policy.risk.property.roomCount.toString()))
     buffer = replace(buffer, '[default_ceiling]', _formatNumber(policy.insurance.estimate.defaultCeiling))
     buffer = replace(buffer, '[default_deduction]', _formatNumber(policy.insurance.estimate.defaultDeductible))
-    buffer = replace(buffer, '[subscribtion_date]', _encodeForPdf(_formatDate(policy.subscriptionDate!)))
+    buffer = replace(buffer, '[subscribtion_date]', _encodeForPdf(_formatDate(new Date())))
     return buffer
   }
 }

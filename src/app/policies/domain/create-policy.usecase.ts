@@ -5,6 +5,7 @@ import { Policy } from './policy'
 import { PolicyRepository } from './policy.repository'
 import { SendValidationLinkToEmailAddress } from '../../email-validations/domain/send-validation-link-to-email-address.usecase'
 import { PartnerRepository } from '../../partners/domain/partner.repository'
+import { Partner } from '../../partners/domain/partner'
 
 export interface CreatePolicy {
     (createPolicyCommand: CreatePolicyCommand): Promise<Policy>
@@ -16,7 +17,8 @@ export namespace CreatePolicy {
       partnerRepository: PartnerRepository, sendValidationLinkToEmailAddress: SendValidationLinkToEmailAddress): CreatePolicy {
       return async (createPolicyCommand: CreatePolicyCommand): Promise<Policy> => {
         const quote: Quote = await quoteRepository.get(createPolicyCommand.quoteId)
-        const newPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository)
+        const offer: Partner.Offer = await partnerRepository.getOffer(createPolicyCommand.partnerCode)
+        const newPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository, offer.productCode)
         await sendValidationEmail(partnerRepository, newPolicy, sendValidationLinkToEmailAddress)
         return await policyRepository.save(newPolicy)
       }

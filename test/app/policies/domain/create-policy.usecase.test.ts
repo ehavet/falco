@@ -23,8 +23,19 @@ describe('Policies - Usecase - Create policy', async () => {
   const createPolicy: CreatePolicy = CreatePolicy.factory(policyRepository, quoteRepository, partnerRepository, sendValidationLinkToEmailAddress)
 
   beforeEach(() => {
+    const pricingMatrix = new Map([
+      [1, { monthlyPrice: 0, defaultDeductible: 0, defaultCeiling: 0 }]
+    ])
     dateFaker.setCurrentDate(now)
     policyRepository.isIdAvailable.resolves(true)
+    partnerRepository.getOffer.resolves({
+      pricingMatrix: pricingMatrix,
+      simplifiedCovers: ['', ''],
+      productCode: 'APP321',
+      productVersion: 'version',
+      contractualTerms: 'terms',
+      ipid: 'ipid'
+    })
   })
 
   afterEach(() => {

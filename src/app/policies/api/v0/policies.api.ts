@@ -4,7 +4,7 @@ import * as HttpErrorSchema from '../../../common-api/HttpErrorSchema'
 import * as Boom from '@hapi/boom'
 import { Container } from '../../policies.container'
 import { PaymentIntentQuery } from '../../domain/payment-intent-query'
-import { PolicyNotFoundError } from '../../domain/policies.errors'
+import { PolicyAlreadySignedError, PolicyNotFoundError } from '../../domain/policies.errors'
 import { QuoteNotFoundError } from '../../../quotes/domain/quote.errors'
 import { CreatePolicyCommand } from '../../domain/create-policy-command'
 import { requestToCreatePolicyCommand } from './mappers/create-policy-command.mapper'
@@ -17,7 +17,7 @@ import { Certificate } from '../../domain/certificate/certificate'
 import { CannotGeneratePolicyNotApplicableError } from '../../domain/certificate/certificate.errors'
 import { GetPolicySpecificTermsQuery } from '../../domain/specific-terms/get-policy-specific-terms-query'
 import { SpecificTerms } from '../../domain/specific-terms/specific-terms'
-import { SpecificTermsAlreadyCreatedError, SpecificTermsNotFoundError } from '../../domain/specific-terms/specific-terms.errors'
+import { SpecificTermsNotFoundError } from '../../domain/specific-terms/specific-terms.errors'
 import { ContractGenerationFailureError, SignatureRequestCreationFailureError, SpecificTermsGenerationFailureError } from '../../domain/signature-request.errors'
 
 const TAGS = ['api', 'policies']
@@ -267,7 +267,7 @@ export default function (container: Container): Array<ServerRoute> {
             case error instanceof PolicyNotFoundError:
             case error instanceof SpecificTermsNotFoundError:
               throw Boom.notFound(error.message)
-            case error instanceof SpecificTermsAlreadyCreatedError:
+            case error instanceof PolicyAlreadySignedError:
               throw Boom.conflict(error.message)
             default:
               throw Boom.internal()

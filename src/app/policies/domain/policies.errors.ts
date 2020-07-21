@@ -13,3 +13,11 @@ export class PolicyAlreadyPaidError extends Error {
     this.name = 'PolicyAlreadyPaidError'
   }
 }
+
+export class PolicyAlreadySignedError extends Error {
+  constructor (policyId: string) {
+    const message: string = `Policy ${policyId} has already been signed`
+    super(message)
+    this.name = 'PolicyAlreadySignedError'
+  }
+}

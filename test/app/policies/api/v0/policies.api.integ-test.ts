@@ -2,7 +2,7 @@ import { HttpServerForTesting, newMinimalServer } from '../../../../utils/server
 import { container, policiesRoutes } from '../../../../../src/app/policies/policies.container'
 import * as supertest from 'supertest'
 import { expect, sinon } from '../../../../test-utils'
-import { PolicyNotFoundError } from '../../../../../src/app/policies/domain/policies.errors'
+import { PolicyAlreadySignedError, PolicyNotFoundError } from '../../../../../src/app/policies/domain/policies.errors'
 import { Policy } from '../../../../../src/app/policies/domain/policy'
 import { createOngoingPolicyFixture, createPolicyFixture } from '../../fixtures/policy.fixture'
 import { createPolicyApiRequestFixture } from '../../fixtures/createPolicyApiRequest.fixture'
@@ -13,7 +13,7 @@ import { CannotGeneratePolicyNotApplicableError } from '../../../../../src/app/p
 import { SignatureRequest } from '../../../../../src/app/policies/domain/signature-request'
 import { ContractGenerationFailureError, SignatureRequestCreationFailureError, SpecificTermsGenerationFailureError } from '../../../../../src/app/policies/domain/signature-request.errors'
 import { SpecificTerms } from '../../../../../src/app/policies/domain/specific-terms/specific-terms'
-import { SpecificTermsAlreadyCreatedError, SpecificTermsNotFoundError } from '../../../../../src/app/policies/domain/specific-terms/specific-terms.errors'
+import { SpecificTermsNotFoundError } from '../../../../../src/app/policies/domain/specific-terms/specific-terms.errors'
 
 describe('Policies - API - Integration', async () => {
   let httpServer: HttpServerForTesting
@@ -920,10 +920,10 @@ describe('Policies - API - Integration', async () => {
       })
     })
 
-    describe('when terms are already created failed', async () => {
+    describe('when the policy has already been signed', async () => {
       it('should return a 409', async () => {
         // Given
-        sinon.stub(container, 'CreateSignatureRequestForPolicy').rejects(new SpecificTermsAlreadyCreatedError('APP753210859'))
+        sinon.stub(container, 'CreateSignatureRequestForPolicy').rejects(new PolicyAlreadySignedError('APP753210859'))
 
         // When
         response = await httpServer.api()
@@ -932,7 +932,7 @@ describe('Policies - API - Integration', async () => {
 
         // Then
         expect(response).to.have.property('statusCode', 409)
-        expect(response.body).to.have.property('message', 'Specific terms for the policy APP753210859 have already been generated')
+        expect(response.body).to.have.property('message', 'Policy APP753210859 has already been signed')
       })
     })
 

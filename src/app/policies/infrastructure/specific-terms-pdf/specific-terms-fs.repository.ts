@@ -1,11 +1,9 @@
 import pdftk from 'node-pdftk'
 import path from 'path'
-import fs from 'fs'
 import { SpecificTermsRepository } from '../../domain/specific-terms/specific-terms.repository'
 import { SpecificTerms } from '../../domain/specific-terms/specific-terms'
 import { Config } from '../../../../config'
 import {
-  SpecificTermsAlreadyCreatedError,
   SpecificTermsNotFoundError
 } from '../../domain/specific-terms/specific-terms.errors'
 
@@ -28,9 +26,8 @@ export class SpecificTermsFSRepository implements SpecificTermsRepository {
     }
   }
 
-  async save (specificTerms: SpecificTerms, policyId: string): Promise<SpecificTerms> {
+  async save (specificTerms: SpecificTerms): Promise<SpecificTerms> {
     const specificTermsFilePath: string = this.getSpecificTermsFilePath(specificTerms.name)
-    this.checkSpecificTermsNotAlreadyGenerated(specificTermsFilePath, policyId)
     await pdftk
       .input(specificTerms.buffer)
       .compress()
@@ -41,11 +38,5 @@ export class SpecificTermsFSRepository implements SpecificTermsRepository {
 
   private getSpecificTermsFilePath (specificTermsName: string) {
     return path.join(this.config.get('FALCO_API_DOCUMENTS_STORAGE_FOLDER'), specificTermsName)
-  }
-
-  private checkSpecificTermsNotAlreadyGenerated (specificTermsFilePath: string, policyId: string): void {
-    if (fs.existsSync(specificTermsFilePath)) {
-      throw new SpecificTermsAlreadyCreatedError(policyId)
-    }
   }
 }

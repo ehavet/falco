@@ -9,7 +9,6 @@ import { SpecificTermsPdfGenerator } from '../../../../src/app/policies/infrastr
 import { SpecificTermsRepository } from '../../../../src/app/policies/domain/specific-terms/specific-terms.repository'
 import { SpecificTerms } from '../../../../src/app/policies/domain/specific-terms/specific-terms'
 import {
-  SpecificTermsAlreadyCreatedError,
   SpecificTermsNotFoundError
 } from '../../../../src/app/policies/domain/specific-terms/specific-terms.errors'
 import { SpecificTermsGenerator } from '../../../../src/app/policies/domain/specific-terms/specific-terms.generator'
@@ -44,15 +43,6 @@ describe('Policies - Infra - Specific terms FS Repository', async () => {
       // Then
       const specificTermsFilePath: string = path.join(specificTermsFolderPath, 'Appenin_Condition_Particulieres_assurance_habitation_APP753210859.pdf')
       expect(fs.existsSync(specificTermsFilePath)).to.be.true
-    })
-
-    it('should throw and error if the given specific terms have already been saved', async () => {
-      // When
-      await specificTermsPdfRepository.save(specificTermsToSave, policy.id)
-
-      // When
-      const promise = specificTermsPdfRepository.save(specificTermsToSave, policy.id)
-      return expect(promise).to.be.rejectedWith(SpecificTermsAlreadyCreatedError)
     })
   })
 

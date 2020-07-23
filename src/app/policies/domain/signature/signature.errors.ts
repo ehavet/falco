@@ -5,3 +5,11 @@ export class SignedContractDownloadError extends Error {
     this.name = 'SignedContractDownloadError'
   }
 }
+
+export class SignedContractDownloadNotFound extends Error {
+  constructor (signatureRequestId: string, filename: string) {
+    const message: string = `Could not find the signed contract with name ${filename} for request ${signatureRequestId}`
+    super(message)
+    this.name = 'SignedContractDownloadError'
+  }
+}

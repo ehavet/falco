@@ -4,7 +4,10 @@ import { HelloSignSignatureRequester } from '../../../../src/app/policies/infras
 import { HelloSignConfig } from '../../../../src/configs/hello-sign.config'
 import { Contract } from '../../../../src/app/policies/domain/contract/contract'
 import { Readable } from 'stream'
-import { SignedContractDownloadError } from '../../../../src/app/policies/domain/signature/signature.errors'
+import {
+  SignedContractDownloadError,
+  SignedContractDownloadNotFound
+} from '../../../../src/app/policies/domain/signature/signature.errors'
 
 describe('HelloSignSignatureRequester', async () => {
   const config: HelloSignConfig = {
@@ -91,6 +94,10 @@ describe('HelloSignSignatureRequester', async () => {
   })
 
   describe('#getSignedContract', async () => {
+    afterEach(() => {
+      config.hellosign.signatureRequest.download.reset()
+    })
+
     it('should return the contract', async () => {
       // Given
       const contractFileName: string = 'contrat_APP658934103.pdf'
@@ -120,6 +127,22 @@ describe('HelloSignSignatureRequester', async () => {
 
       // Then
       return expect(promise).to.be.rejectedWith(SignedContractDownloadError, 'Could not download the signed contract for request signatureRequestId')
+    })
+
+    it('should throw an error if hellosign documents are retrieved but the contract is not found', async () => {
+      // Given
+      const contractFileName: string = 'contrat_APP658934103.pdf'
+      const signatureRequestId: string = 'signatureRequestId'
+      const contractBuffer: Buffer = Buffer.from('contract')
+      const hellosignZipBuffer = await new JSZip().file('somedocument.txt', contractBuffer).generateAsync({ type: 'nodebuffer' })
+      const hellosignZipStream = await Readable.from(hellosignZipBuffer)
+      config.hellosign.signatureRequest.download.withExactArgs(signatureRequestId, { file_type: 'zip' }).resolves(hellosignZipStream)
+
+      // When
+      const promise = helloSignSignatureRequester.getSignedContract(signatureRequestId, contractFileName)
+
+      // Then
+      return expect(promise).to.be.rejectedWith(SignedContractDownloadNotFound, 'Could not find the signed contract with name contrat_APP658934103.pdf for request signatureRequestId')
     })
   })
 })

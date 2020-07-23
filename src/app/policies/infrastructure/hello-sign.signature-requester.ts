@@ -6,7 +6,7 @@ import { Signer } from '../domain/signer'
 import { Contract } from '../domain/contract/contract'
 import { IncomingMessage } from 'http'
 import { Logger } from '../../../libs/logger'
-import { SignedContractDownloadError } from '../domain/signature/signature.errors'
+import { SignedContractDownloadError, SignedContractDownloadNotFound } from '../domain/signature/signature.errors'
 
 export class HelloSignSignatureRequester implements SignatureRequester {
   constructor (private config: HelloSignConfig, private logger: Logger) { }
@@ -52,20 +52,30 @@ export class HelloSignSignatureRequester implements SignatureRequester {
   }
 
   async getSignedContract (signatureRequestId: string, contractFileName: string): Promise<Contract> {
-    let hellosignResponse
+    const downloadedDocuments: IncomingMessage = await this.downloadDocuments(signatureRequestId)
+    const signedContract = await this.extractSignedContract(downloadedDocuments, contractFileName)
+    if (signedContract) {
+      const signedContractBuffer = await signedContract.async('nodebuffer')
+      return { name: contractFileName, buffer: signedContractBuffer }
+    }
+    throw new SignedContractDownloadNotFound(signatureRequestId, contractFileName)
+  }
+
+  private async downloadDocuments (signatureRequestId: string): Promise<IncomingMessage> {
     try {
-      hellosignResponse = await this.config.hellosign.signatureRequest.download(signatureRequestId, { file_type: 'zip' })
+      return await this.config.hellosign.signatureRequest.download(signatureRequestId, { file_type: 'zip' })
     } catch (error) {
       this.logger.error(`Error while downloading documents for the signature request id ${signatureRequestId}`, error)
       throw new SignedContractDownloadError(signatureRequestId)
     }
+  }
 
-    const documentsZipAsBuffer: Buffer = await this.readStream(hellosignResponse)
+  private async extractSignedContract (downloadedDocuments: IncomingMessage, contractFileName: string) {
+    const documentsZipAsBuffer: Buffer = await this.readStream(downloadedDocuments)
 
     const documentsZip: JSZip = await JSZip.loadAsync(documentsZipAsBuffer)
-    const signedContractBuffer = await documentsZip.file(new RegExp(contractFileName))[0].async('nodebuffer')
-
-    return { name: contractFileName, buffer: signedContractBuffer }
+    const foundSignedContract = documentsZip.file(new RegExp(contractFileName))[0]
+    return foundSignedContract
   }
 
   private async readStream (stream: IncomingMessage): Promise<Buffer> {

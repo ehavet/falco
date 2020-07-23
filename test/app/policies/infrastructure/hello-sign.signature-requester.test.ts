@@ -1,11 +1,17 @@
+import JSZip from 'jszip'
 import { expect, sinon } from '../../../test-utils'
 import { HelloSignSignatureRequester } from '../../../../src/app/policies/infrastructure/hello-sign.signature-requester'
 import { HelloSignConfig } from '../../../../src/configs/hello-sign.config'
+import { Contract } from '../../../../src/app/policies/domain/contract/contract'
+import { Readable } from 'stream'
 
 describe('HelloSignSignatureRequester', async () => {
   const config: HelloSignConfig = {
     hellosign: {
-      signatureRequest: { createEmbedded: sinon.mock() },
+      signatureRequest: {
+        createEmbedded: sinon.mock(),
+        download: sinon.mock()
+      },
       embedded: { getSignUrl: sinon.mock() }
     },
     clientId: 'Cl13nt1D',
@@ -15,7 +21,7 @@ describe('HelloSignSignatureRequester', async () => {
 
   const helloSignSignatureRequester: HelloSignSignatureRequester = new HelloSignSignatureRequester(config)
 
-  describe('create', async () => {
+  describe('#create', async () => {
     let signatureId
     let expectedSignUrl
     let options
@@ -79,6 +85,25 @@ describe('HelloSignSignatureRequester', async () => {
       await expect(helloSignSignatureRequester.create(docToSignPath, signer))
       // Then
         .to.be.rejectedWith(Error)
+    })
+  })
+
+  describe('#getSignedContract', async () => {
+    it('should return the contract', async () => {
+      // Given
+      const contractFileName: string = 'contrat_APP658934103.pdf'
+      const signatureRequestId: string = 'signatureRequestId'
+      const contractBuffer: Buffer = Buffer.from('contract')
+      const hellosignZipBuffer = await new JSZip().file(contractFileName, contractBuffer).generateAsync({ type: 'nodebuffer' })
+      const hellosignZipStream = await Readable.from(hellosignZipBuffer)
+      config.hellosign.signatureRequest.download.withExactArgs(signatureRequestId, { file_type: 'zip' }).resolves(hellosignZipStream)
+
+      // When
+      const contract: Contract = await helloSignSignatureRequester.getSignedContract(signatureRequestId, contractFileName)
+
+      // Then
+      expect(contract.name).to.equal(contractFileName)
+      expect(contract.buffer).to.deep.equal(contractBuffer)
     })
   })
 })

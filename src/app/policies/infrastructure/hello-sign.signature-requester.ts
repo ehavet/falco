@@ -1,8 +1,11 @@
+import JSZip from 'jszip'
 import { SignatureRequester } from '../domain/signature-requester'
 import { SignatureRequest } from '../domain/signature-request'
 import { HelloSignConfig } from '../../../configs/hello-sign.config'
 import { logger } from '../../../libs/logger'
 import { Signer } from '../domain/signer'
+import { Contract } from '../domain/contract/contract'
+import { IncomingMessage } from 'http'
 
 export class HelloSignSignatureRequester implements SignatureRequester {
     config: HelloSignConfig
@@ -49,5 +52,23 @@ export class HelloSignSignatureRequester implements SignatureRequester {
         logger.error(error)
         throw error
       }
+    }
+
+    async getSignedContract (signatureRequestId: string, contractFileName: string): Promise<Contract> {
+      const hellosignResponse = await this.config.hellosign.signatureRequest.download(signatureRequestId, { file_type: 'zip' })
+      const documentsZipAsBuffer: Buffer = await this.readStream(hellosignResponse)
+
+      const documentsZip: JSZip = await JSZip.loadAsync(documentsZipAsBuffer)
+      const signedContractBuffer = await documentsZip.file(new RegExp(contractFileName))[0].async('nodebuffer')
+
+      return { name: contractFileName, buffer: signedContractBuffer }
+    }
+
+    private async readStream (stream: IncomingMessage): Promise<Buffer> {
+      const chunks: Array<Buffer> = []
+      for await (const chunk of stream) {
+        chunks.push(chunk)
+      }
+      return Buffer.concat(chunks)
     }
 }

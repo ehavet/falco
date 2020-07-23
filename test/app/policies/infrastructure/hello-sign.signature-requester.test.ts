@@ -4,6 +4,7 @@ import { HelloSignSignatureRequester } from '../../../../src/app/policies/infras
 import { HelloSignConfig } from '../../../../src/configs/hello-sign.config'
 import { Contract } from '../../../../src/app/policies/domain/contract/contract'
 import { Readable } from 'stream'
+import { SignedContractDownloadError } from '../../../../src/app/policies/domain/signature/signature.errors'
 
 describe('HelloSignSignatureRequester', async () => {
   const config: HelloSignConfig = {
@@ -18,8 +19,9 @@ describe('HelloSignSignatureRequester', async () => {
     testMode: true,
     key: 'fakeKey'
   }
+  const logger: any = { error: sinon.stub() }
 
-  const helloSignSignatureRequester: HelloSignSignatureRequester = new HelloSignSignatureRequester(config)
+  const helloSignSignatureRequester: HelloSignSignatureRequester = new HelloSignSignatureRequester(config, logger)
 
   describe('#create', async () => {
     let signatureId
@@ -104,6 +106,20 @@ describe('HelloSignSignatureRequester', async () => {
       // Then
       expect(contract.name).to.equal(contractFileName)
       expect(contract.buffer).to.deep.equal(contractBuffer)
+    })
+
+    it('should throw an error when call to hellosign returns an error', async () => {
+      // Given
+      const contractFileName: string = 'contrat_APP658934103.pdf'
+      const signatureRequestId: string = 'signatureRequestId'
+      const error: Error = new Error('Error')
+      config.hellosign.signatureRequest.download.withExactArgs(signatureRequestId, { file_type: 'zip' }).rejects(error)
+
+      // When
+      const promise = helloSignSignatureRequester.getSignedContract(signatureRequestId, contractFileName)
+
+      // Then
+      return expect(promise).to.be.rejectedWith(SignedContractDownloadError, 'Could not download the signed contract for request signatureRequestId')
     })
   })
 })

@@ -1,6 +1,6 @@
 import JSZip from 'jszip'
 import { expect, sinon } from '../../../test-utils'
-import { HelloSignSignatureRequester } from '../../../../src/app/policies/infrastructure/hello-sign.signature-requester'
+import { HelloSignSignatureServiceProvider } from '../../../../src/app/policies/infrastructure/hello-sign-signature-service.provider'
 import { HelloSignConfig } from '../../../../src/configs/hello-sign.config'
 import { Contract } from '../../../../src/app/policies/domain/contract/contract'
 import { Readable } from 'stream'
@@ -9,7 +9,7 @@ import {
   SignedContractDownloadNotFound
 } from '../../../../src/app/policies/domain/signature/signature.errors'
 
-describe('HelloSignSignatureRequester', async () => {
+describe('HelloSignSignatureServiceProvider', async () => {
   const config: HelloSignConfig = {
     hellosign: {
       signatureRequest: {
@@ -24,7 +24,7 @@ describe('HelloSignSignatureRequester', async () => {
   }
   const logger: any = { error: sinon.stub() }
 
-  const helloSignSignatureRequester: HelloSignSignatureRequester = new HelloSignSignatureRequester(config, logger)
+  const helloSignSignatureServiceProvider: HelloSignSignatureServiceProvider = new HelloSignSignatureServiceProvider(config, logger)
 
   describe('#create', async () => {
     let signatureId
@@ -80,7 +80,7 @@ describe('HelloSignSignatureRequester', async () => {
         embedded: { sign_url: expectedSignUrl }
       })
       // When
-      const response = await helloSignSignatureRequester.create(docToSignPath, signer)
+      const response = await helloSignSignatureServiceProvider.create(docToSignPath, signer)
       // Then
       expect(response).to.deep.equal({ url: expectedSignUrl })
     })
@@ -90,7 +90,7 @@ describe('HelloSignSignatureRequester', async () => {
       config.hellosign.signatureRequest.createEmbedded.withExactArgs(options)
         .rejects(new Error())
       // When
-      await expect(helloSignSignatureRequester.create(docToSignPath, signer))
+      await expect(helloSignSignatureServiceProvider.create(docToSignPath, signer))
       // Then
         .to.be.rejectedWith(Error)
     })
@@ -111,7 +111,7 @@ describe('HelloSignSignatureRequester', async () => {
       config.hellosign.signatureRequest.download.withExactArgs(signatureRequestId, { file_type: 'zip' }).resolves(hellosignZipStream)
 
       // When
-      const contract: Contract = await helloSignSignatureRequester.getSignedContract(signatureRequestId, contractFileName)
+      const contract: Contract = await helloSignSignatureServiceProvider.getSignedContract(signatureRequestId, contractFileName)
 
       // Then
       expect(contract.name).to.equal(contractFileName)
@@ -126,7 +126,7 @@ describe('HelloSignSignatureRequester', async () => {
       config.hellosign.signatureRequest.download.withExactArgs(signatureRequestId, { file_type: 'zip' }).rejects(error)
 
       // When
-      const promise = helloSignSignatureRequester.getSignedContract(signatureRequestId, contractFileName)
+      const promise = helloSignSignatureServiceProvider.getSignedContract(signatureRequestId, contractFileName)
 
       // Then
       return expect(promise).to.be.rejectedWith(SignedContractDownloadError, 'Could not download the signed contract for request signatureRequestId')
@@ -142,7 +142,7 @@ describe('HelloSignSignatureRequester', async () => {
       config.hellosign.signatureRequest.download.withExactArgs(signatureRequestId, { file_type: 'zip' }).resolves(hellosignZipStream)
 
       // When
-      const promise = helloSignSignatureRequester.getSignedContract(signatureRequestId, contractFileName)
+      const promise = helloSignSignatureServiceProvider.getSignedContract(signatureRequestId, contractFileName)
 
       // Then
       return expect(promise).to.be.rejectedWith(SignedContractDownloadNotFound, 'Could not find the signed contract with name contrat_APP658934103.pdf for request signatureRequestId')

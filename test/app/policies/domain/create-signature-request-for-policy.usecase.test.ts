@@ -14,7 +14,7 @@ describe('Policies - Usecase - Create signature request for policy', async () =>
   let contractGenerator
   let contractRepository
   let policyRepository
-  let signatureRequester
+  let signatureServiceProvider
   let policyId: string
   let specificTerms: SpecificTerms
   let policy: Policy
@@ -30,7 +30,7 @@ describe('Policies - Usecase - Create signature request for policy', async () =>
     contractGenerator = { generate: sinon.mock() }
     contractRepository = { saveTempContract: sinon.mock(), saveSignedContract: sinon.stub() }
     policyRepository = { save: sinon.stub(), isIdAvailable: sinon.stub(), get: sinon.mock(), setEmailValidationDate: sinon.stub(), updateAfterPayment: sinon.mock() }
-    signatureRequester = { create: sinon.mock() }
+    signatureServiceProvider = { create: sinon.mock() }
     specificTerms = { name: 'terms', buffer: Buffer.alloc(1) }
     policy = createPolicyFixture({ id: 'APP123456789' })
     policyId = policy.id
@@ -45,7 +45,7 @@ describe('Policies - Usecase - Create signature request for policy', async () =>
       contractGenerator,
       contractRepository,
       policyRepository,
-      signatureRequester
+      signatureServiceProvider
     )
   })
 
@@ -55,7 +55,7 @@ describe('Policies - Usecase - Create signature request for policy', async () =>
     specificTermsGenerator.generate.withExactArgs(policy).resolves(specificTerms)
     contractGenerator.generate.withExactArgs(policyId, specificTerms).resolves(contract)
     contractRepository.saveTempContract.withExactArgs(contract).resolves(contractFilePath)
-    signatureRequester.create.withExactArgs(contractFilePath, signer)
+    signatureServiceProvider.create.withExactArgs(contractFilePath, signer)
       .resolves(expectedSignatureRequest)
     // When
     const result: SignatureRequest = await usecase(policyId)
@@ -93,7 +93,7 @@ describe('Policies - Usecase - Create signature request for policy', async () =>
     specificTermsGenerator.generate.withExactArgs(policy).resolves(specificTerms)
     contractGenerator.generate.withExactArgs(policyId, specificTerms).resolves(contract)
     contractRepository.saveTempContract.withExactArgs(contract).resolves(contractFilePath)
-    signatureRequester.create.withExactArgs(contractFilePath, signer)
+    signatureServiceProvider.create.withExactArgs(contractFilePath, signer)
       .rejects(SignatureRequestCreationFailureError)
     // When
     const result: Promise<SignatureRequest> = usecase(policyId)

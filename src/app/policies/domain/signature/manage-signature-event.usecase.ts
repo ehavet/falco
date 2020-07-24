@@ -4,7 +4,7 @@ import { SignatureEventValidationError } from './signature-event.errors'
 import { PolicyRepository } from '../policy.repository'
 import { Policy } from '../policy'
 import { Logger } from 'pino'
-import { SignatureRequester } from '../signature-requester'
+import { SignatureServiceProvider } from '../signature-service-provider'
 import { Contract } from '../contract/contract'
 import { ContractRepository } from '../contract/contract.repository'
 import SignatureEvent, { SignatureEventType } from './signature-event'
@@ -15,7 +15,7 @@ export interface ManageSignatureEvent {
 
 export namespace ManageSignatureEvent {
 
-    export function factory (signatureEventValidator: SignatureEventValidator, signatureRequester: SignatureRequester, policyRepository: PolicyRepository, contractRepository: ContractRepository, logger: Logger): ManageSignatureEvent {
+    export function factory (signatureEventValidator: SignatureEventValidator, signatureServiceProvider: SignatureServiceProvider, policyRepository: PolicyRepository, contractRepository: ContractRepository, logger: Logger): ManageSignatureEvent {
       return async (manageSignatureEventCommand: ManageSignatureEventCommand): Promise<void> => {
         const signatureEvent = manageSignatureEventCommand.event
         if (signatureEventValidator.isValid(signatureEvent)) {
@@ -24,7 +24,7 @@ export namespace ManageSignatureEvent {
               await _manageSignedEvent(signatureEvent, policyRepository)
               return
             case SignatureEventType.DocumentsDownloadable:
-              await _manageSignedContractDownloadableEvent(signatureEvent, signatureRequester, contractRepository)
+              await _manageSignedContractDownloadableEvent(signatureEvent, signatureServiceProvider, contractRepository)
               return
             default:
               logger.trace('Signature event not managed received')
@@ -41,8 +41,8 @@ export namespace ManageSignatureEvent {
       await policyRepository.updateAfterSignature(policyId, currentDate, Policy.Status.Signed)
     }
 
-    async function _manageSignedContractDownloadableEvent (signatureEvent: SignatureEvent, signatureRequester: SignatureRequester, contractRepository: ContractRepository) {
-      const contract: Contract = await signatureRequester.getSignedContract(signatureEvent.requestId, signatureEvent.contractFileName)
+    async function _manageSignedContractDownloadableEvent (signatureEvent: SignatureEvent, signatureServiceProvider: SignatureServiceProvider, contractRepository: ContractRepository) {
+      const contract: Contract = await signatureServiceProvider.getSignedContract(signatureEvent.requestId, signatureEvent.contractFileName)
       await contractRepository.saveSignedContract(contract)
     }
 

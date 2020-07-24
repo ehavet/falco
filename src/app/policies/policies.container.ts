@@ -29,8 +29,8 @@ import { SpecificTermsFSRepository } from './infrastructure/specific-terms-pdf/s
 import { SpecificTermsGenerator } from './domain/specific-terms/specific-terms.generator'
 import { SpecificTermsPdfGenerator } from './infrastructure/specific-terms-pdf/specific-terms-pdf.generator'
 import { CreateSignatureRequestForPolicy } from './domain/create-signature-request-for-policy.usecase'
-import { SignatureRequester } from './domain/signature-requester'
-import { HelloSignSignatureRequester } from './infrastructure/hello-sign.signature-requester'
+import { SignatureServiceProvider } from './domain/signature-service-provider'
+import { HelloSignSignatureServiceProvider } from './infrastructure/hello-sign-signature-service.provider'
 import { helloSignConfig } from '../../configs/hello-sign.config'
 import { ContractRepository } from './domain/contract/contract.repository'
 import { ContractGenerator } from './domain/contract/contract.generator'
@@ -60,7 +60,7 @@ const paymentProcessor: StripePaymentProcessor = new StripePaymentProcessor(stri
 const paymentEventAuthenticator: StripeEventAuthenticator = new StripeEventAuthenticator(stripeConfig)
 const partnerRepository: PartnerRepository = partnerContainer.partnerRepository
 const certificateRepository: CertificateRepository = new CertificatePdfRepository()
-const signatureRequester: SignatureRequester = new HelloSignSignatureRequester(helloSignConfig, logger)
+const signatureServiceProvider: SignatureServiceProvider = new HelloSignSignatureServiceProvider(helloSignConfig, logger)
 const specificTermsRepository: SpecificTermsRepository = new SpecificTermsFSRepository(config)
 const specificTermsGenerator: SpecificTermsGenerator = new SpecificTermsPdfGenerator()
 const contractRepository: ContractRepository = new ContractFsRepository(config)
@@ -83,9 +83,9 @@ const createSignatureRequestForPolicy: CreateSignatureRequestForPolicy = CreateS
     contractGenerator,
     contractRepository,
     policyRepository,
-    signatureRequester
+    signatureServiceProvider
   )
-const manageSignatureEvent: ManageSignatureEvent = ManageSignatureEvent.factory(signatureEventValidator, signatureRequester, policyRepository, contractRepository, logger)
+const manageSignatureEvent: ManageSignatureEvent = ManageSignatureEvent.factory(signatureEventValidator, signatureServiceProvider, policyRepository, contractRepository, logger)
 
 export const container: Container = {
   CreatePaymentIntentForPolicy: createPaymentIntentForPolicy,

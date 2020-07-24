@@ -1,4 +1,4 @@
-import SignatureRequestEvent, { SignatureEventType } from '../../../domain/signature/signature-request-event'
+import SignatureRequestEvent, { SignatureRequestEventType } from '../../../domain/signature/signature-request-event'
 
 export function resourceToDomain (signatureRequestEventJson: any): SignatureRequestEvent {
   return {
@@ -17,10 +17,10 @@ export function resourceToDomain (signatureRequestEventJson: any): SignatureRequ
 function _toType (eventType: string) {
   switch (eventType) {
     case 'signature_request_sent':
-      return SignatureEventType.Signed
+      return SignatureRequestEventType.Signed
     case 'signature_request_downloadable':
-      return SignatureEventType.DocumentsDownloadable
+      return SignatureRequestEventType.DocumentsDownloadable
     default:
-      return SignatureEventType.Unknown
+      return SignatureRequestEventType.Unknown
   }
 }

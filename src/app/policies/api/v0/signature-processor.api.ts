@@ -35,7 +35,7 @@ export default function (container: Container): Array<ServerRoute> {
         const signatureRequestEventJSON = JSON.parse(payload.json)
         const signatureRequestEvent: SignatureRequestEvent = resourceToDomain(signatureRequestEventJSON)
         try {
-          await container.ManageSignatureEvent({ event: signatureRequestEvent })
+          await container.ManageSignatureRequestEvent({ event: signatureRequestEvent })
         } catch (error) {
           // Here we do not try to throw an error due to HelloSign errors management https://app.hellosign.com/api/eventsAndCallbacksWalkthrough
           logger.error(error)

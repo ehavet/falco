@@ -1,12 +1,12 @@
 import { expect, HttpServerForTesting, newMinimalServer } from '../../../../test-utils'
 import { policiesRoutes } from '../../../../../src/app/policies/policies.container'
 import * as supertest from 'supertest'
-import { signatureEventFixture } from '../../fixtures/signatureEvent.fixture'
+import { signatureRequestEventFixture } from '../../fixtures/signatureRequestEvent.fixture'
 
 describe.skip('Signature Event Handler - API - Integration', async () => {
   let httpServer: HttpServerForTesting
 
-  const eventExample = signatureEventFixture()
+  const eventExample = signatureRequestEventFixture()
 
   describe('POST /internal/v0/signature-processor/event-handler/', async () => {
     let response: supertest.Response

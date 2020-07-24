@@ -1,10 +1,10 @@
 import crypto from 'crypto'
 
-import { SignatureEventValidator } from '../../domain/signature/signature-event-validator'
+import { SignatureRequestEventValidator } from '../../domain/signature/signature-request-event-validator'
 import { HelloSignConfig } from '../../../../configs/hello-sign.config'
 import SignatureRequestEvent from '../../domain/signature/signature-request-event'
 
-export class HelloSignEventValidator implements SignatureEventValidator {
+export class HelloSignRequestEventValidator implements SignatureRequestEventValidator {
     config: HelloSignConfig
 
     constructor (config: HelloSignConfig) {

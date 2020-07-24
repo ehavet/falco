@@ -1,9 +1,9 @@
-import { SignatureEventType } from '../../../../src/app/policies/domain/signature/signature-request-event'
+import { SignatureRequestEventType } from '../../../../src/app/policies/domain/signature/signature-request-event'
 
-export function signatureEventFixture (attr = {}) {
+export function signatureRequestEventFixture (attr = {}) {
   return {
     requestId: '21bb8f947df4ad622c103f662543b230b713d',
-    type: SignatureEventType.Signed,
+    type: SignatureRequestEventType.Signed,
     policyId: 'APP453627845',
     contractFileName: 'Appenin_Contrat_assurance_habitation_APP645372859',
     validation: {

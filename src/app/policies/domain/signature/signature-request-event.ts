@@ -1,12 +1,12 @@
 export default interface SignatureRequestEvent {
   requestId: string,
-  type: SignatureEventType,
+  type: SignatureRequestEventType,
   policyId: string,
   contractFileName: string,
   validation: Validation
 }
 
-export enum SignatureEventType {
+export enum SignatureRequestEventType {
   Signed = 'SIGNED',
   DocumentsDownloadable = 'DOCUMENTS_DOWNLOADABLE',
   Unknown = 'UNKNOWN'

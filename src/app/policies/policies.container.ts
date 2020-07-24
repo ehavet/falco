@@ -36,9 +36,9 @@ import { ContractRepository } from './domain/contract/contract.repository'
 import { ContractGenerator } from './domain/contract/contract.generator'
 import { ContractFsRepository } from './infrastructure/contract/contract-fs.repository'
 import { ContractPdfGenerator } from './infrastructure/contract/contract-pdf.generator'
-import { ManageSignatureEvent } from './domain/signature/manage-signature-event.usecase'
-import { SignatureEventValidator } from './domain/signature/signature-event-validator'
-import { HelloSignEventValidator } from './infrastructure/signature/hello-sign-event.validator'
+import { ManageSignatureRequestEvent } from './domain/signature/manage-signature-request-event.usecase'
+import { SignatureRequestEventValidator } from './domain/signature/signature-request-event-validator'
+import { HelloSignRequestEventValidator } from './infrastructure/signature/hello-sign-request-event.validator'
 import { logger } from '../../libs/logger'
 const config = require('../../config')
 
@@ -51,7 +51,7 @@ export interface Container {
     GeneragePolicyCertificate: GeneratePolicyCertificate
     CreateSignatureRequestForPolicy: CreateSignatureRequestForPolicy
     GetPolicySpecificTerms: GetPolicySpecificTerms,
-    ManageSignatureEvent: ManageSignatureEvent
+    ManageSignatureRequestEvent: ManageSignatureRequestEvent
 }
 
 const policyRepository: PolicyRepository = new PolicySqlRepository()
@@ -65,7 +65,7 @@ const specificTermsRepository: SpecificTermsRepository = new SpecificTermsFSRepo
 const specificTermsGenerator: SpecificTermsGenerator = new SpecificTermsPdfGenerator()
 const contractRepository: ContractRepository = new ContractFsRepository(config)
 const contractGenerator: ContractGenerator = new ContractPdfGenerator()
-const signatureEventValidator: SignatureEventValidator = new HelloSignEventValidator(helloSignConfig)
+const signatureRequestEventValidator: SignatureRequestEventValidator = new HelloSignRequestEventValidator(helloSignConfig)
 
 const createPaymentIntentForPolicy: CreatePaymentIntentForPolicy =
     CreatePaymentIntentForPolicy.factory(paymentProcessor, policyRepository)
@@ -85,7 +85,7 @@ const createSignatureRequestForPolicy: CreateSignatureRequestForPolicy = CreateS
     policyRepository,
     signatureServiceProvider
   )
-const manageSignatureEvent: ManageSignatureEvent = ManageSignatureEvent.factory(signatureEventValidator, signatureServiceProvider, policyRepository, contractRepository, logger)
+const manageSignatureRequestEvent: ManageSignatureRequestEvent = ManageSignatureRequestEvent.factory(signatureRequestEventValidator, signatureServiceProvider, policyRepository, contractRepository, logger)
 
 export const container: Container = {
   CreatePaymentIntentForPolicy: createPaymentIntentForPolicy,
@@ -96,7 +96,7 @@ export const container: Container = {
   GeneragePolicyCertificate: generatePolicyCertificate,
   GetPolicySpecificTerms: getPolicySpecificTerms,
   CreateSignatureRequestForPolicy: createSignatureRequestForPolicy,
-  ManageSignatureEvent: manageSignatureEvent
+  ManageSignatureRequestEvent: manageSignatureRequestEvent
 }
 
 export const policySqlModels: Array<any> = [PolicySqlModel, ContactSqlModel]

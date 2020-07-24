@@ -1,5 +1,5 @@
 import SignatureRequestEvent from './signature-request-event'
 
-export interface SignatureEventValidator {
+export interface SignatureRequestEventValidator {
     isValid(event: SignatureRequestEvent)
 }

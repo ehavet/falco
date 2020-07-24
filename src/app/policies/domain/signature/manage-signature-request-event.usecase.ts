@@ -1,29 +1,29 @@
-import { ManageSignatureEventCommand } from './manage-signature-event-command'
-import { SignatureEventValidator } from './signature-event-validator'
-import { SignatureEventValidationError } from './signature-event.errors'
+import { ManageSignatureRequestEventCommand } from './manage-signature-request-event-command'
+import { SignatureRequestEventValidator } from './signature-request-event-validator'
+import { SignatureRequestEventValidationError } from './signature-request-event.errors'
 import { PolicyRepository } from '../policy.repository'
 import { Policy } from '../policy'
 import { Logger } from 'pino'
 import { SignatureServiceProvider } from '../signature-service-provider'
 import { Contract } from '../contract/contract'
 import { ContractRepository } from '../contract/contract.repository'
-import SignatureRequestEvent, { SignatureEventType } from './signature-request-event'
+import SignatureRequestEvent, { SignatureRequestEventType } from './signature-request-event'
 
-export interface ManageSignatureEvent {
-    (manageSignatureEventCommand: ManageSignatureEventCommand): Promise<void>
+export interface ManageSignatureRequestEvent {
+    (manageSignatureRequestEventCommand: ManageSignatureRequestEventCommand): Promise<void>
 }
 
-export namespace ManageSignatureEvent {
+export namespace ManageSignatureRequestEvent {
 
-    export function factory (signatureEventValidator: SignatureEventValidator, signatureServiceProvider: SignatureServiceProvider, policyRepository: PolicyRepository, contractRepository: ContractRepository, logger: Logger): ManageSignatureEvent {
-      return async (manageSignatureEventCommand: ManageSignatureEventCommand): Promise<void> => {
-        const signatureRequestEvent = manageSignatureEventCommand.event
-        if (signatureEventValidator.isValid(signatureRequestEvent)) {
+    export function factory (signatureRequestEventValidator: SignatureRequestEventValidator, signatureServiceProvider: SignatureServiceProvider, policyRepository: PolicyRepository, contractRepository: ContractRepository, logger: Logger): ManageSignatureRequestEvent {
+      return async (manageSignatureRequestEventCommand: ManageSignatureRequestEventCommand): Promise<void> => {
+        const signatureRequestEvent = manageSignatureRequestEventCommand.event
+        if (signatureRequestEventValidator.isValid(signatureRequestEvent)) {
           switch (signatureRequestEvent.type) {
-            case SignatureEventType.Signed:
+            case SignatureRequestEventType.Signed:
               await _manageSignedEvent(signatureRequestEvent, policyRepository)
               return
-            case SignatureEventType.DocumentsDownloadable:
+            case SignatureRequestEventType.DocumentsDownloadable:
               await _manageSignedContractDownloadableEvent(signatureRequestEvent, signatureServiceProvider, contractRepository)
               return
             default:
@@ -31,7 +31,7 @@ export namespace ManageSignatureEvent {
               return
           }
         }
-        throw new SignatureEventValidationError()
+        throw new SignatureRequestEventValidationError()
       }
     }
 

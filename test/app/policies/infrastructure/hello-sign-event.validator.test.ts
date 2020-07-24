@@ -28,7 +28,7 @@ describe('Signature - Infra - Hello Sign event validator', () => {
     it('should return true is the event event_hash is good', () => {
       // Given
       const helloSignEventFixture = signatureEventFixture()
-      helloSignEventFixture.event.event_hash = '17668c08248741350a8ab0d8285330f339768d1533eed2a8126e3c9d48614439'
+      helloSignEventFixture.hash = '17668c08248741350a8ab0d8285330f339768d1533eed2a8126e3c9d48614439'
 
       // When
       const isValid = helloSignEventValidator.isValid(helloSignEventFixture)

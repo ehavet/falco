@@ -10,6 +10,7 @@ import { Policy } from '../../../../../src/app/policies/domain/policy'
 import { Contract } from '../../../../../src/app/policies/domain/contract/contract'
 import { ContractRepository } from '../../../../../src/app/policies/domain/contract/contract.repository'
 import { SignatureRequester } from '../../../../../src/app/policies/domain/signature-requester'
+import { SignatureEventType } from '../../../../../src/app/policies/domain/signature/signature-event'
 
 describe('Signature - Usecase - Manage Signature Event', async () => {
   const now = new Date('2020-01-05T10:09:08Z')
@@ -42,10 +43,10 @@ describe('Signature - Usecase - Manage Signature Event', async () => {
   describe('when the signature is signed', async () => {
     it('should change policy status to Signed', async () => {
       // Given
-      eventExample.event.event_type = 'signature_request_signed'
+      eventExample.type = SignatureEventType.Signed
       const manageSignatureEventCommand: ManageSignatureEventCommand = { event: eventExample }
       signatureEventValidator.isValid.withArgs(eventExample).returns(true)
-      const policyId = eventExample.signature_request.metadata.policyId
+      const policyId = eventExample.policyId
 
       // When
       await manageSignatureEvent(manageSignatureEventCommand)
@@ -59,13 +60,13 @@ describe('Signature - Usecase - Manage Signature Event', async () => {
   describe('when the signed contract is ready to be downloaded', async () => {
     it('should retrieve and save the signed contract', async () => {
       // Given
-      eventExample.event.event_type = 'signature_request_downloadable'
-      eventExample.signature_request.metadata.contractFileName = 'Appenin_Contrat_assurance_habitation_APP645372888'
+      eventExample.type = SignatureEventType.DocumentsDownloadable
+      eventExample.contractFileName = 'Appenin_Contrat_assurance_habitation_APP645372888'
       const manageSignatureEventCommand: ManageSignatureEventCommand = { event: eventExample }
       const signedContract: Contract = { name: 'contract', buffer: Buffer.from('contract') }
 
       signatureEventValidator.isValid.withArgs(eventExample).returns(true)
-      signatureProvider.getSignedContract.withArgs(eventExample.signature_request.signature_request_id, 'Appenin_Contrat_assurance_habitation_APP645372888').resolves(signedContract)
+      signatureProvider.getSignedContract.withArgs(eventExample.requestId, 'Appenin_Contrat_assurance_habitation_APP645372888').resolves(signedContract)
       contractRepository.saveSignedContract.withArgs(signedContract).resolves(signedContract)
 
       // When

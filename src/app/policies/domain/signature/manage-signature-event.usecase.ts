@@ -7,6 +7,7 @@ import { Logger } from 'pino'
 import { SignatureRequester } from '../signature-requester'
 import { Contract } from '../contract/contract'
 import { ContractRepository } from '../contract/contract.repository'
+import SignatureEvent, { SignatureEventType } from './signature-event'
 
 export interface ManageSignatureEvent {
     (manageSignatureEventCommand: ManageSignatureEventCommand): Promise<void>
@@ -18,11 +19,11 @@ export namespace ManageSignatureEvent {
       return async (manageSignatureEventCommand: ManageSignatureEventCommand): Promise<void> => {
         const signatureEvent = manageSignatureEventCommand.event
         if (signatureEventValidator.isValid(signatureEvent)) {
-          switch (signatureEvent.event.event_type) {
-            case 'signature_request_signed':
+          switch (signatureEvent.type) {
+            case SignatureEventType.Signed:
               await _manageSignedEvent(signatureEvent, policyRepository)
               return
-            case 'signature_request_downloadable':
+            case SignatureEventType.DocumentsDownloadable:
               await _manageSignedContractDownloadableEvent(signatureEvent, signatureRequester, contractRepository)
               return
             default:
@@ -34,14 +35,14 @@ export namespace ManageSignatureEvent {
       }
     }
 
-    async function _manageSignedEvent (signatureEvent: any, policyRepository: PolicyRepository) {
-      const policyId: string = signatureEvent.signature_request.metadata.policyId
+    async function _manageSignedEvent (signatureEvent: SignatureEvent, policyRepository: PolicyRepository) {
+      const policyId: string = signatureEvent.policyId
       const currentDate: Date = new Date()
       await policyRepository.updateAfterSignature(policyId, currentDate, Policy.Status.Signed)
     }
 
-    async function _manageSignedContractDownloadableEvent (signatureEvent: any, signatureRequester: SignatureRequester, contractRepository: ContractRepository) {
-      const contract: Contract = await signatureRequester.getSignedContract(signatureEvent.signature_request.signature_request_id, signatureEvent.signature_request.metadata.contractFileName)
+    async function _manageSignedContractDownloadableEvent (signatureEvent: SignatureEvent, signatureRequester: SignatureRequester, contractRepository: ContractRepository) {
+      const contract: Contract = await signatureRequester.getSignedContract(signatureEvent.requestId, signatureEvent.contractFileName)
       await contractRepository.saveSignedContract(contract)
     }
 

@@ -37,7 +37,10 @@ export class HelloSignSignatureRequester implements SignatureRequester {
           }
         ]
       ],
-      metadata: { policyId: signer.policyId },
+      metadata: {
+        policyId: signer.policyId,
+        contractFileName: this.extractContractFileName(docPath)
+      },
       files: [docPath]
     }
     try {
@@ -84,5 +87,9 @@ export class HelloSignSignatureRequester implements SignatureRequester {
       chunks.push(chunk)
     }
     return Buffer.concat(chunks)
+  }
+
+  private extractContractFileName (docPath: string) {
+    return docPath.split(/[\s/]+/).pop()
   }
 }

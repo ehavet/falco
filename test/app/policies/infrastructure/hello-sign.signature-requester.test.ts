@@ -62,7 +62,10 @@ describe('HelloSignSignatureRequester', async () => {
             }
           ]
         ],
-        metadata: { policyId: 'APP854732084' },
+        metadata: {
+          policyId: 'APP854732084',
+          contractFileName: 'doc.pdf'
+        },
         files: [docToSignPath]
       }
       signer = { emailAdress: 'signer@example.com', name: 'jean jean', policyId: 'APP854732084' }

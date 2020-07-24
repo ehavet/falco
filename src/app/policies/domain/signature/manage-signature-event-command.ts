@@ -1,5 +1,5 @@
-import SignatureEvent from './signature-event'
+import SignatureRequestEvent from './signature-request-event'
 
 export interface ManageSignatureEventCommand {
-    event: SignatureEvent
+    event: SignatureRequestEvent
 }

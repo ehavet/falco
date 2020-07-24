@@ -2,7 +2,7 @@ import crypto from 'crypto'
 
 import { SignatureEventValidator } from '../../domain/signature/signature-event-validator'
 import { HelloSignConfig } from '../../../../configs/hello-sign.config'
-import SignatureEvent from '../../domain/signature/signature-event'
+import SignatureRequestEvent from '../../domain/signature/signature-request-event'
 
 export class HelloSignEventValidator implements SignatureEventValidator {
     config: HelloSignConfig
@@ -11,10 +11,10 @@ export class HelloSignEventValidator implements SignatureEventValidator {
       this.config = config
     }
 
-    isValid (signatureEvent: SignatureEvent): boolean {
+    isValid (signatureRequestEvent: SignatureRequestEvent): boolean {
       const hash = crypto.createHmac('sha256', this.config.key)
-        .update(signatureEvent.time + signatureEvent.type)
+        .update(signatureRequestEvent.validation.time + signatureRequestEvent.validation.rawEventType)
         .digest('hex').toString()
-      return hash === signatureEvent.hash
+      return hash === signatureRequestEvent.validation.hash
     }
 }

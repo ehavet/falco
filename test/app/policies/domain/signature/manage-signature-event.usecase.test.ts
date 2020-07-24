@@ -10,7 +10,7 @@ import { Policy } from '../../../../../src/app/policies/domain/policy'
 import { Contract } from '../../../../../src/app/policies/domain/contract/contract'
 import { ContractRepository } from '../../../../../src/app/policies/domain/contract/contract.repository'
 import { SignatureServiceProvider } from '../../../../../src/app/policies/domain/signature-service-provider'
-import { SignatureEventType } from '../../../../../src/app/policies/domain/signature/signature-event'
+import { SignatureEventType } from '../../../../../src/app/policies/domain/signature/signature-request-event'
 
 describe('Signature - Usecase - Manage Signature Event', async () => {
   const now = new Date('2020-01-05T10:09:08Z')

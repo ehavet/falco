@@ -9,7 +9,7 @@ export function signatureRequestEventFixture (attr = {}) {
     validation: {
       rawEventType: 'signature_request_sent',
       time: '1348177752',
-      hash: '3a31324d1919d7cdc849ff407adf38fc01e01107d9400b028ff8c892469ca947'
+      hash: '55344e8eb55e396c6ad85cf1a9b7fc128ebf9adb81ac9c77503729e477faf7d2'
     },
     ...attr
   }

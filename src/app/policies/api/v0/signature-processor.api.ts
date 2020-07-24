@@ -28,7 +28,6 @@ export default function (container: Container, logger: Logger): Array<ServerRout
           }
         }
       },
-      // @ts-ignore
       handler: async (request, h) => {
         const payload: any = request.payload
         const signatureRequestEvent: SignatureRequestEvent = resourceToDomain(JSON.parse(payload.json))

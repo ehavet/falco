@@ -20,7 +20,8 @@ export function signatureEventFixture (attr = {}) {
       subject: null,
       message: 'Please sign this document.',
       metadata: {
-        policyId: 'APP453627845'
+        policyId: 'APP453627845',
+        contractFileName: 'Appenin_Contrat_assurance_habitation_APP645372859'
       }
     },
     ...attr

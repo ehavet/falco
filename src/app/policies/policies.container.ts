@@ -85,7 +85,7 @@ const createSignatureRequestForPolicy: CreateSignatureRequestForPolicy = CreateS
     policyRepository,
     signatureRequester
   )
-const manageSignatureEvent: ManageSignatureEvent = ManageSignatureEvent.factory(signatureEventValidator, policyRepository, logger)
+const manageSignatureEvent: ManageSignatureEvent = ManageSignatureEvent.factory(signatureEventValidator, signatureRequester, policyRepository, contractRepository, logger)
 
 export const container: Container = {
   CreatePaymentIntentForPolicy: createPaymentIntentForPolicy,

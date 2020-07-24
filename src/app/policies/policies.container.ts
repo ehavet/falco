@@ -104,5 +104,5 @@ export const policySqlModels: Array<any> = [PolicySqlModel, ContactSqlModel]
 export function policiesRoutes () {
   return routes(container)
     .concat(paymentProcessorEventHandler(container))
-    .concat(signatureProcessorEventHandler(container))
+    .concat(signatureProcessorEventHandler(container, logger))
 }

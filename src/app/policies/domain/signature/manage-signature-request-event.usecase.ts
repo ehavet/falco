@@ -22,14 +22,14 @@ export namespace ManageSignatureRequestEvent {
           switch (signatureRequestEvent.type) {
             case SignatureRequestEventType.Signed:
               await _manageSignedEvent(signatureRequestEvent, policyRepository)
-              return
+              break
             case SignatureRequestEventType.DocumentsDownloadable:
               await _manageSignedContractDownloadableEvent(signatureRequestEvent, signatureServiceProvider, contractRepository)
-              return
+              break
             default:
               logger.trace('Signature event not managed received')
-              return
           }
+          return Promise.resolve()
         }
         throw new SignatureRequestEventValidationError()
       }

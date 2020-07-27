@@ -15,7 +15,6 @@ export class SpecificTermsFSRepository implements SpecificTermsRepository {
     try {
       const buffer = await pdftk
         .input(specificTermsFilePath)
-        .uncompress()
         .output()
       return { name: specificTermsName, buffer }
     } catch (error) {

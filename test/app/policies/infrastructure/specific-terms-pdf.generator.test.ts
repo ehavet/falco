@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import pdftk from 'node-pdftk'
 import { createPolicyFixture } from '../fixtures/policy.fixture'
 import { Policy } from '../../../../src/app/policies/domain/policy'
 import { dateFaker, expect } from '../../../test-utils'
@@ -18,19 +19,20 @@ describe('Policies - Infra - Specific terms PDF Generator', async () => {
     const specificTerms = await specificTermsPdfGenerator.generate(policy)
 
     // Then
+    const specificTermsUncompressed = await pdftk.input(specificTerms.buffer).uncompress().output()
     expect(specificTerms.name).to.equal('Appenin_Condition_Particulieres_assurance_habitation_APP753210859.pdf')
-    expect(specificTerms.buffer.includes('\\300 EFFET DU 05\\05701\\0572020')).to.be.true
-    expect(specificTerms.buffer.includes('n\\260APP 753 210 859')).to.be.true
-    expect(specificTerms.buffer.includes('Votre contrat arrivera \\340 \\351ch\\351ance le 05\\05702\\0572020')).to.be.true
-    expect(specificTerms.buffer.includes('votre tarif est de 69\\05484 \\200')).to.be.true
-    expect(specificTerms.buffer.includes('Jean Dupont')).to.be.true
-    expect(specificTerms.buffer.includes('jeandupont\\100email\\056com')).to.be.true
-    expect(specificTerms.buffer.includes('John Doe')).to.be.true
-    expect(specificTerms.buffer.includes('13 rue du loup garou')).to.be.true
-    expect(specificTerms.buffer.includes('91100 Corbeil\\055Essones')).to.be.true
-    expect(specificTerms.buffer.includes('Votre logement est compos\\351 de 2 pi\\350ce\\(s\\) principale\\(s\\)')).to.be.true
-    expect(specificTerms.buffer.includes('valeur mobili\\350re par \\351v\\351nement : 7 000 \\200')).to.be.true
-    expect(specificTerms.buffer.includes('pour les autres garanties de protection de vos biens : 150 \\200')).to.be.true
-    expect(specificTerms.buffer.includes('Fait \\340 Paris, le 12\\05707\\0572020')).to.be.true
+    expect(specificTermsUncompressed.includes('\\300 EFFET DU 05\\05701\\0572020')).to.be.true
+    expect(specificTermsUncompressed.includes('n\\260APP 753 210 859')).to.be.true
+    expect(specificTermsUncompressed.includes('Votre contrat arrivera \\340 \\351ch\\351ance le 05\\05702\\0572020')).to.be.true
+    expect(specificTermsUncompressed.includes('votre tarif est de 69\\05484 \\200')).to.be.true
+    expect(specificTermsUncompressed.includes('Jean Dupont')).to.be.true
+    expect(specificTermsUncompressed.includes('jeandupont\\100email\\056com')).to.be.true
+    expect(specificTermsUncompressed.includes('John Doe')).to.be.true
+    expect(specificTermsUncompressed.includes('13 rue du loup garou')).to.be.true
+    expect(specificTermsUncompressed.includes('91100 Corbeil\\055Essones')).to.be.true
+    expect(specificTermsUncompressed.includes('Votre logement est compos\\351 de 2 pi\\350ce\\(s\\) principale\\(s\\)')).to.be.true
+    expect(specificTermsUncompressed.includes('valeur mobili\\350re par \\351v\\351nement : 7 000 \\200')).to.be.true
+    expect(specificTermsUncompressed.includes('pour les autres garanties de protection de vos biens : 150 \\200')).to.be.true
+    expect(specificTermsUncompressed.includes('Fait \\340 Paris, le 12\\05707\\0572020')).to.be.true
   })
 })

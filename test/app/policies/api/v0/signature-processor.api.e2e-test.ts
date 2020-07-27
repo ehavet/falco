@@ -31,13 +31,9 @@ describe('Signature Event Handler - API - E2E', async () => {
         .field('json', JSON.stringify(signatureRequestSignedEvent))
 
       // Then
-      // Because we launch the event treatment and we don't wait for the result, the policy
-      // update is done asynchronously and we have to wait a little bit in the test
-      setTimeout(async function () {
-        const updatedPolicy = await policyRepository.get(policyId)
-        expect(updatedPolicy.status).to.equal(Policy.Status.Signed)
-        await PolicySqlModel.destroy({ truncate: true, cascade: true })
-      }, 100)
+      const updatedPolicy = await policyRepository.get(policyId)
+      expect(updatedPolicy.status).to.equal(Policy.Status.Signed)
+      await PolicySqlModel.destroy({ truncate: true, cascade: true })
     })
   })
 })

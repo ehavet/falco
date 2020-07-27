@@ -9,7 +9,7 @@ import { PolicyRepository } from '../../../../../src/app/policies/domain/policy.
 import { Policy } from '../../../../../src/app/policies/domain/policy'
 import { Contract } from '../../../../../src/app/policies/domain/contract/contract'
 import { ContractRepository } from '../../../../../src/app/policies/domain/contract/contract.repository'
-import { SignatureServiceProvider } from '../../../../../src/app/policies/domain/signature-service-provider'
+import { SignatureRequestProvider } from '../../../../../src/app/policies/domain/signature-request-provider'
 import { SignatureRequestEventType } from '../../../../../src/app/policies/domain/signature/signature-request-event'
 
 describe('Signature - Usecase - Manage Signature Request Event', async () => {
@@ -17,7 +17,7 @@ describe('Signature - Usecase - Manage Signature Request Event', async () => {
   const signatureRequestEventValidator: SinonStubbedInstance<SignatureRequestEventValidator> = { isValid: sinon.stub() }
   const policyRepository: SinonStubbedInstance<PolicyRepository> = { save: sinon.stub(), isIdAvailable: sinon.stub(), get: sinon.mock(), setEmailValidationDate: sinon.mock(), updateAfterPayment: sinon.mock(), updateAfterSignature: sinon.mock() }
   const contractRepository: SinonStubbedInstance<ContractRepository> = { saveTempContract: sinon.stub(), saveSignedContract: sinon.mock() }
-  const signatureProvider: SinonStubbedInstance<SignatureServiceProvider> = { create: sinon.stub(), getSignedContract: sinon.mock() }
+  const signatureProvider: SinonStubbedInstance<SignatureRequestProvider> = { create: sinon.stub(), getSignedContract: sinon.mock() }
   const logger: any = { trace: () => {} }
   const manageSignatureRequestEvent: ManageSignatureRequestEvent = ManageSignatureRequestEvent.factory(signatureRequestEventValidator, signatureProvider, policyRepository, contractRepository, logger)
   const eventExample = signatureRequestEventFixture()

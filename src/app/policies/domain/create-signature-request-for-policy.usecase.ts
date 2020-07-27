@@ -1,6 +1,6 @@
 import { SignatureRequest } from './signature-request'
 import { PolicyRepository } from './policy.repository'
-import { SignatureServiceProvider } from './signature-service-provider'
+import { SignatureRequestProvider } from './signature-request-provider'
 import { ContractGenerationFailureError, SignatureRequestCreationFailureError, SpecificTermsGenerationFailureError } from './signature-request.errors'
 import { ContractGenerator } from './contract/contract.generator'
 import { ContractRepository } from './contract/contract.repository'
@@ -23,7 +23,7 @@ export namespace CreateSignatureRequestForPolicy {
       contractGenerator: ContractGenerator,
       contractRepository: ContractRepository,
       policyRepository: PolicyRepository,
-      signatureServiceProvider: SignatureServiceProvider
+      signatureRequestProvider: SignatureRequestProvider
     ): CreateSignatureRequestForPolicy {
       return async (policyId: string): Promise<SignatureRequest> => {
         const policy: Policy = await policyRepository.get(policyId)
@@ -52,7 +52,7 @@ export namespace CreateSignatureRequestForPolicy {
             name: `${policy.contact.firstname} ${policy.contact.lastname}`,
             policyId: policy.id
           }
-          return await signatureServiceProvider.create(contractFilePath, signer)
+          return await signatureRequestProvider.create(contractFilePath, signer)
         } catch (error) {
           throw new SignatureRequestCreationFailureError(policyId)
         }

@@ -1,5 +1,5 @@
 import JSZip from 'jszip'
-import { SignatureServiceProvider } from '../domain/signature-service-provider'
+import { SignatureRequestProvider } from '../domain/signature-request-provider'
 import { SignatureRequest } from '../domain/signature-request'
 import { HelloSignConfig } from '../../../configs/hello-sign.config'
 import { Signer } from '../domain/signer'
@@ -8,7 +8,7 @@ import { IncomingMessage } from 'http'
 import { Logger } from '../../../libs/logger'
 import { SignedContractDownloadError, SignedContractDownloadNotFound } from '../domain/signature/signature.errors'
 
-export class HelloSignSignatureServiceProvider implements SignatureServiceProvider {
+export class HelloSignSignatureRequestProvider implements SignatureRequestProvider {
   constructor (private config: HelloSignConfig, private logger: Logger) { }
 
   async create (docPath: string, signer: Signer): Promise<SignatureRequest> {

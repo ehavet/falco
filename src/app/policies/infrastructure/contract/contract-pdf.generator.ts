@@ -22,7 +22,6 @@ export class ContractPdfGenerator implements ContractGenerator {
         C: contractualTermsBuffer
       })
       .cat('A B C')
-      .uncompress()
       .output()
 
     return { name: contractName, buffer }
@@ -35,7 +34,6 @@ export class ContractPdfGenerator implements ContractGenerator {
   private async readFile (filename: string): Promise<Buffer> {
     return await pdftk
       .input(path.join(__dirname, filename))
-      .uncompress()
       .output()
   }
 }

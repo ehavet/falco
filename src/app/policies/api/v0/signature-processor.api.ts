@@ -22,6 +22,11 @@ export default function (container: Container, logger: Logger): Array<ServerRout
             output: 'data'
           }
         },
+        validate: {
+          payload: Joi.object({
+            json: Joi.any().meta({ swaggerType: 'file' }).required().description('Description of the event')
+          })
+        },
         response: {
           status: {
             200: Joi.string()

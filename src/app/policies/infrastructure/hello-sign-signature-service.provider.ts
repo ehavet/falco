@@ -75,9 +75,10 @@ export class HelloSignSignatureServiceProvider implements SignatureServiceProvid
 
   private async extractSignedContract (downloadedDocuments: IncomingMessage, contractFileName: string) {
     const documentsZipAsBuffer: Buffer = await this.readStream(downloadedDocuments)
+    const contractFileNameInZip = contractFileName.replace('.pdf', '')
 
     const documentsZip: JSZip = await JSZip.loadAsync(documentsZipAsBuffer)
-    const foundSignedContract = documentsZip.file(new RegExp(contractFileName))[0]
+    const foundSignedContract = documentsZip.file(new RegExp(contractFileNameInZip))[0]
     return foundSignedContract
   }
 

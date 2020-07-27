@@ -104,9 +104,10 @@ describe('HelloSignSignatureServiceProvider', async () => {
     it('should return the contract', async () => {
       // Given
       const contractFileName: string = 'contrat_APP658934103.pdf'
+      const contractFileNameInZip: string = 'contrat_APP658934103'
       const signatureRequestId: string = 'signatureRequestId'
       const contractBuffer: Buffer = Buffer.from('contract')
-      const hellosignZipBuffer = await new JSZip().file(contractFileName, contractBuffer).generateAsync({ type: 'nodebuffer' })
+      const hellosignZipBuffer = await new JSZip().file(contractFileNameInZip, contractBuffer).generateAsync({ type: 'nodebuffer' })
       const hellosignZipStream = await Readable.from(hellosignZipBuffer)
       config.hellosign.signatureRequest.download.withExactArgs(signatureRequestId, { file_type: 'zip' }).resolves(hellosignZipStream)
 

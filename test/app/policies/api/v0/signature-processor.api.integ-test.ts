@@ -1,12 +1,13 @@
-import { expect, HttpServerForTesting, newMinimalServer } from '../../../../test-utils'
-import { policiesRoutes } from '../../../../../src/app/policies/policies.container'
+import { expect, HttpServerForTesting, newMinimalServer, sinon } from '../../../../test-utils'
+import { container, policiesRoutes } from '../../../../../src/app/policies/policies.container'
 import * as supertest from 'supertest'
-import { signatureEventFixture } from '../../fixtures/signatureEvent.fixture'
+import { signatureRequestEventFixture } from '../../fixtures/signatureRequestEvent.fixture'
+import { signatureRequestEventJSONFixture } from '../../fixtures/signatureRequestEventJSON.fixture'
 
-describe.skip('Signature Event Handler - API - Integration', async () => {
+describe('Signature Event Handler - API - Integration', async () => {
   let httpServer: HttpServerForTesting
 
-  const eventExample = signatureEventFixture()
+  const signatureRequestEvent = signatureRequestEventFixture()
 
   describe('POST /internal/v0/signature-processor/event-handler/', async () => {
     let response: supertest.Response
@@ -15,15 +16,16 @@ describe.skip('Signature Event Handler - API - Integration', async () => {
       httpServer = await newMinimalServer(policiesRoutes())
     })
 
-    describe('when success', () => {
-      it('should reply with status 200', async () => {
-        response = await httpServer.api()
-          .post('/internal/v0/signature-processor/event-handler/')
-          .send(eventExample)
+    it('should reply with status 200', async () => {
+      sinon.stub(container, 'ManageSignatureRequestEvent').withArgs({ event: signatureRequestEvent }).resolves()
 
-        expect(response).to.have.property('statusCode', 200)
-        expect(response).to.have.property('text', 'Hello API Event Received')
-      })
+      response = await httpServer.api()
+        .post('/internal/v0/signature-processor/event-handler/')
+        .type('multipart/form-data')
+        .field('json', JSON.stringify(signatureRequestEventJSONFixture()))
+
+      expect(response).to.have.property('statusCode', 200)
+      expect(response).to.have.property('text', 'Hello API Event Received')
     })
   })
 })

@@ -1,11 +1,14 @@
-import * as HttpErrorSchema from '../../../common-api/HttpErrorSchema'
 import { Container } from '../../policies.container'
 import { ServerRoute } from '@hapi/hapi'
 import Joi from '@hapi/joi'
-import { logger } from '../../../../libs/logger'
+import SignatureRequestEvent from '../../domain/signature/signature-request-event'
+import { resourceToDomain } from './mappers/signature-request-event-resource-to-domain.mapper'
+import { Logger } from '../../../../libs/logger'
+import * as Boom from '@hapi/boom'
+import * as HttpErrorSchema from '../../../common-api/HttpErrorSchema'
 
 const TAGS = ['api', 'signature-processor']
-export default function (container: Container): Array<ServerRoute> {
+export default function (container: Container, logger: Logger): Array<ServerRoute> {
   return [
     {
       method: 'POST',
@@ -21,6 +24,11 @@ export default function (container: Container): Array<ServerRoute> {
             output: 'data'
           }
         },
+        validate: {
+          payload: Joi.object({
+            json: Joi.any().meta({ swaggerType: 'file' }).required().description('Description of the event')
+          })
+        },
         response: {
           status: {
             200: Joi.string(),
@@ -30,12 +38,12 @@ export default function (container: Container): Array<ServerRoute> {
       },
       handler: async (request, h) => {
         const payload: any = request.payload
-        const signatureEvent = JSON.parse(payload.json)
+        const signatureRequestEvent: SignatureRequestEvent = resourceToDomain(JSON.parse(payload.json))
         try {
-          await container.ManageSignatureEvent({ event: signatureEvent })
+          await container.ManageSignatureRequestEvent({ event: signatureRequestEvent })
         } catch (error) {
-          // Here we do not try to throw an error due to HelloSign errors management https://app.hellosign.com/api/eventsAndCallbacksWalkthrough
           logger.error(error)
+          throw Boom.internal(error)
         }
         return h.response('Hello API Event Received').code(200)
       }

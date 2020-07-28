@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 import fs from 'fs'
 import fsx from 'fs-extra'
 import path from 'path'
+import pdftk from 'node-pdftk'
 import { createPolicyFixture } from '../fixtures/policy.fixture'
 import { Policy } from '../../../../src/app/policies/domain/policy'
 import { config, expect } from '../../../test-utils'
@@ -55,8 +56,9 @@ describe('Policies - Infra - Specific terms FS Repository', async () => {
       const specificTermsFound: SpecificTerms = await specificTermsPdfRepository.get('Appenin_Condition_Particulieres_assurance_habitation_APP753210859.pdf')
 
       // Then
+      const specificTermsPdfBuffer = await pdftk.input(specificTermsFound.buffer).uncompress().output()
       expect(specificTermsFound.name).to.equal('Appenin_Condition_Particulieres_assurance_habitation_APP753210859.pdf')
-      expect(specificTermsFound.buffer.includes('n\\260APP 753 210 859')).to.be.true
+      expect(specificTermsPdfBuffer.includes('n\\260APP 753 210 859')).to.be.true
     })
 
     it('should throw a not found error if no specific terms found', async () => {

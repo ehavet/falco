@@ -1,3 +1,4 @@
+import pdftk from 'node-pdftk'
 import { CertificateRepository } from '../../../../src/app/policies/domain/certificate/certificate.repository'
 import { CertificatePdfRepository } from '../../../../src/app/policies/infrastructure/certificate-pdf/certificate-pdf.repository'
 import { createPolicyFixture } from '../fixtures/policy.fixture'
@@ -15,11 +16,12 @@ describe('Policies - Infra - Certificate PDF Repository', async () => {
     const certificate: Certificate = await certificatePdfRepository.generate(policy)
 
     // Then
+    const certificateUncompressed = await pdftk.input(certificate.buffer).uncompress().output()
     expect(certificate.name).to.equal('Appenin_Attestation_assurance_habitation_APP753210859.pdf')
-    expect(certificate.buffer.includes('Jean Dupont')).to.be.true
-    expect(certificate.buffer.includes('13 rue du loup garou')).to.be.true
-    expect(certificate.buffer.includes('91100 Corbeil\\055Essones')).to.be.true
-    expect(certificate.buffer.includes('est assur\\351(e) par le contrat Assurance Habitation APPENIN n\\260 APP 753 210 859')).to.be.true
-    expect(certificate.buffer.includes('depuis le 05\\05701\\0572020 \\(prochaine \\351ch\\351ance le 05\\05701\\0572020\\)')).to.be.true
+    expect(certificateUncompressed.includes('Jean Dupont')).to.be.true
+    expect(certificateUncompressed.includes('13 rue du loup garou')).to.be.true
+    expect(certificateUncompressed.includes('91100 Corbeil\\055Essones')).to.be.true
+    expect(certificateUncompressed.includes('est assur\\351(e) par le contrat Assurance Habitation APPENIN n\\260 APP 753 210 859')).to.be.true
+    expect(certificateUncompressed.includes('depuis le 05\\05701\\0572020 \\(prochaine \\351ch\\351ance le 05\\05701\\0572020\\)')).to.be.true
   })
 })

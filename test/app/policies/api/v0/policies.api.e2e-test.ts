@@ -228,7 +228,7 @@ describe('Policies - API - E2E', async () => {
         .set('X-Consumer-Username', 'myPartner')
 
       // Then
-      expect(response.header['content-length']).to.equal('196013')
+      expect(response.header['content-length']).to.equal('123287')
       expect(response.header['content-disposition']).to.includes('Appenin_Attestation_assurance_habitation_APP753210859.pdf')
       expect(response.body).to.be.instanceOf(Buffer)
     })

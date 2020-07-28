@@ -1,5 +1,4 @@
 import { EmailValidationQuery } from './email-validation-query'
-import { ValidationTokenPayload } from './validation-token-payload'
 import { Crypter } from './crypter'
 import { Mailer } from '../../common-api/domain/mailer'
 import { ValidationLinkConfig } from '../../../configs/validation-link.config'
@@ -17,11 +16,10 @@ export namespace SendValidationLinkToEmailAddress {
       config: ValidationLinkConfig
     ): SendValidationLinkToEmailAddress {
       return async (emailValidationQuery: EmailValidationQuery) => {
-        const validationTokenPayload: ValidationTokenPayload =
-            _buildValidationTokenPayload(emailValidationQuery, config)
-        const validationToken: string = encrypter.encrypt(JSON.stringify(validationTokenPayload))
-        const emailValidationUri: string = _getEmailValidationUri(config.baseUrl, validationToken)
-        await mailer.send(buildValidationLinkEmail(validationTokenPayload.email, emailValidationUri))
+        const validationTokens = _buildValidationTokens(emailValidationQuery, config, encrypter)
+        const emailValidationUriFr: string = _getEmailValidationUri(config.baseUrl, validationTokens.fr)
+        const emailValidationUriEn: string = _getEmailValidationUri(config.baseUrl, validationTokens.en)
+        await mailer.send(buildValidationLinkEmail(emailValidationQuery.email, emailValidationUriFr, emailValidationUriEn))
       }
     }
 }
@@ -36,25 +34,43 @@ function _getExpirationDate (validityPeriodInMonth: number): Date {
   return date
 }
 
-function _getEmailValidationUri (url: string, validationToken: string): string {
+function _getEmailValidationUri (url: string, validationToken: string) {
   return `${url}?token=${querystring.escape(validationToken)}`
+}
+
+function _buildValidationTokens (
+  emailValidationQuery: EmailValidationQuery,
+  config: ValidationLinkConfig,
+  encrypter: Crypter
+) {
+  const tokenByLocale = config.locales.map((locale) => {
+    return {
+      [locale]: encrypter.encrypt(
+        JSON.stringify(_buildValidationTokenPayload(emailValidationQuery, config, locale))
+      )
+    }
+  })
+  return tokenByLocale.reduce(
+    (accumulator, token) => { return { ...accumulator, ...token } }
+  )
 }
 
 function _buildValidationTokenPayload (
   emailValidationQuery: EmailValidationQuery,
-  config: ValidationLinkConfig
-): ValidationTokenPayload {
+  config: ValidationLinkConfig,
+  locale: string
+) {
   return {
     email: emailValidationQuery.email,
-    callbackUrl: _getCallbackUrl(emailValidationQuery.callbackUrl, emailValidationQuery.partnerCode, emailValidationQuery.policyId, config),
+    callbackUrl: _getCallbackUrl(emailValidationQuery.callbackUrl, locale, emailValidationQuery.partnerCode, emailValidationQuery.policyId, config),
     policyId: emailValidationQuery.policyId,
     expiredAt: _getExpirationDate(config.validityPeriodinMonth)
   }
 }
 
-function _getCallbackUrl (callbackUrl: string, partnerCode: string, policyId: string, config: ValidationLinkConfig) : string {
+function _getCallbackUrl (callbackUrl: string, locale: string, partnerCode: string, policyId: string, config: ValidationLinkConfig) : string {
   if (callbackUrl && callbackUrl.length > 0) {
-    return callbackUrl
+    return `${callbackUrl}`
   }
-  return `${config.frontUrl}/${partnerCode}/${config.frontCallbackPageRoute}?policy_id=${policyId}`
+  return `${config.frontUrl}/${locale}/${partnerCode}/${config.frontCallbackPageRoute}?policy_id=${policyId}`
 }

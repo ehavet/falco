@@ -6,13 +6,14 @@ import { ValidationLinkConfig } from '../../../../src/configs/validation-link.co
 import { expectedValidationEmailMessage } from '../expectations/expected-validation-email-message'
 
 describe('Usecase - Send a validation link to an email address', async () => {
-  const encrypter = { encrypt: sinon.mock(), decrypt: sinon.mock() }
+  const encrypter = { encrypt: sinon.stub(), decrypt: sinon.mock() }
   const mailer = { send: sinon.spy() }
   const config: ValidationLinkConfig = {
     baseUrl: 'http://front-url/validate',
     validityPeriodinMonth: 6,
     frontCallbackPageRoute: 'synthese',
-    frontUrl: 'http://front-ulr.fr'
+    frontUrl: 'http://front-ulr.fr',
+    locales: ['fr', 'en']
   }
 
   beforeEach(async () => {
@@ -28,18 +29,20 @@ describe('Usecase - Send a validation link to an email address', async () => {
     // GIVEN
     const emailValidationQuery: EmailValidationQuery = {
       email: 'albert.hofmann@science.org',
-      callbackUrl: 'http://bicycle-day.com',
+      callbackUrl: 'http://given/callback',
       partnerCode: 'partnerCode',
       policyId: 'APP746312047'
     }
     const validationTokenPayload: ValidationTokenPayload = {
       email: 'albert.hofmann@science.org',
-      callbackUrl: 'http://bicycle-day.com',
+      callbackUrl: 'http://given/callback',
       policyId: 'APP746312047',
       expiredAt: new Date('2021-02-12T00:00:00.000Z')
     }
     const encryptedValidationToken = '3NCRYPT3DB4+S364STR1NG=='
-    encrypter.encrypt.withExactArgs(JSON.stringify(validationTokenPayload)).returns(encryptedValidationToken)
+    encrypter.encrypt.withArgs(JSON.stringify(validationTokenPayload))
+      .onFirstCall().returns(encryptedValidationToken)
+      .onSecondCall().returns(encryptedValidationToken)
     const sendValidationLinkToEmailAddress: SendValidationLinkToEmailAddress =
             SendValidationLinkToEmailAddress.factory(encrypter, mailer, config)
     // WHEN
@@ -61,14 +64,18 @@ describe('Usecase - Send a validation link to an email address', async () => {
       partnerCode: 'partnerCode',
       policyId: 'APP746312047'
     }
-    const validationTokenPayload: ValidationTokenPayload = {
+    const validationTokenPayloadFr: ValidationTokenPayload = {
       email: 'albert.hofmann@science.org',
-      callbackUrl: 'http://front-ulr.fr/partnerCode/synthese?policy_id=APP746312047',
+      callbackUrl: 'http://front-ulr.fr/fr/partnerCode/synthese?policy_id=APP746312047',
       policyId: 'APP746312047',
       expiredAt: new Date('2021-02-12T00:00:00.000Z')
     }
-    const encryptedValidationToken = '3NCRYPT3DB4+S364STR1NG=='
-    encrypter.encrypt.withExactArgs(JSON.stringify(validationTokenPayload)).returns(encryptedValidationToken)
+    const validationTokenPayloadEn: ValidationTokenPayload = {
+      email: 'albert.hofmann@science.org',
+      callbackUrl: 'http://front-ulr.fr/en/partnerCode/synthese?policy_id=APP746312047',
+      policyId: 'APP746312047',
+      expiredAt: new Date('2021-02-12T00:00:00.000Z')
+    }
     const sendValidationLinkToEmailAddress: SendValidationLinkToEmailAddress =
         SendValidationLinkToEmailAddress.factory(encrypter, mailer, config)
 
@@ -76,6 +83,7 @@ describe('Usecase - Send a validation link to an email address', async () => {
     await sendValidationLinkToEmailAddress(emailValidationQuery)
 
     // THEN
-    return encrypter.encrypt.verify()
+    sinon.assert.calledWithExactly(encrypter.encrypt, JSON.stringify(validationTokenPayloadFr))
+    sinon.assert.calledWithExactly(encrypter.encrypt, JSON.stringify(validationTokenPayloadEn))
   })
 })

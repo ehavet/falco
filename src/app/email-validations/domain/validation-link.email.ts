@@ -1,16 +1,16 @@
 import { Email } from '../../common-api/domain/mailer'
 const config = require('../../../config')
 
-export function buildValidationLinkEmail (recipient, uri): Email {
+export function buildValidationLinkEmail (recipient, uriFr, uriEn): Email {
   return {
     sender: config.get('FALCO_API_APPENIN_EMAIL_ADDRESS'),
     recipient: recipient,
     subject: 'valider votre email',
-    messageHtml: _buildValidationMessage(uri)
+    messageHtml: _buildValidationMessage(uriEn, uriFr)
   }
 }
 
-function _buildValidationMessage (uri: string): string {
+function _buildValidationMessage (uriEn: string, uriFr: string): string {
   const html = '<!DOCTYPE html>\n' +
       '<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">\n' +
       '<head>\n' +
@@ -269,7 +269,7 @@ function _buildValidationMessage (uri: string): string {
       '                                    <table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: auto;">\n' +
       '                                        <tr>\n' +
       '                                            <td class="button-td button-td-primary" style="border-radius: 24px; background: #2C2B94;">\n' +
-      '\t\t\t\t\t\t\t\t\t\t\t     <a class="button-a button-a-primary" href="\n' + uri + '" style="background: #2C2B94; border: 1px solid #2C2B94; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 24px;">Valider mon adresse email</a>\n' +
+      '\t\t\t\t\t\t\t\t\t\t\t     <a class="button-a button-a-primary" href="\n' + uriFr + '" style="background: #2C2B94; border: 1px solid #2C2B94; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 24px;">Valider mon adresse email</a>\n' +
       '\t\t\t\t\t\t\t\t\t\t\t</td>\n' +
       '                                        </tr>\n' +
       '                                    </table>\n' +
@@ -311,7 +311,7 @@ function _buildValidationMessage (uri: string): string {
       '                                     <table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: auto;">\n' +
       '                                         <tr>\n' +
       '                                             <td class="button-td button-td-primary" style="border-radius: 24px; background: #8180BF;">\n' +
-      '                                                  <a class="button-a button-a-primary" href="\n' + uri + '" style="background: #8180BF; border: 1px solid #8180BF; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 24px;">Confirm my email address</a>\n' +
+      '                                                  <a class="button-a button-a-primary" href="\n' + uriEn + '" style="background: #8180BF; border: 1px solid #8180BF; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #ffffff; display: block; border-radius: 24px;">Confirm my email address</a>\n' +
       '                                             </td>\n' +
       '                                         </tr>\n' +
       '                                     </table>\n' +

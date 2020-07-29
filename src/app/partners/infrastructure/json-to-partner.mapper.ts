@@ -10,7 +10,8 @@ function _toOffer (offer: any) : Partner.Offer {
       productCode: '',
       productVersion: '',
       contractualTerms: '',
-      ipid: ''
+      ipid: '',
+      operationalCodes: []
     }
   }
   return {
@@ -19,7 +20,8 @@ function _toOffer (offer: any) : Partner.Offer {
     productCode: offer.productCode,
     productVersion: offer.productVersion,
     contractualTerms: offer.contractualTerms,
-    ipid: offer.ipid
+    ipid: offer.ipid,
+    operationalCodes: offer.operationalCodes
   }
 }
 

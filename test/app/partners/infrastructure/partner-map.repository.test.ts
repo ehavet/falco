@@ -4,6 +4,7 @@ import { PartnerNotFoundError } from '../../../../src/app/partners/domain/partne
 import { Partner } from '../../../../src/app/partners/domain/partner'
 import { Quote } from '../../../../src/app/quotes/domain/quote'
 import { PartnerRepository } from '../../../../src/app/partners/domain/partner.repository'
+import { OperationalCode } from '../../../../src/app/pricing/domain/operational-code'
 
 const partnerJson = {
   partnerOne: {
@@ -24,6 +25,7 @@ const partnerJson = {
       pricingMatrix: [
         [1, { monthlyPrice: 3.30, defaultDeductible: 120, defaultCeiling: 5000 }]
       ],
+      operationalCodes: ['SEMESTER1', 'FULLYEAR'],
       productCode: 'MRH_Etudiant',
       productVersion: '1.0',
       contractualTerms: '/path/to/contractual/terms',
@@ -49,6 +51,7 @@ const partnerJson = {
         [1, { monthlyPrice: 4.52, defaultDeductible: 120, defaultCeiling: 5000 }],
         [2, { monthlyPrice: 6.95, defaultDeductible: 150, defaultCeiling: 7000 }]
       ],
+      operationalCodes: ['SEMESTER2', 'FULLYEAR'],
       productCode: 'MRH_Etudiant',
       productVersion: '1.0',
       contractualTerms: '/path/to/contractual/terms',
@@ -92,7 +95,8 @@ describe('Partner Map Repository', async () => {
             productCode: 'MRH_Etudiant',
             productVersion: '1.0',
             contractualTerms: '/path/to/contractual/terms',
-            ipid: '/path/to/ipid'
+            ipid: '/path/to/ipid',
+            operationalCodes: ['SEMESTER1', 'FULLYEAR']
           }
         })
     })
@@ -148,6 +152,27 @@ describe('Partner Map Repository', async () => {
     it('should throw an error if partner does not exist', async () => {
       // When
       const promise = partnerMapRepository.getCallbackUrl('unknownPartner')
+
+      // Then
+      return expect(promise).to.be.rejectedWith(PartnerNotFoundError)
+    })
+  })
+
+  describe('#getOperationalCodes', async () => {
+    it('should return the partner available operational codes', async () => {
+      // When
+      const operationalCodes: Array<OperationalCode> = await partnerMapRepository.getOperationalCodes('partnerTwo')
+
+      // Then
+      expect(operationalCodes).to.deep.equal([
+        OperationalCode.SEMESTER2,
+        OperationalCode.FULLYEAR
+      ])
+    })
+
+    it('should throw an error if partner does not exist', async () => {
+      // When
+      const promise = partnerMapRepository.getOperationalCodes('unknownPartner')
 
       // Then
       return expect(promise).to.be.rejectedWith(PartnerNotFoundError)

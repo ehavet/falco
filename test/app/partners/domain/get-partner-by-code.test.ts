@@ -18,7 +18,7 @@ describe('Get partner by code', async () => {
       }]
     }
 
-    const partnerRepository = { getByCode: sinon.stub(), getOffer: sinon.stub(), getCallbackUrl: sinon.stub() }
+    const partnerRepository = { getByCode: sinon.stub(), getOffer: sinon.stub(), getCallbackUrl: sinon.stub(), getOperationalCodes: sinon.stub() }
     partnerRepository.getByCode.withArgs('myPartner').resolves(expectedPartner)
     const getPartnerByCode : GetPartnerByCode = GetPartnerByCode.factory(partnerRepository)
 

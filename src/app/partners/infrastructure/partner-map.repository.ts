@@ -38,8 +38,8 @@ export class PartnerMapRepository implements PartnerRepository {
     return Promise.resolve(partner.callbackUrl)
   }
 
-  // @ts-ignore
   async getOperationalCodes (partnerCode: string): Promise<Array<OperationalCode>> {
-    throw new Error('Not implemented Yet')
+    const partner: Partner = await this.getByCode(partnerCode)
+    return Promise.resolve(partner.offer!.operationalCodes)
   }
 }

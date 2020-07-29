@@ -63,4 +63,42 @@ describe('Prices - Usecase - Compute price with operational code', async () => {
       monthlyPrice: 5.82
     })
   })
+
+  it('should compute premium on 5 months if provided operational code is SEMESTER2', async () => {
+    // Given
+    const policyId = 'APP174635432987'
+    const policy = createPolicyFixture({ id: policyId, partnerCode: 'My Partner' })
+    const computePriceWithOperationalCodeCommand = { policyId, operationalCode: 'SEMESTER2' }
+    const computePriceWithOperationalCode = ComputePriceWithOperationalCode.factory(policyRepository, partnerRepository)
+
+    policyRepository.get.withArgs(policyId).resolves(policy)
+    partnerRepository.getOperationalCodes.withArgs(policy.partnerCode).resolves([OperationalCode.SEMESTER1, OperationalCode.SEMESTER2])
+    // When
+    const price: Price = await computePriceWithOperationalCode(computePriceWithOperationalCodeCommand)
+    // Then
+    return expect(price).to.deep.equal({
+      premium: 29.1,
+      nbMonthsDue: 5,
+      monthlyPrice: 5.82
+    })
+  })
+
+  it('should compute premium on 10 months if provided operational code is FULLYEAR', async () => {
+    // Given
+    const policyId = 'APP174635432987'
+    const policy = createPolicyFixture({ id: policyId, partnerCode: 'My Partner' })
+    const computePriceWithOperationalCodeCommand = { policyId, operationalCode: 'FULLYEAR' }
+    const computePriceWithOperationalCode = ComputePriceWithOperationalCode.factory(policyRepository, partnerRepository)
+
+    policyRepository.get.withArgs(policyId).resolves(policy)
+    partnerRepository.getOperationalCodes.withArgs(policy.partnerCode).resolves([OperationalCode.FULLYEAR])
+    // When
+    const price: Price = await computePriceWithOperationalCode(computePriceWithOperationalCodeCommand)
+    // Then
+    return expect(price).to.deep.equal({
+      premium: 58.20,
+      nbMonthsDue: 10,
+      monthlyPrice: 5.82
+    })
+  })
 })

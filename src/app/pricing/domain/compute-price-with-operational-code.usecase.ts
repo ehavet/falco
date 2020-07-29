@@ -20,8 +20,10 @@ export namespace ComputePriceWithOperationalCode {
         if (partnerOperationCodes.includes(operationalCode)) {
           switch (operationalCode) {
             case OperationalCode.SEMESTER1:
-              return _getPriceForSemester1Code(policy.insurance.estimate.monthlyPrice)
-            default: throw new Error('not implemented')
+            case OperationalCode.SEMESTER2:
+              return _getPriceForMonthsDue(5, policy.insurance.estimate.monthlyPrice)
+            case OperationalCode.FULLYEAR:
+              return _getPriceForMonthsDue(10, policy.insurance.estimate.monthlyPrice)
           }
         }
         throw new OperationalCodeNotApplicableError(computePriceWithOperationalCodeCommand.operationalCode, policy.partnerCode)
@@ -29,7 +31,6 @@ export namespace ComputePriceWithOperationalCode {
     }
 }
 
-function _getPriceForSemester1Code (monthlyPrice: number) {
-  const nbMonthsDue: number = 5
+function _getPriceForMonthsDue (nbMonthsDue: number, monthlyPrice: number) {
   return { premium: nbMonthsDue * monthlyPrice, nbMonthsDue, monthlyPrice }
 }

@@ -4,8 +4,11 @@ import {
   ApplyOperationCodeOnPolicy,
   ApplyOperationCodeOnPolicyCommand
 } from '../../../../src/app/policies/domain/apply-operation-code-on-policy.usecase'
-import { SinonStubbedInstance } from 'sinon'
+import { SinonStubbedInstance, SinonStubbedMember } from 'sinon'
 import { PolicyRepository } from '../../../../src/app/policies/domain/policy.repository'
+import { OperationCodeNotApplicableError } from '../../../../src/app/pricing/domain/operation-code.errors'
+import { ComputePriceWithOperationCodeCommand } from '../../../../src/app/pricing/domain/compute-price-with-operation-code-command'
+import { ComputePriceWithOperationCode } from '../../../../src/app/pricing/domain/compute-price-with-operation-code.usecase'
 
 describe('Policies - Usecase - Apply operation code on policy', async () => {
   const policyRepository: SinonStubbedInstance<PolicyRepository> = {
@@ -16,13 +19,14 @@ describe('Policies - Usecase - Apply operation code on policy', async () => {
     updateAfterPayment: sinon.stub(),
     updateAfterSignature: sinon.stub()
   }
+  const computePriceWithOperationCode : SinonStubbedMember<ComputePriceWithOperationCode> = sinon.stub()
 
   it('should throw an error if the policy does not exist', async () => {
     // Given
     const policyId = 'APP658473092'
     const applyOperationCodeOnPolicyCommand : ApplyOperationCodeOnPolicyCommand =
             { policyId, operationCode: 'SEMESTER1' }
-    const applyOperationCodeOnPolicy = ApplyOperationCodeOnPolicy.factory(policyRepository)
+    const applyOperationCodeOnPolicy = ApplyOperationCodeOnPolicy.factory(policyRepository, computePriceWithOperationCode)
     policyRepository.get.withArgs(policyId).rejects(new PolicyNotFoundError(policyId))
 
     // When
@@ -30,5 +34,23 @@ describe('Policies - Usecase - Apply operation code on policy', async () => {
 
     // Then
     return expect(promise).to.be.rejectedWith(PolicyNotFoundError)
+  })
+
+  it('should throw an error if the operation code does not exist', async () => {
+    // Given
+    const policyId = 'APP658473092'
+    const applyOperationCodeCommand : ApplyOperationCodeOnPolicyCommand =
+        { policyId, operationCode: 'SEMESTER1' }
+    const applyOperationCodeOnPolicy = ApplyOperationCodeOnPolicy.factory(policyRepository, computePriceWithOperationCode)
+    policyRepository.get.withArgs(policyId).resolves()
+
+    const computePriceCommand : ComputePriceWithOperationCodeCommand = { policyId, operationCode: 'SEMESTER1' }
+    computePriceWithOperationCode.withArgs(computePriceCommand).rejects(new OperationCodeNotApplicableError('SEMESTER1', 'partner'))
+
+    // When
+    const promise = applyOperationCodeOnPolicy(applyOperationCodeCommand)
+
+    // Then
+    return expect(promise).to.be.rejectedWith(OperationCodeNotApplicableError)
   })
 })

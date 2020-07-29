@@ -11,7 +11,7 @@ function _toOffer (offer: any) : Partner.Offer {
       productVersion: '',
       contractualTerms: '',
       ipid: '',
-      operationalCodes: []
+      operationCodes: []
     }
   }
   return {
@@ -21,7 +21,7 @@ function _toOffer (offer: any) : Partner.Offer {
     productVersion: offer.productVersion,
     contractualTerms: offer.contractualTerms,
     ipid: offer.ipid,
-    operationalCodes: offer.operationalCodes
+    operationCodes: offer.operationCodes
   }
 }
 

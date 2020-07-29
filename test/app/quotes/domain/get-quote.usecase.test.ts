@@ -8,7 +8,7 @@ import { NoPartnerInsuranceForRiskError } from '../../../../src/app/quotes/domai
 describe('Usecase - Get Quote', async () => {
   let getQuote
   const quoteRepository = { save: sinon.mock(), get: sinon.stub() }
-  const partnerRepository = { getByCode: sinon.stub(), getOffer: sinon.stub(), getCallbackUrl: sinon.stub(), getOperationalCodes: sinon.stub() }
+  const partnerRepository = { getByCode: sinon.stub(), getOffer: sinon.stub(), getCallbackUrl: sinon.stub(), getOperationCodes: sinon.stub() }
   const partnerOffer : Partner.Offer = {
     pricingMatrix: new Map([
       [1, { monthlyPrice: 4.39, defaultDeductible: 120, defaultCeiling: 5000 }],
@@ -19,7 +19,7 @@ describe('Usecase - Get Quote', async () => {
     productVersion: '1.0',
     contractualTerms: '/path/to/contractual/terms',
     ipid: '/path/to/ipid',
-    operationalCodes: []
+    operationCodes: []
   }
   const expectedQuote: Quote = {
     id: '',

@@ -1,5 +1,5 @@
 import { Quote } from '../../quotes/domain/quote'
-import { OperationalCode } from '../../pricing/domain/operational-code'
+import { OperationCode } from '../../pricing/domain/operation-code'
 
 export interface Partner {
     code: string,
@@ -20,7 +20,7 @@ export namespace Partner {
         productVersion: string,
         contractualTerms: string,
         ipid: string,
-        operationalCodes: Array<OperationalCode>
+        operationCodes: Array<OperationCode>
     }
 
     export type RoomCount = number

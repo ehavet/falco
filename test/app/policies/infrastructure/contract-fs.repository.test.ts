@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 import fs from 'fs'
 import fsx from 'fs-extra'
 import path from 'path'
+import pdftk from 'node-pdftk'
 import { createPolicyFixture } from '../fixtures/policy.fixture'
 import { Policy } from '../../../../src/app/policies/domain/policy'
 import { config, expect } from '../../../test-utils'
@@ -13,6 +14,7 @@ import { Contract } from '../../../../src/app/policies/domain/contract/contract'
 import { ContractFsRepository } from '../../../../src/app/policies/infrastructure/contract/contract-fs.repository'
 import { SpecificTermsGenerator } from '../../../../src/app/policies/domain/specific-terms/specific-terms.generator'
 import { SpecificTermsPdfGenerator } from '../../../../src/app/policies/infrastructure/specific-terms-pdf/specific-terms-pdf.generator'
+import { SignedContractNotFoundError } from '../../../../src/app/policies/domain/contract/contract.errors'
 
 describe('Policies - Infra - Contract FS Repository', async () => {
   const documentsFolderPath: string = config.get('FALCO_API_DOCUMENTS_STORAGE_FOLDER')
@@ -73,6 +75,29 @@ describe('Policies - Infra - Contract FS Repository', async () => {
 
       // Then
       expect(savedContract).to.equal(contractToSave)
+    })
+  })
+
+  describe('#getSignedContract', async () => {
+    it('should return the found signed contract', async () => {
+      // Given
+      await contractPdfRepository.saveSignedContract(contractToSave)
+
+      // When
+      const signedContractFound = await contractPdfRepository.getSignedContract(contractToSave.name)
+
+      // Then
+      const signedContractPdfBuffer = await pdftk.input(signedContractFound.buffer).uncompress().output()
+      expect(signedContractFound.name).to.equal('Appenin_Contrat_assurance_habitation_APP753210859.pdf')
+      expect(signedContractPdfBuffer.includes('n\\260APP 753 210 859')).to.be.true
+    })
+
+    it('should throw a not found error if no specific terms found', async () => {
+      // When
+      const promise = contractPdfRepository.getSignedContract('not-existing-contract.pdf')
+
+      // Then
+      return expect(promise).to.be.rejectedWith(SignedContractNotFoundError)
     })
   })
 })

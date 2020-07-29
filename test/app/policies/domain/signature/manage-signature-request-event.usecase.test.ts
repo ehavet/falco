@@ -16,7 +16,7 @@ describe('Signature - Usecase - Manage Signature Request Event', async () => {
   const now = new Date('2020-01-05T10:09:08Z')
   const signatureRequestEventValidator: SinonStubbedInstance<SignatureRequestEventValidator> = { isValid: sinon.stub() }
   const policyRepository: SinonStubbedInstance<PolicyRepository> = { save: sinon.stub(), isIdAvailable: sinon.stub(), get: sinon.mock(), setEmailValidationDate: sinon.mock(), updateAfterPayment: sinon.mock(), updateAfterSignature: sinon.mock() }
-  const contractRepository: SinonStubbedInstance<ContractRepository> = { saveTempContract: sinon.stub(), saveSignedContract: sinon.mock() }
+  const contractRepository: SinonStubbedInstance<ContractRepository> = { saveTempContract: sinon.stub(), saveSignedContract: sinon.mock(), getSignedContract: sinon.stub() }
   const signatureProvider: SinonStubbedInstance<SignatureRequestProvider> = { create: sinon.stub(), getSignedContract: sinon.mock() }
   const logger: any = { trace: () => {} }
   const manageSignatureRequestEvent: ManageSignatureRequestEvent = ManageSignatureRequestEvent.factory(signatureRequestEventValidator, signatureProvider, policyRepository, contractRepository, logger)

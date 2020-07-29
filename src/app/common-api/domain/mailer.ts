@@ -1,3 +1,4 @@
+
 export interface MailerResponse {
     messageId: string
 }
@@ -8,6 +9,19 @@ export interface Email {
     readonly subject: string,
     readonly messageText?: string,
     readonly messageHtml?: string
+    readonly attachments?: (Email.AttachedBuffer|Email.AttachedFile)[]
+}
+
+export namespace Email {
+    export interface AttachedBuffer {
+        readonly filename: string,
+        readonly content: Buffer
+    }
+
+    export interface AttachedFile {
+        readonly filename: string,
+        readonly path: string
+    }
 }
 
 export interface Mailer {

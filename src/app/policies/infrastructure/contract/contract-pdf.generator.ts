@@ -8,7 +8,7 @@ const SIGNATURE_PAGE_FILE_NAME = 'Appenin_Page_Signature_07_20.pdf'
 
 export class ContractPdfGenerator implements ContractGenerator {
   async generate (policyId: string, specificTerms: SpecificTerms): Promise<any> {
-    const contractName: string = this.generateName(policyId)
+    const contractName: string = this.getContractName(policyId)
 
     const [signaturePageBuffer, contractualTermsBuffer] = await Promise.all([
       this.readFile(SIGNATURE_PAGE_FILE_NAME),
@@ -27,7 +27,7 @@ export class ContractPdfGenerator implements ContractGenerator {
     return { name: contractName, buffer }
   }
 
-  private generateName (policyId: string): string {
+  getContractName (policyId: string): string {
     return `Appenin_Contrat_assurance_habitation_${policyId}.pdf`
   }
 

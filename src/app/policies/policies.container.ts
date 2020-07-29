@@ -40,6 +40,9 @@ import { ManageSignatureRequestEvent } from './domain/signature/manage-signature
 import { SignatureRequestEventValidator } from './domain/signature/signature-request-event-validator'
 import { HelloSignRequestEventValidator } from './infrastructure/signature/hello-sign-request-event.validator'
 import { logger } from '../../libs/logger'
+import { Mailer } from '../common-api/domain/mailer'
+import { Nodemailer } from '../common-api/infrastructure/nodemailer.mailer'
+import { nodemailerTransporter } from '../../libs/nodemailer'
 const config = require('../../config')
 
 export interface Container {
@@ -66,13 +69,14 @@ const specificTermsGenerator: SpecificTermsGenerator = new SpecificTermsPdfGener
 const contractRepository: ContractRepository = new ContractFsRepository(config)
 const contractGenerator: ContractGenerator = new ContractPdfGenerator()
 const signatureRequestEventValidator: SignatureRequestEventValidator = new HelloSignRequestEventValidator(helloSignConfig)
+const mailer: Mailer = new Nodemailer(nodemailerTransporter)
 
 const createPaymentIntentForPolicy: CreatePaymentIntentForPolicy =
     CreatePaymentIntentForPolicy.factory(paymentProcessor, policyRepository)
 const sendValidationLinkToEmailAddress: SendValidationLinkToEmailAddress = emailValidationContainer.SendValidationLinkToEmailAddress
 const createPolicy: CreatePolicy = CreatePolicy.factory(policyRepository, quoteRepository, partnerRepository, sendValidationLinkToEmailAddress)
 const confirmPaymentIntentForPolicy: ConfirmPaymentIntentForPolicy =
-    ConfirmPaymentIntentForPolicy.factory(policyRepository)
+    ConfirmPaymentIntentForPolicy.factory(policyRepository, certificateRepository, contractGenerator, contractRepository, mailer)
 const getPolicy: GetPolicy = GetPolicy.factory(policyRepository)
 const generatePolicyCertificate: GeneratePolicyCertificate = GeneratePolicyCertificate.factory(policyRepository, certificateRepository)
 const getPolicySpecificTerms: GetPolicySpecificTerms = GetPolicySpecificTerms.factory(specificTermsRepository, specificTermsGenerator)

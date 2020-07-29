@@ -1,5 +1,12 @@
 import { PolicyRepository } from './policy.repository'
 import { Policy } from './policy'
+import { CertificateRepository } from './certificate/certificate.repository'
+import { Mailer } from '../../common-api/domain/mailer'
+import { buildSubscriptionValidationEmail } from './subscription-validation-email'
+import { CertificateGenerationError } from './certificate/certificate.errors'
+import { SubscriptionValidationEmailBuildError } from './subcription-validation-email.errors'
+import { ContractRepository } from './contract/contract.repository'
+import { ContractGenerator } from './contract/contract.generator'
 
 export interface ConfirmPaymentIntentForPolicy {
     (policyId: string): Promise<void>
@@ -7,11 +14,34 @@ export interface ConfirmPaymentIntentForPolicy {
 
 export namespace ConfirmPaymentIntentForPolicy {
     export function factory (
-      policyRepository: PolicyRepository
+      policyRepository: PolicyRepository,
+      certificateRepository: CertificateRepository,
+      contractGenerator: ContractGenerator,
+      contractRepository: ContractRepository,
+      mailer: Mailer
     ): ConfirmPaymentIntentForPolicy {
       return async (policyId: string) => {
         const currentDate: Date = new Date()
         await policyRepository.updateAfterPayment(policyId, currentDate, currentDate, Policy.Status.Applicable)
+        const policy = await policyRepository.get(policyId)
+
+        let certificate
+        try {
+          certificate = await certificateRepository.generate(policy)
+        } catch (e) {
+          throw new CertificateGenerationError(policyId)
+        }
+
+        const contractFileName = contractGenerator.getContractName(policyId)
+        const signedContract = await contractRepository.getSignedContract(contractFileName)
+
+        let email
+        try {
+          email = buildSubscriptionValidationEmail(policy.contact.email, certificate, signedContract)
+        } catch (e) {
+          throw new SubscriptionValidationEmailBuildError(policyId)
+        }
+        await mailer.send(email)
       }
     }
 }

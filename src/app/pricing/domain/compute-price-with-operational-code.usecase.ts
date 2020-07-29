@@ -18,9 +18,18 @@ export namespace ComputePriceWithOperationalCode {
         const policy = await policyRepository.get(computePriceWithOperationalCodeCommand.policyId)
         const partnerOperationCodes: Array<OperationalCode> = await partnerRepository.getOperationalCodes(policy.partnerCode)
         if (partnerOperationCodes.includes(operationalCode)) {
-          throw new Error('Not yet implemented')
+          switch (operationalCode) {
+            case OperationalCode.SEMESTER1:
+              return _getPriceForSemester1Code(policy.insurance.estimate.monthlyPrice)
+            default: throw new Error('not implemented')
+          }
         }
         throw new OperationalCodeNotApplicableError(computePriceWithOperationalCodeCommand.operationalCode, policy.partnerCode)
       }
     }
+}
+
+function _getPriceForSemester1Code (monthlyPrice: number) {
+  const nbMonthsDue: number = 5
+  return { premium: nbMonthsDue * monthlyPrice, nbMonthsDue, monthlyPrice }
 }

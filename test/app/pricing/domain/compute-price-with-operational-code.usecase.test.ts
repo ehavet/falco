@@ -7,6 +7,7 @@ import { PartnerRepository } from '../../../../src/app/partners/domain/partner.r
 import { OperationalCode } from '../../../../src/app/pricing/domain/operational-code'
 import { createPolicyFixture } from '../../policies/fixtures/policy.fixture'
 import { OperationalCodeNotApplicableError } from '../../../../src/app/pricing/domain/operational-code.errors'
+import { Price } from '../../../../src/app/pricing/domain/price'
 
 describe('Prices - Usecase - Compute price with operational code', async () => {
   const policyRepository: SinonStubbedInstance<PolicyRepository> = { get: sinon.stub(), save: sinon.stub(), isIdAvailable: sinon.stub(), setEmailValidationDate: sinon.stub(), updateAfterPayment: sinon.stub(), updateAfterSignature: sinon.stub() }
@@ -42,5 +43,24 @@ describe('Prices - Usecase - Compute price with operational code', async () => {
 
     // Then
     return expect(promise).to.be.rejectedWith(OperationalCodeNotApplicableError, 'The operational code FULLYEAR is not applicable for partner : My Partner')
+  })
+
+  it('should compute premium on 5 months if provided operational code is SEMESTER1', async () => {
+    // Given
+    const policyId = 'APP174635432987'
+    const policy = createPolicyFixture({ id: policyId, partnerCode: 'My Partner' })
+    const computePriceWithOperationalCodeCommand = { policyId, operationalCode: 'SEMESTER1' }
+    const computePriceWithOperationalCode = ComputePriceWithOperationalCode.factory(policyRepository, partnerRepository)
+
+    policyRepository.get.withArgs(policyId).resolves(policy)
+    partnerRepository.getOperationalCodes.withArgs(policy.partnerCode).resolves([OperationalCode.SEMESTER1, OperationalCode.SEMESTER2])
+    // When
+    const price: Price = await computePriceWithOperationalCode(computePriceWithOperationalCodeCommand)
+    // Then
+    return expect(price).to.deep.equal({
+      premium: 29.1,
+      nbMonthsDue: 5,
+      monthlyPrice: 5.82
+    })
   })
 })

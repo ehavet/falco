@@ -2,6 +2,7 @@ import { Partner } from '../domain/partner'
 import { PartnerRepository } from '../domain/partner.repository'
 import { PartnerNotFoundError } from '../domain/partner.errors'
 import { toPartner } from './json-to-partner.mapper'
+import { OperationCode } from '../../pricing/domain/operation-code'
 
 const objectToMap = object => {
   const map = new Map<string, Partner>()
@@ -35,5 +36,10 @@ export class PartnerMapRepository implements PartnerRepository {
   async getCallbackUrl (partnerCode: string): Promise<string> {
     const partner: Partner = await this.getByCode(partnerCode)
     return Promise.resolve(partner.callbackUrl)
+  }
+
+  async getOperationCodes (partnerCode: string): Promise<Array<OperationCode>> {
+    const partner: Partner = await this.getByCode(partnerCode)
+    return Promise.resolve(partner.offer!.operationCodes)
   }
 }

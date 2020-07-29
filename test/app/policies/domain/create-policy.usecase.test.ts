@@ -18,7 +18,7 @@ describe('Policies - Usecase - Create policy', async () => {
   const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({ quoteId: quote.id, startDate: null })
   const policyRepository: SinonStubbedInstance<PolicyRepository> = { save: sinon.stub(), isIdAvailable: sinon.stub(), get: sinon.stub(), setEmailValidationDate: sinon.stub(), updateAfterPayment: sinon.mock(), updateAfterSignature: sinon.stub() }
   const quoteRepository: SinonStubbedInstance<QuoteRepository> = { save: sinon.stub(), get: sinon.stub() }
-  const partnerRepository: SinonStubbedInstance<PartnerRepository> = { getByCode: sinon.stub(), getOffer: sinon.stub(), getCallbackUrl: sinon.stub() }
+  const partnerRepository: SinonStubbedInstance<PartnerRepository> = { getByCode: sinon.stub(), getOffer: sinon.stub(), getCallbackUrl: sinon.stub(), getOperationCodes: sinon.stub() }
   const sendValidationLinkToEmailAddress = sinon.stub()
   const createPolicy: CreatePolicy = CreatePolicy.factory(policyRepository, quoteRepository, partnerRepository, sendValidationLinkToEmailAddress)
 
@@ -34,7 +34,8 @@ describe('Policies - Usecase - Create policy', async () => {
       productCode: 'APP321',
       productVersion: 'version',
       contractualTerms: 'terms',
-      ipid: 'ipid'
+      ipid: 'ipid',
+      operationCodes: []
     })
   })
 

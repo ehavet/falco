@@ -13,6 +13,10 @@ describe('Signature Event Handler - API - E2E', async () => {
       httpServer = await newProdLikeServer()
     })
 
+    after(async () => {
+      await PolicySqlModel.destroy({ truncate: true, cascade: true })
+    })
+
     it('should update the policy if a signed event is received', async () => {
       // Given
       const signatureRequestSignedEvent = signatureRequestEventJSONFixture()
@@ -33,7 +37,6 @@ describe('Signature Event Handler - API - E2E', async () => {
       // Then
       const updatedPolicy = await policyRepository.get(policyId)
       expect(updatedPolicy.status).to.equal(Policy.Status.Signed)
-      await PolicySqlModel.destroy({ truncate: true, cascade: true })
     })
   })
 })

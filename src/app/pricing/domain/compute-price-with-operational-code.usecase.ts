@@ -1,6 +1,9 @@
 import { Price } from './price'
 import { ComputePriceWithOperationalCodeCommand } from './compute-price-with-operational-code-command'
 import { PolicyRepository } from '../../policies/domain/policy.repository'
+import { OperationalCode } from './operational-code'
+import { PartnerRepository } from '../../partners/domain/partner.repository'
+import { OperationalCodeNotApplicableError } from './operational-code.errors'
 
 export interface ComputePriceWithOperationalCode {
     (computePriceWithOperationalCodeCommand: ComputePriceWithOperationalCodeCommand): Promise<Price>
@@ -8,10 +11,16 @@ export interface ComputePriceWithOperationalCode {
 
 export namespace ComputePriceWithOperationalCode {
 
-    export function factory (policyRepository: PolicyRepository): ComputePriceWithOperationalCode {
+    export function factory (policyRepository: PolicyRepository, partnerRepository: PartnerRepository): ComputePriceWithOperationalCode {
       return async (computePriceWithOperationalCodeCommand: ComputePriceWithOperationalCodeCommand): Promise<Price> => {
+        const operationalCode: OperationalCode = OperationalCode[computePriceWithOperationalCodeCommand.operationalCode]
+
         const policy = await policyRepository.get(computePriceWithOperationalCodeCommand.policyId)
-        throw new Error(policy.toString())
+        const partnerOperationCodes: Array<OperationalCode> = await partnerRepository.getOperationalCodes(policy.partnerCode)
+        if (partnerOperationCodes.includes(operationalCode)) {
+          throw new Error('Not yet implemented')
+        }
+        throw new OperationalCodeNotApplicableError(computePriceWithOperationalCodeCommand.operationalCode, policy.partnerCode)
       }
     }
 }

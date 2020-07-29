@@ -47,7 +47,8 @@
       "productCode": "APP658",
       "productVersion": "2020-07-15",
       "contractualTerms": "/docs/Appenin_Conditions_Generales_assurance_habitation_APP658.pdf",
-      "ipid": "/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf"
+      "ipid": "/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf",
+      "operationalCodes": ["SEMESTER", "SEMESTER2", "YEARLY"]
     }
   }
 }

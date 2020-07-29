@@ -22,7 +22,7 @@ export interface Policy {
     paymentDate?: Date,
     subscriptionDate?: Date,
     emailValidationDate?: Date,
-    status: Policy.Status
+    readonly status: Policy.Status
 }
 
 export namespace Policy {

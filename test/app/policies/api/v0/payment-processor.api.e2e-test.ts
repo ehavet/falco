@@ -26,7 +26,7 @@ describe('PaymentProcessor - API - E2E', async () => {
   })
 
   describe('POST /internal/v0/payment-processor/event-handler/', async () => {
-    it('should update policy subscription date, payment date and status', async () => {
+    it('should update policy and send subscription validation email', async () => {
       // Given
       const policyRepository = new PolicySqlRepository()
       const policyId = 'APP463109486'

@@ -4,6 +4,7 @@ import fsx from 'fs-extra'
 import { Config } from '../../../../config'
 import { ContractRepository } from '../../domain/contract/contract.repository'
 import { Contract } from '../../domain/contract/contract'
+import { SignedContractNotFoundError } from '../../domain/contract/contract.errors'
 
 export class ContractFsRepository implements ContractRepository {
   private tempContractsFolderPath: string
@@ -33,6 +34,21 @@ export class ContractFsRepository implements ContractRepository {
       .output(signedContractFilePath)
 
     return contract
+  }
+
+  async getSignedContract (contractFileName: string): Promise<Contract> {
+    const contractFilePath: string = this.getSignedContractsFilePath(contractFileName)
+    try {
+      const buffer = await pdftk
+        .input(contractFilePath)
+        .output()
+      return { name: contractFileName, buffer }
+    } catch (error) {
+      if (error.includes('Error: Unable to find file.')) {
+        throw new SignedContractNotFoundError(contractFileName)
+      }
+      throw error
+    }
   }
 
   private getTempContractsFilePath (contractName: string) {

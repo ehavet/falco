@@ -5,3 +5,11 @@ export class CannotGeneratePolicyNotApplicableError extends Error {
     this.name = 'CannotGeneratePolicyNotApplicableError'
   }
 }
+
+export class CertificateGenerationError extends Error {
+  constructor (policyId: string) {
+    const message: string = `An error occurred while generating certificate for policy: ${policyId}`
+    super(message)
+    this.name = 'CertificateGenerationError'
+  }
+}

@@ -1,11 +1,11 @@
+import dayjs from 'dayjs'
 import { expect, sinon } from '../../../test-utils'
 import { PolicyNotFoundError } from '../../../../src/app/policies/domain/policies.errors'
 import {
   ApplyOperationCodeOnPolicy,
   ApplyOperationCodeOnPolicyCommand
 } from '../../../../src/app/policies/domain/apply-operation-code-on-policy.usecase'
-import { SinonStubbedInstance, SinonStubbedMember } from 'sinon'
-import { PolicyRepository } from '../../../../src/app/policies/domain/policy.repository'
+import { SinonStubbedMember } from 'sinon'
 import { OperationCodeNotApplicableError } from '../../../../src/app/pricing/domain/operation-code.errors'
 import { ComputePriceWithOperationCodeCommand } from '../../../../src/app/pricing/domain/compute-price-with-operation-code-command'
 import { ComputePriceWithOperationCode } from '../../../../src/app/pricing/domain/compute-price-with-operation-code.usecase'
@@ -15,7 +15,7 @@ import { createPolicyFixture } from '../fixtures/policy.fixture'
 import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles'
 
 describe('Policies - Usecase - Apply operation code on policy', async () => {
-  const policyRepository: SinonStubbedInstance<PolicyRepository> = policyRepositoryStub()
+  const policyRepository = policyRepositoryStub()
   const computePriceWithOperationCode : SinonStubbedMember<ComputePriceWithOperationCode> = sinon.stub()
 
   it('should throw an error if the policy does not exist', async () => {
@@ -51,18 +51,24 @@ describe('Policies - Usecase - Apply operation code on policy', async () => {
     return expect(promise).to.be.rejectedWith(OperationCodeNotApplicableError)
   })
 
-  it('should update and save the policy with the new price', async () => {
+  it('should update and save the policy with the new price and term end date', async () => {
     // Given
     const policyId = 'APP658473092'
     const policy = createPolicyFixture({ id: policyId })
     const applyOperationCodeCommand : ApplyOperationCodeOnPolicyCommand =
         { policyId, operationCode: 'SEMESTER1' }
     const applyOperationCodeOnPolicy = ApplyOperationCodeOnPolicy.factory(policyRepository, computePriceWithOperationCode)
-    policyRepository.get.withArgs(policyId).resolves()
+    policyRepository.get.withArgs(policyId).resolves(policy)
 
     const computePriceCommand : ComputePriceWithOperationCodeCommand = { policyId, operationCode: 'SEMESTER1' }
     const newPrice: Price = { premium: 75.32, nbMonthsDue: 5, monthlyPrice: policy.insurance.estimate.monthlyPrice }
     computePriceWithOperationCode.withArgs(computePriceCommand).resolves(newPrice)
+
+    policy.premium = 75.32
+    policy.nbMonthsDue = 5
+    policy.termEndDate = dayjs(policy.termStartDate).add(5, 'month').toDate()
+    policyRepository.update = sinon.mock()
+    policyRepository.update.withExactArgs(policy).resolves()
 
     // When
     const policyUpdated: Policy = await applyOperationCodeOnPolicy(applyOperationCodeCommand)
@@ -70,5 +76,6 @@ describe('Policies - Usecase - Apply operation code on policy', async () => {
     // Then
     expect(policyUpdated.premium).to.equal(newPrice.premium)
     expect(policyUpdated.nbMonthsDue).to.equal(newPrice.nbMonthsDue)
+    expect(policyUpdated.termEndDate).to.deep.equal(dayjs(policy.termStartDate).add(newPrice.nbMonthsDue, 'month').toDate())
   })
 })

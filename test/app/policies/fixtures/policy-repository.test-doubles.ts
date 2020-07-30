@@ -1,6 +1,4 @@
 import { sinon } from '../../../test-utils'
-import { SinonStubbedInstance } from 'sinon'
-import { PolicyRepository } from '../../../../src/app/policies/domain/policy.repository'
 
 export function policyRepositoryMock (attr = {}) {
   return {
@@ -15,7 +13,7 @@ export function policyRepositoryMock (attr = {}) {
   }
 }
 
-export function policyRepositoryStub (attr = {}) : SinonStubbedInstance<PolicyRepository> {
+export function policyRepositoryStub (attr = {}) {
   return {
     save: sinon.stub(),
     isIdAvailable: sinon.stub(),

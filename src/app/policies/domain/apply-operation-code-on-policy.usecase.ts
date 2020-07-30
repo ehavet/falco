@@ -1,6 +1,7 @@
 import { Policy } from './policy'
 import { PolicyRepository } from './policy.repository'
 import { ComputePriceWithOperationCode } from '../../pricing/domain/compute-price-with-operation-code.usecase'
+import dayjs from 'dayjs'
 
 export interface ApplyOperationCodeOnPolicy {
     (applyOperationCodeOnPolicyCommand: ApplyOperationCodeOnPolicyCommand): Promise<Policy>
@@ -20,7 +21,13 @@ export namespace ApplyOperationCodeOnPolicy {
 
         const policy = await policyRepository.get(policyId)
 
-        await computePriceWithOperationalCode({ policyId, operationCode })
+        const price = await computePriceWithOperationalCode({ policyId, operationCode })
+
+        policy.premium = price.premium
+        policy.nbMonthsDue = price.nbMonthsDue
+        policy.termEndDate = dayjs(policy.termStartDate).add(price.nbMonthsDue, 'month').toDate()
+
+        await policyRepository.update(policy)
         return policy
       }
     }

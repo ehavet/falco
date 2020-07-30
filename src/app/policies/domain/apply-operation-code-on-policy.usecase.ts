@@ -10,7 +10,8 @@ export interface ApplyOperationCodeOnPolicy {
 
 export interface ApplyOperationCodeOnPolicyCommand {
     policyId: string,
-    operationCode: string
+    operationCode: string,
+    termStartDate: Date
 }
 
 export namespace ApplyOperationCodeOnPolicy {
@@ -30,7 +31,9 @@ export namespace ApplyOperationCodeOnPolicy {
 
         policy.premium = price.premium
         policy.nbMonthsDue = price.nbMonthsDue
-        policy.termEndDate = dayjs(policy.termStartDate).add(price.nbMonthsDue, 'month').toDate()
+        policy.startDate = applyOperationCodeOnPolicyCommand.termStartDate
+        policy.termStartDate = applyOperationCodeOnPolicyCommand.termStartDate
+        policy.termEndDate = dayjs(applyOperationCodeOnPolicyCommand.termStartDate).add(price.nbMonthsDue, 'month').toDate()
 
         await policyRepository.update(policy)
         return policy

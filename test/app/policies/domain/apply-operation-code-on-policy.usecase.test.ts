@@ -22,7 +22,7 @@ describe('Policies - Usecase - Apply operation code on policy', async () => {
     // Given
     const policyId = 'APP658473092'
     const applyOperationCodeOnPolicyCommand : ApplyOperationCodeOnPolicyCommand =
-            { policyId, operationCode: 'SEMESTER1' }
+            { policyId, operationCode: 'SEMESTER1', termStartDate: new Date('2020-02-12T00:00:00.000Z') }
     const applyOperationCodeOnPolicy = ApplyOperationCodeOnPolicy.factory(policyRepository, computePriceWithOperationCode)
     policyRepository.get.withArgs(policyId).rejects(new PolicyNotFoundError(policyId))
 
@@ -38,7 +38,7 @@ describe('Policies - Usecase - Apply operation code on policy', async () => {
     const policyId = 'APP658473092'
     const policy = createPolicyFixture({ id: policyId, status: Policy.Status.Signed })
     const applyOperationCodeCommand : ApplyOperationCodeOnPolicyCommand =
-        { policyId, operationCode: 'SEMESTER1' }
+        { policyId, operationCode: 'SEMESTER1', termStartDate: new Date('2020-02-12T00:00:00.000Z') }
     const applyOperationCodeOnPolicy = ApplyOperationCodeOnPolicy.factory(policyRepository, computePriceWithOperationCode)
     policyRepository.get.withArgs(policyId).resolves(policy)
 
@@ -53,7 +53,7 @@ describe('Policies - Usecase - Apply operation code on policy', async () => {
     // Given
     const policyId = 'APP658473092'
     const applyOperationCodeCommand : ApplyOperationCodeOnPolicyCommand =
-        { policyId, operationCode: 'SEMESTER1' }
+        { policyId, operationCode: 'SEMESTER1', termStartDate: new Date('2020-02-12T00:00:00.000Z') }
     const applyOperationCodeOnPolicy = ApplyOperationCodeOnPolicy.factory(policyRepository, computePriceWithOperationCode)
     policyRepository.get.withArgs(policyId).resolves(createPolicyFixture())
 
@@ -67,12 +67,13 @@ describe('Policies - Usecase - Apply operation code on policy', async () => {
     return expect(promise).to.be.rejectedWith(OperationCodeNotApplicableError)
   })
 
-  it('should update and save the policy with the new price and term end date', async () => {
+  it('should update and save the policy with the new price, term start date and term end date', async () => {
     // Given
     const policyId = 'APP658473092'
     const policy = createPolicyFixture({ id: policyId })
+    const termStartDate = new Date('2020-07-12T00:00:00.000Z')
     const applyOperationCodeCommand : ApplyOperationCodeOnPolicyCommand =
-        { policyId, operationCode: 'SEMESTER1' }
+        { policyId, operationCode: 'SEMESTER1', termStartDate }
     const applyOperationCodeOnPolicy = ApplyOperationCodeOnPolicy.factory(policyRepository, computePriceWithOperationCode)
     policyRepository.get.withArgs(policyId).resolves(policy)
 
@@ -80,9 +81,11 @@ describe('Policies - Usecase - Apply operation code on policy', async () => {
     const newPrice: Price = { premium: 75.32, nbMonthsDue: 5, monthlyPrice: policy.insurance.estimate.monthlyPrice }
     computePriceWithOperationCode.withArgs(computePriceCommand).resolves(newPrice)
 
-    policy.premium = 75.32
-    policy.nbMonthsDue = 5
-    policy.termEndDate = dayjs(policy.termStartDate).add(5, 'month').toDate()
+    const expectedPolicy = createPolicyFixture({ ...policy })
+    expectedPolicy.premium = 75.32
+    expectedPolicy.nbMonthsDue = 5
+    expectedPolicy.termStartDate = termStartDate
+    expectedPolicy.termEndDate = dayjs(termStartDate).add(5, 'month').toDate()
     policyRepository.update = sinon.mock()
     policyRepository.update.withExactArgs(policy).resolves()
 
@@ -92,6 +95,8 @@ describe('Policies - Usecase - Apply operation code on policy', async () => {
     // Then
     expect(policyUpdated.premium).to.equal(newPrice.premium)
     expect(policyUpdated.nbMonthsDue).to.equal(newPrice.nbMonthsDue)
-    expect(policyUpdated.termEndDate).to.deep.equal(dayjs(policy.termStartDate).add(newPrice.nbMonthsDue, 'month').toDate())
+    expect(policyUpdated.startDate).to.deep.equal(termStartDate)
+    expect(policyUpdated.termStartDate).to.deep.equal(termStartDate)
+    expect(policyUpdated.termEndDate).to.deep.equal(dayjs(termStartDate).add(newPrice.nbMonthsDue, 'month').toDate())
   })
 })

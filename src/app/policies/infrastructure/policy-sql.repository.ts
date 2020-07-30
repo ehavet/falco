@@ -95,8 +95,22 @@ export class PolicySqlRepository implements PolicyRepository {
     throw new PolicyNotFoundError(policyId)
   }
 
-  // @ts-ignore
+  // TODO 1: Integrate the previous specific updates into this generic one
+  // TODO 2: Refacto in order to find a beter way to update, without the need to request the db for the policy
   async update (policy: Policy): Promise<void> {
-    throw new Error('Not implemented yet')
+    const policySql: PolicySqlModel = await PolicySqlModel
+      .findByPk(policy.id, {
+        rejectOnEmpty: false, include: [{ all: true }, { model: RiskSqlModel, include: [{ all: true }] }]
+      })
+    if (policySql) {
+      policySql.premium = policy.premium
+      policySql.nbMonthsDue = policy.nbMonthsDue
+      policySql.startDate = policy.startDate
+      policySql.termStartDate = policy.termStartDate
+      policySql.termEndDate = policy.termEndDate
+      await policySql.save()
+      return Promise.resolve()
+    }
+    throw new PolicyNotFoundError(policy.id)
   }
 }

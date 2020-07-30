@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { expect, sinon } from '../../../test-utils'
-import { PolicyNotFoundError } from '../../../../src/app/policies/domain/policies.errors'
+import { PolicyNotFoundError, PolicyNotUpdatable } from '../../../../src/app/policies/domain/policies.errors'
 import {
   ApplyOperationCodeOnPolicy,
   ApplyOperationCodeOnPolicyCommand
@@ -33,13 +33,29 @@ describe('Policies - Usecase - Apply operation code on policy', async () => {
     return expect(promise).to.be.rejectedWith(PolicyNotFoundError)
   })
 
+  it('should not update the policy if it is already Signed or Payed or Applicable', async () => {
+    // Given
+    const policyId = 'APP658473092'
+    const policy = createPolicyFixture({ id: policyId, status: Policy.Status.Signed })
+    const applyOperationCodeCommand : ApplyOperationCodeOnPolicyCommand =
+        { policyId, operationCode: 'SEMESTER1' }
+    const applyOperationCodeOnPolicy = ApplyOperationCodeOnPolicy.factory(policyRepository, computePriceWithOperationCode)
+    policyRepository.get.withArgs(policyId).resolves(policy)
+
+    // When
+    const promise = applyOperationCodeOnPolicy(applyOperationCodeCommand)
+
+    // Then
+    return expect(promise).to.be.rejectedWith(PolicyNotUpdatable)
+  })
+
   it('should throw an error if the operation code does not exist', async () => {
     // Given
     const policyId = 'APP658473092'
     const applyOperationCodeCommand : ApplyOperationCodeOnPolicyCommand =
         { policyId, operationCode: 'SEMESTER1' }
     const applyOperationCodeOnPolicy = ApplyOperationCodeOnPolicy.factory(policyRepository, computePriceWithOperationCode)
-    policyRepository.get.withArgs(policyId).resolves()
+    policyRepository.get.withArgs(policyId).resolves(createPolicyFixture())
 
     const computePriceCommand : ComputePriceWithOperationCodeCommand = { policyId, operationCode: 'SEMESTER1' }
     computePriceWithOperationCode.withArgs(computePriceCommand).rejects(new OperationCodeNotApplicableError('SEMESTER1', 'partner'))

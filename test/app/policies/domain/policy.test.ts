@@ -1,4 +1,4 @@
-import { dateFaker, expect, sinon } from '../../../test-utils'
+import { dateFaker, expect } from '../../../test-utils'
 import { Policy } from '../../../../src/app/policies/domain/policy'
 import { Quote } from '../../../../src/app/quotes/domain/quote'
 import { createQuote } from '../../quotes/fixtures/quote.fixture'
@@ -6,12 +6,13 @@ import { CreatePolicyCommand } from '../../../../src/app/policies/domain/create-
 import { createCreatePolicyCommand } from '../fixtures/createPolicyCommand.fixture'
 import { PolicyRepository } from '../../../../src/app/policies/domain/policy.repository'
 import { SinonStubbedInstance } from 'sinon'
+import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles'
 
 describe('Policies - Domain', async () => {
   describe('#create', async () => {
     const now = new Date('2020-02-29T10:09:08Z')
     const expectedTermEndDate = new Date('2021-04-04T10:09:08.000Z')
-    const policyRepository: SinonStubbedInstance<PolicyRepository> = { save: sinon.stub(), isIdAvailable: sinon.stub(), get: sinon.stub(), setEmailValidationDate: sinon.stub(), updateAfterPayment: sinon.mock(), updateAfterSignature: sinon.stub() }
+    const policyRepository: SinonStubbedInstance<PolicyRepository> = policyRepositoryStub()
     const quote: Quote = createQuote()
     const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({ quoteId: quote.id })
     const productCode = 'MYP321'

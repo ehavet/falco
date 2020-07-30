@@ -8,11 +8,12 @@ import { ExpiredEmailValidationTokenError, BadEmailValidationToken } from '../..
 import { BadDecryptError } from '../../../../src/app/email-validations/infrastructure/crypto.crypter'
 import { createPolicyFixture } from '../../policies/fixtures/policy.fixture'
 import { Policy } from '../../../../src/app/policies/domain/policy'
+import { policyRepositoryMock } from '../../policies/fixtures/policy-repository.test-doubles'
 
 describe('Usecase - Get a validation callback url from a validation token', async () => {
   const now: Date = new Date('2020-02-12T00:00:00.000Z')
   const decrypter = { encrypt: sinon.mock(), decrypt: sinon.mock() }
-  const policyRepository = { save: sinon.stub(), isIdAvailable: sinon.stub(), get: sinon.mock(), setEmailValidationDate: sinon.mock(), updateAfterPayment: sinon.mock(), updateAfterSignature: sinon.mock() }
+  const policyRepository = policyRepositoryMock()
   const validationToken: ValidationToken = {
     token: '3NCRYPT3DB4S364STR1NG=='
   }

@@ -94,4 +94,9 @@ export class PolicySqlRepository implements PolicyRepository {
     }
     throw new PolicyNotFoundError(policyId)
   }
+
+  // @ts-ignore
+  async update (policy: Policy): Promise<void> {
+    throw new Error('Not implemented yet')
+  }
 }

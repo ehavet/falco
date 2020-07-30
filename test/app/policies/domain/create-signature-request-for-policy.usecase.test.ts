@@ -7,6 +7,7 @@ import { SignatureRequest } from '../../../../src/app/policies/domain/signature-
 import { ContractGenerationFailureError, SignatureRequestCreationFailureError, SpecificTermsGenerationFailureError } from '../../../../src/app/policies/domain/signature-request.errors'
 import { Policy } from '../../../../src/app/policies/domain/policy'
 import { Signer } from '../../../../src/app/policies/domain/signer'
+import { policyRepositoryMock } from '../fixtures/policy-repository.test-doubles'
 
 describe('Signature - Usecase - Create signature request for policy', async () => {
   let specificTermsGenerator
@@ -29,7 +30,7 @@ describe('Signature - Usecase - Create signature request for policy', async () =
     specificTermsRepository = { save: sinon.spy(), get: sinon.stub() }
     contractGenerator = { generate: sinon.mock() }
     contractRepository = { saveTempContract: sinon.mock(), saveSignedContract: sinon.stub() }
-    policyRepository = { save: sinon.stub(), isIdAvailable: sinon.stub(), get: sinon.mock(), setEmailValidationDate: sinon.stub(), updateAfterPayment: sinon.mock() }
+    policyRepository = policyRepositoryMock()
     signatureRequestProvider = { create: sinon.mock() }
     specificTerms = { name: 'terms', buffer: Buffer.alloc(1) }
     policy = createPolicyFixture({ id: 'APP123456789' })

@@ -1,21 +1,15 @@
 import { createPolicyFixture } from '../fixtures/policy.fixture'
 import { Policy } from '../../../../src/app/policies/domain/policy'
 import { PolicyRepository } from '../../../../src/app/policies/domain/policy.repository'
-import { expect, sinon } from '../../../test-utils'
+import { expect } from '../../../test-utils'
 import { SinonStubbedInstance } from 'sinon'
 import { GetPolicy } from '../../../../src/app/policies/domain/get-policy.usecase'
 import { PolicyNotFoundError } from '../../../../src/app/policies/domain/policies.errors'
 import { GetPolicyQuery } from '../../../../src/app/policies/domain/get-policy-query'
+import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles'
 
 describe('Policies - Usecase - Get policy', async () => {
-  const policyRepository: SinonStubbedInstance<PolicyRepository> = {
-    get: sinon.stub(),
-    save: sinon.stub(),
-    isIdAvailable: sinon.stub(),
-    setEmailValidationDate: sinon.stub(),
-    updateAfterPayment: sinon.stub(),
-    updateAfterSignature: sinon.stub()
-  }
+  const policyRepository: SinonStubbedInstance<PolicyRepository> = policyRepositoryStub()
 
   const getPolicy: GetPolicy = GetPolicy.factory(policyRepository)
 

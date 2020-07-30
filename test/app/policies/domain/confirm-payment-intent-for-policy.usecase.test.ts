@@ -11,17 +11,11 @@ import { expectedSubscriptionValidationEmail } from '../expectations/expected-su
 import { CertificateGenerationError } from '../../../../src/app/policies/domain/certificate/certificate.errors'
 import { ContractRepository } from '../../../../src/app/policies/domain/contract/contract.repository'
 import { ContractGenerator } from '../../../../src/app/policies/domain/contract/contract.generator'
+import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles'
 
 describe('PaymentProcessor - Usecase - confirm payment intent for policy', async () => {
   const now = new Date('2020-01-05T10:09:08Z')
-  const policyRepository: SinonStubbedInstance<PolicyRepository> = {
-    save: sinon.stub(),
-    isIdAvailable: sinon.stub(),
-    get: sinon.stub(),
-    setEmailValidationDate: sinon.stub(),
-    updateAfterPayment: sinon.stub(),
-    updateAfterSignature: sinon.stub()
-  }
+  const policyRepository: SinonStubbedInstance<PolicyRepository> = policyRepositoryStub()
   const certificateRepository: SinonStubbedInstance<CertificateRepository> = {
     generate: sinon.stub()
   }

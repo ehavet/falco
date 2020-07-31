@@ -12,6 +12,7 @@ import { PolicySqlRepository } from './infrastructure/policy-sql.repository'
 import { container as quoteContainer } from '../quotes/quote.container'
 import { container as emailValidationContainer } from '../email-validations/email-validations.container'
 import { container as partnerContainer } from '../partners/partner.container'
+import { container as priceContainer } from '../pricing/pricing.container'
 import { QuoteRepository } from '../quotes/domain/quote.repository'
 import { ConfirmPaymentIntentForPolicy } from './domain/confirm-payment-intent-for-policy.usecase'
 import { SendValidationLinkToEmailAddress } from '../email-validations/domain/send-validation-link-to-email-address.usecase'
@@ -43,6 +44,7 @@ import { logger } from '../../libs/logger'
 import { Mailer } from '../common-api/domain/mailer'
 import { Nodemailer } from '../common-api/infrastructure/nodemailer.mailer'
 import { nodemailerTransporter } from '../../libs/nodemailer'
+import { UpdatePolicyStartDateAndDuration } from './domain/update-policy-start-date-and-duration.usecase'
 const config = require('../../config')
 
 export interface Container {
@@ -54,7 +56,8 @@ export interface Container {
     GeneragePolicyCertificate: GeneratePolicyCertificate
     CreateSignatureRequestForPolicy: CreateSignatureRequestForPolicy
     GetPolicySpecificTerms: GetPolicySpecificTerms,
-    ManageSignatureRequestEvent: ManageSignatureRequestEvent
+    ManageSignatureRequestEvent: ManageSignatureRequestEvent,
+    UpdatePolicyStartDateAndDuration: UpdatePolicyStartDateAndDuration
 }
 
 const policyRepository: PolicyRepository = new PolicySqlRepository()
@@ -90,6 +93,7 @@ const createSignatureRequestForPolicy: CreateSignatureRequestForPolicy = CreateS
     signatureRequestProvider
   )
 const manageSignatureRequestEvent: ManageSignatureRequestEvent = ManageSignatureRequestEvent.factory(signatureRequestEventValidator, signatureRequestProvider, policyRepository, contractRepository, logger)
+const updatePolicyStartDateAndDuration: UpdatePolicyStartDateAndDuration = UpdatePolicyStartDateAndDuration.factory(policyRepository, priceContainer.ComputePriceWithOperationCode)
 
 export const container: Container = {
   CreatePaymentIntentForPolicy: createPaymentIntentForPolicy,
@@ -100,7 +104,8 @@ export const container: Container = {
   GeneragePolicyCertificate: generatePolicyCertificate,
   GetPolicySpecificTerms: getPolicySpecificTerms,
   CreateSignatureRequestForPolicy: createSignatureRequestForPolicy,
-  ManageSignatureRequestEvent: manageSignatureRequestEvent
+  ManageSignatureRequestEvent: manageSignatureRequestEvent,
+  UpdatePolicyStartDateAndDuration: updatePolicyStartDateAndDuration
 }
 
 export const policySqlModels: Array<any> = [PolicySqlModel, ContactSqlModel]

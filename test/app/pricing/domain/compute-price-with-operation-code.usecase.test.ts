@@ -8,9 +8,10 @@ import { OperationCode } from '../../../../src/app/pricing/domain/operation-code
 import { createPolicyFixture } from '../../policies/fixtures/policy.fixture'
 import { OperationCodeNotApplicableError } from '../../../../src/app/pricing/domain/operation-code.errors'
 import { Price } from '../../../../src/app/pricing/domain/price'
+import { policyRepositoryStub } from '../../policies/fixtures/policy-repository.test-doubles'
 
 describe('Prices - Usecase - Compute price with operation code', async () => {
-  const policyRepository: SinonStubbedInstance<PolicyRepository> = { get: sinon.stub(), save: sinon.stub(), isIdAvailable: sinon.stub(), setEmailValidationDate: sinon.stub(), updateAfterPayment: sinon.stub(), updateAfterSignature: sinon.stub() }
+  const policyRepository: SinonStubbedInstance<PolicyRepository> = policyRepositoryStub()
   const partnerRepository: SinonStubbedInstance<PartnerRepository> = { getOperationCodes: sinon.stub(), getByCode: sinon.stub(), getCallbackUrl: sinon.stub(), getOffer: sinon.stub() }
 
   it('should throw an error if the policy to apply the operation code on does not exist', async () => {

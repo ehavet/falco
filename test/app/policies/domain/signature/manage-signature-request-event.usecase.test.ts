@@ -11,11 +11,12 @@ import { Contract } from '../../../../../src/app/policies/domain/contract/contra
 import { ContractRepository } from '../../../../../src/app/policies/domain/contract/contract.repository'
 import { SignatureRequestProvider } from '../../../../../src/app/policies/domain/signature-request-provider'
 import { SignatureRequestEventType } from '../../../../../src/app/policies/domain/signature/signature-request-event'
+import { policyRepositoryMock } from '../../fixtures/policy-repository.test-doubles'
 
 describe('Signature - Usecase - Manage Signature Request Event', async () => {
   const now = new Date('2020-01-05T10:09:08Z')
   const signatureRequestEventValidator: SinonStubbedInstance<SignatureRequestEventValidator> = { isValid: sinon.stub() }
-  const policyRepository: SinonStubbedInstance<PolicyRepository> = { save: sinon.stub(), isIdAvailable: sinon.stub(), get: sinon.mock(), setEmailValidationDate: sinon.mock(), updateAfterPayment: sinon.mock(), updateAfterSignature: sinon.mock() }
+  const policyRepository: SinonStubbedInstance<PolicyRepository> = policyRepositoryMock()
   const contractRepository: SinonStubbedInstance<ContractRepository> = { saveTempContract: sinon.stub(), saveSignedContract: sinon.mock(), getSignedContract: sinon.stub() }
   const signatureProvider: SinonStubbedInstance<SignatureRequestProvider> = { create: sinon.stub(), getSignedContract: sinon.mock() }
   const logger: any = { trace: () => {} }

@@ -5,6 +5,7 @@ import { PaymentIntent } from '../../../../src/app/policies/domain/payment-inten
 import { PolicyAlreadyPaidError, PolicyNotFoundError } from '../../../../src/app/policies/domain/policies.errors'
 import { createPolicyFixture } from '../fixtures/policy.fixture'
 import { Policy } from '../../../../src/app/policies/domain/policy'
+import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles'
 
 describe('Usecase - Create payment intent for policy', async () => {
   it('should return a payment intent id when policy id is passed as arguments', async () => {
@@ -19,7 +20,7 @@ describe('Usecase - Create payment intent for policy', async () => {
       currency: 'eur'
     }
 
-    const policyRepository = { get: sinon.mock(), save: sinon.stub(), isIdAvailable: sinon.stub(), setEmailValidationDate: sinon.stub(), updateAfterPayment: sinon.mock(), updateAfterSignature: sinon.stub() }
+    const policyRepository = policyRepositoryStub()
     const paymentProcessor = { createIntent: sinon.mock() }
 
     policyRepository.get.withArgs('APP463109486').resolves(policy)
@@ -43,7 +44,7 @@ describe('Usecase - Create payment intent for policy', async () => {
       policyId: 'unexistingP0l1cy1d'
     }
     const paymentProcessor = { createIntent: sinon.stub }
-    const policyRepository = { get: sinon.mock(), save: sinon.stub(), isIdAvailable: sinon.stub(), setEmailValidationDate: sinon.stub(), updateAfterPayment: sinon.mock(), updateAfterSignature: sinon.stub() }
+    const policyRepository = policyRepositoryStub()
     policyRepository.get.withArgs('unexistingP0l1cy1d').throws(new PolicyNotFoundError(paymentIntentQuery.policyId))
     const createPaymentIntentForPolicy: CreatePaymentIntentForPolicy =
         CreatePaymentIntentForPolicy.factory(paymentProcessor, policyRepository)
@@ -60,7 +61,7 @@ describe('Usecase - Create payment intent for policy', async () => {
     }
     const alreadyPaidPolicy = createPolicyFixture({ id: 'APP789890859', status: Policy.Status.Applicable })
     const paymentProcessor = { createIntent: sinon.stub }
-    const policyRepository = { get: sinon.mock(), save: sinon.stub(), isIdAvailable: sinon.stub(), setEmailValidationDate: sinon.stub(), updateAfterPayment: sinon.mock(), updateAfterSignature: sinon.stub() }
+    const policyRepository = policyRepositoryStub()
 
     policyRepository.get.withArgs('APP789890859').resolves(alreadyPaidPolicy)
 

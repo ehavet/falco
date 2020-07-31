@@ -4,6 +4,7 @@ import { generate } from 'randomstring'
 import { PolicyRepository } from './policy.repository'
 import dayjs from 'dayjs'
 import { CannotGeneratePolicyNotApplicableError } from './certificate/certificate.errors'
+import { Price } from '../../pricing/domain/price'
 
 const DEFAULT_NUMBER_OF_MONTHS_DUE = 12
 
@@ -64,6 +65,18 @@ export namespace Policy {
             policy.status === Policy.Status.Applicable
     }
 
+    export function updatePolicyPriceAndStartDate (policy: Policy, price: Price, startDate: Date): void {
+      policy.premium = price.premium
+      policy.nbMonthsDue = price.nbMonthsDue
+      policy.startDate = startDate
+      policy.termStartDate = startDate
+      policy.termEndDate = _computeTermEndDate(startDate, price.nbMonthsDue)
+    }
+
+    function _computeTermEndDate (termStartDate: Date, nbMonthsDue: number): Date {
+      return dayjs(termStartDate).add(nbMonthsDue, 'month').subtract(1, 'day').toDate()
+    }
+
     export async function
     create (createPolicyCommand: CreatePolicyCommand, quote: Quote, policyRepository: PolicyRepository, productCode: string): Promise<Policy> {
       const generatedId: string = _generateId(createPolicyCommand.partnerCode, productCode)
@@ -79,7 +92,7 @@ export namespace Policy {
           premium: DEFAULT_NUMBER_OF_MONTHS_DUE * quote.insurance.estimate.monthlyPrice,
           startDate: startDate,
           termStartDate: startDate,
-          termEndDate: dayjs(startDate).add(1, 'year').subtract(1, 'day').toDate(),
+          termEndDate: _computeTermEndDate(startDate, DEFAULT_NUMBER_OF_MONTHS_DUE),
           signatureDate: undefined,
           paymentDate: undefined,
           subscriptionDate: undefined,

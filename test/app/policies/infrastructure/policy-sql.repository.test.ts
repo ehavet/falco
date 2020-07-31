@@ -6,6 +6,7 @@ import { expect } from '../../../test-utils'
 import { PolicySqlModel } from '../../../../src/app/policies/infrastructure/policy-sql.model'
 import { RiskSqlModel } from '../../../../src/app/quotes/infrastructure/risk-sql.model'
 import { PolicyNotFoundError } from '../../../../src/app/policies/domain/policies.errors'
+import dayjs = require('dayjs')
 
 async function resetDb () {
   await PolicySqlModel.destroy({ truncate: true, cascade: true })
@@ -22,8 +23,10 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
     it('should save the policy into the db', async () => {
       // Given
       const policy: Policy = createPolicyFixture({ id: 'APP463109486' })
+
       // When
       await policyRepository.save(policy)
+
       // Then
       const result = await PolicySqlModel.findAll({
         include: [{ all: true }, { model: RiskSqlModel, include: [{ all: true }] }]
@@ -45,6 +48,7 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
 
       // When
       const createdPolicy: Policy = await policyRepository.save(expectedPolicy)
+
       // Then
       expect(createdPolicy).to.deep.equal(expectedPolicy)
     })
@@ -193,6 +197,47 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
 
       // Then
       return expect(promise).to.be.rejectedWith(PolicyNotFoundError)
+    })
+  })
+
+  describe('#update', async () => {
+    it('should update policy premium, nbMonthsDue, startDate, termStartDate/termEndDate', async () => {
+      // Given
+      const startDate: Date = new Date('2020-05-15T00:00:00Z')
+      const endDate: Date = dayjs(startDate).add(1, 'month').toDate()
+      const policy = await policyRepository.save(createPolicyFixture())
+      policy.premium = 44.44
+      policy.nbMonthsDue = 1
+      policy.startDate = startDate
+      policy.termStartDate = startDate
+      policy.termEndDate = endDate
+
+      // When
+      await policyRepository
+        .update(policy)
+
+      // Then
+      const updatedPolicy: Policy = await policyRepository.get(policy.id)
+      expect(updatedPolicy.premium).to.equal(policy.premium)
+      expect(updatedPolicy.nbMonthsDue).to.equal(policy.nbMonthsDue)
+      expect(updatedPolicy.startDate).to.deep.equal(policy.startDate)
+      expect(updatedPolicy.termStartDate).to.deep.equal(policy.termStartDate)
+      expect(updatedPolicy.termEndDate).to.deep.equal(policy.termEndDate)
+    })
+
+    it('should throw an error if the policy is not found', async () => {
+      // Given
+      const policy = await policyRepository.save(createPolicyFixture())
+      policy.premium = 111.11
+
+      // When
+      const promise = policyRepository
+        .update(policy)
+
+      // Then
+      expect(promise).to.be.rejectedWith(PolicyNotFoundError)
+      const updatedPolicy: Policy = await policyRepository.get(policy.id)
+      expect(updatedPolicy.premium).to.equal(69.84)
     })
   })
 })

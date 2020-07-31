@@ -11,12 +11,13 @@ import { PolicyRepository } from '../../../../src/app/policies/domain/policy.rep
 import { createOngoingPolicyFixture } from '../fixtures/policy.fixture'
 import { EmailValidationQuery } from '../../../../src/app/email-validations/domain/email-validation-query'
 import { PartnerRepository } from '../../../../src/app/partners/domain/partner.repository'
+import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles'
 
 describe('Policies - Usecase - Create policy', async () => {
   const now = new Date('2020-01-05T10:09:08Z')
   const quote: Quote = createQuote()
   const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({ quoteId: quote.id, startDate: null })
-  const policyRepository: SinonStubbedInstance<PolicyRepository> = { save: sinon.stub(), isIdAvailable: sinon.stub(), get: sinon.stub(), setEmailValidationDate: sinon.stub(), updateAfterPayment: sinon.mock(), updateAfterSignature: sinon.stub() }
+  const policyRepository: SinonStubbedInstance<PolicyRepository> = policyRepositoryStub()
   const quoteRepository: SinonStubbedInstance<QuoteRepository> = { save: sinon.stub(), get: sinon.stub() }
   const partnerRepository: SinonStubbedInstance<PartnerRepository> = { getByCode: sinon.stub(), getOffer: sinon.stub(), getCallbackUrl: sinon.stub(), getOperationCodes: sinon.stub() }
   const sendValidationLinkToEmailAddress = sinon.stub()

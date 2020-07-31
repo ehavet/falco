@@ -8,16 +8,10 @@ import { Certificate } from '../../../../src/app/policies/domain/certificate/cer
 import { GeneratePolicyCertificate } from '../../../../src/app/policies/domain/certificate/generate-policy-certificate.usecase'
 import { GeneratePolicyCertificateQuery } from '../../../../src/app/policies/domain/certificate/generate-policy-certificate-query'
 import { CannotGeneratePolicyNotApplicableError } from '../../../../src/app/policies/domain/certificate/certificate.errors'
+import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles'
 
 describe('Policies - Usecase - Generate policy certificate', async () => {
-  const policyRepository: SinonStubbedInstance<PolicyRepository> = {
-    get: sinon.stub(),
-    save: sinon.stub(),
-    isIdAvailable: sinon.stub(),
-    setEmailValidationDate: sinon.stub(),
-    updateAfterPayment: sinon.stub(),
-    updateAfterSignature: sinon.stub()
-  }
+  const policyRepository: SinonStubbedInstance<PolicyRepository> = policyRepositoryStub()
 
   const certificateRepository: SinonStubbedInstance<CertificateRepository> = { generate: sinon.mock() }
 

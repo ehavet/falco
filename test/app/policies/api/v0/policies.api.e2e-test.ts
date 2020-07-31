@@ -138,7 +138,7 @@ describe('Policies - API - E2E', async () => {
       expect(response.body).to.deep.equal(expectedPolicy)
     })
 
-    it('should save the quote', async () => {
+    it('should save the policy', async () => {
       // Then
       const savedPolicy = await PolicySqlModel.findByPk(response.body.id)
       expect(savedPolicy).to.be.instanceOf(PolicySqlModel)
@@ -206,6 +206,29 @@ describe('Policies - API - E2E', async () => {
         status: 'INITIATED'
       }
       expect(response.body).to.deep.equal(expectedResourcePolicy)
+    })
+  })
+
+  describe('PATCH /v0/policies/:id', async () => {
+    it('should update the policy price and dates', async () => {
+      // Given
+      const policyId: string = 'APP105944294'
+      const policyRepository: PolicyRepository = new PolicySqlRepository()
+      const expectedPolicy: Policy = createPolicyFixture({ id: policyId, partnerCode: 'essca' })
+      await policyRepository.save(expectedPolicy)
+
+      // When
+      await httpServer.api().patch(`/v0/policies/${policyId}`)
+        .send({ spec_ops_code: 'SEMESTER1', start_date: '2020-04-05' })
+        .set('X-Consumer-Username', 'essca')
+
+      // Then
+      const updatedPolicy = await PolicySqlModel.findByPk(policyId)
+      expect(updatedPolicy.premium).to.equal(29.1)
+      expect(updatedPolicy.nbMonthsDue).to.equal(5)
+      expect(updatedPolicy.startDate).to.equal('2020-04-05')
+      expect(updatedPolicy.termStartDate).to.equal('2020-04-05')
+      expect(updatedPolicy.termEndDate).to.equal('2020-09-04')
     })
   })
 

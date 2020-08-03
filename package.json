@@ -119,7 +119,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "lint-staged && ./scripts/vault-pre-commit-hooks.sh"
+
     }
   },
   "lint-staged": {

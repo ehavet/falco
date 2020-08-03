@@ -1,9 +1,10 @@
 import { Email } from '../../../../src/app/common-api/domain/mailer'
 
 export const expectedSubscriptionValidationEmail: Email = {
-  sender: 'test-ci@appenin.fr',
+  sender: '"Appenin Assurance" <moncontrat@appenin.fr>',
   recipient: 'test@email.com',
-  subject: 'Votre appartement est assuré !',
+  subject: 'Appenin - vos documents contractuels / your contractual documents',
+  cc: 'notif-souscription@appenin.fr',
   messageHtml: '<!DOCTYPE html>\n' +
         '<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">\n' +
         '<head>\n' +

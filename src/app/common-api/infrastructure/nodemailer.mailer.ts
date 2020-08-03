@@ -24,7 +24,8 @@ function _getMailPayload (email: Email) {
     to: email.recipient,
     subject: email.subject,
     text: email.messageText,
-    html: email.messageHtml
+    html: email.messageHtml,
+    cc: email.cc
   }
   if (email.attachments === undefined) { return message }
   const attachments = { attachments: email.attachments }

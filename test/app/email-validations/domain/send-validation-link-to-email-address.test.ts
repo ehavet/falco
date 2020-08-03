@@ -49,9 +49,9 @@ describe('Usecase - Send a validation link to an email address', async () => {
     await sendValidationLinkToEmailAddress(emailValidationQuery)
     // THEN
     sinon.assert.calledOnceWithExactly(mailer.send, {
-      sender: 'test-ci@appenin.fr',
+      sender: '"Appenin Assurance" <validation@appenin.fr>',
       recipient: 'albert.hofmann@science.org',
-      subject: 'valider votre email',
+      subject: 'Appenin - validation de votre adresse e-mail / e-mail validation',
       messageHtml: expectedValidationEmailMessage
     })
   })

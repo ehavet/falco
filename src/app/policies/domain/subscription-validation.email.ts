@@ -1,7 +1,6 @@
 import { Certificate } from './certificate/certificate'
-import { Email } from '../../common-api/domain/mailer'
 import { Contract } from './contract/contract'
-const config = require('../../../config')
+import { Email } from '../../common-api/domain/mailer'
 
 export function buildSubscriptionValidationEmail (recipient, certificate: Certificate, signedContract: Contract): Email {
   const attachedCertificate: Email.AttachedBuffer = {
@@ -14,11 +13,12 @@ export function buildSubscriptionValidationEmail (recipient, certificate: Certif
   }
 
   return {
-    sender: config.get('FALCO_API_APPENIN_EMAIL_ADDRESS'),
+    sender: '"Appenin Assurance" <moncontrat@appenin.fr>',
     recipient: recipient,
-    subject: 'Votre appartement est assuré !',
+    subject: 'Appenin - vos documents contractuels / your contractual documents',
     messageHtml: _buildSubscriptionValidationMessage(),
-    attachments: [attachedCertificate, attachedSignedContract]
+    attachments: [attachedCertificate, attachedSignedContract],
+    cc: 'notif-souscription@appenin.fr'
   }
 }
 

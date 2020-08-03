@@ -1,11 +1,10 @@
 import { Email } from '../../common-api/domain/mailer'
-const config = require('../../../config')
 
 export function buildValidationLinkEmail (recipient, uriFr, uriEn): Email {
   return {
-    sender: config.get('FALCO_API_APPENIN_EMAIL_ADDRESS'),
+    sender: '"Appenin Assurance" <validation@appenin.fr>',
     recipient: recipient,
-    subject: 'valider votre email',
+    subject: 'Appenin - validation de votre adresse e-mail / e-mail validation',
     messageHtml: _buildValidationMessage(uriEn, uriFr)
   }
 }

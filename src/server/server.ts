@@ -6,6 +6,7 @@ import { partnerRoutes } from '../app/partners/partner.container'
 import { emailValidationsRoutes } from '../app/email-validations/email-validations.container'
 import { policiesRoutes } from '../app/policies/policies.container'
 import { quoteRoutes } from '../app/quotes/quote.container'
+import { pricingRoutes } from '../app/pricing/pricing.container'
 
 export default async (config: Map<string, any>): Promise<Server> => {
   const server = new Server({
@@ -31,6 +32,7 @@ export default async (config: Map<string, any>): Promise<Server> => {
   server.route(emailValidationsRoutes())
   server.route(quoteRoutes())
   server.route(policiesRoutes())
+  server.route(pricingRoutes())
   await server.register(happiSwaggerPlugin(config))
   const sequelize = await initSequelize(config)
 

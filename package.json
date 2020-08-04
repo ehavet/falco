@@ -1,6 +1,6 @@
 {
   "name": "falco-api",
-  "version": "0.1.54",
+  "version": "0.1.55",
   "description": "API pour souscription simple et rapide à une assurance habitation",
   "license": "UNLICENSED",
   "author": "Appenin",
@@ -120,7 +120,6 @@
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged && ./scripts/vault-pre-commit-hooks.sh"
-
     }
   },
   "lint-staged": {

@@ -1,7 +1,7 @@
 variables:
+  GIT_CLEAN_FLAGS: "-ffdx --exclude=node_modules --exclude=cache" # Prevent from deleting those folders before checking out git repo.
   NODE_VERSION: "14.4.0"
   NODE_IMAGE: "node:$NODE_VERSION"
-  YARN_CACHE_FOLDER: ".yarn/"
   POSTGRES_VERSION: "11.7"
   POSTGRES_IMAGE: "postgres:$POSTGRES_VERSION-alpine"
   POSTGRES_DB: test
@@ -68,58 +68,27 @@ default:
   tags:
     - docker
 
-# Cache modules in between jobs
-cache:
-  key: ${CI_COMMIT_REF_SLUG}
-  paths:
-    - .yarn/
-
-before_script:
-  - yarn install --frozen-lockfile --non-interactive --production=false
-
-"Install Dependencies":
-  stage: install
-  extends: .trigger_build
-  script:
-    - yarn install --frozen-lockfile --non-interactive --production=false
-
 "Check Syntax":
   stage: quality
   extends: .trigger_build
+  before_script:
+    - yarn install --frozen-lockfile --non-interactive --production=false
   script:
     - yarn lint
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - .yarn/
-    policy: pull
 
 "Audit Dependencies":
   stage: quality
   extends: .trigger_build
-  before_script:
+  script:
     - export AUDIT_LEVEL=moderate
     - export AUDIT_LEVEL_STATUS_CODE="4" #https://classic.yarnpkg.com/en/docs/cli/audit/#toc-yarn-audit
-  script:
     - scripts/dependency-audit.sh > yarn-audit-api.log
     - tail -n 3 yarn-audit-api.log
-  cache: {}
   artifacts:
     when: always
     paths:
       - yarn-audit-api.log
     expire_in: 10 days
-
-"Build Project":
-  stage: build
-  extends: .trigger_build
-  script:
-    - yarn build
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - .yarn/
-    policy: pull
 
 "Run Unit & Integration Tests":
   stage: test
@@ -130,9 +99,9 @@ before_script:
     - apt-get update
     - apt-get -y install pdftk
     - yarn install --frozen-lockfile --non-interactive --production=false
-    - yarn build
   script:
     # No CCA step run as container are only used for test purpose
+    - yarn build
     - yarn db:migrate
     - yarn db:seed
     - yarn test:ci
@@ -142,11 +111,6 @@ before_script:
     paths:
       - coverage
     expire_in: 10 days
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - .yarn/
-    policy: pull
 
 "Update application version":
   stage: track
@@ -165,7 +129,6 @@ before_script:
   artifacts:
     paths:
       - vars/application_version.txt
-  cache: {}
 
 .deploy: &deploy
   stage: deploy
@@ -195,7 +158,6 @@ before_script:
     - pip install -r requirements.pip
     - ansible-galaxy role install -r requirements.yml
     - 'ansible-playbook -i inventory.$DEPLOY_ENVIRONMENT --tags "nodejs,app-api" --extra-vars "@sites/ansible_extra_vars.yml" sites/api.appenin.fr.yml'
-  cache: {}
 
 "Deploy API to Staging":
   <<: *deploy
@@ -203,11 +165,9 @@ before_script:
   variables:
     APPLICATION_VERSION: 'cat vars/application_version.txt'
     DEPLOY_ENVIRONMENT: 'staging'
-  cache: {}
 
 "Deploy API":
   <<: *deploy
   extends: .trigger_deployment
   variables:
     APPLICATION_VERSION: 'echo $CI_COMMIT_REF_NAME'
-  cache: {}

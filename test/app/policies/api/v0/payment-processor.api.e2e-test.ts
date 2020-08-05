@@ -62,6 +62,6 @@ describe('PaymentProcessor - API - E2E', async () => {
       expect(retrievedPolicy.paymentDate).to.deep.equal(now)
       expect(retrievedPolicy.subscriptionDate).to.deep.equal(now)
       expect(retrievedPolicy.status).to.be.equal(Policy.Status.Applicable)
-    })
+    }).timeout(10000)
   })
 })

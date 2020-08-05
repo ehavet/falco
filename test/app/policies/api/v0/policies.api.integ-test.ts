@@ -19,8 +19,8 @@ import { ContractGenerationFailureError, SignatureRequestCreationFailureError, S
 import { SpecificTerms } from '../../../../../src/app/policies/domain/specific-terms/specific-terms'
 import { SpecificTermsNotFoundError } from '../../../../../src/app/policies/domain/specific-terms/specific-terms.errors'
 import {
-  UpdatePolicyStartDateAndDurationCommand
-} from '../../../../../src/app/policies/domain/update-policy-start-date-and-duration.usecase'
+  UpdatePolicyCommand
+} from '../../../../../src/app/policies/domain/update-policy.usecase'
 import { OperationCodeNotApplicableError } from '../../../../../src/app/pricing/domain/operation-code.errors'
 
 describe('Policies - API - Integration', async () => {
@@ -974,13 +974,62 @@ describe('Policies - API - Integration', async () => {
   describe('PATCH /v0/policies/:id', async () => {
     let response: supertest.Response
 
-    describe('when the policy is updated', async () => {
+    const expectedResourcePolicy = {
+      id: 'APP105944294',
+      code: 'myPartner',
+      insurance: {
+        monthly_price: 5.82,
+        default_deductible: 150,
+        default_ceiling: 7000,
+        currency: 'EUR',
+        simplified_covers: ['ACDDE', 'ACVOL'],
+        product_code: 'MRH-Loc-Etud',
+        product_version: 'v2020-02-01',
+        contractual_terms: '/path/to/contractual/terms',
+        ipid: '/path/to/ipid'
+      },
+      risk: {
+        property: {
+          room_count: 2,
+          address: '13 rue du loup garou',
+          postal_code: 91100,
+          city: 'Corbeil-Essones'
+        },
+        people: {
+          policy_holder: {
+            firstname: 'Jean',
+            lastname: 'Dupont'
+          },
+          other_insured: [{ firstname: 'John', lastname: 'Doe' }]
+        }
+      },
+      contact: {
+        lastname: 'Dupont',
+        firstname: 'Jean',
+        address: '13 rue du loup garou',
+        postal_code: 91100,
+        city: 'Corbeil-Essones',
+        email: 'jeandupont@email.com',
+        phone_number: '+33684205510'
+      },
+      nb_months_due: 12,
+      premium: 69.84,
+      start_date: '2020-01-05',
+      term_start_date: '2020-01-05',
+      term_end_date: '2020-01-05',
+      subscription_date: '2020-01-05T10:09:08.000Z',
+      signature_date: '2020-01-05T10:09:08.000Z',
+      payment_date: '2020-01-05T10:09:08.000Z',
+      status: 'INITIATED'
+    }
+
+    describe('when the policy is updated with special operation code', async () => {
       before(async () => {
         // Given
         const policyId: string = 'APP105944294'
         const expectedPolicy: Policy = createPolicyFixture({ id: policyId })
-        const command: UpdatePolicyStartDateAndDurationCommand = { policyId, operationCode: 'MYCODE', startDate: new Date('2020-04-05') }
-        sinon.stub(container, 'UpdatePolicyStartDateAndDuration').withArgs(command).resolves(expectedPolicy)
+        const command: UpdatePolicyCommand = { policyId, operationCode: 'MYCODE', startDate: new Date('2020-04-05') }
+        sinon.stub(container, 'UpdatePolicy').withArgs(command).resolves(expectedPolicy)
 
         // When
         response = await httpServer.api().patch(`/v0/policies/${policyId}`)
@@ -995,55 +1044,32 @@ describe('Policies - API - Integration', async () => {
 
       it('should return the policy updated', async () => {
         // Then
-        const expectedResourcePolicy = {
-          id: 'APP105944294',
-          code: 'myPartner',
-          insurance: {
-            monthly_price: 5.82,
-            default_deductible: 150,
-            default_ceiling: 7000,
-            currency: 'EUR',
-            simplified_covers: ['ACDDE', 'ACVOL'],
-            product_code: 'MRH-Loc-Etud',
-            product_version: 'v2020-02-01',
-            contractual_terms: '/path/to/contractual/terms',
-            ipid: '/path/to/ipid'
-          },
-          risk: {
-            property: {
-              room_count: 2,
-              address: '13 rue du loup garou',
-              postal_code: 91100,
-              city: 'Corbeil-Essones'
-            },
-            people: {
-              policy_holder: {
-                firstname: 'Jean',
-                lastname: 'Dupont'
-              },
-              other_insured: [{ firstname: 'John', lastname: 'Doe' }]
-            }
-          },
-          contact: {
-            lastname: 'Dupont',
-            firstname: 'Jean',
-            address: '13 rue du loup garou',
-            postal_code: 91100,
-            city: 'Corbeil-Essones',
-            email: 'jeandupont@email.com',
-            phone_number: '+33684205510'
-          },
-          nb_months_due: 12,
-          premium: 69.84,
-          start_date: '2020-01-05',
-          term_start_date: '2020-01-05',
-          term_end_date: '2020-01-05',
-          subscription_date: '2020-01-05T10:09:08.000Z',
-          signature_date: '2020-01-05T10:09:08.000Z',
-          payment_date: '2020-01-05T10:09:08.000Z',
-          status: 'INITIATED'
-        }
         expect(response.body).to.deep.equal(expectedResourcePolicy)
+      })
+    })
+
+    describe('when the policy is updated without special operation code', async () => {
+      before(async () => {
+        // Given
+        const policyId: string = 'APP105944294'
+        const expectedPolicy: Policy = createPolicyFixture({ id: policyId })
+        const command: UpdatePolicyCommand = { policyId, operationCode: undefined, startDate: new Date('2020-04-05') }
+        sinon.stub(container, 'UpdatePolicy').withArgs(command).resolves(expectedPolicy)
+
+        // When
+        response = await httpServer.api().patch(`/v0/policies/${policyId}`)
+          .send({ start_date: '2020-04-05' })
+          .set('X-Consumer-Username', 'myPartner')
+      })
+
+      it('should reply with status 200', async () => {
+        // Then
+        expect(response).to.have.property('statusCode', 200)
+      })
+
+      it('should return the policy with start date updated', async () => {
+        // Then
+        expect(response.body.start_date).to.deep.equal(expectedResourcePolicy.start_date)
       })
     })
 
@@ -1051,7 +1077,7 @@ describe('Policies - API - Integration', async () => {
       it('should reply with status 500', async () => {
         // Given
         const policyId: string = 'APP105944294'
-        sinon.stub(container, 'UpdatePolicyStartDateAndDuration').rejects(Error)
+        sinon.stub(container, 'UpdatePolicy').rejects(Error)
 
         // When
         response = await httpServer.api().patch(`/v0/policies/${policyId}`)
@@ -1067,7 +1093,7 @@ describe('Policies - API - Integration', async () => {
       it('should reply with status 404', async () => {
         // Given
         const policyId: string = 'APP105944294'
-        sinon.stub(container, 'UpdatePolicyStartDateAndDuration').rejects(new PolicyNotFoundError(policyId))
+        sinon.stub(container, 'UpdatePolicy').rejects(new PolicyNotFoundError(policyId))
 
         // When
         response = await httpServer.api().patch(`/v0/policies/${policyId}`)
@@ -1084,7 +1110,7 @@ describe('Policies - API - Integration', async () => {
       it('should reply with status 422', async () => {
         // Given
         const policyId: string = 'APP105944294'
-        sinon.stub(container, 'UpdatePolicyStartDateAndDuration').rejects(new PolicyNotUpdatable(policyId, Policy.Status.Signed))
+        sinon.stub(container, 'UpdatePolicy').rejects(new PolicyNotUpdatable(policyId, Policy.Status.Signed))
 
         // When
         response = await httpServer.api().patch(`/v0/policies/${policyId}`)
@@ -1100,7 +1126,7 @@ describe('Policies - API - Integration', async () => {
       it('should reply with status 422', async () => {
         // Given
         const policyId: string = 'APP105944294'
-        sinon.stub(container, 'UpdatePolicyStartDateAndDuration').rejects(new OperationCodeNotApplicableError('SEMESTER', 'mypartner'))
+        sinon.stub(container, 'UpdatePolicy').rejects(new OperationCodeNotApplicableError('SEMESTER', 'mypartner'))
 
         // When
         response = await httpServer.api().patch(`/v0/policies/${policyId}`)
@@ -1118,15 +1144,6 @@ describe('Policies - API - Integration', async () => {
         // When
         const response = await httpServer.api().patch('/v0/policies/WRONGPOLICY')
           .send({ spec_ops_code: 'MYCODE', start_date: '2020-04-05' })
-          .set('X-Consumer-Username', 'myPartner')
-
-        expect(response).to.have.property('statusCode', 400)
-      })
-
-      it('should reply with status 400 when there is no spec ops code', async () => {
-        // When
-        const response = await httpServer.api().patch('/v0/policies/APP658143293')
-          .send({ start_date: '2020-04-05' })
           .set('X-Consumer-Username', 'myPartner')
 
         expect(response).to.have.property('statusCode', 400)

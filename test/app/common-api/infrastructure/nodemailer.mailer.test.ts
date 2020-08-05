@@ -23,15 +23,17 @@ describe('Nodemailer', async () => {
         sender: 'sender@email.com',
         recipient: 'recipient@email.com',
         subject: 'a subject',
-        messageText: 'a message',
-        messageHtml: '<b>a message</b>'
+        messageText: undefined,
+        messageHtml: '<b>a message</b>',
+        cc: 'copie@mail.fr'
       }
       nodemailerTransporterMock.sendMail.withExactArgs({
         from: email.sender,
         to: email.recipient,
         subject: email.subject,
         text: email.messageText,
-        html: email.messageHtml
+        html: email.messageHtml,
+        cc: email.cc
       }).resolves({ messageId: 'messageId' })
       // WHEN
       const response = await mailer.send(email)
@@ -45,8 +47,9 @@ describe('Nodemailer', async () => {
         sender: 'sender@email.com',
         recipient: 'recipient@email.com',
         subject: 'a subject',
-        messageText: 'a message',
+        messageText: undefined,
         messageHtml: '<b>a message</b>',
+        cc: 'copie@mail.fr',
         attachments: [
           { filename: 'file.pdf', path: '/path/file.pdf' },
           { filename: 'file.pdf', content: Buffer.alloc(1) }
@@ -58,6 +61,7 @@ describe('Nodemailer', async () => {
         subject: email.subject,
         text: email.messageText,
         html: email.messageHtml,
+        cc: email.cc,
         attachments: [
           { filename: 'file.pdf', path: '/path/file.pdf' },
           { filename: 'file.pdf', content: Buffer.alloc(1) }
@@ -75,7 +79,9 @@ describe('Nodemailer', async () => {
         sender: 'sender@email.com',
         recipient: 'recipient@email.com',
         subject: 'a subject',
-        messageText: 'a message'
+        messageText: undefined,
+        messageHtml: '<b>a message</b>',
+        cc: 'copie@mail.fr'
       }
       nodemailerTransporterMock.sendMail.rejects(Error)
       // WHEN

@@ -4,12 +4,13 @@ export interface MailerResponse {
 }
 
 export interface Email {
-    readonly sender: string
+    readonly sender: string,
     readonly recipient: string,
     readonly subject: string,
     readonly messageText?: string,
-    readonly messageHtml?: string
-    readonly attachments?: (Email.AttachedBuffer|Email.AttachedFile)[]
+    readonly messageHtml?: string,
+    readonly attachments?: (Email.AttachedBuffer|Email.AttachedFile)[],
+    readonly cc?: string
 }
 
 export namespace Email {

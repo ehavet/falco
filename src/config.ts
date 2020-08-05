@@ -26,8 +26,6 @@ module.exports = Envie({
 
   FALCO_API_EMAIL_VALIDATION_VALIDITY_PERIOD: Joi.number().min(1),
 
-  FALCO_API_APPENIN_EMAIL_ADDRESS: Joi.string().email(),
-
   FALCO_API_EMAIL_TRANSPORT: Joi.string().valid('sendmail', 'stream'),
 
   FALCO_API_STRIPE_PRIVATE_KEY: Joi.string(),

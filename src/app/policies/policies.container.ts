@@ -44,7 +44,7 @@ import { logger } from '../../libs/logger'
 import { Mailer } from '../common-api/domain/mailer'
 import { Nodemailer } from '../common-api/infrastructure/nodemailer.mailer'
 import { nodemailerTransporter } from '../../libs/nodemailer'
-import { UpdatePolicyStartDateAndDuration } from './domain/update-policy-start-date-and-duration.usecase'
+import { UpdatePolicy } from './domain/update-policy.usecase'
 const config = require('../../config')
 
 export interface Container {
@@ -57,7 +57,7 @@ export interface Container {
     CreateSignatureRequestForPolicy: CreateSignatureRequestForPolicy
     GetPolicySpecificTerms: GetPolicySpecificTerms,
     ManageSignatureRequestEvent: ManageSignatureRequestEvent,
-    UpdatePolicyStartDateAndDuration: UpdatePolicyStartDateAndDuration
+    UpdatePolicy: UpdatePolicy
 }
 
 const policyRepository: PolicyRepository = new PolicySqlRepository()
@@ -93,7 +93,7 @@ const createSignatureRequestForPolicy: CreateSignatureRequestForPolicy = CreateS
     signatureRequestProvider
   )
 const manageSignatureRequestEvent: ManageSignatureRequestEvent = ManageSignatureRequestEvent.factory(signatureRequestEventValidator, signatureRequestProvider, policyRepository, contractRepository, logger)
-const updatePolicyStartDateAndDuration: UpdatePolicyStartDateAndDuration = UpdatePolicyStartDateAndDuration.factory(policyRepository, priceContainer.ComputePriceWithOperationCode)
+const updatePolicy: UpdatePolicy = UpdatePolicy.factory(policyRepository, priceContainer.ComputePriceWithOperationCode)
 
 export const container: Container = {
   CreatePaymentIntentForPolicy: createPaymentIntentForPolicy,
@@ -105,7 +105,7 @@ export const container: Container = {
   GetPolicySpecificTerms: getPolicySpecificTerms,
   CreateSignatureRequestForPolicy: createSignatureRequestForPolicy,
   ManageSignatureRequestEvent: manageSignatureRequestEvent,
-  UpdatePolicyStartDateAndDuration: updatePolicyStartDateAndDuration
+  UpdatePolicy: updatePolicy
 }
 
 export const policySqlModels: Array<any> = [PolicySqlModel, ContactSqlModel]

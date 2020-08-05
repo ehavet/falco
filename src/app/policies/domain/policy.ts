@@ -65,16 +65,19 @@ export namespace Policy {
             policy.status === Policy.Status.Applicable
     }
 
-    export function updatePolicyPriceAndStartDate (policy: Policy, price: Price, startDate: Date): void {
+    export function updatePolicyPrice (policy: Policy, price: Price): void {
       policy.premium = price.premium
       policy.nbMonthsDue = price.nbMonthsDue
-      policy.startDate = startDate
-      policy.termStartDate = startDate
-      policy.termEndDate = _computeTermEndDate(startDate, price.nbMonthsDue)
     }
 
-    function _computeTermEndDate (termStartDate: Date, nbMonthsDue: number): Date {
-      return dayjs(termStartDate).add(nbMonthsDue, 'month').subtract(1, 'day').toDate()
+    export function updatePolicyStartDate (policy: Policy, startDate: Date, durationInMonths?: number): void {
+      policy.startDate = startDate
+      policy.termStartDate = startDate
+      policy.termEndDate = _computeTermEndDate(startDate, durationInMonths || DEFAULT_NUMBER_OF_MONTHS_DUE)
+    }
+
+    function _computeTermEndDate (termStartDate: Date, durationInMonths: number): Date {
+      return dayjs(termStartDate).add(durationInMonths, 'month').subtract(1, 'day').toDate()
     }
 
     export async function

@@ -19,7 +19,7 @@ import { GetPolicySpecificTermsQuery } from '../../domain/specific-terms/get-pol
 import { SpecificTerms } from '../../domain/specific-terms/specific-terms'
 import { SpecificTermsNotFoundError } from '../../domain/specific-terms/specific-terms.errors'
 import { ContractGenerationFailureError, SignatureRequestCreationFailureError, SpecificTermsGenerationFailureError } from '../../domain/signature-request.errors'
-import { UpdatePolicyStartDateAndDurationCommand } from '../../domain/update-policy-start-date-and-duration.usecase'
+import { UpdatePolicyCommand } from '../../domain/update-policy.usecase'
 import { OperationCodeNotApplicableError } from '../../../pricing/domain/operation-code.errors'
 
 const TAGS = ['api', 'policies']
@@ -150,7 +150,7 @@ export default function (container: Container): Array<ServerRoute> {
             id: Joi.string().min(12).max(12).required().description('Policy id').example('APP365094241')
           }),
           payload: Joi.object({
-            spec_ops_code: Joi.string().required().min(2).max(30).description('Special code operation to apply on policy').example('MYCODE'),
+            spec_ops_code: Joi.string().optional().description('Special code operation to apply on policy').example('MYCODE'),
             start_date: Joi.date().required().description('Start date').example('2020-04-26')
           })
         },
@@ -165,13 +165,13 @@ export default function (container: Container): Array<ServerRoute> {
       },
       handler: async (request, h) => {
         const payload: any = request.payload
-        const command: UpdatePolicyStartDateAndDurationCommand = {
+        const command: UpdatePolicyCommand = {
           policyId: request.params.id,
           startDate: new Date(payload.start_date),
           operationCode: payload.spec_ops_code
         }
         try {
-          const createdPolicy: Policy = await container.UpdatePolicyStartDateAndDuration(command)
+          const createdPolicy: Policy = await container.UpdatePolicy(command)
           return h.response(policyToResource(createdPolicy)).code(200)
         } catch (error) {
           if (error instanceof PolicyNotFoundError) {

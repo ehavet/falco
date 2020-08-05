@@ -52,7 +52,7 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
       // Then
       expect(createdPolicy).to.deep.equal(expectedPolicy)
     })
-  })
+  }).timeout(10000)
 
   describe('#isIdAvailable', async () => {
     it('should return true is there is no policy in database with the same id', async () => {
@@ -76,7 +76,7 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
       // Then
       expect(isIdAvailable).to.be.false
     })
-  })
+  }).timeout(10000)
 
   describe('#get', async () => {
     it('should return a Policy for a given existing id', async () => {
@@ -104,7 +104,7 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
       // Then
         .to.be.rejectedWith(PolicyNotFoundError)
     })
-  })
+  }).timeout(10000)
 
   describe('#setEmailValidationDate', async () => {
     it('should update the policy email validation date', async () => {
@@ -133,7 +133,7 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
       // Then
       return expect(promise).to.be.rejectedWith(PolicyNotFoundError)
     })
-  })
+  }).timeout(10000)
 
   describe('#updateAfterPayment', async () => {
     it('should update policy payment date subscription date and status', async () => {
@@ -166,7 +166,7 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
       // Then
       return expect(promise).to.be.rejectedWith(PolicyNotFoundError)
     })
-  })
+  }).timeout(10000)
 
   describe('#updateAfterSignature', async () => {
     it('should update policy signature date subscription date and status', async () => {
@@ -198,7 +198,7 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
       // Then
       return expect(promise).to.be.rejectedWith(PolicyNotFoundError)
     })
-  })
+  }).timeout(10000)
 
   describe('#update', async () => {
     it('should update policy premium, nbMonthsDue, startDate, termStartDate/termEndDate', async () => {
@@ -239,5 +239,5 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
       const updatedPolicy: Policy = await policyRepository.get(policy.id)
       expect(updatedPolicy.premium).to.equal(69.84)
     })
-  })
+  }).timeout(10000)
 })

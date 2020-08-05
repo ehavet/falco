@@ -47,7 +47,7 @@ describe('Policies - Infra - Contract FS Repository', async () => {
       // Then
       const specificTermsFilePath: string = path.join(documentsFolderPath, 'tmp', 'Appenin_Contrat_assurance_habitation_APP753210859.pdf')
       expect(fs.existsSync(specificTermsFilePath)).to.be.true
-    })
+    }).timeout(10000)
 
     it('should return the path to the temp contract', async () => {
       // When
@@ -56,7 +56,7 @@ describe('Policies - Infra - Contract FS Repository', async () => {
       // Then
       const specificTermsFilePath: string = path.join(documentsFolderPath, 'tmp', 'Appenin_Contrat_assurance_habitation_APP753210859.pdf')
       expect(tempContractPath).to.equal(specificTermsFilePath)
-    })
+    }).timeout(10000)
   })
 
   describe('#saveSignedContract', async () => {
@@ -67,7 +67,7 @@ describe('Policies - Infra - Contract FS Repository', async () => {
       // Then
       const signedContractsFilePath: string = path.join(documentsFolderPath, 'Appenin_Contrat_assurance_habitation_APP753210859.pdf')
       expect(fs.existsSync(signedContractsFilePath)).to.be.true
-    })
+    }).timeout(10000)
 
     it('should return the contract', async () => {
       // When
@@ -76,7 +76,7 @@ describe('Policies - Infra - Contract FS Repository', async () => {
       // Then
       expect(savedContract).to.equal(contractToSave)
     })
-  })
+  }).timeout(10000)
 
   describe('#getSignedContract', async () => {
     it('should return the found signed contract', async () => {
@@ -90,7 +90,7 @@ describe('Policies - Infra - Contract FS Repository', async () => {
       const signedContractPdfBuffer = await pdftk.input(signedContractFound.buffer).uncompress().output()
       expect(signedContractFound.name).to.equal('Appenin_Contrat_assurance_habitation_APP753210859.pdf')
       expect(signedContractPdfBuffer.includes('n\\260APP 753 210 859')).to.be.true
-    })
+    }).timeout(10000)
 
     it('should throw a not found error if no specific terms found', async () => {
       // When
@@ -99,5 +99,5 @@ describe('Policies - Infra - Contract FS Repository', async () => {
       // Then
       return expect(promise).to.be.rejectedWith(SignedContractNotFoundError)
     })
-  })
+  }).timeout(10000)
 })

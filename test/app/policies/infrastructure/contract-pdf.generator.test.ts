@@ -27,7 +27,7 @@ describe('Policies - Infra - Contract PDF Generator', async () => {
       expect(subscriptionDocumentsPdfBuffer.includes('Par cette signature, j\\222accepte les termes du contrat')).to.be.true
       expect(subscriptionDocumentsPdfBuffer.includes('(P)87.9 (AR)49.3 (TICULI\\310RES)')).to.be.true
       expect(subscriptionDocumentsPdfBuffer.includes('CONDITIONS G\\311N\\311RALES')).to.be.true
-    })
+    }).timeout(10000)
   })
 
   describe('#getContractName', () => {
@@ -37,6 +37,6 @@ describe('Policies - Infra - Contract PDF Generator', async () => {
 
       // Then
       expect(contractFileName).to.equal('Appenin_Contrat_assurance_habitation_APP111111111.pdf')
-    })
+    }).timeout(10000)
   })
 })

@@ -2,9 +2,12 @@ import { Sequelize } from 'sequelize-typescript'
 import { Logger, logger } from './logger'
 import { quoteSqlModels } from '../app/quotes/quote.container'
 import { policySqlModels } from '../app/policies/policies.container'
+import { DatabaseInitializationError } from '../app/common-api/domain/database.errors'
+
+let sequelize: Sequelize
 
 export async function initSequelize (config) {
-  const sequelize: Sequelize = new Sequelize(config.get('FALCO_API_DATABASE_URL'), {
+  sequelize = new Sequelize(config.get('FALCO_API_DATABASE_URL'), {
     dialect: 'postgres',
     logging: logDbStatement(logger, config.get('FALCO_API_APP_NAME'), config.get('FALCO_API_DATABASE_URL')),
     pool: {
@@ -14,11 +17,14 @@ export async function initSequelize (config) {
       idle: 10000
     }
   })
-
   sequelize.addModels(quoteSqlModels)
   sequelize.addModels(policySqlModels)
 
   return sequelize
+}
+
+export function getSequelize () {
+  return sequelize || new DatabaseInitializationError()
 }
 
 function logDbStatement (logger: Logger, db: string, databaseUrl: string) {

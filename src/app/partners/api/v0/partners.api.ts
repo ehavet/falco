@@ -32,7 +32,10 @@ export default function (container: Container): Array<ServerRoute> {
                 room_count: Joi.object({
                   required: Joi.boolean().description('Question required or not').example(true),
                   options: Joi.array().description('Possible values').example([1, 2, 3])
-                }).description('Question about the number of rooms of the property')
+                }).description('Question about the number of rooms of the property'),
+                roommate: Joi.object({
+                  available: Joi.boolean().description('Question to ask or not').example(false)
+                }).description('Question about the possibility of roommates for the insured property')
               }).description('List of questions to ask for the quote')
             }).label('Partner'),
             400: HttpErrorSchema.badRequestSchema,

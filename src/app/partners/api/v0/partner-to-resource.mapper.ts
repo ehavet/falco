@@ -15,6 +15,8 @@ function _toQuestions (jsonQuestions: any) {
     switch (jsonQuestion.code) {
       case Partner.Question.QuestionCode.RoomCount:
         return Object.assign(questions, _toRoomCountQuestion(jsonQuestion))
+      case Partner.Question.QuestionCode.Roommate:
+        return Object.assign(questions, _toRoommateQuestion(jsonQuestion))
       default:
         return questions
     }
@@ -22,12 +24,18 @@ function _toQuestions (jsonQuestions: any) {
 }
 
 function _toRoomCountQuestion (jsonQuestion: any) {
-  const roomCountQuestion = {
+  return {
     room_count: {
       options: jsonQuestion.options.list,
       required: jsonQuestion.required
     }
   }
+}
 
-  return roomCountQuestion
+function _toRoommateQuestion (jsonQuestion: any) {
+  return {
+    roommate: {
+      available: jsonQuestion.available
+    }
+  }
 }

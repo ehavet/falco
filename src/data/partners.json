@@ -10,6 +10,10 @@
           "list": [1, 2, 3]
         },
         "required": true
+      },
+      {
+        "code": "Roommate",
+        "available": true
       }
     ],
     "offer": {
@@ -37,6 +41,10 @@
           "list": [1, 2]
         },
         "required": true
+      },
+      {
+        "code": "Roommate",
+        "available": false
       }
     ],
     "offer": {

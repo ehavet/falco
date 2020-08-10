@@ -15,7 +15,12 @@ describe('Get partner by code', async () => {
         options: {
           list: [1, 2]
         }
-      }]
+      },
+      {
+        code: Partner.Question.QuestionCode.Roommate,
+        available: true
+      }
+      ]
     }
 
     const partnerRepository = { getByCode: sinon.stub(), getOffer: sinon.stub(), getCallbackUrl: sinon.stub(), getOperationCodes: sinon.stub() }

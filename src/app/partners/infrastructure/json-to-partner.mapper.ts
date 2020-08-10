@@ -56,8 +56,7 @@ function _toRoomCountQuestion (jsonQuestion: any) {
     code: Partner.Question.QuestionCode.RoomCount,
     options: {
       list: jsonQuestion.options.list
-    },
-    required: jsonQuestion.required
+    }
   }
 
   return question

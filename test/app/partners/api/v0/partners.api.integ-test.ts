@@ -21,7 +21,6 @@ describe('Partners - API - Integ', async () => {
         callbackUrl: 'http://myPartner-callback.com',
         questions: [{
           code: Partner.Question.QuestionCode.RoomCount,
-          required: true,
           options: {
             list: [1, 2]
           }
@@ -38,7 +37,6 @@ describe('Partners - API - Integ', async () => {
         translation_key: 'myPartnerTranslationKey',
         questions: {
           room_count: {
-            required: true,
             options: [1, 2]
           },
           roommate: {

@@ -30,7 +30,6 @@ export default function (container: Container): Array<ServerRoute> {
               translation_key: Joi.string().description('Partner translation key').example('myPartnerTranslationKey'),
               questions: Joi.object({
                 room_count: Joi.object({
-                  required: Joi.boolean().description('Question required or not').example(true),
                   options: Joi.array().description('Possible values').example([1, 2, 3])
                 }).description('Question about the number of rooms of the property'),
                 roommate: Joi.object({

@@ -29,9 +29,8 @@ export namespace Partner {
 
 export namespace Partner.Question {
     export interface RoomCountQuestion {
-        code: QuestionCode.RoomCount,
+        code: QuestionCode,
         options: ListOptions<RoomCount>,
-        required: boolean,
     }
 
     export interface RoommateQuestion {

@@ -8,8 +8,7 @@
         "code": "RoomCount",
         "options": {
           "list": [1, 2, 3]
-        },
-        "required": true
+        }
       },
       {
         "code": "Roommate",
@@ -39,8 +38,7 @@
         "code": "RoomCount",
         "options": {
           "list": [1, 2]
-        },
-        "required": true
+        }
       },
       {
         "code": "Roommate",

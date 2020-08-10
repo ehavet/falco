@@ -16,8 +16,7 @@ const partnerJson = {
         code: Partner.Question.QuestionCode.RoomCount,
         options: {
           list: [1, 2, 3]
-        },
-        required: true
+        }
       },
       {
         code: Partner.Question.QuestionCode.Roommate,
@@ -45,8 +44,7 @@ const partnerJson = {
         code: Partner.Question.QuestionCode.RoomCount,
         options: {
           list: [1]
-        },
-        required: true
+        }
       },
       {
         code: Partner.Question.QuestionCode.Roommate,
@@ -91,8 +89,7 @@ describe('Partner Map Repository', async () => {
               code: Partner.Question.QuestionCode.RoomCount,
               options: {
                 list: [1, 2, 3]
-              },
-              required: true
+              }
             },
             {
               code: Partner.Question.QuestionCode.Roommate,

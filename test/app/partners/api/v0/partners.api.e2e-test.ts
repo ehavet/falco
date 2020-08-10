@@ -21,7 +21,6 @@ describe('Partners - API - E2E', async () => {
         translation_key: 'studyo',
         questions: {
           room_count: {
-            required: true,
             options: [1, 2, 3]
           },
           roommate: {

@@ -11,7 +11,6 @@ describe('Get partner by code', async () => {
       callbackUrl: 'http://myPartner-callback.com',
       questions: [{
         code: Partner.Question.QuestionCode.RoomCount,
-        required: true,
         options: {
           list: [1, 2]
         }

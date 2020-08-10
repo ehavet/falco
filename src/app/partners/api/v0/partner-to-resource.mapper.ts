@@ -26,8 +26,7 @@ function _toQuestions (jsonQuestions: any) {
 function _toRoomCountQuestion (jsonQuestion: any) {
   return {
     room_count: {
-      options: jsonQuestion.options.list,
-      required: jsonQuestion.required
+      options: jsonQuestion.options.list
     }
   }
 }

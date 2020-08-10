@@ -11,7 +11,7 @@ export interface Partner {
 
 export namespace Partner {
 
-    export type Question = Question.RoomCountQuestion
+    export type Question = Question.RoomCountQuestion | Question.RoommateQuestion
 
     export interface Offer {
         pricingMatrix: Map<RoomCount, Quote.Insurance.Estimate>
@@ -34,8 +34,14 @@ export namespace Partner.Question {
         required: boolean,
     }
 
+    export interface RoommateQuestion {
+        code: QuestionCode,
+        available: boolean
+    }
+
     export enum QuestionCode {
-        RoomCount = 'RoomCount'
+        RoomCount = 'RoomCount',
+        Roommate = 'Roommate'
     }
 
     export interface ListOptions<T> {

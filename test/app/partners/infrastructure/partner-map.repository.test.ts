@@ -18,6 +18,10 @@ const partnerJson = {
           list: [1, 2, 3]
         },
         required: true
+      },
+      {
+        code: Partner.Question.QuestionCode.Roommate,
+        available: false
       }
     ],
     offer: {
@@ -43,6 +47,10 @@ const partnerJson = {
           list: [1]
         },
         required: true
+      },
+      {
+        code: Partner.Question.QuestionCode.Roommate,
+        available: true
       }
     ],
     offer: {
@@ -85,6 +93,10 @@ describe('Partner Map Repository', async () => {
                 list: [1, 2, 3]
               },
               required: true
+            },
+            {
+              code: Partner.Question.QuestionCode.Roommate,
+              available: false
             }
           ],
           offer: {

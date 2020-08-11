@@ -16,8 +16,11 @@ const partnerJson = {
         code: Partner.Question.QuestionCode.RoomCount,
         options: {
           list: [1, 2, 3]
-        },
-        required: true
+        }
+      },
+      {
+        code: Partner.Question.QuestionCode.Roommate,
+        applicable: false
       }
     ],
     offer: {
@@ -41,8 +44,11 @@ const partnerJson = {
         code: Partner.Question.QuestionCode.RoomCount,
         options: {
           list: [1]
-        },
-        required: true
+        }
+      },
+      {
+        code: Partner.Question.QuestionCode.Roommate,
+        applicable: true
       }
     ],
     offer: {
@@ -83,8 +89,11 @@ describe('Partner Map Repository', async () => {
               code: Partner.Question.QuestionCode.RoomCount,
               options: {
                 list: [1, 2, 3]
-              },
-              required: true
+              }
+            },
+            {
+              code: Partner.Question.QuestionCode.Roommate,
+              applicable: false
             }
           ],
           offer: {

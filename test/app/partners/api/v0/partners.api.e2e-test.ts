@@ -1,7 +1,7 @@
 import * as supertest from 'supertest'
 import { expect, HttpServerForTesting, newProdLikeServer } from '../../../../test-utils'
 
-describe('Http API partners e2e', async () => {
+describe('Partners - API - E2E', async () => {
   let httpServer: HttpServerForTesting
   before(async () => {
     httpServer = await newProdLikeServer()
@@ -21,8 +21,10 @@ describe('Http API partners e2e', async () => {
         translation_key: 'studyo',
         questions: {
           room_count: {
-            required: true,
             options: [1, 2, 3]
+          },
+          roommate: {
+            applicable: true
           }
         }
       })

@@ -4,7 +4,7 @@ import { container, partnerRoutes } from '../../../../../src/app/partners/partne
 import { Partner } from '../../../../../src/app/partners/domain/partner'
 import { PartnerNotFoundError } from '../../../../../src/app/partners/domain/partner.errors'
 
-describe('Http API partners integ', async () => {
+describe('Partners - API - Integ', async () => {
   let httpServer: HttpServerForTesting
 
   before(async () => {
@@ -21,11 +21,15 @@ describe('Http API partners integ', async () => {
         callbackUrl: 'http://myPartner-callback.com',
         questions: [{
           code: Partner.Question.QuestionCode.RoomCount,
-          required: true,
           options: {
             list: [1, 2]
           }
-        }]
+        },
+        {
+          code: Partner.Question.QuestionCode.Roommate,
+          applicable: true
+        }
+        ]
       }
 
       const expectedResourcePartner = {
@@ -33,8 +37,10 @@ describe('Http API partners integ', async () => {
         translation_key: 'myPartnerTranslationKey',
         questions: {
           room_count: {
-            required: true,
             options: [1, 2]
+          },
+          roommate: {
+            applicable: true
           }
         }
       }

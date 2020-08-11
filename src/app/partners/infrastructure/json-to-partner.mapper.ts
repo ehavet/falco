@@ -43,6 +43,8 @@ function _toQuestions (questions: any) {
     switch (jsonQuestion.code) {
       case Partner.Question.QuestionCode.RoomCount:
         return _toRoomCountQuestion(jsonQuestion)
+      case Partner.Question.QuestionCode.Roommate:
+        return _toRoommateQuestion(jsonQuestion)
       default:
         return undefined
     }
@@ -54,8 +56,16 @@ function _toRoomCountQuestion (jsonQuestion: any) {
     code: Partner.Question.QuestionCode.RoomCount,
     options: {
       list: jsonQuestion.options.list
-    },
-    required: jsonQuestion.required
+    }
+  }
+
+  return question
+}
+
+function _toRoommateQuestion (jsonQuestion: any) {
+  const question: Partner.Question.RoommateQuestion = {
+    code: Partner.Question.QuestionCode.Roommate,
+    applicable: jsonQuestion.applicable
   }
 
   return question

@@ -390,7 +390,7 @@ describe('Policies - API - Integration', async () => {
           expect(response).to.have.property('statusCode', 400)
         })
 
-        describe('and a policy holder but', async () => {
+        describe('and a policy holder', async () => {
           it('but no firstname', async () => {
             // Given
             delete requestParams.risk.people.policy_holder.firstname

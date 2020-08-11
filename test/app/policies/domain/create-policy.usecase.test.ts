@@ -12,6 +12,7 @@ import { createOngoingPolicyFixture } from '../fixtures/policy.fixture'
 import { EmailValidationQuery } from '../../../../src/app/email-validations/domain/email-validation-query'
 import { PartnerRepository } from '../../../../src/app/partners/domain/partner.repository'
 import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles'
+import { RoommatesNotAllowedError } from '../../../../src/app/policies/domain/policies.errors'
 
 describe('Policies - Usecase - Create policy', async () => {
   const now = new Date('2020-01-05T10:09:08Z')
@@ -21,7 +22,8 @@ describe('Policies - Usecase - Create policy', async () => {
   const quoteRepository: SinonStubbedInstance<QuoteRepository> = { save: sinon.stub(), get: sinon.stub() }
   const partnerRepository: SinonStubbedInstance<PartnerRepository> = { getByCode: sinon.stub(), getOffer: sinon.stub(), getCallbackUrl: sinon.stub(), getOperationCodes: sinon.stub() }
   const sendValidationLinkToEmailAddress = sinon.stub()
-  const createPolicy: CreatePolicy = CreatePolicy.factory(policyRepository, quoteRepository, partnerRepository, sendValidationLinkToEmailAddress)
+  const doesPartnerAllowRoommates = sinon.stub()
+  const createPolicy: CreatePolicy = CreatePolicy.factory(policyRepository, quoteRepository, partnerRepository, sendValidationLinkToEmailAddress, doesPartnerAllowRoommates)
 
   beforeEach(() => {
     const pricingMatrix = new Map([
@@ -38,10 +40,12 @@ describe('Policies - Usecase - Create policy', async () => {
       ipid: 'ipid',
       operationCodes: []
     })
+    doesPartnerAllowRoommates.resolves(true)
   })
 
   afterEach(() => {
     sendValidationLinkToEmailAddress.reset()
+    doesPartnerAllowRoommates.reset()
   })
 
   it('should save the created policy', async () => {
@@ -60,7 +64,7 @@ describe('Policies - Usecase - Create policy', async () => {
     return expect(saveSpy).to.have.been.calledWith(expectedPolicy)
   })
 
-  it('should return the newly create policy', async () => {
+  it('should return the newly created policy', async () => {
     // Given
     const expectedPolicy = createOngoingPolicyFixture()
     quoteRepository.get.withArgs(createPolicyCommand.quoteId).resolves(quote)
@@ -100,5 +104,19 @@ describe('Policies - Usecase - Create policy', async () => {
     expect(actualEmailValidationQuery.callbackUrl).to.equal(emailValidationQuery.callbackUrl)
     expect(actualEmailValidationQuery.partnerCode).to.equal(emailValidationQuery.partnerCode)
     expect(actualEmailValidationQuery.policyId).to.exist
+  })
+
+  it('should throw an error if there are roommates but the partner does not allow it', async () => {
+    // Given
+    quoteRepository.get.withArgs(createPolicyCommand.quoteId).resolves(quote)
+
+    doesPartnerAllowRoommates.reset()
+    doesPartnerAllowRoommates.resolves(false)
+
+    // When
+    const promise = createPolicy(createPolicyCommand)
+
+    // Then
+    expect(promise).to.be.rejectedWith(RoommatesNotAllowedError)
   })
 })

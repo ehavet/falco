@@ -44,6 +44,7 @@ import { Mailer } from '../common-api/domain/mailer'
 import { Nodemailer } from '../common-api/infrastructure/nodemailer.mailer'
 import { nodemailerTransporter } from '../../libs/nodemailer'
 import { UpdatePolicy } from './domain/update-policy.usecase'
+import { DoesPartnerAllowRoommates } from '../partners/domain/does-partner-allow-roommates.usecase'
 import { ApplySpecialOperationCodeOnPolicy } from './domain/apply-special-operation-code-on-policy.usecase'
 import { ApplyStartDateOnPolicy } from './domain/apply-start-date-on-policy.usecase'
 const config = require('../../config')
@@ -80,7 +81,8 @@ const createPaymentIntentForPolicy: CreatePaymentIntentForPolicy =
     CreatePaymentIntentForPolicy.factory(paymentProcessor, policyRepository)
 
 const sendValidationLinkToEmailAddress: SendValidationLinkToEmailAddress = emailValidationContainer.SendValidationLinkToEmailAddress
-const createPolicy: CreatePolicy = CreatePolicy.factory(policyRepository, quoteRepository, partnerRepository, sendValidationLinkToEmailAddress)
+const doesPartnerAllowRoommates: DoesPartnerAllowRoommates = partnerContainer.DoesPartnerAllowRoommates
+const createPolicy: CreatePolicy = CreatePolicy.factory(policyRepository, quoteRepository, partnerRepository, sendValidationLinkToEmailAddress, doesPartnerAllowRoommates)
 const confirmPaymentIntentForPolicy: ConfirmPaymentIntentForPolicy =
     ConfirmPaymentIntentForPolicy.factory(policyRepository, certificateRepository, contractGenerator, contractRepository, mailer)
 const getPolicy: GetPolicy = GetPolicy.factory(policyRepository)

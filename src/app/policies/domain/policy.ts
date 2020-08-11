@@ -4,6 +4,8 @@ import { generate } from 'randomstring'
 import { PolicyRepository } from './policy.repository'
 import dayjs from 'dayjs'
 import { CannotGeneratePolicyNotApplicableError } from './certificate/certificate.errors'
+import { DoesPartnerAllowRoommates } from '../../partners/domain/does-partner-allow-roommates.usecase'
+import { RoommatesNotAllowedError } from './policies.errors'
 import { PolicyStartDateConsistencyError } from './policies.errors'
 
 const DEFAULT_NUMBER_OF_MONTHS_DUE = 12
@@ -85,19 +87,22 @@ export namespace Policy {
     }
 
     export async function
-    create (createPolicyCommand: CreatePolicyCommand, quote: Quote, policyRepository: PolicyRepository, productCode: string): Promise<Policy> {
-      const generatedId: string = _generateId(createPolicyCommand.partnerCode, productCode)
+    create (createPolicyCommand: CreatePolicyCommand, quote: Quote, policyRepository: PolicyRepository,
+      productCode: string, doesPartnerAllowRoommates: DoesPartnerAllowRoommates): Promise<Policy> {
+      const partnerCode: string = createPolicyCommand.partnerCode
+      const generatedId: string = _generateId(partnerCode, productCode)
       if (await policyRepository.isIdAvailable(generatedId)) {
+        const risk = await _createRisk(createPolicyCommand.risk, quote.risk, partnerCode, doesPartnerAllowRoommates)
         const startDate: Date = _getStartDate(createPolicyCommand)
         return {
           id: generatedId,
           partnerCode: createPolicyCommand.partnerCode,
           insurance: quote.insurance,
-          risk: _createRisk(createPolicyCommand.risk, quote.risk),
+          risk,
           contact: _createContact(createPolicyCommand.contact, createPolicyCommand.risk),
           nbMonthsDue: DEFAULT_NUMBER_OF_MONTHS_DUE,
           premium: DEFAULT_NUMBER_OF_MONTHS_DUE * quote.insurance.estimate.monthlyPrice,
-          startDate: startDate,
+          startDate,
           termStartDate: startDate,
           termEndDate: _computeTermEndDate(startDate, DEFAULT_NUMBER_OF_MONTHS_DUE),
           signatureDate: undefined,
@@ -108,7 +113,7 @@ export namespace Policy {
         }
       }
 
-      return create(createPolicyCommand, quote, policyRepository, productCode)
+      return create(createPolicyCommand, quote, policyRepository, productCode, doesPartnerAllowRoommates)
     }
 
     function _generateId (partnerCode: string, productCode: string): string {
@@ -122,7 +127,12 @@ export namespace Policy {
       return createPolicyCommand.startDate || new Date()
     }
 
-    function _createRisk (queryRisk: CreatePolicyCommand.Risk, quoteRisk: Quote.Risk): Policy.Risk {
+    async function _createRisk (queryRisk: CreatePolicyCommand.Risk, quoteRisk: Quote.Risk,
+      partnerCode: string, doesPartnerAllowRoommates: DoesPartnerAllowRoommates): Promise<Policy.Risk> {
+      const partnerAllowsRoommates = await doesPartnerAllowRoommates({ partnerCode })
+      if (queryRisk.people.otherInsured?.length > 0 && !partnerAllowsRoommates) {
+        throw new RoommatesNotAllowedError(partnerCode)
+      }
       return {
         property: {
           roomCount: quoteRisk.property.roomCount,

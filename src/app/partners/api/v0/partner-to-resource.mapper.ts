@@ -34,7 +34,7 @@ function _toRoomCountQuestion (jsonQuestion: any) {
 function _toRoommateQuestion (jsonQuestion: any) {
   return {
     roommate: {
-      available: jsonQuestion.available
+      applicable: jsonQuestion.applicable
     }
   }
 }

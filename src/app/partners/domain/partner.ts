@@ -35,7 +35,7 @@ export namespace Partner.Question {
 
     export interface RoommateQuestion {
         code: QuestionCode,
-        available: boolean
+        applicable: boolean
     }
 
     export enum QuestionCode {

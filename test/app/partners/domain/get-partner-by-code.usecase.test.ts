@@ -17,7 +17,7 @@ describe('Get partner by code', async () => {
       },
       {
         code: Partner.Question.QuestionCode.Roommate,
-        available: true
+        applicable: true
       }
       ]
     }

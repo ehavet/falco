@@ -12,7 +12,7 @@
       },
       {
         "code": "Roommate",
-        "available": true
+        "applicable": true
       }
     ],
     "offer": {
@@ -42,7 +42,7 @@
       },
       {
         "code": "Roommate",
-        "available": false
+        "applicable": false
       }
     ],
     "offer": {

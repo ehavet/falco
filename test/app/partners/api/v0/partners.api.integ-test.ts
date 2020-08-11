@@ -27,7 +27,7 @@ describe('Partners - API - Integ', async () => {
         },
         {
           code: Partner.Question.QuestionCode.Roommate,
-          available: true
+          applicable: true
         }
         ]
       }
@@ -40,7 +40,7 @@ describe('Partners - API - Integ', async () => {
             options: [1, 2]
           },
           roommate: {
-            available: true
+            applicable: true
           }
         }
       }

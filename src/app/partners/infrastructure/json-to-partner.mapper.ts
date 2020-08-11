@@ -65,7 +65,7 @@ function _toRoomCountQuestion (jsonQuestion: any) {
 function _toRoommateQuestion (jsonQuestion: any) {
   const question: Partner.Question.RoommateQuestion = {
     code: Partner.Question.QuestionCode.Roommate,
-    available: jsonQuestion.available
+    applicable: jsonQuestion.applicable
   }
 
   return question

@@ -20,7 +20,7 @@ const partnerJson = {
       },
       {
         code: Partner.Question.QuestionCode.Roommate,
-        available: false
+        applicable: false
       }
     ],
     offer: {
@@ -48,7 +48,7 @@ const partnerJson = {
       },
       {
         code: Partner.Question.QuestionCode.Roommate,
-        available: true
+        applicable: true
       }
     ],
     offer: {
@@ -93,7 +93,7 @@ describe('Partner Map Repository', async () => {
             },
             {
               code: Partner.Question.QuestionCode.Roommate,
-              available: false
+              applicable: false
             }
           ],
           offer: {

@@ -33,7 +33,7 @@ export default function (container: Container): Array<ServerRoute> {
                   options: Joi.array().description('Possible values').example([1, 2, 3])
                 }).description('Question about the number of rooms of the property'),
                 roommate: Joi.object({
-                  available: Joi.boolean().description('Question to ask or not').example(false)
+                  applicable: Joi.boolean().description('Question to ask or not').example(false)
                 }).description('Question about the possibility of roommates for the insured property')
               }).description('List of questions to ask for the quote')
             }).label('Partner'),

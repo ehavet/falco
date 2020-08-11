@@ -24,7 +24,7 @@ describe('Partners - API - E2E', async () => {
             options: [1, 2, 3]
           },
           roommate: {
-            available: true
+            applicable: true
           }
         }
       })

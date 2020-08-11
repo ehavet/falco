@@ -2,7 +2,7 @@ import { expect, sinon } from '../../../test-utils'
 import { Partner } from '../../../../src/app/partners/domain/partner'
 import { GetPartnerByCode } from '../../../../src/app/partners/domain/get-partner-by-code.usecase'
 
-describe('Get partner by code', async () => {
+describe('Partners - Usecase - Get partner by code', async () => {
   it('should return requested partner', async () => {
     // GIVEN
     const expectedPartner: Partner = {

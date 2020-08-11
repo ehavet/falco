@@ -5,6 +5,7 @@ import { Partner } from '../../../../src/app/partners/domain/partner'
 import { Quote } from '../../../../src/app/quotes/domain/quote'
 import { PartnerRepository } from '../../../../src/app/partners/domain/partner.repository'
 import { OperationCode } from '../../../../src/app/policies/domain/operation-code'
+import { createPartnerFixture } from '../fixtures/partner.fixture'
 
 const partnerJson = {
   partnerOne: {
@@ -79,35 +80,7 @@ describe('Partner Map Repository', async () => {
       const partner: Partner = await partnerMapRepository.getByCode('partnerOne')
 
       // THEN
-      expect(partner).to.deep.equal(
-        {
-          code: 'partnerOne',
-          translationKey: 'translationKey',
-          callbackUrl: 'http://partner1-callback.com',
-          questions: [
-            {
-              code: Partner.Question.QuestionCode.RoomCount,
-              options: {
-                list: [1, 2, 3]
-              }
-            },
-            {
-              code: Partner.Question.QuestionCode.Roommate,
-              applicable: false
-            }
-          ],
-          offer: {
-            simplifiedCovers: ['ACDDE'],
-            pricingMatrix: new Map([
-              [1, { monthlyPrice: 3.30, defaultDeductible: 120, defaultCeiling: 5000 }]
-            ]),
-            productCode: 'MRH_Etudiant',
-            productVersion: '1.0',
-            contractualTerms: '/path/to/contractual/terms',
-            ipid: '/path/to/ipid',
-            operationCodes: ['SEMESTER1', 'FULLYEAR']
-          }
-        })
+      expect(partner).to.deep.equal(createPartnerFixture())
     })
 
     it('should thrown not found error when partner is not found', async () => {

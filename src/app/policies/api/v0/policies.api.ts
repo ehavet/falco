@@ -4,7 +4,13 @@ import * as HttpErrorSchema from '../../../common-api/HttpErrorSchema'
 import * as Boom from '@hapi/boom'
 import { Container } from '../../policies.container'
 import { PaymentIntentQuery } from '../../domain/payment-intent-query'
-import { PolicyAlreadySignedError, PolicyNotFoundError, PolicyNotUpdatableError, PolicyStartDateConsistencyError } from '../../domain/policies.errors'
+import {
+  PolicyAlreadySignedError,
+  PolicyNotFoundError,
+  PolicyNotUpdatableError,
+  PolicyStartDateConsistencyError,
+  RoommatesNotAllowedError
+} from '../../domain/policies.errors'
 import { QuoteNotFoundError } from '../../../quotes/domain/quote.errors'
 import { CreatePolicyCommand } from '../../domain/create-policy-command'
 import { requestToCreatePolicyCommand } from './mappers/create-policy-command.mapper'
@@ -92,6 +98,7 @@ export default function (container: Container, logger: Logger): Array<ServerRout
             201: policySchema,
             400: HttpErrorSchema.badRequestSchema,
             404: HttpErrorSchema.notFoundSchema,
+            422: HttpErrorSchema.unprocessableEntitySchema,
             500: HttpErrorSchema.internalServerErrorSchema
           }
         }
@@ -105,6 +112,9 @@ export default function (container: Container, logger: Logger): Array<ServerRout
         } catch (error) {
           if (error instanceof QuoteNotFoundError) {
             throw Boom.notFound(error.message)
+          }
+          if (error instanceof RoommatesNotAllowedError) {
+            throw Boom.badData(error.message)
           }
           throw Boom.internal(error)
         }

@@ -42,9 +42,9 @@ module.exports = Envie({
 
   FALCO_API_CRYPTO_IV: Joi.string(),
 
-  FALCO_API_EMAIL_VALIDATION_URL: Joi.string().uri().default('http://front-url/validate'),
+  FALCO_API_EMAIL_VALIDATION_LINK_URL: Joi.string().uri().default('http://front-url/validate'),
 
-  FALCO_API_EMAIL_VALIDATION_VALIDITY_PERIOD: Joi.number().min(1).default(6),
+  FALCO_API_EMAIL_VALIDATION_TOKEN_VALIDITY_PERIOD: Joi.number().min(1).default(6),
 
   FALCO_API_EMAIL_TRANSPORT: Joi.string().valid('sendmail', 'stream'),
 
@@ -54,9 +54,9 @@ module.exports = Envie({
 
   FALCO_API_STRIPE_WEBHOOK_SECRET: Joi.string(),
 
-  FALCO_API_EMAIL_VALIDATION_APPENIN_CALLBACK_PAGE_ROUTE: Joi.string().default('synthese'),
+  FALCO_API_EMAIL_VALIDATION_DEFAULT_CALLBACK_ROUTE: Joi.string().default('synthese'),
 
-  FALCO_API_FALCO_FRONT_URL: Joi.string().default('http://front-url'),
+  FALCO_API_EMAIL_VALIDATION_DEFAULT_CALLBACK_URL: Joi.string().default('http://front-url'),
 
   FALCO_API_DOCUMENTS_STORAGE_FOLDER: Joi.string().default(_getSpecificTermsStorageFolder()),
 

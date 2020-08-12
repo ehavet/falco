@@ -9,9 +9,9 @@ export interface ValidationLinkConfig {
 }
 
 export const validationLinkConfig: ValidationLinkConfig = {
-  baseUrl: config.get('FALCO_API_EMAIL_VALIDATION_URL'),
-  validityPeriodinMonth: config.get('FALCO_API_EMAIL_VALIDATION_VALIDITY_PERIOD'),
-  frontUrl: config.get('FALCO_API_FALCO_FRONT_URL'),
-  frontCallbackPageRoute: config.get('FALCO_API_EMAIL_VALIDATION_APPENIN_CALLBACK_PAGE_ROUTE'),
+  baseUrl: config.get('FALCO_API_EMAIL_VALIDATION_LINK_URL'),
+  validityPeriodinMonth: config.get('FALCO_API_EMAIL_VALIDATION_TOKEN_VALIDITY_PERIOD'),
+  frontUrl: config.get('FALCO_API_EMAIL_VALIDATION_DEFAULT_CALLBACK_URL'),
+  frontCallbackPageRoute: config.get('FALCO_API_EMAIL_VALIDATION_DEFAULT_CALLBACK_ROUTE'),
   locales: ['fr', 'en']
 }

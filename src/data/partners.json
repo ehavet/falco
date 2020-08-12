@@ -37,7 +37,7 @@
       {
         "code": "RoomCount",
         "options": {
-          "list": [1, 2]
+          "list": [1, 2, 3]
         }
       },
       {
@@ -49,7 +49,8 @@
       "simplifiedCovers": ["ACDDE", "ACINCEX", "ACVOL", "ACASSHE", "ACDEFJU", "ACRC"],
       "pricingMatrix": [
         [1, { "monthlyPrice": 6.34, "defaultDeductible": 120, "defaultCeiling": 3000 }],
-        [2, { "monthlyPrice": 8.00, "defaultDeductible": 120, "defaultCeiling": 3000 }]
+        [2, { "monthlyPrice": 6.34, "defaultDeductible": 120, "defaultCeiling": 3000 }],
+        [3, { "monthlyPrice": 6.34, "defaultDeductible": 120, "defaultCeiling": 3000 }]
       ],
       "operationCodes": ["SEMESTER1", "SEMESTER2", "FULLYEAR"],
       "productCode": "APP658",

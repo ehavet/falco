@@ -16,10 +16,11 @@ describe('Policies - Domain', async () => {
     const policyRepository: SinonStubbedInstance<PolicyRepository> = policyRepositoryStub()
     const doesPartnerAllowRoommates = sinon.stub()
     const quote: Quote = createQuote()
-    const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({ quoteId: quote.id })
+    let createPolicyCommand: CreatePolicyCommand
     const productCode = 'MYP321'
 
     beforeEach(() => {
+      createPolicyCommand = createCreatePolicyCommand({ quoteId: quote.id })
       dateFaker.setCurrentDate(now)
       policyRepository.isIdAvailable.resolves(true)
       doesPartnerAllowRoommates.resolves(true)

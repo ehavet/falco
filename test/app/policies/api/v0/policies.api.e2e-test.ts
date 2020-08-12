@@ -329,7 +329,7 @@ describe('Policies - API - E2E', async () => {
         .set('X-Consumer-Username', 'studyo')
       // Then
       expect(response.body.url).to.include(('https://app.hellosign.com/editor/embeddedSign?signature_id='))
-    }).timeout(10000)
+    }).timeout(15000)
   })
 
   describe('POST /v0/policies/:id/apply-spec-ops-code', async () => {

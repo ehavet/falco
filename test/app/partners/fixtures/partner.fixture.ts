@@ -15,7 +15,7 @@ export function createPartnerFixture (attr: Partial<Partner> = {}): Partner {
       },
       {
         code: Partner.Question.QuestionCode.Roommate,
-        applicable: false
+        applicable: true
       }
     ],
     offer: {
@@ -23,7 +23,7 @@ export function createPartnerFixture (attr: Partial<Partner> = {}): Partner {
       pricingMatrix: new Map([
         [1, { monthlyPrice: 3.30, defaultDeductible: 120, defaultCeiling: 5000 }]
       ]),
-      productCode: 'MRH_Etudiant',
+      productCode: 'APP666',
       productVersion: '1.0',
       contractualTerms: '/path/to/contractual/terms',
       ipid: '/path/to/ipid',

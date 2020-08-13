@@ -9,3 +9,7 @@ export function doesPartnerAllowRoommates (partner: Partner): boolean {
   }
   throw new PartnerQuestionNotFoundError(partner.code, Partner.Question.QuestionCode.Roommate)
 }
+
+export function getProductCode (partner: Partner): string {
+  return partner.offer.productCode
+}

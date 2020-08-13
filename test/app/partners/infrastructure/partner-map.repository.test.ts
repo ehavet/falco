@@ -21,7 +21,7 @@ const partnerJson = {
       },
       {
         code: Partner.Question.QuestionCode.Roommate,
-        applicable: false
+        applicable: true
       }
     ],
     offer: {
@@ -30,7 +30,7 @@ const partnerJson = {
         [1, { monthlyPrice: 3.30, defaultDeductible: 120, defaultCeiling: 5000 }]
       ],
       operationCodes: ['SEMESTER1', 'FULLYEAR'],
-      productCode: 'MRH_Etudiant',
+      productCode: 'APP666',
       productVersion: '1.0',
       contractualTerms: '/path/to/contractual/terms',
       ipid: '/path/to/ipid'
@@ -49,7 +49,7 @@ const partnerJson = {
       },
       {
         code: Partner.Question.QuestionCode.Roommate,
-        applicable: true
+        applicable: false
       }
     ],
     offer: {

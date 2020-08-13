@@ -6,7 +6,7 @@ export interface Partner {
     translationKey: string
     callbackUrl: string
     questions: Array<Partner.Question>
-    offer?: Partner.Offer
+    offer: Partner.Offer
 }
 
 export namespace Partner {

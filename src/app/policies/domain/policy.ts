@@ -4,9 +4,9 @@ import { generate } from 'randomstring'
 import { PolicyRepository } from './policy.repository'
 import dayjs from 'dayjs'
 import { CannotGeneratePolicyNotApplicableError } from './certificate/certificate.errors'
-import { DoesPartnerAllowRoommates } from '../../partners/domain/does-partner-allow-roommates.usecase'
-import { RoommatesNotAllowedError } from './policies.errors'
-import { PolicyStartDateConsistencyError } from './policies.errors'
+import { Partner } from '../../partners/domain/partner'
+import * as PartnerFunc from '../../partners/domain/partner.func'
+import { PolicyStartDateConsistencyError, RoommatesNotAllowedError } from './policies.errors'
 
 const DEFAULT_NUMBER_OF_MONTHS_DUE = 12
 
@@ -87,12 +87,12 @@ export namespace Policy {
     }
 
     export async function
-    create (createPolicyCommand: CreatePolicyCommand, quote: Quote, policyRepository: PolicyRepository,
-      productCode: string, doesPartnerAllowRoommates: DoesPartnerAllowRoommates): Promise<Policy> {
+    create (createPolicyCommand: CreatePolicyCommand, quote: Quote, policyRepository: PolicyRepository, partner: Partner): Promise<Policy> {
       const partnerCode: string = createPolicyCommand.partnerCode
+      const productCode: string = PartnerFunc.getProductCode(partner)
       const generatedId: string = _generateId(partnerCode, productCode)
       if (await policyRepository.isIdAvailable(generatedId)) {
-        const risk = await _createRisk(createPolicyCommand.risk, quote.risk, partnerCode, doesPartnerAllowRoommates)
+        const risk = await _createRisk(createPolicyCommand.risk, quote.risk, partnerCode, partner)
         const startDate: Date = _getStartDate(createPolicyCommand)
         return {
           id: generatedId,
@@ -113,7 +113,7 @@ export namespace Policy {
         }
       }
 
-      return create(createPolicyCommand, quote, policyRepository, productCode, doesPartnerAllowRoommates)
+      return create(createPolicyCommand, quote, policyRepository, partner)
     }
 
     function _generateId (partnerCode: string, productCode: string): string {
@@ -128,8 +128,8 @@ export namespace Policy {
     }
 
     async function _createRisk (queryRisk: CreatePolicyCommand.Risk, quoteRisk: Quote.Risk,
-      partnerCode: string, doesPartnerAllowRoommates: DoesPartnerAllowRoommates): Promise<Policy.Risk> {
-      const partnerAllowsRoommates = await doesPartnerAllowRoommates({ partnerCode })
+      partnerCode: string, partner: Partner): Promise<Policy.Risk> {
+      const partnerAllowsRoommates = PartnerFunc.doesPartnerAllowRoommates(partner)
       if (queryRisk.people.otherInsured?.length > 0 && !partnerAllowsRoommates) {
         throw new RoommatesNotAllowedError(partnerCode)
       }

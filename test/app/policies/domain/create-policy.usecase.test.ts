@@ -12,7 +12,10 @@ import { createOngoingPolicyFixture } from '../fixtures/policy.fixture'
 import { EmailValidationQuery } from '../../../../src/app/email-validations/domain/email-validation-query'
 import { PartnerRepository } from '../../../../src/app/partners/domain/partner.repository'
 import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles'
+import { createPartnerFixture } from '../../partners/fixtures/partner.fixture'
 import { RoommatesNotAllowedError } from '../../../../src/app/policies/domain/policies.errors'
+import { Partner } from '../../../../src/app/partners/domain/partner'
+import Question = Partner.Question
 
 describe('Policies - Usecase - Create policy', async () => {
   const now = new Date('2020-01-05T10:09:08Z')
@@ -22,30 +25,16 @@ describe('Policies - Usecase - Create policy', async () => {
   const quoteRepository: SinonStubbedInstance<QuoteRepository> = { save: sinon.stub(), get: sinon.stub() }
   const partnerRepository: SinonStubbedInstance<PartnerRepository> = { getByCode: sinon.stub(), getOffer: sinon.stub(), getCallbackUrl: sinon.stub(), getOperationCodes: sinon.stub() }
   const sendValidationLinkToEmailAddress = sinon.stub()
-  const doesPartnerAllowRoommates = sinon.stub()
-  const createPolicy: CreatePolicy = CreatePolicy.factory(policyRepository, quoteRepository, partnerRepository, sendValidationLinkToEmailAddress, doesPartnerAllowRoommates)
+  const createPolicy: CreatePolicy = CreatePolicy.factory(policyRepository, quoteRepository, partnerRepository, sendValidationLinkToEmailAddress)
 
   beforeEach(() => {
-    const pricingMatrix = new Map([
-      [1, { monthlyPrice: 0, defaultDeductible: 0, defaultCeiling: 0 }]
-    ])
     dateFaker.setCurrentDate(now)
     policyRepository.isIdAvailable.resolves(true)
-    partnerRepository.getOffer.resolves({
-      pricingMatrix: pricingMatrix,
-      simplifiedCovers: ['', ''],
-      productCode: 'APP321',
-      productVersion: 'version',
-      contractualTerms: 'terms',
-      ipid: 'ipid',
-      operationCodes: []
-    })
-    doesPartnerAllowRoommates.resolves(true)
+    partnerRepository.getByCode.resolves(createPartnerFixture())
   })
 
   afterEach(() => {
     sendValidationLinkToEmailAddress.reset()
-    doesPartnerAllowRoommates.reset()
   })
 
   it('should save the created policy', async () => {
@@ -108,10 +97,11 @@ describe('Policies - Usecase - Create policy', async () => {
 
   it('should throw an error if there are roommates but the partner does not allow it', async () => {
     // Given
+    partnerRepository.getByCode.reset()
+    const questions: Array<Question> = [{ code: Partner.Question.QuestionCode.Roommate, applicable: false }]
+    const partner = createPartnerFixture({ questions })
+    partnerRepository.getByCode.resolves(partner)
     quoteRepository.get.withArgs(createPolicyCommand.quoteId).resolves(quote)
-
-    doesPartnerAllowRoommates.reset()
-    doesPartnerAllowRoommates.resolves(false)
 
     // When
     const promise = createPolicy(createPolicyCommand)

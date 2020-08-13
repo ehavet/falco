@@ -2,7 +2,7 @@ import { Partner } from '../domain/partner'
 import { PartnerRepository } from '../domain/partner.repository'
 import { PartnerNotFoundError } from '../domain/partner.errors'
 import { toPartner } from './json-to-partner.mapper'
-import { OperationCode } from '../../pricing/domain/operation-code'
+import { OperationCode } from '../../policies/domain/operation-code'
 
 const objectToMap = object => {
   const map = new Map<string, Partner>()

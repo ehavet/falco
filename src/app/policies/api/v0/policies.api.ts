@@ -4,7 +4,7 @@ import * as HttpErrorSchema from '../../../common-api/HttpErrorSchema'
 import * as Boom from '@hapi/boom'
 import { Container } from '../../policies.container'
 import { PaymentIntentQuery } from '../../domain/payment-intent-query'
-import { PolicyAlreadySignedError, PolicyNotFoundError, PolicyNotUpdatable } from '../../domain/policies.errors'
+import { PolicyAlreadySignedError, PolicyNotFoundError, PolicyNotUpdatableError, PolicyStartDateConsistencyError } from '../../domain/policies.errors'
 import { QuoteNotFoundError } from '../../../quotes/domain/quote.errors'
 import { CreatePolicyCommand } from '../../domain/create-policy-command'
 import { requestToCreatePolicyCommand } from './mappers/create-policy-command.mapper'
@@ -20,11 +20,15 @@ import { SpecificTerms } from '../../domain/specific-terms/specific-terms'
 import { SpecificTermsNotFoundError } from '../../domain/specific-terms/specific-terms.errors'
 import { ContractGenerationFailureError, SignatureRequestCreationFailureError, SpecificTermsGenerationFailureError } from '../../domain/signature-request.errors'
 import { UpdatePolicyCommand } from '../../domain/update-policy.usecase'
-import { OperationCodeNotApplicableError } from '../../../pricing/domain/operation-code.errors'
+import { OperationCodeNotApplicableError } from '../../domain/operation-code.errors'
+import { ApplySpecialOperationCodeCommand } from '../../domain/apply-special-operation-code-command'
+import { PartnerNotFoundError } from '../../../partners/domain/partner.errors'
+import { Logger } from '../../../../libs/logger'
+import { ApplyStartDateOnPolicyCommand } from '../../domain/apply-start-date-on-policy.usecase'
 
 const TAGS = ['api', 'policies']
 
-export default function (container: Container): Array<ServerRoute> {
+export default function (container: Container, logger: Logger): Array<ServerRoute> {
   return [
     {
       method: 'POST',
@@ -140,7 +144,7 @@ export default function (container: Container): Array<ServerRoute> {
       }
     },
     {
-      method: 'PATCH',
+      method: 'PUT',
       path: '/v0/policies/{id}',
       options: {
         tags: TAGS,
@@ -177,7 +181,7 @@ export default function (container: Container): Array<ServerRoute> {
           if (error instanceof PolicyNotFoundError) {
             throw Boom.notFound(error.message)
           }
-          if (error instanceof PolicyNotUpdatable ||
+          if (error instanceof PolicyNotUpdatableError ||
               error instanceof OperationCodeNotApplicableError) {
             throw Boom.badData(error.message)
           }
@@ -319,6 +323,106 @@ export default function (container: Container): Array<ServerRoute> {
               throw Boom.conflict(error.message)
             default:
               throw Boom.internal()
+          }
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/v0/policies/{id}/apply-spec-ops-code',
+      options: {
+        tags: TAGS,
+        description: 'Apply a special operation code on policy',
+        validate: {
+          params: Joi.object({
+            id: Joi.string().min(12).max(12).required()
+              .description('Policy id').example('APP365094241')
+          }),
+          payload: Joi.object({
+            spec_ops_code: Joi.string().trim()
+              .empty(['', null]).default('BLANK').max(100)
+              .description('Special operation code').example('SPECIALCODE1')
+          })
+        },
+        response: {
+          status: {
+            200: policySchema,
+            400: HttpErrorSchema.badRequestSchema,
+            404: HttpErrorSchema.notFoundSchema,
+            422: HttpErrorSchema.unprocessableEntitySchema,
+            500: HttpErrorSchema.internalServerErrorSchema
+          }
+        }
+      },
+      handler: async (request, h) => {
+        try {
+          const payload: any = request.payload
+          const params: any = request.params
+          const command: ApplySpecialOperationCodeCommand = {
+            policyId: params.id,
+            operationCode: payload.spec_ops_code
+          }
+          const updatedPolicy: Policy = await container.ApplySpecialOperationCodeOnPolicy(command)
+          return h.response(policyToResource(updatedPolicy)).code(200)
+        } catch (error) {
+          switch (true) {
+            case error instanceof OperationCodeNotApplicableError:
+              throw Boom.badData(error.message)
+            case error instanceof PolicyNotFoundError:
+            case error instanceof PartnerNotFoundError:
+              throw Boom.notFound(error.message)
+            default:
+              logger.error(error)
+              throw Boom.internal(error)
+          }
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/v0/policies/{id}/change-start-date',
+      options: {
+        tags: TAGS,
+        description: 'Apply start date update changes on policy',
+        validate: {
+          params: Joi.object({
+            id: Joi.string().min(12).max(12).required()
+              .description('Policy id').example('APP365094241')
+          }),
+          payload: Joi.object({
+            start_date: Joi.date().required()
+              .description('Policy start date').example('2020-04-26')
+          })
+        },
+        response: {
+          status: {
+            200: policySchema,
+            400: HttpErrorSchema.badRequestSchema,
+            404: HttpErrorSchema.notFoundSchema,
+            422: HttpErrorSchema.unprocessableEntitySchema,
+            500: HttpErrorSchema.internalServerErrorSchema
+          }
+        }
+      },
+      handler: async (request, h) => {
+        try {
+          const payload: any = request.payload
+          const params: any = request.params
+          const command: ApplyStartDateOnPolicyCommand = {
+            policyId: params.id,
+            startDate: payload.start_date
+          }
+          const updatedPolicy: Policy = await container.ApplyStartDateOnPolicy(command)
+          return h.response(policyToResource(updatedPolicy)).code(200)
+        } catch (error) {
+          switch (true) {
+            case error instanceof PolicyStartDateConsistencyError:
+              throw Boom.badData(error.message)
+            case error instanceof PolicyNotFoundError:
+              throw Boom.notFound(error.message)
+            default:
+              logger.error(error)
+              throw Boom.internal(error)
           }
         }
       }

@@ -1,5 +1,5 @@
 import { Partner } from './partner'
-import { OperationCode } from '../../pricing/domain/operation-code'
+import { OperationCode } from '../../policies/domain/operation-code'
 
 export interface PartnerRepository {
     getByCode(partnerCode: string): Promise<Partner>

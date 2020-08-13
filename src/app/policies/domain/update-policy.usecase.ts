@@ -1,8 +1,7 @@
 import { Policy } from './policy'
 import { PolicyRepository } from './policy.repository'
-import { ComputePriceWithOperationCode } from '../../pricing/domain/compute-price-with-operation-code.usecase'
-import { PolicyNotUpdatable } from './policies.errors'
-import { Price } from '../../pricing/domain/price'
+import { ApplySpecialOperationCodeOnPolicy } from './apply-special-operation-code-on-policy.usecase'
+import { PolicyNotUpdatableError } from './policies.errors'
 
 export interface UpdatePolicy {
     (updatePolicyCommand: UpdatePolicyCommand): Promise<Policy>
@@ -16,25 +15,21 @@ export interface UpdatePolicyCommand {
 
 export namespace UpdatePolicy {
 
-    export function factory (policyRepository: PolicyRepository, computePriceWithOperationalCode: ComputePriceWithOperationCode): UpdatePolicy {
+    export function factory (policyRepository: PolicyRepository, applySpecialOperationCodeOnPolicy: ApplySpecialOperationCodeOnPolicy): UpdatePolicy {
       return async (updatePolicyCommand: UpdatePolicyCommand): Promise<Policy> => {
         const policyId = updatePolicyCommand.policyId
         const operationCode = updatePolicyCommand.operationCode
-        const policy = await policyRepository.get(policyId)
-        let price: Price
+        let policy = await policyRepository.get(policyId)
 
         if (Policy.isSigned(policy)) {
-          throw new PolicyNotUpdatable(policy.id, policy.status)
+          throw new PolicyNotUpdatableError(policy.id, policy.status)
         }
 
         if (operationCode) {
-          price = await computePriceWithOperationalCode({ policyId, operationCode })
-          Policy.updatePolicyPrice(policy, price)
-          Policy.updatePolicyStartDate(policy, updatePolicyCommand.startDate, price.nbMonthsDue)
-        } else {
-          Policy.updatePolicyStartDate(policy, updatePolicyCommand.startDate)
+          policy = await applySpecialOperationCodeOnPolicy({ policyId, operationCode })
         }
 
+        Policy.applyStartDate(policy, updatePolicyCommand.startDate)
         await policyRepository.update(policy)
         return policy
       }

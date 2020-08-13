@@ -1,26 +1,30 @@
 import dayjs from 'dayjs'
-import { expect, sinon } from '../../../test-utils'
-import { PolicyNotFoundError, PolicyNotUpdatable } from '../../../../src/app/policies/domain/policies.errors'
+import { dateFaker, expect, sinon } from '../../../test-utils'
+import { PolicyNotFoundError, PolicyNotUpdatableError } from '../../../../src/app/policies/domain/policies.errors'
 import { UpdatePolicy, UpdatePolicyCommand } from '../../../../src/app/policies/domain/update-policy.usecase'
 import { SinonStubbedMember } from 'sinon'
-import { OperationCodeNotApplicableError } from '../../../../src/app/pricing/domain/operation-code.errors'
-import { ComputePriceWithOperationCodeCommand } from '../../../../src/app/pricing/domain/compute-price-with-operation-code-command'
-import { ComputePriceWithOperationCode } from '../../../../src/app/pricing/domain/compute-price-with-operation-code.usecase'
+import { OperationCodeNotApplicableError } from '../../../../src/app/policies/domain/operation-code.errors'
+import { ApplySpecialOperationCodeCommand } from '../../../../src/app/policies/domain/apply-special-operation-code-command'
+import { ApplySpecialOperationCodeOnPolicy } from '../../../../src/app/policies/domain/apply-special-operation-code-on-policy.usecase'
 import { Policy } from '../../../../src/app/policies/domain/policy'
-import { Price } from '../../../../src/app/pricing/domain/price'
 import { createPolicyFixture } from '../fixtures/policy.fixture'
 import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles'
 
 describe('Policies - Usecase - Update Policy', async () => {
+  const now: Date = new Date('2020-07-13')
   const policyRepository = policyRepositoryStub()
-  const computePriceWithOperationCode : SinonStubbedMember<ComputePriceWithOperationCode> = sinon.stub()
+  const applySpecialOperationCodeOnPolicy : SinonStubbedMember<ApplySpecialOperationCodeOnPolicy> = sinon.stub()
+
+  beforeEach(() => {
+    dateFaker.setCurrentDate(now)
+  })
 
   it('should throw an error if the policy does not exist', async () => {
     // Given
     const policyId = 'APP658473092'
     const updatePolicyCommand : UpdatePolicyCommand =
-            { policyId, operationCode: 'SEMESTER1', startDate: new Date('2020-02-12T00:00:00.000Z') }
-    const updatePolicy = UpdatePolicy.factory(policyRepository, computePriceWithOperationCode)
+            { policyId, operationCode: 'SEMESTER1', startDate: new Date('2020-07-13T00:00:00.000Z') }
+    const updatePolicy = UpdatePolicy.factory(policyRepository, applySpecialOperationCodeOnPolicy)
     policyRepository.get.withArgs(policyId).rejects(new PolicyNotFoundError(policyId))
 
     // When
@@ -35,27 +39,27 @@ describe('Policies - Usecase - Update Policy', async () => {
     const policyId = 'APP658473092'
     const policy = createPolicyFixture({ id: policyId, status: Policy.Status.Signed })
     const updatePolicyCommand : UpdatePolicyCommand =
-        { policyId, operationCode: 'SEMESTER1', startDate: new Date('2020-02-12T00:00:00.000Z') }
-    const updatePolicy = UpdatePolicy.factory(policyRepository, computePriceWithOperationCode)
+        { policyId, operationCode: 'SEMESTER1', startDate: new Date('2020-07-13T00:00:00.000Z') }
+    const updatePolicy = UpdatePolicy.factory(policyRepository, applySpecialOperationCodeOnPolicy)
     policyRepository.get.withArgs(policyId).resolves(policy)
 
     // When
     const promise = updatePolicy(updatePolicyCommand)
 
     // Then
-    return expect(promise).to.be.rejectedWith(PolicyNotUpdatable)
+    return expect(promise).to.be.rejectedWith(PolicyNotUpdatableError)
   })
 
   it('should throw an error if the operation code does not exist', async () => {
     // Given
     const policyId = 'APP658473092'
     const updatePolicyCommand : UpdatePolicyCommand =
-        { policyId, operationCode: 'SEMESTER1', startDate: new Date('2020-02-12T00:00:00.000Z') }
-    const updatePolicy = UpdatePolicy.factory(policyRepository, computePriceWithOperationCode)
+        { policyId, operationCode: 'SEMESTER1', startDate: new Date('2020-07-13T00:00:00.000Z') }
+    const updatePolicy = UpdatePolicy.factory(policyRepository, applySpecialOperationCodeOnPolicy)
     policyRepository.get.withArgs(policyId).resolves(createPolicyFixture())
 
-    const computePriceCommand : ComputePriceWithOperationCodeCommand = { policyId, operationCode: 'SEMESTER1' }
-    computePriceWithOperationCode.withArgs(computePriceCommand).rejects(new OperationCodeNotApplicableError('SEMESTER1', 'partner'))
+    const applySpecialOperationCodeCommand : ApplySpecialOperationCodeCommand = { policyId, operationCode: 'SEMESTER1' }
+    applySpecialOperationCodeOnPolicy.withArgs(applySpecialOperationCodeCommand).rejects(new OperationCodeNotApplicableError('SEMESTER1', 'partner'))
 
     // When
     const promise = updatePolicy(updatePolicyCommand)
@@ -68,39 +72,38 @@ describe('Policies - Usecase - Update Policy', async () => {
     // Given
     const policyId = 'APP658473092'
     const policy = createPolicyFixture({ id: policyId })
-    const startDate = new Date('2020-07-12T00:00:00.000Z')
+    const startDate = new Date('2020-07-13T00:00:00.000Z')
     const updatePolicyCommand : UpdatePolicyCommand =
         { policyId, operationCode: 'SEMESTER1', startDate }
-    const updatePolicy = UpdatePolicy.factory(policyRepository, computePriceWithOperationCode)
+    const updatePolicy = UpdatePolicy.factory(policyRepository, applySpecialOperationCodeOnPolicy)
     policyRepository.get.withArgs(policyId).resolves(policy)
 
-    const computePriceCommand : ComputePriceWithOperationCodeCommand = { policyId, operationCode: 'SEMESTER1' }
-    const newPrice: Price = { premium: 75.32, nbMonthsDue: 5, monthlyPrice: policy.insurance.estimate.monthlyPrice }
-    computePriceWithOperationCode.withArgs(computePriceCommand).resolves(newPrice)
+    const applySpecialOperationCodeCommand : ApplySpecialOperationCodeCommand = { policyId: policyId, operationCode: 'SEMESTER1' }
 
     const expectedPolicy = createPolicyFixture({ ...policy })
-    expectedPolicy.premium = 75.32
+    expectedPolicy.premium = 29.1
     expectedPolicy.nbMonthsDue = 5
     expectedPolicy.termStartDate = startDate
     expectedPolicy.termEndDate = dayjs(startDate).add(5, 'month').toDate()
-    policyRepository.update = sinon.mock()
-    policyRepository.update.withExactArgs(policy).resolves()
+
+    applySpecialOperationCodeOnPolicy.withArgs(applySpecialOperationCodeCommand).resolves(expectedPolicy)
 
     // When
-    const policyUpdated: Policy = await updatePolicy(updatePolicyCommand)
+    const response: Policy = await updatePolicy(updatePolicyCommand)
 
     // Then
-    expect(policyUpdated.premium).to.equal(newPrice.premium)
-    expect(policyUpdated.nbMonthsDue).to.equal(newPrice.nbMonthsDue)
-    expect(policyUpdated.startDate).to.deep.equal(startDate)
-    expect(policyUpdated.termStartDate).to.deep.equal(startDate)
-    expect(policyUpdated.termEndDate).to.deep.equal(dayjs(startDate).add(newPrice.nbMonthsDue, 'month').subtract(1, 'day').toDate())
+    sinon.assert.calledOnceWithExactly(policyRepository.update, expectedPolicy)
+    expect(response.premium).to.equal(29.1)
+    expect(response.nbMonthsDue).to.equal(5)
+    expect(response.startDate).to.deep.equal(startDate)
+    expect(response.termStartDate).to.deep.equal(startDate)
+    expect(response.termEndDate).to.deep.equal(dayjs(startDate).add(expectedPolicy.nbMonthsDue, 'month').subtract(1, 'day').toDate())
   })
 
   it('should update policy start date, term start date and term end date', async () => {
     // Given
     const policyId = 'APP658473092'
-    const expectedStartDate = new Date('2020-07-12T00:00:00.000Z')
+    const expectedStartDate = new Date('2020-07-13T00:00:00.000Z')
     const twelveMonthsLaterExpectedStartDate = dayjs(expectedStartDate).add(12, 'month').subtract(1, 'day').toDate()
     const initialPolicy = createPolicyFixture({ id: policyId })
     const expectedPolicy = createPolicyFixture({
@@ -113,7 +116,7 @@ describe('Policies - Usecase - Update Policy', async () => {
     policyRepository.update = sinon.spy()
 
     // When
-    const updatePolicy = UpdatePolicy.factory(policyRepository, computePriceWithOperationCode)
+    const updatePolicy = UpdatePolicy.factory(policyRepository, applySpecialOperationCodeOnPolicy)
     const command: UpdatePolicyCommand = { policyId, operationCode: undefined, startDate: expectedStartDate }
     const policyUpdated: Policy = await updatePolicy(command)
 

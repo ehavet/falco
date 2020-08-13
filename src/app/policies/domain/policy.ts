@@ -4,7 +4,7 @@ import { generate } from 'randomstring'
 import { PolicyRepository } from './policy.repository'
 import dayjs from 'dayjs'
 import { CannotGeneratePolicyNotApplicableError } from './certificate/certificate.errors'
-import { Price } from '../../pricing/domain/price'
+import { PolicyStartDateConsistencyError } from './policies.errors'
 
 const DEFAULT_NUMBER_OF_MONTHS_DUE = 12
 
@@ -65,15 +65,17 @@ export namespace Policy {
             policy.status === Policy.Status.Applicable
     }
 
-    export function updatePolicyPrice (policy: Policy, price: Price): void {
-      policy.premium = price.premium
-      policy.nbMonthsDue = price.nbMonthsDue
+    export function applyNbMonthsDue (policy: Policy, nbMonthsDue: number): void {
+      policy.premium = nbMonthsDue * policy.insurance.estimate.monthlyPrice
+      policy.nbMonthsDue = nbMonthsDue
+      policy.termEndDate = _computeTermEndDate(policy.startDate, nbMonthsDue)
     }
 
-    export function updatePolicyStartDate (policy: Policy, startDate: Date, durationInMonths?: number): void {
+    export function applyStartDate (policy: Policy, startDate: Date): void {
+      if (dayjs(startDate).isBefore(dayjs(new Date()))) throw new PolicyStartDateConsistencyError()
       policy.startDate = startDate
       policy.termStartDate = startDate
-      policy.termEndDate = _computeTermEndDate(startDate, durationInMonths || DEFAULT_NUMBER_OF_MONTHS_DUE)
+      policy.termEndDate = _computeTermEndDate(startDate, policy.nbMonthsDue)
     }
 
     function _computeTermEndDate (termStartDate: Date, durationInMonths: number): Date {

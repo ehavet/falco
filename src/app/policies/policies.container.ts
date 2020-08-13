@@ -12,7 +12,6 @@ import { PolicySqlRepository } from './infrastructure/policy-sql.repository'
 import { container as quoteContainer } from '../quotes/quote.container'
 import { container as emailValidationContainer } from '../email-validations/email-validations.container'
 import { container as partnerContainer } from '../partners/partner.container'
-import { container as priceContainer } from '../pricing/pricing.container'
 import { QuoteRepository } from '../quotes/domain/quote.repository'
 import { ConfirmPaymentIntentForPolicy } from './domain/confirm-payment-intent-for-policy.usecase'
 import { SendValidationLinkToEmailAddress } from '../email-validations/domain/send-validation-link-to-email-address.usecase'
@@ -45,6 +44,8 @@ import { Mailer } from '../common-api/domain/mailer'
 import { Nodemailer } from '../common-api/infrastructure/nodemailer.mailer'
 import { nodemailerTransporter } from '../../libs/nodemailer'
 import { UpdatePolicy } from './domain/update-policy.usecase'
+import { ApplySpecialOperationCodeOnPolicy } from './domain/apply-special-operation-code-on-policy.usecase'
+import { ApplyStartDateOnPolicy } from './domain/apply-start-date-on-policy.usecase'
 const config = require('../../config')
 
 export interface Container {
@@ -57,7 +58,9 @@ export interface Container {
     CreateSignatureRequestForPolicy: CreateSignatureRequestForPolicy
     GetPolicySpecificTerms: GetPolicySpecificTerms,
     ManageSignatureRequestEvent: ManageSignatureRequestEvent,
-    UpdatePolicy: UpdatePolicy
+    UpdatePolicy: UpdatePolicy,
+    ApplySpecialOperationCodeOnPolicy: ApplySpecialOperationCodeOnPolicy,
+    ApplyStartDateOnPolicy: ApplyStartDateOnPolicy
 }
 
 const policyRepository: PolicyRepository = new PolicySqlRepository()
@@ -73,9 +76,9 @@ const contractRepository: ContractRepository = new ContractFsRepository(config)
 const contractGenerator: ContractGenerator = new ContractPdfGenerator()
 const signatureRequestEventValidator: SignatureRequestEventValidator = new HelloSignRequestEventValidator(helloSignConfig)
 const mailer: Mailer = new Nodemailer(nodemailerTransporter)
-
 const createPaymentIntentForPolicy: CreatePaymentIntentForPolicy =
     CreatePaymentIntentForPolicy.factory(paymentProcessor, policyRepository)
+
 const sendValidationLinkToEmailAddress: SendValidationLinkToEmailAddress = emailValidationContainer.SendValidationLinkToEmailAddress
 const createPolicy: CreatePolicy = CreatePolicy.factory(policyRepository, quoteRepository, partnerRepository, sendValidationLinkToEmailAddress)
 const confirmPaymentIntentForPolicy: ConfirmPaymentIntentForPolicy =
@@ -93,7 +96,9 @@ const createSignatureRequestForPolicy: CreateSignatureRequestForPolicy = CreateS
     signatureRequestProvider
   )
 const manageSignatureRequestEvent: ManageSignatureRequestEvent = ManageSignatureRequestEvent.factory(signatureRequestEventValidator, signatureRequestProvider, policyRepository, contractRepository, logger)
-const updatePolicy: UpdatePolicy = UpdatePolicy.factory(policyRepository, priceContainer.ComputePriceWithOperationCode)
+const applySpecialOperationCodeOnPolicy: ApplySpecialOperationCodeOnPolicy = ApplySpecialOperationCodeOnPolicy.factory(policyRepository, partnerRepository)
+const updatePolicy: UpdatePolicy = UpdatePolicy.factory(policyRepository, applySpecialOperationCodeOnPolicy)
+const applyStartDateOnPolicy: ApplyStartDateOnPolicy = ApplyStartDateOnPolicy.factory(policyRepository)
 
 export const container: Container = {
   CreatePaymentIntentForPolicy: createPaymentIntentForPolicy,
@@ -105,13 +110,15 @@ export const container: Container = {
   GetPolicySpecificTerms: getPolicySpecificTerms,
   CreateSignatureRequestForPolicy: createSignatureRequestForPolicy,
   ManageSignatureRequestEvent: manageSignatureRequestEvent,
-  UpdatePolicy: updatePolicy
+  UpdatePolicy: updatePolicy,
+  ApplySpecialOperationCodeOnPolicy: applySpecialOperationCodeOnPolicy,
+  ApplyStartDateOnPolicy: applyStartDateOnPolicy
 }
 
 export const policySqlModels: Array<any> = [PolicySqlModel, ContactSqlModel]
 
 export function policiesRoutes () {
-  return routes(container)
+  return routes(container, logger)
     .concat(paymentProcessorEventHandler(container))
     .concat(signatureProcessorEventHandler(container, logger))
 }

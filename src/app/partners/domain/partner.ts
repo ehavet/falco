@@ -1,5 +1,5 @@
 import { Quote } from '../../quotes/domain/quote'
-import { OperationCode } from '../../pricing/domain/operation-code'
+import { OperationCode } from '../../policies/domain/operation-code'
 
 export interface Partner {
     code: string,

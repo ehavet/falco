@@ -98,17 +98,19 @@ export class PolicySqlRepository implements PolicyRepository {
   // TODO 1: Integrate the previous specific updates into this generic one
   // TODO 2: Refacto in order to find a beter way to update, without the need to request the db for the policy
   async update (policy: Policy): Promise<void> {
-    const policySql: PolicySqlModel = await PolicySqlModel
-      .findByPk(policy.id, {
-        rejectOnEmpty: false, include: [{ all: true }, { model: RiskSqlModel, include: [{ all: true }] }]
+    const persitedPolicy: PolicySqlModel = await PolicySqlModel.findByPk(
+      policy.id, {
+        rejectOnEmpty: false,
+        include: [{ all: true },
+          { model: RiskSqlModel, include: [{ all: true }] }]
       })
-    if (policySql) {
-      policySql.premium = policy.premium
-      policySql.nbMonthsDue = policy.nbMonthsDue
-      policySql.startDate = policy.startDate
-      policySql.termStartDate = policy.termStartDate
-      policySql.termEndDate = policy.termEndDate
-      await policySql.save()
+    if (persitedPolicy) {
+      persitedPolicy.premium = policy.premium
+      persitedPolicy.nbMonthsDue = policy.nbMonthsDue
+      persitedPolicy.startDate = policy.startDate
+      persitedPolicy.termStartDate = policy.termStartDate
+      persitedPolicy.termEndDate = policy.termEndDate
+      await persitedPolicy.save()
       return Promise.resolve()
     }
     throw new PolicyNotFoundError(policy.id)

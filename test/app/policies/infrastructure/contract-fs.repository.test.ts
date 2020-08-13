@@ -76,7 +76,7 @@ describe('Policies - Infra - Contract FS Repository', async () => {
       // Then
       expect(savedContract).to.equal(contractToSave)
     }).timeout(10000)
-  })
+  }).timeout(10000)
 
   describe('#getSignedContract', async () => {
     it('should return the found signed contract', async () => {
@@ -100,4 +100,4 @@ describe('Policies - Infra - Contract FS Repository', async () => {
       return expect(promise).to.be.rejectedWith(SignedContractNotFoundError)
     })
   }).timeout(10000)
-})
+}).timeout(10000)

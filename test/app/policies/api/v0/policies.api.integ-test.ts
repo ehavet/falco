@@ -3,9 +3,7 @@ import { container, policiesRoutes } from '../../../../../src/app/policies/polic
 import * as supertest from 'supertest'
 import { expect, sinon } from '../../../../test-utils'
 import {
-  PolicyAlreadySignedError,
-  PolicyNotFoundError,
-  PolicyNotUpdatable
+  PolicyAlreadySignedError, PolicyNotFoundError, PolicyNotUpdatableError, PolicyStartDateConsistencyError
 } from '../../../../../src/app/policies/domain/policies.errors'
 import { Policy } from '../../../../../src/app/policies/domain/policy'
 import { createOngoingPolicyFixture, createPolicyFixture } from '../../fixtures/policy.fixture'
@@ -21,7 +19,10 @@ import { SpecificTermsNotFoundError } from '../../../../../src/app/policies/doma
 import {
   UpdatePolicyCommand
 } from '../../../../../src/app/policies/domain/update-policy.usecase'
-import { OperationCodeNotApplicableError } from '../../../../../src/app/pricing/domain/operation-code.errors'
+import { OperationCodeNotApplicableError } from '../../../../../src/app/policies/domain/operation-code.errors'
+import { ApplySpecialOperationCodeCommand } from '../../../../../src/app/policies/domain/apply-special-operation-code-command'
+import { PartnerNotFoundError } from '../../../../../src/app/partners/domain/partner.errors'
+import { ApplyStartDateOnPolicyCommand } from '../../../../../src/app/policies/domain/apply-start-date-on-policy.usecase'
 
 describe('Policies - API - Integration', async () => {
   let httpServer: HttpServerForTesting
@@ -121,7 +122,7 @@ describe('Policies - API - Integration', async () => {
         expect(response).to.have.property('statusCode', 201)
       })
 
-      it('should return the created quote', async () => {
+      it('should return the created policy', async () => {
         const expectedResourcePolicy = {
           id: 'APP753210859',
           code: 'myPartner',
@@ -971,7 +972,7 @@ describe('Policies - API - Integration', async () => {
     })
   })
 
-  describe('PATCH /v0/policies/:id', async () => {
+  describe('PUT /v0/policies/:id', async () => {
     let response: supertest.Response
 
     const expectedResourcePolicy = {
@@ -1032,7 +1033,7 @@ describe('Policies - API - Integration', async () => {
         sinon.stub(container, 'UpdatePolicy').withArgs(command).resolves(expectedPolicy)
 
         // When
-        response = await httpServer.api().patch(`/v0/policies/${policyId}`)
+        response = await httpServer.api().put(`/v0/policies/${policyId}`)
           .send({ spec_ops_code: 'MYCODE', start_date: '2020-04-05' })
           .set('X-Consumer-Username', 'myPartner')
       })
@@ -1057,7 +1058,7 @@ describe('Policies - API - Integration', async () => {
         sinon.stub(container, 'UpdatePolicy').withArgs(command).resolves(expectedPolicy)
 
         // When
-        response = await httpServer.api().patch(`/v0/policies/${policyId}`)
+        response = await httpServer.api().put(`/v0/policies/${policyId}`)
           .send({ start_date: '2020-04-05' })
           .set('X-Consumer-Username', 'myPartner')
       })
@@ -1080,7 +1081,7 @@ describe('Policies - API - Integration', async () => {
         sinon.stub(container, 'UpdatePolicy').rejects(Error)
 
         // When
-        response = await httpServer.api().patch(`/v0/policies/${policyId}`)
+        response = await httpServer.api().put(`/v0/policies/${policyId}`)
           .send({ spec_ops_code: 'MYCODE', start_date: '2020-04-05' })
           .set('X-Consumer-Username', 'myPartner')
 
@@ -1096,7 +1097,7 @@ describe('Policies - API - Integration', async () => {
         sinon.stub(container, 'UpdatePolicy').rejects(new PolicyNotFoundError(policyId))
 
         // When
-        response = await httpServer.api().patch(`/v0/policies/${policyId}`)
+        response = await httpServer.api().put(`/v0/policies/${policyId}`)
           .send({ spec_ops_code: 'MYCODE', start_date: '2020-04-05' })
           .set('X-Consumer-Username', 'myPartner')
 
@@ -1110,10 +1111,10 @@ describe('Policies - API - Integration', async () => {
       it('should reply with status 422', async () => {
         // Given
         const policyId: string = 'APP105944294'
-        sinon.stub(container, 'UpdatePolicy').rejects(new PolicyNotUpdatable(policyId, Policy.Status.Signed))
+        sinon.stub(container, 'UpdatePolicy').rejects(new PolicyNotUpdatableError(policyId, Policy.Status.Signed))
 
         // When
-        response = await httpServer.api().patch(`/v0/policies/${policyId}`)
+        response = await httpServer.api().put(`/v0/policies/${policyId}`)
           .send({ spec_ops_code: 'MYCODE', start_date: '2020-04-05' })
           .set('X-Consumer-Username', 'myPartner')
 
@@ -1129,7 +1130,7 @@ describe('Policies - API - Integration', async () => {
         sinon.stub(container, 'UpdatePolicy').rejects(new OperationCodeNotApplicableError('SEMESTER', 'mypartner'))
 
         // When
-        response = await httpServer.api().patch(`/v0/policies/${policyId}`)
+        response = await httpServer.api().put(`/v0/policies/${policyId}`)
           .send({ spec_ops_code: 'MYCODE', start_date: '2020-04-05' })
           .set('X-Consumer-Username', 'myPartner')
 
@@ -1142,7 +1143,7 @@ describe('Policies - API - Integration', async () => {
     describe('when there is a validation error', () => {
       it('should reply with status 400 when the policy id is not 12 characters', async () => {
         // When
-        const response = await httpServer.api().patch('/v0/policies/WRONGPOLICY')
+        const response = await httpServer.api().put('/v0/policies/WRONGPOLICY')
           .send({ spec_ops_code: 'MYCODE', start_date: '2020-04-05' })
           .set('X-Consumer-Username', 'myPartner')
 
@@ -1151,9 +1152,442 @@ describe('Policies - API - Integration', async () => {
 
       it('should reply with status 400 when the policy id is not 12 characters', async () => {
         // When
-        const response = await httpServer.api().patch('/v0/policies/APP658143293')
+        const response = await httpServer.api().put('/v0/policies/APP658143293')
           .send({ spec_ops_code: 'MYCODE' })
           .set('X-Consumer-Username', 'myPartner')
+
+        expect(response).to.have.property('statusCode', 400)
+      })
+    })
+  })
+
+  describe('POST /v0/policies/id/apply-spec-ops-code', async () => {
+    let response: supertest.Response
+
+    describe('when success', () => {
+      const policyId = 'APP854732081'
+      const policy: Policy = createPolicyFixture({ id: policyId })
+
+      const command: ApplySpecialOperationCodeCommand = {
+        policyId: 'APP854732081',
+        operationCode: 'SEMESTER1'
+      }
+
+      const expectedResourcePolicy = {
+        id: 'APP854732081',
+        code: 'myPartner',
+        insurance: {
+          monthly_price: 5.82,
+          default_deductible: 150,
+          default_ceiling: 7000,
+          currency: 'EUR',
+          simplified_covers: ['ACDDE', 'ACVOL'],
+          product_code: 'MRH-Loc-Etud',
+          product_version: 'v2020-02-01',
+          contractual_terms: '/path/to/contractual/terms',
+          ipid: '/path/to/ipid'
+        },
+        risk: {
+          property: {
+            room_count: 2,
+            address: '13 rue du loup garou',
+            postal_code: 91100,
+            city: 'Corbeil-Essones'
+          },
+          people: {
+            policy_holder: {
+              firstname: 'Jean',
+              lastname: 'Dupont'
+            },
+            other_insured: [{ firstname: 'John', lastname: 'Doe' }]
+          }
+        },
+        contact: {
+          lastname: 'Dupont',
+          firstname: 'Jean',
+          address: '13 rue du loup garou',
+          postal_code: 91100,
+          city: 'Corbeil-Essones',
+          email: 'jeandupont@email.com',
+          phone_number: '+33684205510'
+        },
+        nb_months_due: 12,
+        premium: 69.84,
+        start_date: '2020-01-05',
+        term_start_date: '2020-01-05',
+        term_end_date: '2020-01-05',
+        subscription_date: '2020-01-05T10:09:08.000Z',
+        signature_date: '2020-01-05T10:09:08.000Z',
+        payment_date: '2020-01-05T10:09:08.000Z',
+        status: 'INITIATED'
+      }
+
+      beforeEach(async () => {
+        sinon.stub(container, 'ApplySpecialOperationCodeOnPolicy')
+          .withArgs(command)
+          .resolves(policy)
+
+        response = await httpServer.api()
+          .post(`/v0/policies/${policyId}/apply-spec-ops-code`)
+          .send({
+            spec_ops_code: 'SEMESTER1'
+          })
+      })
+
+      it('should reply with status 200', async () => {
+        expect(response).to.have.property('statusCode', 200)
+      })
+
+      it('should return a policy', async () => {
+        expect(response.body).to.deep.equal(expectedResourcePolicy)
+      })
+    })
+
+    describe('should convert empty code to BLANK', () => {
+      const policyId = 'APP854732081'
+      const policy: Policy = createPolicyFixture({ id: policyId })
+
+      const command: ApplySpecialOperationCodeCommand = {
+        policyId: 'APP854732081',
+        operationCode: 'BLANK'
+      }
+
+      it('should reply with status 200', async () => {
+        sinon.stub(container, 'ApplySpecialOperationCodeOnPolicy')
+          .withArgs(command)
+          .resolves(policy)
+
+        response = await httpServer.api()
+          .post(`/v0/policies/${policyId}/apply-spec-ops-code`)
+          .send({
+            spec_ops_code: ''
+          })
+
+        expect(response).to.have.property('statusCode', 200)
+      })
+    })
+
+    describe('should convert null code to BLANK', () => {
+      const policyId = 'APP854732081'
+      const policy: Policy = createPolicyFixture({ id: policyId })
+
+      const command: ApplySpecialOperationCodeCommand = {
+        policyId: 'APP854732081',
+        operationCode: 'BLANK'
+      }
+
+      it('should reply with status 200', async () => {
+        sinon.stub(container, 'ApplySpecialOperationCodeOnPolicy')
+          .withArgs(command)
+          .resolves(policy)
+
+        response = await httpServer.api()
+          .post(`/v0/policies/${policyId}/apply-spec-ops-code`)
+          .send({
+            spec_ops_code: null
+          })
+
+        expect(response).to.have.property('statusCode', 200)
+      })
+    })
+
+    describe('should convert blank code to BLANK', () => {
+      const policyId = 'APP854732081'
+      const policy: Policy = createPolicyFixture({ id: policyId })
+
+      const command: ApplySpecialOperationCodeCommand = {
+        policyId: 'APP854732081',
+        operationCode: 'BLANK'
+      }
+
+      it('should reply with status 200', async () => {
+        sinon.stub(container, 'ApplySpecialOperationCodeOnPolicy')
+          .withArgs(command)
+          .resolves(policy)
+
+        response = await httpServer.api()
+          .post(`/v0/policies/${policyId}/apply-spec-ops-code`)
+          .send({
+            spec_ops_code: '     '
+          })
+
+        expect(response).to.have.property('statusCode', 200)
+      })
+    })
+
+    describe('when the policy is not found', () => {
+      it('should reply with status 404', async () => {
+        const command: ApplySpecialOperationCodeCommand = {
+          policyId: 'APP854732081',
+          operationCode: 'SEMESTER1'
+        }
+        sinon.stub(container, 'ApplySpecialOperationCodeOnPolicy')
+          .withArgs(command)
+          .rejects(new PolicyNotFoundError(command.policyId))
+
+        response = await httpServer.api()
+          .post(`/v0/policies/${command.policyId}/apply-spec-ops-code`)
+          .send({
+            spec_ops_code: 'SEMESTER1'
+          })
+
+        expect(response).to.have.property('statusCode', 404)
+        expect(response.body).to.have.property('message', `Could not find policy with id : ${command.policyId}`)
+      })
+    })
+
+    describe('when the partner is not found', () => {
+      it('should reply with status 404', async () => {
+        const command: ApplySpecialOperationCodeCommand = {
+          policyId: 'APP854732081',
+          operationCode: 'SEMESTER1'
+        }
+        sinon.stub(container, 'ApplySpecialOperationCodeOnPolicy')
+          .withArgs(command)
+          .rejects(new PartnerNotFoundError('Partner'))
+
+        response = await httpServer.api()
+          .post('/v0/policies/APP854732081/apply-spec-ops-code')
+          .send({
+            spec_ops_code: 'SEMESTER1'
+          })
+
+        expect(response).to.have.property('statusCode', 404)
+        expect(response.body).to.have.property('message', 'Could not find partner with code : Partner')
+      })
+    })
+
+    describe('when the special operation code is not applicable', () => {
+      it('should reply with status 422', async () => {
+        const command: ApplySpecialOperationCodeCommand = {
+          policyId: 'APP854732081',
+          operationCode: 'SEMESTER1'
+        }
+        sinon.stub(container, 'ApplySpecialOperationCodeOnPolicy')
+          .withArgs(command)
+          .rejects(new OperationCodeNotApplicableError('SEMESTER1', 'Partner'))
+
+        response = await httpServer.api()
+          .post('/v0/policies/APP854732081/apply-spec-ops-code')
+          .send({
+            spec_ops_code: 'SEMESTER1'
+          })
+
+        expect(response).to.have.property('statusCode', 422)
+        expect(response.body).to.have.property('message', 'The operation code SEMESTER1 is not applicable for partner : Partner')
+      })
+    })
+
+    describe('when there is an unknown error', () => {
+      it('should reply with status 500 when unknown error', async () => {
+        const command: ApplySpecialOperationCodeCommand = {
+          policyId: 'APP854732081',
+          operationCode: 'SEMESTER1'
+        }
+        sinon.stub(container, 'ApplySpecialOperationCodeOnPolicy')
+          .withArgs(command)
+          .rejects(new Error())
+
+        response = await httpServer.api()
+          .post('/v0/policies/APP854732081/apply-spec-ops-code')
+          .send({
+            spec_ops_code: 'SEMESTER1'
+          })
+
+        expect(response).to.have.property('statusCode', 500)
+      })
+    })
+
+    describe('when there is a validation error', () => {
+      it('should reply with status 400 when wrong spec ops code format', async () => {
+        response = await httpServer.api()
+          .post('/v0/policies/APP854732081/apply-spec-ops-code')
+          .send({
+            spec_ops_code: 'SEMESTER1SEMESTER1SEMESTER1SEMESTER1SEMESTER1SEMESTER1S' +
+                  'SEMESTER1SEMESTER1SEMESTER1SEMESTER1SEMESTER1EMESTER1SEMESTER1SEMESTER1'
+          })
+
+        expect(response).to.have.property('statusCode', 400)
+      })
+    })
+
+    describe('when there is a missing key', () => {
+      it('should return status 400', async () => {
+        response = await httpServer.api()
+          .post('/v0/policies/APP854732081/apply-spec-ops-code')
+          .send({
+            wrong_key: 'key'
+          })
+
+        expect(response).to.have.property('statusCode', 400)
+      })
+    })
+  })
+
+  describe('POST /v0/policies/id/change-start-date', async () => {
+    let response: supertest.Response
+    const startDate = new Date('2020-04-26')
+
+    describe('when success', () => {
+      const policyId = 'APP854732081'
+      const policy: Policy = createPolicyFixture({ id: policyId })
+
+      const command: ApplyStartDateOnPolicyCommand = {
+        policyId: 'APP854732081',
+        startDate: startDate
+      }
+
+      const expectedResourcePolicy = {
+        id: 'APP854732081',
+        code: 'myPartner',
+        insurance: {
+          monthly_price: 5.82,
+          default_deductible: 150,
+          default_ceiling: 7000,
+          currency: 'EUR',
+          simplified_covers: ['ACDDE', 'ACVOL'],
+          product_code: 'MRH-Loc-Etud',
+          product_version: 'v2020-02-01',
+          contractual_terms: '/path/to/contractual/terms',
+          ipid: '/path/to/ipid'
+        },
+        risk: {
+          property: {
+            room_count: 2,
+            address: '13 rue du loup garou',
+            postal_code: 91100,
+            city: 'Corbeil-Essones'
+          },
+          people: {
+            policy_holder: {
+              firstname: 'Jean',
+              lastname: 'Dupont'
+            },
+            other_insured: [{ firstname: 'John', lastname: 'Doe' }]
+          }
+        },
+        contact: {
+          lastname: 'Dupont',
+          firstname: 'Jean',
+          address: '13 rue du loup garou',
+          postal_code: 91100,
+          city: 'Corbeil-Essones',
+          email: 'jeandupont@email.com',
+          phone_number: '+33684205510'
+        },
+        nb_months_due: 12,
+        premium: 69.84,
+        start_date: '2020-01-05',
+        term_start_date: '2020-01-05',
+        term_end_date: '2020-01-05',
+        subscription_date: '2020-01-05T10:09:08.000Z',
+        signature_date: '2020-01-05T10:09:08.000Z',
+        payment_date: '2020-01-05T10:09:08.000Z',
+        status: 'INITIATED'
+      }
+
+      beforeEach(async () => {
+        sinon.stub(container, 'ApplyStartDateOnPolicy')
+          .withArgs(command)
+          .resolves(policy)
+
+        response = await httpServer.api()
+          .post(`/v0/policies/${policyId}/change-start-date`)
+          .send({
+            start_date: '2020-04-26'
+          })
+      })
+
+      it('should reply with status 201', async () => {
+        expect(response).to.have.property('statusCode', 200)
+      })
+
+      it('should return a policy', async () => {
+        expect(response.body).to.deep.equal(expectedResourcePolicy)
+      })
+    })
+
+    describe('when the policy is not found', () => {
+      it('should reply with status 404', async () => {
+        const command: ApplyStartDateOnPolicyCommand = {
+          policyId: 'APP854732081',
+          startDate: startDate
+        }
+        sinon.stub(container, 'ApplyStartDateOnPolicy')
+          .withArgs(command)
+          .rejects(new PolicyNotFoundError(command.policyId))
+
+        response = await httpServer.api()
+          .post(`/v0/policies/${command.policyId}/change-start-date`)
+          .send({
+            start_date: '2020-04-26'
+          })
+
+        expect(response).to.have.property('statusCode', 404)
+        expect(response.body).to.have.property('message', `Could not find policy with id : ${command.policyId}`)
+      })
+    })
+
+    describe('when catching PolicyStartDateConsistencyError', () => {
+      it('should reply with status 422', async () => {
+        const command: ApplyStartDateOnPolicyCommand = {
+          policyId: 'APP854732081',
+          startDate: startDate
+        }
+        sinon.stub(container, 'ApplyStartDateOnPolicy')
+          .withArgs(command)
+          .rejects(new PolicyStartDateConsistencyError())
+
+        response = await httpServer.api()
+          .post('/v0/policies/APP854732081/change-start-date')
+          .send({
+            start_date: '2020-04-26'
+          })
+
+        expect(response).to.have.property('statusCode', 422)
+        expect(response.body).to.have.property('message', 'Start date cannot be earlier than today')
+      })
+    })
+
+    describe('when there is an unknown error', () => {
+      it('should reply with status 500 when unknown error', async () => {
+        const command: ApplyStartDateOnPolicyCommand = {
+          policyId: 'APP854732081',
+          startDate: startDate
+        }
+        sinon.stub(container, 'ApplyStartDateOnPolicy')
+          .withArgs(command)
+          .rejects(new Error())
+
+        response = await httpServer.api()
+          .post('/v0/policies/APP854732081/change-start-date')
+          .send({
+            start_date: '2020-04-26'
+          })
+
+        expect(response).to.have.property('statusCode', 500)
+      })
+    })
+
+    describe('when there is a validation error', () => {
+      it('should reply with status 400 when wrong spec ops code format', async () => {
+        response = await httpServer.api()
+          .post('/v0/policies/APP854732081/change-start-date')
+          .send({
+            start_date: 'wrong_date_format'
+          })
+
+        expect(response).to.have.property('statusCode', 400)
+      })
+    })
+
+    describe('when there is a missing key', () => {
+      it('should return status 400', async () => {
+        response = await httpServer.api()
+          .post('/v0/policies/APP854732081/change-start-date')
+          .send({
+            wrong_key: 'key'
+          })
 
         expect(response).to.have.property('statusCode', 400)
       })

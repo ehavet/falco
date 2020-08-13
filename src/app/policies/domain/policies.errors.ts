@@ -8,11 +8,11 @@ export class PolicyNotFoundError extends Error {
   }
 }
 
-export class PolicyNotUpdatable extends Error {
+export class PolicyNotUpdatableError extends Error {
   constructor (policyId: string, status: Policy.Status) {
     const message: string = `Could not update policy ${policyId} because it is already ${status}`
     super(message)
-    this.name = 'PolicyNotUpdatable'
+    this.name = 'PolicyNotUpdatableError'
   }
 }
 
@@ -29,5 +29,13 @@ export class PolicyAlreadySignedError extends Error {
     const message: string = `Policy ${policyId} has already been signed`
     super(message)
     this.name = 'PolicyAlreadySignedError'
+  }
+}
+
+export class PolicyStartDateConsistencyError extends Error {
+  constructor () {
+    const message: string = 'Start date cannot be earlier than today'
+    super(message)
+    this.name = 'PolicyStartDateConsistencyError'
   }
 }

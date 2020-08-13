@@ -29,7 +29,7 @@ describe('Policies - API - E2E', async () => {
     let response: supertest.Response
     let policyRepository: PolicySqlRepository
 
-    before(async () => {
+    beforeEach(async () => {
       policyRepository = new PolicySqlRepository()
       const policy: Policy = createPolicyFixture(
         {
@@ -209,7 +209,13 @@ describe('Policies - API - E2E', async () => {
     })
   })
 
-  describe('PATCH /v0/policies/:id', async () => {
+  describe('PUT /v0/policies/:id', async () => {
+    const now = new Date('2020-04-05T00:00:00Z')
+
+    beforeEach(async () => {
+      dateFaker.setCurrentDate(now)
+    })
+
     it('should update the policy price and dates', async () => {
       // Given
       const policyId: string = 'APP105944294'
@@ -218,21 +224,66 @@ describe('Policies - API - E2E', async () => {
       await policyRepository.save(expectedPolicy)
 
       // When
-      await httpServer.api().patch(`/v0/policies/${policyId}`)
+      const response = await httpServer.api()
+        .put(`/v0/policies/${policyId}`)
         .send({ spec_ops_code: 'SEMESTER1', start_date: '2020-04-05' })
         .set('X-Consumer-Username', 'essca')
 
       // Then
-      const updatedPolicy = await PolicySqlModel.findByPk(policyId)
-      expect(updatedPolicy.premium).to.equal(29.1)
-      expect(updatedPolicy.nbMonthsDue).to.equal(5)
-      expect(updatedPolicy.startDate).to.equal('2020-04-05')
-      expect(updatedPolicy.termStartDate).to.equal('2020-04-05')
-      expect(updatedPolicy.termEndDate).to.equal('2020-09-04')
+      const expectedResourcePolicy = {
+        id: 'APP105944294',
+        code: 'essca',
+        insurance: {
+          monthly_price: 5.82,
+          default_deductible: 150,
+          default_ceiling: 7000,
+          currency: 'EUR',
+          simplified_covers: ['ACDDE', 'ACVOL'],
+          product_code: 'MRH-Loc-Etud',
+          product_version: 'v2020-02-01',
+          contractual_terms: '/path/to/contractual/terms',
+          ipid: '/path/to/ipid'
+        },
+        risk: {
+          property: {
+            room_count: 2,
+            address: '13 rue du loup garou',
+            postal_code: 91100,
+            city: 'Corbeil-Essones'
+          },
+          people: {
+            policy_holder: {
+              firstname: 'Jean',
+              lastname: 'Dupont'
+            },
+            other_insured: [{ firstname: 'John', lastname: 'Doe' }]
+          }
+        },
+        contact: {
+          lastname: 'Dupont',
+          firstname: 'Jean',
+          address: '13 rue du loup garou',
+          postal_code: 91100,
+          city: 'Corbeil-Essones',
+          email: 'jeandupont@email.com',
+          phone_number: '+33684205510'
+        },
+        nb_months_due: 5,
+        premium: 29.1,
+        start_date: '2020-04-05',
+        term_start_date: '2020-04-05',
+        term_end_date: '2020-09-04',
+        subscription_date: '2020-01-05T10:09:08.000Z',
+        signature_date: '2020-01-05T10:09:08.000Z',
+        payment_date: '2020-01-05T10:09:08.000Z',
+        status: 'INITIATED'
+      }
+      expect(response.body).to.deep.equal(expectedResourcePolicy)
     })
   })
 
   describe('POST /v0/policies/:id/certificates', async () => {
+    // Given
     let response: supertest.Response
     const now = new Date('2020-04-18T10:09:08Z')
     const policy: Policy = createPolicyFixture({ status: Policy.Status.Applicable })
@@ -279,5 +330,163 @@ describe('Policies - API - E2E', async () => {
       // Then
       expect(response.body.url).to.include(('https://app.hellosign.com/editor/embeddedSign?signature_id='))
     }).timeout(10000)
+  })
+
+  describe('POST /v0/policies/:id/apply-spec-ops-code', async () => {
+    it('should apply special operation code on policies', async () => {
+      // Given
+      const policyRepository = new PolicySqlRepository()
+      const policyId = 'APP123456789'
+      const initialPolicy: Policy = createPolicyFixture(
+        {
+          id: policyId,
+          partnerCode: 'essca',
+          insurance: {
+            estimate: {
+              monthlyPrice: 10,
+              defaultDeductible: 150,
+              defaultCeiling: 7000
+            },
+            currency: 'EUR',
+            simplifiedCovers: ['ACDDE', 'ACVOL'],
+            productCode: 'MRH-Loc-Etud',
+            productVersion: 'v2020-02-01',
+            contractualTerms: '/path/to/contractual/terms',
+            ipid: '/path/to/ipid'
+          },
+          premium: 120,
+          nbMonthsDue: 12
+        }
+      )
+      await policyRepository.save(initialPolicy)
+      // When
+      const response = await httpServer.api()
+        .post(`/v0/policies/${policyId}/apply-spec-ops-code`)
+        .send({
+          spec_ops_code: 'SEMESTER1'
+        })
+      // Then
+      const expectedResourcePolicy = {
+        id: 'APP123456789',
+        code: 'essca',
+        insurance: {
+          monthly_price: 10,
+          default_deductible: 150,
+          default_ceiling: 7000,
+          currency: 'EUR',
+          simplified_covers: ['ACDDE', 'ACVOL'],
+          product_code: 'MRH-Loc-Etud',
+          product_version: 'v2020-02-01',
+          contractual_terms: '/path/to/contractual/terms',
+          ipid: '/path/to/ipid'
+        },
+        risk: {
+          property: {
+            room_count: 2,
+            address: '13 rue du loup garou',
+            postal_code: 91100,
+            city: 'Corbeil-Essones'
+          },
+          people: {
+            policy_holder: {
+              firstname: 'Jean',
+              lastname: 'Dupont'
+            },
+            other_insured: [{ firstname: 'John', lastname: 'Doe' }]
+          }
+        },
+        contact: {
+          lastname: 'Dupont',
+          firstname: 'Jean',
+          address: '13 rue du loup garou',
+          postal_code: 91100,
+          city: 'Corbeil-Essones',
+          email: 'jeandupont@email.com',
+          phone_number: '+33684205510'
+        },
+        nb_months_due: 5,
+        premium: 50,
+        start_date: '2020-01-05',
+        term_end_date: '2020-06-04',
+        term_start_date: '2020-01-05',
+        subscription_date: '2020-01-05T10:09:08.000Z',
+        signature_date: '2020-01-05T10:09:08.000Z',
+        payment_date: '2020-01-05T10:09:08.000Z',
+        status: 'INITIATED'
+      }
+      expect(response.body).to.deep.equal(expectedResourcePolicy)
+    })
+  })
+
+  describe('POST /v0/policies/:id/change-start-date', async () => {
+    const now = new Date('2020-07-13T00:00:00Z')
+
+    beforeEach(async () => {
+      dateFaker.setCurrentDate(now)
+    })
+
+    it('should apply special operation code on policies', async () => {
+      // Given
+      const policyRepository = new PolicySqlRepository()
+      const policyId = 'APP123456789'
+      const initialPolicy: Policy = createPolicyFixture({ id: policyId })
+      await policyRepository.save(initialPolicy)
+      // When
+      const response = await httpServer.api()
+        .post(`/v0/policies/${policyId}/change-start-date`)
+        .send({
+          start_date: '2020-07-13'
+        })
+      // Then
+      const expectedResourcePolicy = {
+        id: 'APP123456789',
+        code: 'myPartner',
+        insurance: {
+          monthly_price: 5.82,
+          default_deductible: 150,
+          default_ceiling: 7000,
+          currency: 'EUR',
+          simplified_covers: ['ACDDE', 'ACVOL'],
+          product_code: 'MRH-Loc-Etud',
+          product_version: 'v2020-02-01',
+          contractual_terms: '/path/to/contractual/terms',
+          ipid: '/path/to/ipid'
+        },
+        risk: {
+          property: {
+            room_count: 2,
+            address: '13 rue du loup garou',
+            postal_code: 91100,
+            city: 'Corbeil-Essones'
+          },
+          people: {
+            policy_holder: {
+              firstname: 'Jean',
+              lastname: 'Dupont'
+            },
+            other_insured: [{ firstname: 'John', lastname: 'Doe' }]
+          }
+        },
+        contact: {
+          lastname: 'Dupont',
+          firstname: 'Jean',
+          address: '13 rue du loup garou',
+          postal_code: 91100,
+          city: 'Corbeil-Essones',
+          email: 'jeandupont@email.com',
+          phone_number: '+33684205510'
+        },
+        nb_months_due: 12,
+        premium: 69.84,
+        start_date: '2020-07-13',
+        term_end_date: '2021-07-12',
+        term_start_date: '2020-07-13',
+        subscription_date: '2020-01-05T10:09:08.000Z',
+        signature_date: '2020-01-05T10:09:08.000Z',
+        payment_date: '2020-01-05T10:09:08.000Z',
+        status: 'INITIATED'
+      }
+      expect(response.body).to.deep.equal(expectedResourcePolicy)
+    })
   })
 })

@@ -72,7 +72,9 @@ export namespace Policy {
     }
 
     export function applyStartDate (policy: Policy, startDate: Date): void {
-      if (dayjs(startDate).isBefore(dayjs(new Date()))) throw new PolicyStartDateConsistencyError()
+      const currentDate: Date = new Date()
+      currentDate.setHours(0, 0, 0, 0)
+      if (dayjs(startDate).isBefore(dayjs(currentDate))) throw new PolicyStartDateConsistencyError()
       policy.startDate = startDate
       policy.termStartDate = startDate
       policy.termEndDate = _computeTermEndDate(startDate, policy.nbMonthsDue)

@@ -3,7 +3,11 @@ import { container, policiesRoutes } from '../../../../../src/app/policies/polic
 import * as supertest from 'supertest'
 import { expect, sinon } from '../../../../test-utils'
 import {
-  PolicyAlreadySignedError, PolicyNotFoundError, PolicyNotUpdatableError, PolicyStartDateConsistencyError
+  PolicyAlreadySignedError,
+  PolicyNotFoundError,
+  PolicyNotUpdatableError,
+  PolicyStartDateConsistencyError,
+  RoommatesNotAllowedError
 } from '../../../../../src/app/policies/domain/policies.errors'
 import { Policy } from '../../../../../src/app/policies/domain/policy'
 import { createOngoingPolicyFixture, createPolicyFixture } from '../../fixtures/policy.fixture'
@@ -190,6 +194,23 @@ describe('Policies - API - Integration', async () => {
         // Then
         expect(response).to.have.property('statusCode', 404)
         expect(response.body).to.have.property('message', 'Quote with id 3E76DJ2 cannot be found')
+      })
+    })
+
+    describe('when there are roommates but the partner does not allow it', async () => {
+      it('should return a 422', async () => {
+        // Given
+        sinon.stub(container, 'CreatePolicy').rejects(new RoommatesNotAllowedError('myPartner'))
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies')
+          .send(requestParams)
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 422)
+        expect(response.body).to.have.property('message', 'The roommates are not allowed for partner myPartner')
       })
     })
 
@@ -390,7 +411,7 @@ describe('Policies - API - Integration', async () => {
           expect(response).to.have.property('statusCode', 400)
         })
 
-        describe('and a policy holder but', async () => {
+        describe('and a policy holder', async () => {
           it('but no firstname', async () => {
             // Given
             delete requestParams.risk.people.policy_holder.firstname

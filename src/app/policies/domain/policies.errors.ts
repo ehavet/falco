@@ -39,3 +39,11 @@ export class PolicyStartDateConsistencyError extends Error {
     this.name = 'PolicyStartDateConsistencyError'
   }
 }
+
+export class RoommatesNotAllowedError extends Error {
+  constructor (partnerCode) {
+    const message: string = `The roommates are not allowed for partner ${partnerCode}`
+    super(message)
+    this.name = 'RoommatesNotAllowedError'
+  }
+}

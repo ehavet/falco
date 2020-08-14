@@ -227,17 +227,13 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
 
     it('should throw an error if the policy is not found', async () => {
       // Given
-      const policy = await policyRepository.save(createPolicyFixture())
-      policy.premium = 111.11
+      const policyNotInDb: Policy = createPolicyFixture()
 
       // When
-      const promise = policyRepository
-        .update(policy)
+      const promise = policyRepository.update(policyNotInDb)
 
       // Then
-      expect(promise).to.be.rejectedWith(PolicyNotFoundError)
-      const updatedPolicy: Policy = await policyRepository.get(policy.id)
-      expect(updatedPolicy.premium).to.equal(69.84)
+      return expect(promise).to.be.rejectedWith(PolicyNotFoundError)
     })
   }).timeout(10000)
 })

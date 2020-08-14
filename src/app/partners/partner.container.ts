@@ -5,7 +5,7 @@ import { PartnerMapRepository } from './infrastructure/partner-map.repository'
 import { PartnerRepository } from './domain/partner.repository'
 
 export interface Container {
-  GetPartnerByCode: GetPartnerByCode
+  GetPartnerByCode: GetPartnerByCode,
   partnerRepository: PartnerRepository
 }
 

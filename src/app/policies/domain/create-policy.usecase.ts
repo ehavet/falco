@@ -17,8 +17,8 @@ export namespace CreatePolicy {
       partnerRepository: PartnerRepository, sendValidationLinkToEmailAddress: SendValidationLinkToEmailAddress): CreatePolicy {
       return async (createPolicyCommand: CreatePolicyCommand): Promise<Policy> => {
         const quote: Quote = await quoteRepository.get(createPolicyCommand.quoteId)
-        const offer: Partner.Offer = await partnerRepository.getOffer(createPolicyCommand.partnerCode)
-        const newPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository, offer.productCode)
+        const partner: Partner = await partnerRepository.getByCode(createPolicyCommand.partnerCode)
+        const newPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository, partner)
         await sendValidationEmail(partnerRepository, newPolicy, sendValidationLinkToEmailAddress)
         return await policyRepository.save(newPolicy)
       }

@@ -3,6 +3,7 @@ import { expect, sinon, HttpServerForTesting, newMinimalServer } from '../../../
 import { container, partnerRoutes } from '../../../../../src/app/partners/partner.container'
 import { Partner } from '../../../../../src/app/partners/domain/partner'
 import { PartnerNotFoundError } from '../../../../../src/app/partners/domain/partner.errors'
+import { createPartnerFixture } from '../../fixtures/partner.fixture'
 
 describe('Partners - API - Integ', async () => {
   let httpServer: HttpServerForTesting
@@ -15,29 +16,14 @@ describe('Partners - API - Integ', async () => {
     let response: supertest.Response
 
     describe('when the partner is found', () => {
-      const partner: Partner = {
-        code: 'myPartnerKey',
-        translationKey: 'myPartnerTranslationKey',
-        callbackUrl: 'http://myPartner-callback.com',
-        questions: [{
-          code: Partner.Question.QuestionCode.RoomCount,
-          options: {
-            list: [1, 2]
-          }
-        },
-        {
-          code: Partner.Question.QuestionCode.Roommate,
-          applicable: true
-        }
-        ]
-      }
+      const partner: Partner = createPartnerFixture()
 
       const expectedResourcePartner = {
-        code: 'myPartnerKey',
-        translation_key: 'myPartnerTranslationKey',
+        code: 'partnerOne',
+        translation_key: 'translationKey',
         questions: {
           room_count: {
-            options: [1, 2]
+            options: [1, 2, 3]
           },
           roommate: {
             applicable: true

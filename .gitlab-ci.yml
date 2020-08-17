@@ -86,7 +86,6 @@ default:
     - cat .env.ci.vault >> .env
     - sed -i -e '$a\' .env # Add a new line if needed
     - cat .env.ci.plain >> .env
-    - cat .env
     - yarn build
     - yarn db:migrate
     - yarn db:seed

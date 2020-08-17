@@ -4,30 +4,10 @@ variables:
   NODE_IMAGE: "node:$NODE_VERSION"
   POSTGRES_VERSION: "11.7"
   POSTGRES_IMAGE: "postgres:$POSTGRES_VERSION-alpine"
-  POSTGRES_DB: test
-  POSTGRES_USER: test
-  POSTGRES_PASSWORD: test
-  POSTGRES_HOST_AUTH_METHOD: trust
   PYTHON_VERSION: "3.8"
   PYTHON_IMAGE: "python:$PYTHON_VERSION"
   APP_VERSION_COMMIT_MESSAGE_PREFIX: "Update application version"  #Be aware to change the '.trigger_build' and '.trigger_staging' rules if you change the message
   FALCO_OPS_BRANCH: 'master'
-  FALCO_API_DATABASE_URL: "postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB"
-  FALCO_API_APP_NAME: falco-api'
-  FALCO_API_LOG_LEVEL: 'debug'
-  FALCO_API_PORT: 8080
-  FALCO_API_URL_PREFIX: '/'
-  FALCO_API_CRYPTO_KEY: 'D8xUrhp++DiNtwXA1d4MLzYSmW+8HCRk'
-  FALCO_API_CRYPTO_IV: 'ABCDEFGHIJKLMNOP'
-  FALCO_API_EMAIL_VALIDATION_URL: 'http://front-url/validate'
-  FALCO_API_EMAIL_VALIDATION_VALIDITY_PERIOD: 6
-  FALCO_API_STRIPE_PRIVATE_KEY: 'sk_test_51GqKYGB099cSJ3oRcsTo6QpE9S6jzlolPcWxeL1Xu8stadcCsdHDK5Wis6MrSw6ApjV0UMZK4u8uJcxIGeNQHOSs00SL7BvJfG'
-  FALCO_API_EMAIL_VALIDATION_APPENIN_CALLBACK_PAGE_ROUTE: 'synthese'
-  FALCO_API_FALCO_FRONT_URL: 'http://front-url'
-  FALCO_API_DOCUMENTS_STORAGE_FOLDER: '/tmp'
-  FALCO_API_HELLO_SIGN_TEST_MODE: 'true'
-  FALCO_API_HELLO_SIGN_CLIENT_ID: '653684646dbba900c2263d4b6fd3a634'
-  FALCO_API_HELLO_SIGN_PRIVATE_KEY: 'd7a99955dc097de103689b68d8940a232f3a26c14295f8d39b24b5e50b15a63b'
 
 .trigger_build: &trigger_build
   rules:
@@ -96,14 +76,27 @@ default:
     - "$POSTGRES_IMAGE"
   before_script:
     - apt-get update
-    - apt-get -y install pdftk
+    - apt-get -y install pdftk ansible
     - yarn install --frozen-lockfile --non-interactive --production=false
   script:
-    # No CCA step run as container are only used for test purpose
+    - export ANSIBLE_VAULT_PASSWORD_FILE=/tmp/ansible-vault.password
+    - echo $ANSIBLE_VAULT_PASSWORD > $ANSIBLE_VAULT_PASSWORD_FILE
+    - ansible-vault decrypt .env.ci.vault
+    - rm -f $ANSIBLE_VAULT_PASSWORD_FILE
+    - cat .env.ci.vault >> .env
+    - sed -i -e '$a\' .env # Add a new line if needed
+    - cat .env.ci.plain >> .env
+    - cat .env
+    - rm -f .env.*
     - yarn build
     - yarn db:migrate
     - yarn db:seed
     - yarn test:ci
+  variables:
+    POSTGRES_DB: falco-db
+    POSTGRES_USER: falcoadmin
+    POSTGRES_PASSWORD: falcoadmin
+    POSTGRES_HOST_AUTH_METHOD: trust
   coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
   artifacts:
     when: always

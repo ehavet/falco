@@ -83,9 +83,9 @@ default:
     - echo $ANSIBLE_VAULT_PASSWORD > $ANSIBLE_VAULT_PASSWORD_FILE
     - ansible-vault decrypt .env.ci.vault
     - rm -f $ANSIBLE_VAULT_PASSWORD_FILE
-    - cat .env.ci.vault >> .env
+    - cat .env.ci.vault >> .env.ci
     - sed -i -e '$a\' .env # Add a new line if needed
-    - cat .env.ci.plain >> .env
+    - cat .env.ci.plain >> .env.ci
     - cat .env
     - rm -f .env.*
     - yarn build
@@ -97,6 +97,7 @@ default:
     POSTGRES_USER: falcoadmin
     POSTGRES_PASSWORD: falcoadmin
     POSTGRES_HOST_AUTH_METHOD: trust
+    NODE_ENV: ci
   coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
   artifacts:
     when: always

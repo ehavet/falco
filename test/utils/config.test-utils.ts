@@ -48,7 +48,7 @@ module.exports = Envie({
 
   FALCO_API_EMAIL_TRANSPORT: Joi.string().valid('sendmail', 'stream'),
 
-  FALCO_API_STRIPE_PRIVATE_KEY: Joi.string().default('sk_test_51GqKYGB099cSJ3oRcsTo6QpE9S6jzlolPcWxeL1Xu8stadcCsdHDK5Wis6MrSw6ApjV0UMZK4u8uJcxIGeNQHOSs00SL7BvJfG'),
+  FALCO_API_STRIPE_API_KEY: Joi.string().default('sk_test_51GqKYGB099cSJ3oRcsTo6QpE9S6jzlolPcWxeL1Xu8stadcCsdHDK5Wis6MrSw6ApjV0UMZK4u8uJcxIGeNQHOSs00SL7BvJfG'),
 
   FALCO_API_STRIPE_API_VERSION: Joi.string().default('2020-03-02'),
 

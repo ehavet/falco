@@ -15,7 +15,12 @@ export function createPartnerFixture (attr: Partial<Partner> = {}): Partner {
       },
       {
         code: Partner.Question.QuestionCode.Roommate,
-        applicable: true
+        applicable: true,
+        maximumNumbers: [
+          { roomCount: 1, value: 0 },
+          { roomCount: 2, value: 1 },
+          { roomCount: 3, value: 2 }
+        ]
       }
     ],
     offer: {

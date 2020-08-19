@@ -21,7 +21,8 @@ const partnerJson = {
       },
       {
         code: Partner.Question.QuestionCode.Roommate,
-        applicable: true
+        applicable: true,
+        maximumNumbers: [{ roomCount: 1, value: 0 }, { roomCount: 2, value: 1 }, { roomCount: 3, value: 2 }]
       }
     ],
     offer: {
@@ -67,7 +68,7 @@ const partnerJson = {
   }
 }
 
-describe('Partner Map Repository', async () => {
+describe('Partners - Infra - Partner Map Repository', async () => {
   let partnerMapRepository: PartnerRepository
 
   beforeEach(() => {

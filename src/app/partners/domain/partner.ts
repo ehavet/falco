@@ -35,7 +35,13 @@ export namespace Partner.Question {
 
     export interface RoommateQuestion {
         code: QuestionCode,
-        applicable: boolean
+        applicable: boolean,
+        maximumNumbers?: Array<MaximumNumberOfRoommates>
+    }
+
+    export interface MaximumNumberOfRoommates {
+        roomCount: number,
+        value: number
     }
 
     export enum QuestionCode {

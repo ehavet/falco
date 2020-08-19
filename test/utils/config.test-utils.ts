@@ -42,28 +42,28 @@ module.exports = Envie({
 
   FALCO_API_CRYPTO_IV: Joi.string(),
 
-  FALCO_API_EMAIL_VALIDATION_URL: Joi.string().uri().default('http://front-url/validate'),
+  FALCO_API_EMAIL_VALIDATION_LINK_URL: Joi.string().uri().default('http://front-url/validate'),
 
-  FALCO_API_EMAIL_VALIDATION_VALIDITY_PERIOD: Joi.number().min(1).default(6),
+  FALCO_API_EMAIL_VALIDATION_TOKEN_VALIDITY_PERIOD: Joi.number().min(1).default(6),
 
   FALCO_API_EMAIL_TRANSPORT: Joi.string().valid('sendmail', 'stream'),
 
-  FALCO_API_STRIPE_PRIVATE_KEY: Joi.string().default('sk_test_51GqKYGB099cSJ3oRcsTo6QpE9S6jzlolPcWxeL1Xu8stadcCsdHDK5Wis6MrSw6ApjV0UMZK4u8uJcxIGeNQHOSs00SL7BvJfG'),
+  FALCO_API_STRIPE_API_KEY: Joi.string().default('sk_test_51GqKYGB099cSJ3oRcsTo6QpE9S6jzlolPcWxeL1Xu8stadcCsdHDK5Wis6MrSw6ApjV0UMZK4u8uJcxIGeNQHOSs00SL7BvJfG'),
 
   FALCO_API_STRIPE_API_VERSION: Joi.string().default('2020-03-02'),
 
   FALCO_API_STRIPE_WEBHOOK_SECRET: Joi.string(),
 
-  FALCO_API_EMAIL_VALIDATION_APPENIN_CALLBACK_PAGE_ROUTE: Joi.string().default('synthese'),
+  FALCO_API_EMAIL_VALIDATION_DEFAULT_CALLBACK_ROUTE: Joi.string().default('synthese'),
 
-  FALCO_API_FALCO_FRONT_URL: Joi.string().default('http://front-url'),
+  FALCO_API_EMAIL_VALIDATION_DEFAULT_CALLBACK_URL: Joi.string().default('http://front-url'),
 
   FALCO_API_DOCUMENTS_STORAGE_FOLDER: Joi.string().default(_getSpecificTermsStorageFolder()),
 
-  FALCO_API_HELLO_SIGN_PRIVATE_KEY: Joi.string().default('589cf524fffd6f47c33c3e4cabab20a2044ba' +
+  FALCO_API_HELLO_SIGN_API_KEY: Joi.string().default('589cf524fffd6f47c33c3e4cabab20a2044ba' +
       '45c095f242ee97a17dfd701565c'),
 
-  FALCO_API_HELLO_SIGN_TEST_MODE: Joi.boolean().default(false),
+  FALCO_API_HELLO_SIGN_PRODUCTION_MODE: Joi.boolean().default(false),
 
   FALCO_API_HELLO_SIGN_CLIENT_ID: Joi.string().default('91c073e7562d88f96d40d013c7b493ef')
 }) as Config

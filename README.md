@@ -1,7 +1,7 @@
 # falco-api
 
-[![pipeline status](https://gitlab.com/appenin/falco-api/badges/init_api/pipeline.svg)](https://gitlab.com/appenin/falco-api/-/commits/init_api)
-[![coverage report](https://gitlab.com/appenin/falco-api/badges/init_api/coverage.svg)](https://gitlab.com/appenin/falco-api/-/commits/init_api)
+[![pipeline status](https://gitlab.com/appenin/falco-api/badges/master/pipeline.svg)](https://gitlab.com/%{project_path}/-/commits/%{default_branch})
+[![coverage report](https://gitlab.com/appenin/falco-api/badges/master//coverage.svg)](https://gitlab.com/%{project_path}/-/commits/%{default_branch})
 
 ## Prerequisites
 

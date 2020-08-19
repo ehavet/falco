@@ -9,8 +9,8 @@ export interface HelloSignConfig {
 }
 
 export const helloSignConfig: HelloSignConfig = {
-  hellosign: hellosignSdk({ key: config.get('FALCO_API_HELLO_SIGN_PRIVATE_KEY') }),
+  hellosign: hellosignSdk({ key: config.get('FALCO_API_HELLO_SIGN_API_KEY') }),
   clientId: config.get('FALCO_API_HELLO_SIGN_CLIENT_ID'),
   testMode: !config.get('FALCO_API_HELLO_SIGN_PRODUCTION_MODE'),
-  key: config.get('FALCO_API_HELLO_SIGN_PRIVATE_KEY')
+  key: config.get('FALCO_API_HELLO_SIGN_API_KEY')
 }

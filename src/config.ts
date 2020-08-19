@@ -40,7 +40,7 @@ module.exports = Envie({
 
   FALCO_API_DOCUMENTS_STORAGE_FOLDER: Joi.string(),
 
-  FALCO_API_HELLO_SIGN_PRIVATE_KEY: Joi.string(),
+  FALCO_API_HELLO_SIGN_API_KEY: Joi.string(),
 
   FALCO_API_HELLO_SIGN_PRODUCTION_MODE: Joi.boolean(),
 

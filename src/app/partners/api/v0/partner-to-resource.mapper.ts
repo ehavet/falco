@@ -32,9 +32,19 @@ function _toRoomCountQuestion (jsonQuestion: any) {
 }
 
 function _toRoommateQuestion (jsonQuestion: any) {
+  function _toRoomateMaximumNumbers (maximumNumbers: any) {
+    return maximumNumbers.map(maximumNumber => {
+      return {
+        room_count: maximumNumber.roomCount,
+        value: maximumNumber.value
+      }
+    })
+  }
+
   return {
     roommate: {
-      applicable: jsonQuestion.applicable
+      applicable: jsonQuestion.applicable,
+      maximum_numbers: jsonQuestion.applicable ? _toRoomateMaximumNumbers(jsonQuestion.maximumNumbers) : undefined
     }
   }
 }

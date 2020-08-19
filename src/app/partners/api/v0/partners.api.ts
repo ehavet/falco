@@ -33,7 +33,13 @@ export default function (container: Container): Array<ServerRoute> {
                   options: Joi.array().description('Possible values').example([1, 2, 3])
                 }).description('Question about the number of rooms of the property'),
                 roommate: Joi.object({
-                  applicable: Joi.boolean().description('Question to ask or not').example(false)
+                  applicable: Joi.boolean().description('Define if the question is applicable for the partner. If not, do not ask the question to the subscriber otherwise an error could be thrown when creating a policy').example(false),
+                  maximum_numbers: Joi.array().optional().items(
+                    Joi.object({
+                      room_count: Joi.number().description('Room count targeted by the limitation of roommates').example(3),
+                      value: Joi.number().description('Number maximum of roommates').example(2)
+                    }).optional().description('Number Maximum of roommates for one room count')
+                  ).description('Number maxixmum of roommates regarding the different partner room counts. Only present if the question is applicable.')
                 }).description('Question about the possibility of roommates for the insured property')
               }).description('List of questions to ask for the quote')
             }).label('Partner'),

@@ -26,7 +26,11 @@ describe('Partners - API - Integ', async () => {
             options: [1, 2, 3]
           },
           roommate: {
-            applicable: true
+            applicable: true,
+            maximum_numbers: [
+              { room_count: 1, value: 0 },
+              { room_count: 2, value: 1 },
+              { room_count: 3, value: 2 }]
           }
         }
       }

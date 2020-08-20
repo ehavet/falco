@@ -6,7 +6,7 @@ import dayjs from 'dayjs'
 import { CannotGeneratePolicyNotApplicableError } from './certificate/certificate.errors'
 import { Partner } from '../../partners/domain/partner'
 import * as PartnerFunc from '../../partners/domain/partner.func'
-import { PolicyStartDateConsistencyError, RoommatesNotAllowedError } from './policies.errors'
+import { PolicyStartDateConsistencyError, RoommatesNotAllowedError, NumberOfRoommatesError } from './policies.errors'
 
 const DEFAULT_NUMBER_OF_MONTHS_DUE = 12
 
@@ -92,7 +92,8 @@ export namespace Policy {
       const productCode: string = PartnerFunc.getProductCode(partner)
       const generatedId: string = _generateId(partnerCode, productCode)
       if (await policyRepository.isIdAvailable(generatedId)) {
-        const risk = await _createRisk(createPolicyCommand.risk, quote.risk, partnerCode, partner)
+        // eslint-disable-next-line no-use-before-define
+        const risk = Risk.createRisk(createPolicyCommand.risk, quote.risk, partner)
         const startDate: Date = _getStartDate(createPolicyCommand)
         return {
           id: generatedId,
@@ -127,23 +128,6 @@ export namespace Policy {
       return createPolicyCommand.startDate || new Date()
     }
 
-    async function _createRisk (queryRisk: CreatePolicyCommand.Risk, quoteRisk: Quote.Risk,
-      partnerCode: string, partner: Partner): Promise<Policy.Risk> {
-      const partnerAllowsRoommates = PartnerFunc.doesPartnerAllowRoommates(partner)
-      if (queryRisk.people.otherInsured?.length > 0 && !partnerAllowsRoommates) {
-        throw new RoommatesNotAllowedError(partnerCode)
-      }
-      return {
-        property: {
-          roomCount: quoteRisk.property.roomCount,
-          address: queryRisk.property.address,
-          postalCode: queryRisk.property.postalCode,
-          city: queryRisk.property.city
-        },
-        people: queryRisk.people
-      }
-    }
-
     function _createContact (queryContact: CreatePolicyCommand.Contact, queryRisk: CreatePolicyCommand.Risk): Policy.Contact {
       return {
         lastname: queryRisk.people.policyHolder.lastname,
@@ -168,6 +152,33 @@ export namespace Policy.Risk {
     export interface People {
         policyHolder: People.PolicyHolder,
         otherInsured: Array<People.OtherInsured>
+    }
+
+    export function createRisk (commandRisk: CreatePolicyCommand.Risk, quoteRisk: Quote.Risk, partner: Partner): Policy.Risk {
+      if (_hasRoommates(commandRisk)) {
+        if (!PartnerFunc.doesPartnerAllowRoommates(partner)) {
+          throw new RoommatesNotAllowedError(partner.code)
+        }
+
+        const numberOfRoommates: number = commandRisk.people.otherInsured?.length
+        if (!PartnerFunc.doesPartnerAllowThisNumberOfRoommates(partner, numberOfRoommates, quoteRisk)) {
+          throw new NumberOfRoommatesError(numberOfRoommates, quoteRisk.property.roomCount)
+        }
+      }
+
+      return {
+        property: {
+          roomCount: quoteRisk.property.roomCount,
+          address: commandRisk.property.address,
+          postalCode: commandRisk.property.postalCode,
+          city: commandRisk.property.city
+        },
+        people: commandRisk.people
+      }
+    }
+
+    function _hasRoommates (commandRisk: CreatePolicyCommand.Risk) {
+      return commandRisk.people.otherInsured?.length > 0
     }
 }
 

@@ -7,7 +7,7 @@ import { createCreatePolicyCommand } from '../fixtures/createPolicyCommand.fixtu
 import { PolicyRepository } from '../../../../src/app/policies/domain/policy.repository'
 import { SinonStubbedInstance } from 'sinon'
 import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles'
-import { RoommatesNotAllowedError } from '../../../../src/app/policies/domain/policies.errors'
+import { RoommatesNotAllowedError, NumberOfRoommatesError } from '../../../../src/app/policies/domain/policies.errors'
 import { createPartnerFixture } from '../../partners/fixtures/partner.fixture'
 import { Partner } from '../../../../src/app/partners/domain/partner'
 import Question = Partner.Question
@@ -240,6 +240,44 @@ describe('Policies - Domain', async () => {
 
       // Then
       expect(promise).to.be.rejectedWith(RoommatesNotAllowedError, 'The roommates are not allowed for partner myPartner')
+    })
+
+    it('should throw an error if the partner allows roommates but there are more roommates than allowed', async () => {
+      // Given
+      const commandWith2Roommates: CreatePolicyCommand = createCreatePolicyCommand({ quoteId: quote.id })
+      commandWith2Roommates.risk.people.otherInsured = [{ firstname: 'John', lastname: 'Doe' }, { firstname: 'Eric', lastname: 'Smith' }]
+
+      const questions: Array<Question> = [{
+        code: Partner.Question.QuestionCode.Roommate,
+        applicable: true,
+        maximumNumbers: [{ roomCount: quote.risk.property.roomCount, value: 1 }]
+      }]
+      partner.questions = questions
+
+      // When
+      const promise = Policy.create(commandWith2Roommates, quote, policyRepository, partner)
+
+      // Then
+      return expect(promise).to.be.rejectedWith(NumberOfRoommatesError, 'Partner does not allow 2 roommate(s) for a property of 2 room(s)')
+    })
+
+    it('should throw an error if the partner allows roommates but no limitation is found for the property room count', async () => {
+      // Given
+      const commandWith2Roommates: CreatePolicyCommand = createCreatePolicyCommand({ quoteId: quote.id })
+      commandWith2Roommates.risk.people.otherInsured = [{ firstname: 'John', lastname: 'Doe' }]
+
+      const questions: Array<Question> = [{
+        code: Partner.Question.QuestionCode.Roommate,
+        applicable: true,
+        maximumNumbers: [{ roomCount: 5, value: 1 }]
+      }]
+      partner.questions = questions
+
+      // When
+      const promise = Policy.create(commandWith2Roommates, quote, policyRepository, partner)
+
+      // Then
+      return expect(promise).to.be.rejectedWith(NumberOfRoommatesError, 'Partner does not allow 1 roommate(s) for a property of 2 room(s)')
     })
   })
 })

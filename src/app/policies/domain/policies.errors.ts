@@ -47,3 +47,11 @@ export class RoommatesNotAllowedError extends Error {
     this.name = 'RoommatesNotAllowedError'
   }
 }
+
+export class NumberOfRoommatesError extends Error {
+  constructor (numberOfRoommates: number, roomCount: number) {
+    const message: string = `Partner does not allow ${numberOfRoommates} roommate(s) for a property of ${roomCount} room(s)`
+    super(message)
+    this.name = 'NumberOfRoommatesError'
+  }
+}

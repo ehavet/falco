@@ -65,7 +65,8 @@ function _toRoomCountQuestion (jsonQuestion: any) {
 function _toRoommateQuestion (jsonQuestion: any) {
   const question: Partner.Question.RoommateQuestion = {
     code: Partner.Question.QuestionCode.Roommate,
-    applicable: jsonQuestion.applicable
+    applicable: jsonQuestion.applicable,
+    maximumNumbers: jsonQuestion.maximumNumbers
   }
 
   return question

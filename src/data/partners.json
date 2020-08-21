@@ -12,7 +12,9 @@
       },
       {
         "code": "Roommate",
-        "applicable": true
+        "applicable": true,
+        "_comment":  "The rule for the maximum number of roommates for studyo is the following : roomcount - 1",
+        "maximumNumbers": [{ "roomCount": 1, "value": 0 }, { "roomCount": 2, "value": 1 }, { "roomCount": 3, "value": 2 }]
       }
     ],
     "offer": {
@@ -42,7 +44,8 @@
       },
       {
         "code": "Roommate",
-        "applicable": false
+        "applicable": false,
+        "_comment":  "There is no maximum number of roommates here because Essca does not allow roommates"
       }
     ],
     "offer": {

@@ -107,6 +107,6 @@ describe('Policies - Usecase - Create policy', async () => {
     const promise = createPolicy(createPolicyCommand)
 
     // Then
-    expect(promise).to.be.rejectedWith(RoommatesNotAllowedError)
+    return expect(promise).to.be.rejectedWith(RoommatesNotAllowedError)
   })
 })

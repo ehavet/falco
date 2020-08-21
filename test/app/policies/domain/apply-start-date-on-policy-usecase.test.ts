@@ -26,7 +26,7 @@ describe('Policies - Usecase - Apply start date on policy', async () => {
     // When
     const promise = applyStartDateOnPolicy({ policyId: policyId, startDate: validStartDate })
     // Then
-    expect(promise).to.be.rejectedWith(PolicyNotUpdatableError)
+    return expect(promise).to.be.rejectedWith(PolicyNotUpdatableError)
   })
 
   it('should throw an PolicyStartDateConsistencyError when start date is earlier than today', async () => {
@@ -37,7 +37,7 @@ describe('Policies - Usecase - Apply start date on policy', async () => {
     // When
     const promise = applyStartDateOnPolicy({ policyId: policyId, startDate: earlierThanTodayDate })
     // Then
-    expect(promise).to.be.rejectedWith(PolicyStartDateConsistencyError)
+    return expect(promise).to.be.rejectedWith(PolicyStartDateConsistencyError)
   })
 
   it('should throw an PolicyNotFoundError when policy does not exist', async () => {
@@ -46,7 +46,7 @@ describe('Policies - Usecase - Apply start date on policy', async () => {
     // When
     const promise = applyStartDateOnPolicy({ policyId: policyId, startDate: validStartDate })
     // Then
-    expect(promise).to.be.rejectedWith(PolicyNotFoundError)
+    return expect(promise).to.be.rejectedWith(PolicyNotFoundError)
   })
 
   it('should change start date and update term dates accordingly then return updated policy', async () => {

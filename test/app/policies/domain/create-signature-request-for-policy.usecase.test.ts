@@ -70,10 +70,10 @@ describe('Signature - Usecase - Create signature request for policy', async () =
     policyRepository.get.withExactArgs(policyId).resolves(policy)
     specificTermsGenerator.generate.withExactArgs(policy).rejects(SpecificTermsGenerationFailureError)
     // When
-    const result: Promise<SignatureRequest> = usecase(policyId)
+    const promise: Promise<SignatureRequest> = usecase(policyId)
     // Then
     expect(specificTermsRepository.save.calledOnceWithExactly(specificTerms, policyId)).to.be.equal(false)
-    expect(result).to.be.rejectedWith(SpecificTermsGenerationFailureError)
+    return expect(promise).to.be.rejectedWith(SpecificTermsGenerationFailureError)
   })
 
   it('should return ContractGenerationFailureError when contract generation fail', async () => {
@@ -82,10 +82,10 @@ describe('Signature - Usecase - Create signature request for policy', async () =
     specificTermsGenerator.generate.withExactArgs(policy).resolves(specificTerms)
     contractGenerator.generate.withExactArgs(policyId, specificTerms).rejects(ContractGenerationFailureError)
     // When
-    const result: Promise<SignatureRequest> = usecase(policyId)
+    const promise: Promise<SignatureRequest> = usecase(policyId)
     // Then
     expect(specificTermsRepository.save.calledOnceWithExactly(specificTerms, policyId)).to.be.equal(false)
-    expect(result).to.be.rejectedWith(ContractGenerationFailureError)
+    return expect(promise).to.be.rejectedWith(ContractGenerationFailureError)
   })
 
   it('should return SignatureRequestCreationFailureError when contract generation fail', async () => {
@@ -97,9 +97,9 @@ describe('Signature - Usecase - Create signature request for policy', async () =
     signatureRequestProvider.create.withExactArgs(contractFilePath, signer)
       .rejects(SignatureRequestCreationFailureError)
     // When
-    const result: Promise<SignatureRequest> = usecase(policyId)
+    const promise: Promise<SignatureRequest> = usecase(policyId)
     // Then
     expect(specificTermsRepository.save.calledOnceWithExactly(specificTerms, policyId)).to.be.equal(false)
-    expect(result).to.be.rejectedWith(SignatureRequestCreationFailureError)
+    return expect(promise).to.be.rejectedWith(SignatureRequestCreationFailureError)
   })
 })

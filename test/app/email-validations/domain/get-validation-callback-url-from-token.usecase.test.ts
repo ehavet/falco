@@ -117,7 +117,7 @@ describe('Usecase - Get a validation callback url from a validation token', asyn
             GetValidationCallbackUriFromToken.factory(decrypter, policyRepository)
 
     // WHEN
-    expect(getValidationCallbackUriFromToken(validationToken))
+    return expect(getValidationCallbackUriFromToken(validationToken))
 
     // THEN
       .to.be.rejectedWith(ExpiredEmailValidationTokenError)
@@ -133,7 +133,7 @@ describe('Usecase - Get a validation callback url from a validation token', asyn
             GetValidationCallbackUriFromToken.factory(decrypter, policyRepository)
 
     // WHEN
-    expect(getValidationCallbackUriFromToken(corruptedValidationToken))
+    return expect(getValidationCallbackUriFromToken(corruptedValidationToken))
 
     // THEN
       .to.be.rejectedWith(BadEmailValidationToken)

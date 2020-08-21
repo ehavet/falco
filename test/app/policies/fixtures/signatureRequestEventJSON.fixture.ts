@@ -4,8 +4,8 @@ export function signatureRequestEventJSONFixture (attr = {}) {
     client_id: null,
     event: {
       event_time: '1348177752',
-      event_type: 'signature_request_sent',
-      event_hash: '55344e8eb55e396c6ad85cf1a9b7fc128ebf9adb81ac9c77503729e477faf7d2',
+      event_type: 'signature_request_signed',
+      event_hash: '43b6813a08bed6c3723fac94ec7870ee4f3409b89972896a031e35dca64079ce',
       event_metadata: {
         related_signature_id: 'ad4d8a769b555fa5ef38691465d426682bf2c992',
         reported_for_account_id: '63522885f9261e2b04eea043933ee7313eb674fd',

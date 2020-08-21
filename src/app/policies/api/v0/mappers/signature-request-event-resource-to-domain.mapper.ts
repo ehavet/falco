@@ -16,7 +16,7 @@ export function resourceToDomain (signatureRequestEventJson: any): SignatureRequ
 
 function _toType (eventType: string) {
   switch (eventType) {
-    case 'signature_request_sent':
+    case 'signature_request_signed':
       return SignatureRequestEventType.Signed
     case 'signature_request_downloadable':
       return SignatureRequestEventType.DocumentsDownloadable

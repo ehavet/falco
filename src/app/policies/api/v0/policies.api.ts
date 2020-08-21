@@ -5,6 +5,7 @@ import * as Boom from '@hapi/boom'
 import { Container } from '../../policies.container'
 import { PaymentIntentQuery } from '../../domain/payment-intent-query'
 import {
+  NumberOfRoommatesError,
   PolicyAlreadySignedError,
   PolicyNotFoundError,
   PolicyNotUpdatableError,
@@ -112,7 +113,8 @@ export default function (container: Container): Array<ServerRoute> {
           if (error instanceof QuoteNotFoundError) {
             throw Boom.notFound(error.message)
           }
-          if (error instanceof RoommatesNotAllowedError) {
+          if (error instanceof RoommatesNotAllowedError ||
+              error instanceof NumberOfRoommatesError) {
             throw Boom.badData(error.message)
           }
           throw Boom.internal(error)

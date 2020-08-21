@@ -239,7 +239,7 @@ describe('Policies - Domain', async () => {
       const promise = Policy.create(createPolicyCommand, quote, policyRepository, partner)
 
       // Then
-      expect(promise).to.be.rejectedWith(RoommatesNotAllowedError, 'The roommates are not allowed for partner myPartner')
+      return expect(promise).to.be.rejectedWith(RoommatesNotAllowedError, 'The roommates are not allowed for partner partnerOne')
     })
 
     it('should throw an error if the partner allows roommates but there are more roommates than allowed', async () => {

@@ -3,6 +3,7 @@ import { container, policiesRoutes } from '../../../../../src/app/policies/polic
 import * as supertest from 'supertest'
 import { expect, sinon } from '../../../../test-utils'
 import {
+  NumberOfRoommatesError,
   PolicyAlreadySignedError,
   PolicyNotFoundError,
   PolicyNotUpdatableError,
@@ -212,6 +213,23 @@ describe('Policies - API - Integration', async () => {
         // Then
         expect(response).to.have.property('statusCode', 422)
         expect(response.body).to.have.property('message', 'The roommates are not allowed for partner myPartner')
+      })
+    })
+
+    describe('when the number of roommates is incorrect regarding the partner', async () => {
+      it('should return a 422', async () => {
+        // Given
+        sinon.stub(container, 'CreatePolicy').rejects(new NumberOfRoommatesError(2, 1))
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies')
+          .send(requestParams)
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 422)
+        expect(response.body).to.have.property('message', 'Partner does not allow 2 roommate(s) for a property of 1 room(s)')
       })
     })
 

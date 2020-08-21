@@ -17,6 +17,7 @@ export function policyToResource (policy: Policy) {
     subscription_date: policy.subscriptionDate ? policy.subscriptionDate : null,
     signature_date: policy.signatureDate ? policy.signatureDate : null,
     payment_date: policy.paymentDate ? policy.paymentDate : null,
+    email_validated: !!policy.emailValidationDate,
     status: policy.status
   }
 }

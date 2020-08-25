@@ -4,7 +4,7 @@ const config = require('./config')
 
 async function startServer () {
   try {
-    const server = await createServer(config)
+    const server = await createServer(config, logger)
     await server.start()
     logger.info(`Server running at: ${server.info.uri}`)
   } catch (error) {

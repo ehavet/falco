@@ -2,6 +2,7 @@ import { Server, ServerRoute } from '@hapi/hapi'
 import { SuperTest, Test } from 'supertest'
 import createServer from '../../src/server/server'
 import { register } from 'prom-client'
+import { logger } from '../../src/libs/logger'
 import supertest = require('supertest')
 const config = require('./config.test-utils')
 
@@ -12,7 +13,7 @@ export interface HttpServerForTesting {
 // Creates a server the same way it is created for production
 // Useful for end to end api tests
 export const newProdLikeServer = async (): Promise<HttpServerForTesting> => {
-  const hapiServer = await createServer(config)
+  const hapiServer = await createServer(config, logger)
   return new HapiHttpServerForTesting(hapiServer)
 }
 

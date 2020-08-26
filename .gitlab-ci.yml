@@ -147,7 +147,7 @@ default:
     - git-crypt unlock
     - pip install -r requirements.pip
     - ansible-galaxy role install -r requirements.yml
-    - 'ansible-playbook -i inventory.$DEPLOY_ENVIRONMENT --tags "nodejs,app-api" --extra-vars "@sites/ansible_extra_vars.yml" sites/api.appenin.fr.yml'
+    - 'ansible-playbook -i inventory.$DEPLOY_ENVIRONMENT --tags "nodejs,app" --extra-vars "@sites/ansible_extra_vars.yml" sites/api.appenin.fr.yml'
 
 "Deploy API to Staging":
   <<: *deploy

@@ -1,5 +1,5 @@
 import { expect, sinon } from '../../../test-utils'
-import { SequelizeHealthChecker } from '../../../../src/app/health-checks/infrastructure/sequelize.health-checker'
+import { SequelizeHealthChecker } from '../../../../src/app/probes/infrastructure/sequelize.health-checker'
 import { Sequelize } from 'sequelize-typescript'
 import * as SequelizeModule from '../../../../src/libs/sequelize'
 import { SinonStubbedInstance } from 'sinon'

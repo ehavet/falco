@@ -1,7 +1,7 @@
-import { GetApplicationVersion } from '../../../../src/app/common-api/domain/get-application-version.usecase'
-import { ApplicationInquirer } from '../../../../src/app/common-api/domain/application-inquirer'
-import { AppeninApplicationInquirer } from '../../../../src/app/common-api/infrastructure/appenin.application-inquirer'
-import { ApplicationVersion } from '../../../../src/app/common-api/domain/application-version'
+import { GetApplicationVersion } from '../../../../src/app/probes/domain/get-application-version.usecase'
+import { ApplicationInquirer } from '../../../../src/app/probes/domain/application-inquirer'
+import { AppeninApplicationInquirer } from '../../../../src/app/probes/infrastructure/appenin.application-inquirer'
+import { ApplicationVersion } from '../../../../src/app/probes/domain/application-version'
 import { expect } from '../../../test-utils'
 
 describe('Usecase - Get application version', async () => {

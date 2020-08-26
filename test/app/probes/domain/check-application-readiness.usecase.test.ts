@@ -1,6 +1,6 @@
 import { expect, sinon } from '../../../test-utils'
-import { SequelizeHealthChecker } from '../../../../src/app/health-checks/infrastructure/sequelize.health-checker'
-import { CheckApplicationReadiness } from '../../../../src/app/health-checks/domain/check-application-readiness.usecase'
+import { SequelizeHealthChecker } from '../../../../src/app/probes/infrastructure/sequelize.health-checker'
+import { CheckApplicationReadiness } from '../../../../src/app/probes/domain/check-application-readiness.usecase'
 
 describe('Usecase - Check Application Readiness', async () => {
   let usecase: CheckApplicationReadiness

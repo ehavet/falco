@@ -1,6 +1,6 @@
 import { ApplicationConfig } from '../../../../src/configs/application.config'
-import { AppeninApplicationInquirer } from '../../../../src/app/common-api/infrastructure/appenin.application-inquirer'
-import { ApplicationInquirer } from '../../../../src/app/common-api/domain/application-inquirer'
+import { AppeninApplicationInquirer } from '../../../../src/app/probes/infrastructure/appenin.application-inquirer'
+import { ApplicationInquirer } from '../../../../src/app/probes/domain/application-inquirer'
 import { expect } from '../../../test-utils'
 
 describe('AppeninApplicationInquirer', async () => {

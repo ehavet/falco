@@ -43,15 +43,10 @@ export class HelloSignSignatureRequestProvider implements SignatureRequestProvid
       },
       files: [docPath]
     }
-    try {
-      const embeddedSignatureRequest = await this.config.hellosign.signatureRequest.createEmbedded(options)
-      const signatureId = embeddedSignatureRequest.signature_request.signatures[0].signature_id
-      const signUrl = await this.config.hellosign.embedded.getSignUrl(signatureId)
-      return { url: signUrl.embedded.sign_url }
-    } catch (error) {
-      this.logger.error(error)
-      throw error
-    }
+    const embeddedSignatureRequest = await this.config.hellosign.signatureRequest.createEmbedded(options)
+    const signatureId = embeddedSignatureRequest.signature_request.signatures[0].signature_id
+    const signUrl = await this.config.hellosign.embedded.getSignUrl(signatureId)
+    return { url: signUrl.embedded.sign_url }
   }
 
   async getSignedContract (signatureRequestId: string, contractFileName: string): Promise<Contract> {

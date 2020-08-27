@@ -7,8 +7,11 @@ import { emailValidationsRoutes } from '../app/email-validations/email-validatio
 import { policiesRoutes } from '../app/policies/policies.container'
 import { quoteRoutes } from '../app/quotes/quote.container'
 import { probesRoutes } from '../app/probes/probes.container'
+import { Logger } from '../libs/logger'
+import { listenHandlerErrorsEvents } from './event-listeners/on-handler-error.event-listener'
+import { listenServerStopEvent } from './event-listeners/on-server-stop.event-listener'
 
-export default async (config: Map<string, any>): Promise<Server> => {
+export default async (config: Map<string, any>, logger: Logger): Promise<Server> => {
   const server = new Server({
     port: config.get('FALCO_API_PORT'),
     routes: {
@@ -17,6 +20,7 @@ export default async (config: Map<string, any>): Promise<Server> => {
       },
       validate: {
         failAction: async (_request, _h, err) => {
+          if (err) logger.debug(err)
           throw err
         },
         options: {
@@ -36,9 +40,8 @@ export default async (config: Map<string, any>): Promise<Server> => {
   await server.register(happiSwaggerPlugin(config))
   const sequelize = await initSequelize(config)
 
-  server.events.on('stop', () => {
-    sequelize.close()
-  })
+  server.events.on({ name: 'request', tags: true, filter: { tags: ['handler', 'error'], all: true } }, listenHandlerErrorsEvents(logger))
+  server.events.on('stop', listenServerStopEvent(sequelize))
 
   return server
 }

@@ -29,12 +29,11 @@ import { UpdatePolicyCommand } from '../../domain/update-policy.usecase'
 import { OperationCodeNotApplicableError } from '../../domain/operation-code.errors'
 import { ApplySpecialOperationCodeCommand } from '../../domain/apply-special-operation-code-command'
 import { PartnerNotFoundError } from '../../../partners/domain/partner.errors'
-import { Logger } from '../../../../libs/logger'
 import { ApplyStartDateOnPolicyCommand } from '../../domain/apply-start-date-on-policy.usecase'
 
 const TAGS = ['api', 'policies']
 
-export default function (container: Container, logger: Logger): Array<ServerRoute> {
+export default function (container: Container): Array<ServerRoute> {
   return [
     {
       method: 'POST',
@@ -382,7 +381,6 @@ export default function (container: Container, logger: Logger): Array<ServerRout
             case error instanceof PartnerNotFoundError:
               throw Boom.notFound(error.message)
             default:
-              logger.error(error)
               throw Boom.internal(error)
           }
         }
@@ -431,7 +429,6 @@ export default function (container: Container, logger: Logger): Array<ServerRout
             case error instanceof PolicyNotFoundError:
               throw Boom.notFound(error.message)
             default:
-              logger.error(error)
               throw Boom.internal(error)
           }
         }

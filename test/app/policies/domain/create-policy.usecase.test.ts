@@ -13,7 +13,7 @@ import { EmailValidationQuery } from '../../../../src/app/email-validations/doma
 import { PartnerRepository } from '../../../../src/app/partners/domain/partner.repository'
 import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles'
 import { createPartnerFixture } from '../../partners/fixtures/partner.fixture'
-import { RoommatesNotAllowedError } from '../../../../src/app/policies/domain/policies.errors'
+import { PolicyRiskRoommatesNotAllowedError } from '../../../../src/app/policies/domain/policies.errors'
 import { Partner } from '../../../../src/app/partners/domain/partner'
 import Question = Partner.Question
 
@@ -107,6 +107,6 @@ describe('Policies - Usecase - Create policy', async () => {
     const promise = createPolicy(createPolicyCommand)
 
     // Then
-    return expect(promise).to.be.rejectedWith(RoommatesNotAllowedError)
+    return expect(promise).to.be.rejectedWith(PolicyRiskRoommatesNotAllowedError)
   })
 })

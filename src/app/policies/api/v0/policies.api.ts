@@ -5,12 +5,12 @@ import * as Boom from '@hapi/boom'
 import { Container } from '../../policies.container'
 import { PaymentIntentQuery } from '../../domain/payment-intent-query'
 import {
-  NumberOfRoommatesError,
+  PolicyRiskNumberOfRoommatesError,
   PolicyAlreadySignedError,
   PolicyNotFoundError,
   PolicyNotUpdatableError,
   PolicyStartDateConsistencyError,
-  RoommatesNotAllowedError
+  PolicyRiskRoommatesNotAllowedError
 } from '../../domain/policies.errors'
 import { QuoteNotFoundError } from '../../../quotes/domain/quote.errors'
 import { CreatePolicyCommand } from '../../domain/create-policy-command'
@@ -113,8 +113,8 @@ export default function (container: Container): Array<ServerRoute> {
           if (error instanceof QuoteNotFoundError) {
             throw Boom.notFound(error.message)
           }
-          if (error instanceof RoommatesNotAllowedError ||
-              error instanceof NumberOfRoommatesError) {
+          if (error instanceof PolicyRiskRoommatesNotAllowedError ||
+              error instanceof PolicyRiskNumberOfRoommatesError) {
             throw Boom.badData(error.message)
           }
           throw Boom.internal(error)

@@ -5,7 +5,7 @@ import { Partner } from '../../../../src/app/partners/domain/partner'
 import Question = Partner.Question
 
 describe('Partners - Domain - Functions', () => {
-  describe('#doesPartnerAllowThisNumberOfRoommates', () => {
+  describe('#doesPartnerAllowNumberOfRoommatesForProperty', () => {
     it('should return true if the number of roommates equals the number max of roommates allowed for the given room count', () => {
       const questions: Array<Question> = [{
         code: Partner.Question.QuestionCode.Roommate,
@@ -16,7 +16,7 @@ describe('Partners - Domain - Functions', () => {
       const partner = createPartnerFixture({ questions })
 
       // When
-      const allowNumberOfRoommates = PartnerFunc.doesPartnerAllowThisNumberOfRoommates(partner, 2, { property: { roomCount: 2 } })
+      const allowNumberOfRoommates = PartnerFunc.doesPartnerAllowNumberOfRoommatesForProperty(partner, 2, { property: { roomCount: 2 } })
 
       // Then
       expect(allowNumberOfRoommates).to.be.true
@@ -32,7 +32,7 @@ describe('Partners - Domain - Functions', () => {
       const partner = createPartnerFixture({ questions })
 
       // When
-      const allowNumberOfRoommates = PartnerFunc.doesPartnerAllowThisNumberOfRoommates(partner, 1, { property: { roomCount: 2 } })
+      const allowNumberOfRoommates = PartnerFunc.doesPartnerAllowNumberOfRoommatesForProperty(partner, 1, { property: { roomCount: 2 } })
 
       // Then
       expect(allowNumberOfRoommates).to.be.true
@@ -48,7 +48,7 @@ describe('Partners - Domain - Functions', () => {
       const partner = createPartnerFixture({ questions })
 
       // When
-      const allowNumberOfRoommates = PartnerFunc.doesPartnerAllowThisNumberOfRoommates(partner, 3, { property: { roomCount: 2 } })
+      const allowNumberOfRoommates = PartnerFunc.doesPartnerAllowNumberOfRoommatesForProperty(partner, 3, { property: { roomCount: 2 } })
 
       // Then
       expect(allowNumberOfRoommates).to.be.false
@@ -64,7 +64,7 @@ describe('Partners - Domain - Functions', () => {
       const partner = createPartnerFixture({ questions })
 
       // When
-      const allowNumberOfRoommates = PartnerFunc.doesPartnerAllowThisNumberOfRoommates(partner, 2, { property: { roomCount: 2 } })
+      const allowNumberOfRoommates = PartnerFunc.doesPartnerAllowNumberOfRoommatesForProperty(partner, 2, { property: { roomCount: 2 } })
 
       // Then
       expect(allowNumberOfRoommates).to.be.false

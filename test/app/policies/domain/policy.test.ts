@@ -7,7 +7,7 @@ import { createCreatePolicyCommand } from '../fixtures/createPolicyCommand.fixtu
 import { PolicyRepository } from '../../../../src/app/policies/domain/policy.repository'
 import { SinonStubbedInstance } from 'sinon'
 import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles'
-import { RoommatesNotAllowedError, NumberOfRoommatesError } from '../../../../src/app/policies/domain/policies.errors'
+import { PolicyRiskRoommatesNotAllowedError, PolicyRiskNumberOfRoommatesError } from '../../../../src/app/policies/domain/policies.errors'
 import { createPartnerFixture } from '../../partners/fixtures/partner.fixture'
 import { Partner } from '../../../../src/app/partners/domain/partner'
 import Question = Partner.Question
@@ -239,7 +239,7 @@ describe('Policies - Domain', async () => {
       const promise = Policy.create(createPolicyCommand, quote, policyRepository, partner)
 
       // Then
-      return expect(promise).to.be.rejectedWith(RoommatesNotAllowedError, 'The roommates are not allowed for partner partnerOne')
+      return expect(promise).to.be.rejectedWith(PolicyRiskRoommatesNotAllowedError, 'Adding roommates is not allowed')
     })
 
     it('should throw an error if the partner allows roommates but there are more roommates than allowed', async () => {
@@ -258,7 +258,7 @@ describe('Policies - Domain', async () => {
       const promise = Policy.create(commandWith2Roommates, quote, policyRepository, partner)
 
       // Then
-      return expect(promise).to.be.rejectedWith(NumberOfRoommatesError, 'Partner does not allow 2 roommate(s) for a property of 2 room(s)')
+      return expect(promise).to.be.rejectedWith(PolicyRiskNumberOfRoommatesError, 'A property of 2 room(s) allows a maximum of 1 roommate(s)')
     })
 
     it('should throw an error if the partner allows roommates but no limitation is found for the property room count', async () => {
@@ -277,7 +277,7 @@ describe('Policies - Domain', async () => {
       const promise = Policy.create(commandWith2Roommates, quote, policyRepository, partner)
 
       // Then
-      return expect(promise).to.be.rejectedWith(NumberOfRoommatesError, 'Partner does not allow 1 roommate(s) for a property of 2 room(s)')
+      return expect(promise).to.be.rejectedWith(PolicyRiskNumberOfRoommatesError, 'A property of 2 room(s) allows a maximum of 0 roommate(s)')
     })
   })
 })

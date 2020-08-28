@@ -40,18 +40,18 @@ export class PolicyStartDateConsistencyError extends Error {
   }
 }
 
-export class RoommatesNotAllowedError extends Error {
-  constructor (partnerCode) {
-    const message: string = `The roommates are not allowed for partner ${partnerCode}`
+export class PolicyRiskRoommatesNotAllowedError extends Error {
+  constructor () {
+    const message: string = 'Adding roommates is not allowed'
     super(message)
-    this.name = 'RoommatesNotAllowedError'
+    this.name = 'PolicyRiskRoommatesNotAllowedError'
   }
 }
 
-export class NumberOfRoommatesError extends Error {
-  constructor (numberOfRoommates: number, roomCount: number) {
-    const message: string = `Partner does not allow ${numberOfRoommates} roommate(s) for a property of ${roomCount} room(s)`
+export class PolicyRiskNumberOfRoommatesError extends Error {
+  constructor (maxRoommateNumber: number, roomCount: number) {
+    const message: string = `A property of ${roomCount} room(s) allows a maximum of ${maxRoommateNumber} roommate(s)`
     super(message)
-    this.name = 'NumberOfRoommatesError'
+    this.name = 'PolicyRiskNumberOfRoommatesError'
   }
 }

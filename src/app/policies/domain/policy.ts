@@ -6,7 +6,7 @@ import dayjs from 'dayjs'
 import { CannotGeneratePolicyNotApplicableError } from './certificate/certificate.errors'
 import { Partner } from '../../partners/domain/partner'
 import * as PartnerFunc from '../../partners/domain/partner.func'
-import { PolicyStartDateConsistencyError, RoommatesNotAllowedError, NumberOfRoommatesError } from './policies.errors'
+import { PolicyStartDateConsistencyError, PolicyRiskRoommatesNotAllowedError, PolicyRiskNumberOfRoommatesError } from './policies.errors'
 
 const DEFAULT_NUMBER_OF_MONTHS_DUE = 12
 
@@ -157,12 +157,12 @@ export namespace Policy.Risk {
     export function createRisk (commandRisk: CreatePolicyCommand.Risk, quoteRisk: Quote.Risk, partner: Partner): Policy.Risk {
       if (_hasRoommates(commandRisk)) {
         if (!PartnerFunc.doesPartnerAllowRoommates(partner)) {
-          throw new RoommatesNotAllowedError(partner.code)
+          throw new PolicyRiskRoommatesNotAllowedError()
         }
 
         const numberOfRoommates: number = commandRisk.people.otherInsured?.length
-        if (!PartnerFunc.doesPartnerAllowThisNumberOfRoommates(partner, numberOfRoommates, quoteRisk)) {
-          throw new NumberOfRoommatesError(numberOfRoommates, quoteRisk.property.roomCount)
+        if (!PartnerFunc.doesPartnerAllowNumberOfRoommatesForProperty(partner, numberOfRoommates, quoteRisk)) {
+          throw new PolicyRiskNumberOfRoommatesError(PartnerFunc.getMaxNumberOfRoommatesForProperty(partner, quoteRisk), quoteRisk.property.roomCount)
         }
       }
 

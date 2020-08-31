@@ -115,8 +115,8 @@ describe('PaymentProcessor - Usecase - confirm payment intent for policy', async
     policyRepository.get.withArgs(policyId).resolves(policy)
     certificateRepository.generate.withArgs(policy).rejects(new CertificateGenerationError(policyId))
     // When
-    const response = confirmPaymentIntentForPolicy(policyId)
+    const promise = confirmPaymentIntentForPolicy(policyId)
     // Then
-    expect(response).to.be.rejectedWith(CertificateGenerationError)
+    return expect(promise).to.be.rejectedWith(CertificateGenerationError)
   })
 })

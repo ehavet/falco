@@ -37,7 +37,7 @@ describe('Signature - Usecase - Manage Signature Request Event', async () => {
       const promise = manageSignatureRequestEvent(manageSignatureRequestEventCommand)
 
       // Then
-      expect(promise).to.be.rejectedWith(SignatureRequestEventValidationError)
+      return expect(promise).to.be.rejectedWith(SignatureRequestEventValidationError)
     })
   })
 

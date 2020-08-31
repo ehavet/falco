@@ -429,7 +429,7 @@ describe('Policies - API - E2E', async () => {
       dateFaker.setCurrentDate(now)
     })
 
-    it('should apply special operation code on policies', async () => {
+    it('should apply new start date to policy', async () => {
       // Given
       const policyRepository = new PolicySqlRepository()
       const policyId = 'APP123456789'

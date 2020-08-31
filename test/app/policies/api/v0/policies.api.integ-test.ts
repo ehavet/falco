@@ -3,11 +3,12 @@ import { container, policiesRoutes } from '../../../../../src/app/policies/polic
 import * as supertest from 'supertest'
 import { expect, sinon } from '../../../../test-utils'
 import {
+  PolicyRiskNumberOfRoommatesError,
   PolicyAlreadySignedError,
   PolicyNotFoundError,
   PolicyNotUpdatableError,
   PolicyStartDateConsistencyError,
-  RoommatesNotAllowedError
+  PolicyRiskRoommatesNotAllowedError
 } from '../../../../../src/app/policies/domain/policies.errors'
 import { Policy } from '../../../../../src/app/policies/domain/policy'
 import { createOngoingPolicyFixture, createPolicyFixture } from '../../fixtures/policy.fixture'
@@ -201,7 +202,7 @@ describe('Policies - API - Integration', async () => {
     describe('when there are roommates but the partner does not allow it', async () => {
       it('should return a 422', async () => {
         // Given
-        sinon.stub(container, 'CreatePolicy').rejects(new RoommatesNotAllowedError('myPartner'))
+        sinon.stub(container, 'CreatePolicy').rejects(new PolicyRiskRoommatesNotAllowedError())
 
         // When
         response = await httpServer.api()
@@ -211,7 +212,24 @@ describe('Policies - API - Integration', async () => {
 
         // Then
         expect(response).to.have.property('statusCode', 422)
-        expect(response.body).to.have.property('message', 'The roommates are not allowed for partner myPartner')
+        expect(response.body).to.have.property('message', 'Adding roommates is not allowed')
+      })
+    })
+
+    describe('when the number of roommates is incorrect regarding the partner', async () => {
+      it('should return a 422', async () => {
+        // Given
+        sinon.stub(container, 'CreatePolicy').rejects(new PolicyRiskNumberOfRoommatesError(2, 1))
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies')
+          .send(requestParams)
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 422)
+        expect(response.body).to.have.property('message', 'A property of 1 room(s) allows a maximum of 2 roommate(s)')
       })
     })
 

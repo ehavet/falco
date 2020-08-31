@@ -86,10 +86,10 @@ describe('Partners - Infra - Partner Map Repository', async () => {
 
     it('should thrown not found error when partner is not found', async () => {
       // WHEN
-      const partnerPromise: Promise<Partner> = partnerMapRepository.getByCode('unkownPartnerCode')
+      const promise: Promise<Partner> = partnerMapRepository.getByCode('unkownPartnerCode')
 
       // THEN
-      expect(partnerPromise).to.be.rejectedWith(PartnerNotFoundError)
+      return expect(promise).to.be.rejectedWith(PartnerNotFoundError)
     })
   })
 

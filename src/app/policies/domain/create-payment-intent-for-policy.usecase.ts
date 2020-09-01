@@ -3,7 +3,7 @@ import { PaymentIntent } from './payment-intent'
 import { PaymentProcessor } from './payment-processor'
 import { PolicyRepository } from './policy.repository'
 import { Policy } from './policy'
-import { PolicyAlreadyPaidError } from './policies.errors'
+import { PolicyAlreadyPaidError, PolicyCanceledError } from './policies.errors'
 
 export interface CreatePaymentIntentForPolicy {
     (paymentIntentQuery: PaymentIntentQuery): Promise<PaymentIntent>
@@ -16,10 +16,12 @@ export namespace CreatePaymentIntentForPolicy {
     ): CreatePaymentIntentForPolicy {
       return async (paymentIntentQuery: PaymentIntentQuery) => {
         const policy: Policy = await policyRepository.get(paymentIntentQuery.policyId)
-        if (policy.status === Policy.Status.Applicable) {
-          throw new PolicyAlreadyPaidError(policy.id)
-        }
+
+        if (Policy.isCanceled(policy)) { throw new PolicyCanceledError(policy.id) }
+        if (policy.status === Policy.Status.Applicable) { throw new PolicyAlreadyPaidError(policy.id) }
+
         const intent = await paymentProcessor.createIntent(policy.id, _toZeroDecimal(policy.premium), policy.insurance.currency)
+
         return {
           id: intent.id,
           amount: _toTwoDecimal(intent.amount),

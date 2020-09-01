@@ -1,5 +1,5 @@
 import { dateFaker, expect, sinon } from '../../../test-utils'
-import { PolicyNotFoundError } from '../../../../src/app/policies/domain/policies.errors'
+import { PolicyCanceledError, PolicyNotFoundError, PolicyNotUpdatableError } from '../../../../src/app/policies/domain/policies.errors'
 import { SinonStubbedInstance } from 'sinon'
 import { PolicyRepository } from '../../../../src/app/policies/domain/policy.repository'
 import { PartnerRepository } from '../../../../src/app/partners/domain/partner.repository'
@@ -50,6 +50,38 @@ describe('Policies - Usecase - Apply special operation code on policy', async ()
 
     // Then
     return expect(promise).to.be.rejectedWith(OperationCodeNotApplicableError, 'The operation code FULLYEAR is not applicable for partner : My Partner')
+  })
+
+  it('should throw an PolicyCanceledError if policy is canceled', async () => {
+    // Given
+    const policyId = 'APP174635432987'
+    const policy = createPolicyFixture({ id: policyId, partnerCode: 'My Partner', status: Policy.Status.Canceled })
+    const applySpecialOperationCodeOnPolicyCommand = { policyId, operationCode: 'FULLYEAR' }
+    const applySpecialOperationCodeOnPolicy = ApplySpecialOperationCodeOnPolicy.factory(policyRepository, partnerRepository)
+
+    policyRepository.get.withArgs(policyId).resolves(policy)
+
+    // When
+    const promise = applySpecialOperationCodeOnPolicy(applySpecialOperationCodeOnPolicyCommand)
+
+    // Then
+    return expect(promise).to.be.rejectedWith(PolicyCanceledError, `The policy ${policyId} has been canceled`)
+  })
+
+  it('should throw an PolicyNotUpdatableError if policy has been already signed', async () => {
+    // Given
+    const policyId = 'APP174635432987'
+    const policy = createPolicyFixture({ id: policyId, partnerCode: 'My Partner', status: Policy.Status.Signed })
+    const applySpecialOperationCodeOnPolicyCommand = { policyId, operationCode: 'FULLYEAR' }
+    const applySpecialOperationCodeOnPolicy = ApplySpecialOperationCodeOnPolicy.factory(policyRepository, partnerRepository)
+
+    policyRepository.get.withArgs(policyId).resolves(policy)
+
+    // When
+    const promise = applySpecialOperationCodeOnPolicy(applySpecialOperationCodeOnPolicyCommand)
+
+    // Then
+    return expect(promise).to.be.rejectedWith(PolicyNotUpdatableError, `Could not update policy ${policyId} because it is already SIGNED`)
   })
 
   it('should update premium on 5 months if provided operation code is SEMESTER1', async () => {

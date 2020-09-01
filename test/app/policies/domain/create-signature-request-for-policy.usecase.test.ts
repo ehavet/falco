@@ -8,6 +8,7 @@ import { ContractGenerationFailureError, SignatureRequestCreationFailureError, S
 import { Policy } from '../../../../src/app/policies/domain/policy'
 import { Signer } from '../../../../src/app/policies/domain/signer'
 import { policyRepositoryMock } from '../fixtures/policy-repository.test-doubles'
+import { PolicyAlreadySignedError, PolicyCanceledError } from '../../../../src/app/policies/domain/policies.errors'
 
 describe('Signature - Usecase - Create signature request for policy', async () => {
   let specificTermsGenerator
@@ -48,6 +49,26 @@ describe('Signature - Usecase - Create signature request for policy', async () =
       policyRepository,
       signatureRequestProvider
     )
+  })
+
+  it('should throw an PolicyAlreadySignedError when policy is already signed', async () => {
+    // Given
+    policy = createPolicyFixture({ id: policyId, status: Policy.Status.Signed })
+    policyRepository.get.withExactArgs(policyId).resolves(policy)
+    // When
+    const promise = usecase(policyId)
+    // Then
+    expect(promise).to.be.rejectedWith(PolicyAlreadySignedError)
+  })
+
+  it('should throw an PolicyCanceledError when policy has been canceled', async () => {
+    // Given
+    policy = createPolicyFixture({ id: policyId, status: Policy.Status.Canceled })
+    policyRepository.get.withExactArgs(policyId).resolves(policy)
+    // When
+    const promise = usecase(policyId)
+    // Then
+    expect(promise).to.be.rejectedWith(PolicyCanceledError, `The policy ${policyId} has been canceled`)
   })
 
   it('should create signature request and return it url', async () => {

@@ -1,8 +1,8 @@
-export class CannotGeneratePolicyNotApplicableError extends Error {
+export class PolicyForbiddenCertificateGenerationError extends Error {
   constructor () {
-    const message: string = 'Could not generate the certificate because the policy is not applicable yet'
+    const message: string = 'Could not generate the certificate because the policy is not applicable'
     super(message)
-    this.name = 'CannotGeneratePolicyNotApplicableError'
+    this.name = 'PolicyForbiddenCertificateGenerationError'
   }
 }
 

@@ -1,6 +1,6 @@
 import { Policy } from './policy'
 import { PolicyRepository } from './policy.repository'
-import { PolicyNotUpdatableError } from './policies.errors'
+import { PolicyCanceledError, PolicyNotUpdatableError } from './policies.errors'
 
 export interface ApplyStartDateOnPolicy {
     (command: ApplyStartDateOnPolicyCommand): Promise<Policy>
@@ -16,6 +16,7 @@ export namespace ApplyStartDateOnPolicy {
       return async (command: ApplyStartDateOnPolicyCommand) => {
         const policy: Policy = await policyRepository.get(command.policyId)
 
+        if (Policy.isCanceled(policy)) { throw new PolicyCanceledError(policy.id) }
         if (Policy.isSigned(policy)) throw new PolicyNotUpdatableError(policy.id, policy.status)
 
         Policy.applyStartDate(policy, command.startDate)

@@ -7,8 +7,9 @@ import { CertificateRepository } from '../../../../src/app/policies/domain/certi
 import { Certificate } from '../../../../src/app/policies/domain/certificate/certificate'
 import { GeneratePolicyCertificate } from '../../../../src/app/policies/domain/certificate/generate-policy-certificate.usecase'
 import { GeneratePolicyCertificateQuery } from '../../../../src/app/policies/domain/certificate/generate-policy-certificate-query'
-import { CannotGeneratePolicyNotApplicableError } from '../../../../src/app/policies/domain/certificate/certificate.errors'
+import { PolicyForbiddenCertificateGenerationError } from '../../../../src/app/policies/domain/certificate/certificate.errors'
 import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles'
+import { PolicyCanceledError } from '../../../../src/app/policies/domain/policies.errors'
 
 describe('Policies - Usecase - Generate policy certificate', async () => {
   const policyRepository: SinonStubbedInstance<PolicyRepository> = policyRepositoryStub()
@@ -52,6 +53,20 @@ describe('Policies - Usecase - Generate policy certificate', async () => {
     const promise = generatePolicyCertificate(generatePolicyCertificateQuery)
 
     // Then
-    return expect(promise).to.be.rejectedWith(CannotGeneratePolicyNotApplicableError)
+    return expect(promise).to.be.rejectedWith(PolicyForbiddenCertificateGenerationError)
+  })
+
+  it('should throw an error if the policy has been canceled', async () => {
+    // Given
+    const policyId: string = 'APP854732084'
+    const policyFromDb: Policy = createPolicyFixture({ id: policyId, status: Policy.Status.Canceled })
+    const generatePolicyCertificateQuery: GeneratePolicyCertificateQuery = { policyId }
+    policyRepository.get.withArgs(policyId).resolves(policyFromDb)
+
+    // When
+    const promise = generatePolicyCertificate(generatePolicyCertificateQuery)
+
+    // Then
+    return expect(promise).to.be.rejectedWith(PolicyCanceledError)
   })
 })

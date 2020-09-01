@@ -2,7 +2,7 @@ import { expect, sinon } from '../../../test-utils'
 import { CreatePaymentIntentForPolicy } from '../../../../src/app/policies/domain/create-payment-intent-for-policy.usecase'
 import { PaymentIntentQuery } from '../../../../src/app/policies/domain/payment-intent-query'
 import { PaymentIntent } from '../../../../src/app/policies/domain/payment-intent'
-import { PolicyAlreadyPaidError, PolicyNotFoundError } from '../../../../src/app/policies/domain/policies.errors'
+import { PolicyAlreadyPaidError, PolicyCanceledError, PolicyNotFoundError } from '../../../../src/app/policies/domain/policies.errors'
 import { createPolicyFixture } from '../fixtures/policy.fixture'
 import { Policy } from '../../../../src/app/policies/domain/policy'
 import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles'
@@ -71,5 +71,24 @@ describe('Usecase - Create payment intent for policy', async () => {
     await expect(createPaymentIntentForPolicy(paymentIntentQuery))
     // THEN
       .to.be.rejectedWith(PolicyAlreadyPaidError)
+  })
+
+  it('should throw PolicyCanceledError when policy has been canceled', async () => {
+    // GIVEN
+    const paymentIntentQuery: PaymentIntentQuery = {
+      policyId: 'APP789890859'
+    }
+    const canceledPolicy = createPolicyFixture({ id: 'APP789890859', status: Policy.Status.Canceled })
+    const paymentProcessor = { createIntent: sinon.stub }
+    const policyRepository = policyRepositoryStub()
+
+    policyRepository.get.withArgs('APP789890859').resolves(canceledPolicy)
+
+    const createPaymentIntentForPolicy: CreatePaymentIntentForPolicy =
+        CreatePaymentIntentForPolicy.factory(paymentProcessor, policyRepository)
+    // WHEN
+    await expect(createPaymentIntentForPolicy(paymentIntentQuery))
+    // THEN
+      .to.be.rejectedWith(PolicyCanceledError, 'The policy APP789890859 has been canceled')
   })
 })

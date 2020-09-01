@@ -24,8 +24,9 @@ describe('Policies - Infra - Contract FS Repository', async () => {
   let contractToSave: Contract
   let policy: Policy
 
-  beforeEach(async () => {
+  beforeEach(async function () {
     // Given
+    this.timeout(10000)
     await fsx.emptyDir(documentsFolderPath)
     policy = createPolicyFixture({ partnerCode: 'essca' })
     policy.termEndDate = dayjs(policy.termStartDate).add(1, 'month').toDate()

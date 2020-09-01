@@ -6,7 +6,9 @@ import { Container } from '../../policies.container'
 import { PaymentIntentQuery } from '../../domain/payment-intent-query'
 import {
   PolicyRiskNumberOfRoommatesError,
+  PolicyAlreadyPaidError,
   PolicyAlreadySignedError,
+  PolicyCanceledError,
   PolicyNotFoundError,
   PolicyNotUpdatableError,
   PolicyStartDateConsistencyError,
@@ -21,7 +23,7 @@ import { createPolicyRequestSchema, policySchema } from './schemas/post-policy.s
 import { GetPolicyQuery } from '../../domain/get-policy-query'
 import { GeneratePolicyCertificateQuery } from '../../domain/certificate/generate-policy-certificate-query'
 import { Certificate } from '../../domain/certificate/certificate'
-import { CannotGeneratePolicyNotApplicableError } from '../../domain/certificate/certificate.errors'
+import { PolicyForbiddenCertificateGenerationError } from '../../domain/certificate/certificate.errors'
 import { GetPolicySpecificTermsQuery } from '../../domain/specific-terms/get-policy-specific-terms-query'
 import { SpecificTerms } from '../../domain/specific-terms/specific-terms'
 import { SpecificTermsNotFoundError } from '../../domain/specific-terms/specific-terms.errors'
@@ -57,6 +59,7 @@ export default function (container: Container): Array<ServerRoute> {
             }),
             400: HttpErrorSchema.badRequestSchema,
             404: HttpErrorSchema.notFoundSchema,
+            409: HttpErrorSchema.conflictSchema,
             500: HttpErrorSchema.internalServerErrorSchema
           }
         }
@@ -77,10 +80,15 @@ export default function (container: Container): Array<ServerRoute> {
             })
             .code(201)
         } catch (error) {
-          if (error instanceof PolicyNotFoundError) {
-            throw Boom.notFound(error.message)
+          switch (true) {
+            case error instanceof PolicyNotFoundError:
+              throw Boom.notFound(error.message)
+            case error instanceof PolicyCanceledError:
+            case error instanceof PolicyAlreadyPaidError:
+              throw Boom.conflict(error.message)
+            default:
+              throw Boom.internal(error)
           }
-          throw Boom.internal(error)
         }
       }
     },
@@ -174,6 +182,8 @@ export default function (container: Container): Array<ServerRoute> {
             200: policySchema,
             400: HttpErrorSchema.badRequestSchema,
             404: HttpErrorSchema.notFoundSchema,
+            409: HttpErrorSchema.conflictSchema,
+            422: HttpErrorSchema.unprocessableEntitySchema,
             500: HttpErrorSchema.internalServerErrorSchema
           }
         }
@@ -189,14 +199,17 @@ export default function (container: Container): Array<ServerRoute> {
           const createdPolicy: Policy = await container.UpdatePolicy(command)
           return h.response(policyToResource(createdPolicy)).code(200)
         } catch (error) {
-          if (error instanceof PolicyNotFoundError) {
-            throw Boom.notFound(error.message)
+          switch (true) {
+            case error instanceof PolicyNotFoundError:
+              throw Boom.notFound(error.message)
+            case error instanceof OperationCodeNotApplicableError:
+              throw Boom.badData(error.message)
+            case error instanceof PolicyCanceledError:
+            case error instanceof PolicyNotUpdatableError:
+              throw Boom.conflict(error.message)
+            default:
+              throw Boom.internal(error)
           }
-          if (error instanceof PolicyNotUpdatableError ||
-              error instanceof OperationCodeNotApplicableError) {
-            throw Boom.badData(error.message)
-          }
-          throw Boom.internal(error)
         }
       }
     },
@@ -218,7 +231,8 @@ export default function (container: Container): Array<ServerRoute> {
         response: {
           status: {
             400: HttpErrorSchema.badRequestSchema,
-            422: HttpErrorSchema.unprocessableEntitySchema,
+            404: HttpErrorSchema.notFoundSchema,
+            409: HttpErrorSchema.conflictSchema,
             500: HttpErrorSchema.internalServerErrorSchema
           }
         },
@@ -241,11 +255,15 @@ export default function (container: Container): Array<ServerRoute> {
             .header('Content-Disposition', `attachment; filename=${certificate.name}`)
             .encoding('binary').code(201)
         } catch (error) {
-          if (error instanceof CannotGeneratePolicyNotApplicableError ||
-              error instanceof PolicyNotFoundError) {
-            throw Boom.badData(error.message)
+          switch (true) {
+            case error instanceof PolicyNotFoundError:
+              throw Boom.notFound(error.message)
+            case error instanceof PolicyCanceledError:
+            case error instanceof PolicyForbiddenCertificateGenerationError:
+              throw Boom.conflict(error.message)
+            default:
+              throw Boom.internal(error)
           }
-          throw Boom.internal(error)
         }
       }
     },
@@ -264,6 +282,7 @@ export default function (container: Container): Array<ServerRoute> {
           status: {
             400: HttpErrorSchema.badRequestSchema,
             404: HttpErrorSchema.notFoundSchema,
+            409: HttpErrorSchema.conflictSchema,
             500: HttpErrorSchema.internalServerErrorSchema
           }
         },
@@ -286,10 +305,15 @@ export default function (container: Container): Array<ServerRoute> {
             .header('Content-Disposition', `attachment; filename=${specificTerms.name}`)
             .encoding('binary').code(200)
         } catch (error) {
-          if (error instanceof SpecificTermsNotFoundError) {
-            throw Boom.notFound(error.message)
+          switch (true) {
+            case error instanceof PolicyNotFoundError:
+            case error instanceof SpecificTermsNotFoundError:
+              throw Boom.notFound(error.message)
+            case error instanceof PolicyCanceledError:
+              throw Boom.conflict(error.message)
+            default:
+              throw Boom.internal(error)
           }
-          throw Boom.internal(error)
         }
       }
     },
@@ -331,6 +355,7 @@ export default function (container: Container): Array<ServerRoute> {
             case error instanceof SpecificTermsNotFoundError:
               throw Boom.notFound(error.message)
             case error instanceof PolicyAlreadySignedError:
+            case error instanceof PolicyCanceledError:
               throw Boom.conflict(error.message)
             default:
               throw Boom.internal()
@@ -360,6 +385,7 @@ export default function (container: Container): Array<ServerRoute> {
             200: policySchema,
             400: HttpErrorSchema.badRequestSchema,
             404: HttpErrorSchema.notFoundSchema,
+            409: HttpErrorSchema.conflictSchema,
             422: HttpErrorSchema.unprocessableEntitySchema,
             500: HttpErrorSchema.internalServerErrorSchema
           }
@@ -382,6 +408,9 @@ export default function (container: Container): Array<ServerRoute> {
             case error instanceof PolicyNotFoundError:
             case error instanceof PartnerNotFoundError:
               throw Boom.notFound(error.message)
+            case error instanceof PolicyCanceledError:
+            case error instanceof PolicyNotUpdatableError:
+              throw Boom.conflict(error.message)
             default:
               throw Boom.internal(error)
           }
@@ -409,6 +438,7 @@ export default function (container: Container): Array<ServerRoute> {
             200: policySchema,
             400: HttpErrorSchema.badRequestSchema,
             404: HttpErrorSchema.notFoundSchema,
+            409: HttpErrorSchema.conflictSchema,
             422: HttpErrorSchema.unprocessableEntitySchema,
             500: HttpErrorSchema.internalServerErrorSchema
           }
@@ -430,6 +460,9 @@ export default function (container: Container): Array<ServerRoute> {
               throw Boom.badData(error.message)
             case error instanceof PolicyNotFoundError:
               throw Boom.notFound(error.message)
+            case error instanceof PolicyCanceledError:
+            case error instanceof PolicyNotUpdatableError:
+              throw Boom.conflict(error.message)
             default:
               throw Boom.internal(error)
           }

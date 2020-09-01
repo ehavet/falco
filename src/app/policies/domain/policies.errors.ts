@@ -16,9 +16,17 @@ export class PolicyNotUpdatableError extends Error {
   }
 }
 
+export class PolicyCanceledError extends Error {
+  constructor (policyId: string) {
+    const message: string = `The policy ${policyId} has been canceled`
+    super(message)
+    this.name = 'PolicyCanceledError'
+  }
+}
+
 export class PolicyAlreadyPaidError extends Error {
   constructor (policyId: string) {
-    const message: string = `Policy ${policyId} has already been paid`
+    const message: string = `The policy ${policyId} has already been paid`
     super(message)
     this.name = 'PolicyAlreadyPaidError'
   }
@@ -26,7 +34,7 @@ export class PolicyAlreadyPaidError extends Error {
 
 export class PolicyAlreadySignedError extends Error {
   constructor (policyId: string) {
-    const message: string = `Policy ${policyId} has already been signed`
+    const message: string = `The policy ${policyId} has already been signed`
     super(message)
     this.name = 'PolicyAlreadySignedError'
   }

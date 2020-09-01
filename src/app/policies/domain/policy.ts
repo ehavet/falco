@@ -3,7 +3,6 @@ import { CreatePolicyCommand } from './create-policy-command'
 import { generate } from 'randomstring'
 import { PolicyRepository } from './policy.repository'
 import dayjs from 'dayjs'
-import { CannotGeneratePolicyNotApplicableError } from './certificate/certificate.errors'
 import { Partner } from '../../partners/domain/partner'
 import * as PartnerFunc from '../../partners/domain/partner.func'
 import { PolicyStartDateConsistencyError, PolicyRiskRoommatesNotAllowedError, PolicyRiskNumberOfRoommatesError } from './policies.errors'
@@ -48,23 +47,22 @@ export namespace Policy {
         Initiated = 'INITIATED',
         Signed = 'SIGNED',
         Paid = 'PAID',
-        Applicable = 'APPLICABLE'
+        Applicable = 'APPLICABLE',
+        Canceled = 'CANCELED'
     }
 
     export function emailNotValidatedYet (policy: Policy): boolean {
       return policy.emailValidationDate === undefined || policy.emailValidationDate === null
     }
 
-    export function checkCanGenerateCertificate (policy: Policy): void {
-      if (Policy.Status.Applicable !== policy.status) {
-        throw new CannotGeneratePolicyNotApplicableError()
-      }
-    }
-
     export function isSigned (policy: Policy): boolean {
       return policy.status === Policy.Status.Signed ||
             policy.status === Policy.Status.Paid ||
             policy.status === Policy.Status.Applicable
+    }
+
+    export function isCanceled (policy: Policy): boolean {
+      return policy.status === Policy.Status.Canceled
     }
 
     export function applyNbMonthsDue (policy: Policy, nbMonthsDue: number): void {

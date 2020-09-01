@@ -4,7 +4,7 @@ import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles
 import { dateFaker } from '../../../utils/date-faker.test-utils'
 import { createPolicyFixture } from '../fixtures/policy.fixture'
 import { sinon, expect } from '../../../test-utils'
-import { PolicyNotFoundError, PolicyNotUpdatableError, PolicyStartDateConsistencyError } from '../../../../src/app/policies/domain/policies.errors'
+import { PolicyCanceledError, PolicyNotFoundError, PolicyNotUpdatableError, PolicyStartDateConsistencyError } from '../../../../src/app/policies/domain/policies.errors'
 import { ApplyStartDateOnPolicy } from '../../../../src/app/policies/domain/apply-start-date-on-policy.usecase'
 import { Policy } from '../../../../src/app/policies/domain/policy'
 
@@ -27,6 +27,16 @@ describe('Policies - Usecase - Apply start date on policy', async () => {
     const promise = applyStartDateOnPolicy({ policyId: policyId, startDate: validStartDate })
     // Then
     return expect(promise).to.be.rejectedWith(PolicyNotUpdatableError)
+  })
+
+  it('should throw an PolicyCanceledError when policy has been canceled', async () => {
+    // Given
+    const policy = createPolicyFixture({ id: policyId, status: Policy.Status.Canceled })
+    policyRepository.get.withArgs(policyId).resolves(policy)
+    // When
+    const promise = applyStartDateOnPolicy({ policyId: policyId, startDate: validStartDate })
+    // Then
+    expect(promise).to.be.rejectedWith(PolicyCanceledError, `The policy ${policyId} has been canceled`)
   })
 
   it('should throw an PolicyStartDateConsistencyError when start date is earlier than today', async () => {

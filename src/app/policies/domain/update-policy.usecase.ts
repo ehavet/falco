@@ -1,7 +1,7 @@
 import { Policy } from './policy'
 import { PolicyRepository } from './policy.repository'
 import { ApplySpecialOperationCodeOnPolicy } from './apply-special-operation-code-on-policy.usecase'
-import { PolicyNotUpdatableError } from './policies.errors'
+import { PolicyCanceledError, PolicyNotUpdatableError } from './policies.errors'
 
 export interface UpdatePolicy {
     (updatePolicyCommand: UpdatePolicyCommand): Promise<Policy>
@@ -21,9 +21,8 @@ export namespace UpdatePolicy {
         const operationCode = updatePolicyCommand.operationCode
         let policy = await policyRepository.get(policyId)
 
-        if (Policy.isSigned(policy)) {
-          throw new PolicyNotUpdatableError(policy.id, policy.status)
-        }
+        if (Policy.isCanceled(policy)) { throw new PolicyCanceledError(policy.id) }
+        if (Policy.isSigned(policy)) { throw new PolicyNotUpdatableError(policy.id, policy.status) }
 
         if (operationCode) {
           policy = await applySpecialOperationCodeOnPolicy({ policyId, operationCode })

@@ -10,7 +10,7 @@ import { Policy } from './policy'
 import { SpecificTerms } from './specific-terms/specific-terms'
 import { Contract } from './contract/contract'
 import { Signer } from './signer'
-import { PolicyAlreadySignedError } from './policies.errors'
+import { PolicyAlreadySignedError, PolicyCanceledError } from './policies.errors'
 
 export interface CreateSignatureRequestForPolicy {
     (policyId: string): Promise<SignatureRequest>
@@ -30,9 +30,8 @@ export namespace CreateSignatureRequestForPolicy {
         let specificTerms: SpecificTerms
         let contract: Contract
 
-        if (Policy.isSigned(policy)) {
-          throw new PolicyAlreadySignedError(policy.id)
-        }
+        if (Policy.isCanceled(policy)) { throw new PolicyCanceledError(policy.id) }
+        if (Policy.isSigned(policy)) { throw new PolicyAlreadySignedError(policy.id) }
 
         try {
           specificTerms = await specificTermsGenerator.generate(policy)

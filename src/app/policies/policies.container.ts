@@ -85,7 +85,7 @@ const confirmPaymentIntentForPolicy: ConfirmPaymentIntentForPolicy =
     ConfirmPaymentIntentForPolicy.factory(policyRepository, certificateRepository, contractGenerator, contractRepository, mailer)
 const getPolicy: GetPolicy = GetPolicy.factory(policyRepository)
 const generatePolicyCertificate: GeneratePolicyCertificate = GeneratePolicyCertificate.factory(policyRepository, certificateRepository)
-const getPolicySpecificTerms: GetPolicySpecificTerms = GetPolicySpecificTerms.factory(specificTermsRepository, specificTermsGenerator)
+const getPolicySpecificTerms: GetPolicySpecificTerms = GetPolicySpecificTerms.factory(specificTermsRepository, specificTermsGenerator, policyRepository)
 const createSignatureRequestForPolicy: CreateSignatureRequestForPolicy = CreateSignatureRequestForPolicy
   .factory(
     specificTermsGenerator,

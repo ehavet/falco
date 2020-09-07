@@ -31,7 +31,7 @@ describe('Policies - Usecase - Apply start date on policy', async () => {
 
   it('should throw an PolicyCanceledError when policy has been canceled', async () => {
     // Given
-    const policy = createPolicyFixture({ id: policyId, status: Policy.Status.Canceled })
+    const policy = createPolicyFixture({ id: policyId, status: Policy.Status.Cancelled })
     policyRepository.get.withArgs(policyId).resolves(policy)
     // When
     const promise = applyStartDateOnPolicy({ policyId: policyId, startDate: validStartDate })

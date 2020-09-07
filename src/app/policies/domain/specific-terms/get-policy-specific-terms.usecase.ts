@@ -19,7 +19,7 @@ export namespace GetPolicySpecificTerms {
     ): GetPolicySpecificTerms {
       return async (getPolicySpecificTermsQuery: GetPolicySpecificTermsQuery): Promise<SpecificTerms> => {
         const policy: Policy = await policyRepository.get(getPolicySpecificTermsQuery.policyId)
-        if (Policy.isCanceled(policy)) { throw new PolicyCanceledError(policy.id) }
+        if (Policy.isCancelled(policy)) { throw new PolicyCanceledError(policy.id) }
         const specificTermsName: string = specificTermsGenerator.getNameFor(getPolicySpecificTermsQuery.policyId)
         return specificTermsRepository.get(specificTermsName)
       }

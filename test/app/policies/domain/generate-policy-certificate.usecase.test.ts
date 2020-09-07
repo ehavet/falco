@@ -59,7 +59,7 @@ describe('Policies - Usecase - Generate policy certificate', async () => {
   it('should throw an error if the policy has been canceled', async () => {
     // Given
     const policyId: string = 'APP854732084'
-    const policyFromDb: Policy = createPolicyFixture({ id: policyId, status: Policy.Status.Canceled })
+    const policyFromDb: Policy = createPolicyFixture({ id: policyId, status: Policy.Status.Cancelled })
     const generatePolicyCertificateQuery: GeneratePolicyCertificateQuery = { policyId }
     policyRepository.get.withArgs(policyId).resolves(policyFromDb)
 

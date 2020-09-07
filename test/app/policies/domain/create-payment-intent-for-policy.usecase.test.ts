@@ -78,11 +78,11 @@ describe('Usecase - Create payment intent for policy', async () => {
     const paymentIntentQuery: PaymentIntentQuery = {
       policyId: 'APP789890859'
     }
-    const canceledPolicy = createPolicyFixture({ id: 'APP789890859', status: Policy.Status.Canceled })
+    const cancelledPolicy = createPolicyFixture({ id: 'APP789890859', status: Policy.Status.Cancelled })
     const paymentProcessor = { createIntent: sinon.stub }
     const policyRepository = policyRepositoryStub()
 
-    policyRepository.get.withArgs('APP789890859').resolves(canceledPolicy)
+    policyRepository.get.withArgs('APP789890859').resolves(cancelledPolicy)
 
     const createPaymentIntentForPolicy: CreatePaymentIntentForPolicy =
         CreatePaymentIntentForPolicy.factory(paymentProcessor, policyRepository)

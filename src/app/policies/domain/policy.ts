@@ -48,7 +48,7 @@ export namespace Policy {
         Signed = 'SIGNED',
         Paid = 'PAID',
         Applicable = 'APPLICABLE',
-        Canceled = 'CANCELED'
+        Cancelled = 'CANCELLED'
     }
 
     export function emailNotValidatedYet (policy: Policy): boolean {
@@ -61,8 +61,8 @@ export namespace Policy {
             policy.status === Policy.Status.Applicable
     }
 
-    export function isCanceled (policy: Policy): boolean {
-      return policy.status === Policy.Status.Canceled
+    export function isCancelled (policy: Policy): boolean {
+      return policy.status === Policy.Status.Cancelled
     }
 
     export function applyNbMonthsDue (policy: Policy, nbMonthsDue: number): void {

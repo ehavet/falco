@@ -63,7 +63,7 @@ describe('Signature - Usecase - Create signature request for policy', async () =
 
   it('should throw an PolicyCanceledError when policy has been canceled', async () => {
     // Given
-    policy = createPolicyFixture({ id: policyId, status: Policy.Status.Canceled })
+    policy = createPolicyFixture({ id: policyId, status: Policy.Status.Cancelled })
     policyRepository.get.withExactArgs(policyId).resolves(policy)
     // When
     const promise = usecase(policyId)

@@ -55,7 +55,7 @@ describe('Policies - Usecase - Apply special operation code on policy', async ()
   it('should throw an PolicyCanceledError if policy is canceled', async () => {
     // Given
     const policyId = 'APP174635432987'
-    const policy = createPolicyFixture({ id: policyId, partnerCode: 'My Partner', status: Policy.Status.Canceled })
+    const policy = createPolicyFixture({ id: policyId, partnerCode: 'My Partner', status: Policy.Status.Cancelled })
     const applySpecialOperationCodeOnPolicyCommand = { policyId, operationCode: 'FULLYEAR' }
     const applySpecialOperationCodeOnPolicy = ApplySpecialOperationCodeOnPolicy.factory(policyRepository, partnerRepository)
 

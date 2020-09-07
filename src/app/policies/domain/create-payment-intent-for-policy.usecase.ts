@@ -17,7 +17,7 @@ export namespace CreatePaymentIntentForPolicy {
       return async (paymentIntentQuery: PaymentIntentQuery) => {
         const policy: Policy = await policyRepository.get(paymentIntentQuery.policyId)
 
-        if (Policy.isCanceled(policy)) { throw new PolicyCanceledError(policy.id) }
+        if (Policy.isCancelled(policy)) { throw new PolicyCanceledError(policy.id) }
         if (policy.status === Policy.Status.Applicable) { throw new PolicyAlreadyPaidError(policy.id) }
 
         const intent = await paymentProcessor.createIntent(policy.id, _toZeroDecimal(policy.premium), policy.insurance.currency)

@@ -21,7 +21,7 @@ export namespace UpdatePolicy {
         const operationCode = updatePolicyCommand.operationCode
         let policy = await policyRepository.get(policyId)
 
-        if (Policy.isCanceled(policy)) { throw new PolicyCanceledError(policy.id) }
+        if (Policy.isCancelled(policy)) { throw new PolicyCanceledError(policy.id) }
         if (Policy.isSigned(policy)) { throw new PolicyNotUpdatableError(policy.id, policy.status) }
 
         if (operationCode) {

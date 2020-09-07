@@ -17,7 +17,7 @@ export namespace ApplySpecialOperationCodeOnPolicy {
         const operationCode: OperationCode = _getOperationCode(applySpecialOperationCodeCommand.operationCode)
         const policy = await policyRepository.get(applySpecialOperationCodeCommand.policyId)
 
-        if (Policy.isCanceled(policy)) { throw new PolicyCanceledError(policy.id) }
+        if (Policy.isCancelled(policy)) { throw new PolicyCanceledError(policy.id) }
         if (Policy.isSigned(policy)) { throw new PolicyNotUpdatableError(policy.id, policy.status) }
 
         const partnerOperationCodes: Array<OperationCode> = await partnerRepository.getOperationCodes(policy.partnerCode)

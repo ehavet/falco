@@ -16,7 +16,7 @@ export namespace ApplyStartDateOnPolicy {
       return async (command: ApplyStartDateOnPolicyCommand) => {
         const policy: Policy = await policyRepository.get(command.policyId)
 
-        if (Policy.isCanceled(policy)) { throw new PolicyCanceledError(policy.id) }
+        if (Policy.isCancelled(policy)) { throw new PolicyCanceledError(policy.id) }
         if (Policy.isSigned(policy)) throw new PolicyNotUpdatableError(policy.id, policy.status)
 
         Policy.applyStartDate(policy, command.startDate)

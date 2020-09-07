@@ -38,7 +38,7 @@ describe('Policies - Usecase - Get Policy Specific Terms', async () => {
     // Given
     const policyId: string = 'APP854732084'
     const getPolicySpecificTermsQuery: GetPolicySpecificTermsQuery = { policyId }
-    const policy: Policy = createPolicyFixture({ id: policyId, status: Policy.Status.Canceled })
+    const policy: Policy = createPolicyFixture({ id: policyId, status: Policy.Status.Cancelled })
     policyRepository.get.withArgs(policyId).resolves(policy)
 
     // When

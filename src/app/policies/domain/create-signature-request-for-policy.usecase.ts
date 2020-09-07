@@ -30,7 +30,7 @@ export namespace CreateSignatureRequestForPolicy {
         let specificTerms: SpecificTerms
         let contract: Contract
 
-        if (Policy.isCanceled(policy)) { throw new PolicyCanceledError(policy.id) }
+        if (Policy.isCancelled(policy)) { throw new PolicyCanceledError(policy.id) }
         if (Policy.isSigned(policy)) { throw new PolicyAlreadySignedError(policy.id) }
 
         try {

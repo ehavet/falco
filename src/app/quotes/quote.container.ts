@@ -1,15 +1,15 @@
 import routes from './api/v0/quotes.api'
 import { GetQuote } from './domain/get-quote.usecase'
-import { QuoteSqlModel } from './infrastructure/quote-sql.model'
-import { InsuranceSqlModel } from './infrastructure/insurance-sql.model'
-import { RiskSqlModel } from './infrastructure/risk-sql.model'
 import { QuoteSqlRepository } from './infrastructure/quote-sql.repository'
 import { QuoteRepository } from './domain/quote.repository'
 import { PartnerRepository } from '../partners/domain/partner.repository'
 import { container as partnerContainer } from '../partners/partner.container'
-import { PolicyHolderSqlModel } from './infrastructure/policy-holder-sql.model'
-import { OtherInsuredSqlModel } from './infrastructure/other-insured-sql.model'
-import { PropertySqlModel } from './infrastructure/property-sql.model'
+import { QuoteInsuranceSqlModel } from './infrastructure/sql-models/quote-insurance-sql.model'
+import { QuoteRiskSqlModel } from './infrastructure/sql-models/quote-risk-sql.model'
+import { QuotePropertySqlModel } from './infrastructure/sql-models/quote-property-sql.model'
+import { QuoteRiskOtherPeopleSqlModel } from './infrastructure/sql-models/quote-risk-other-people-sql.model'
+import { QuotePersonSqlModel } from './infrastructure/sql-models/quote-person-sql.model'
+import { QuoteSqlModel } from './infrastructure/sql-models/quote-sql-model'
 
 export interface Container {
   GetQuote: GetQuote
@@ -26,7 +26,8 @@ export const container: Container = {
 }
 
 export const quoteSqlModels: Array<any> = [
-  QuoteSqlModel, InsuranceSqlModel, RiskSqlModel, PropertySqlModel, PolicyHolderSqlModel, OtherInsuredSqlModel
+  QuoteSqlModel, QuoteInsuranceSqlModel, QuoteRiskSqlModel,
+  QuotePropertySqlModel, QuoteRiskOtherPeopleSqlModel, QuotePersonSqlModel
 ]
 
 export function quoteRoutes () {

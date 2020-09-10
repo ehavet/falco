@@ -1,5 +1,5 @@
-import { QuoteSqlModel } from './quote-sql.model'
 import { Quote } from '../domain/quote'
+import { QuoteSqlModel } from './sql-models/quote-sql-model'
 
 export function sqlToQuoteMapper (quoteSql: QuoteSqlModel): Quote {
   return {

@@ -4,10 +4,10 @@ import { Policy } from '../../../../../src/app/policies/domain/policy'
 import { config, dateFaker, expect, HttpServerForTesting, newProdLikeServer } from '../../../../test-utils'
 import { PolicySqlModel } from '../../../../../src/app/policies/infrastructure/policy-sql.model'
 import { createPolicyApiRequestFixture } from '../../fixtures/createPolicyApiRequest.fixture'
-import { QuoteSqlModel } from '../../../../../src/app/quotes/infrastructure/quote-sql.model'
 import { PolicySqlRepository } from '../../../../../src/app/policies/infrastructure/policy-sql.repository'
 import { PolicyRepository } from '../../../../../src/app/policies/domain/policy.repository'
 import fsx from 'fs-extra'
+import { QuoteSqlModel } from '../../../../../src/app/quotes/infrastructure/sql-models/quote-sql-model'
 
 async function resetDb () {
   await PolicySqlModel.destroy({ truncate: true, cascade: true })

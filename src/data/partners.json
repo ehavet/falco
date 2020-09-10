@@ -61,5 +61,37 @@
       "contractualTerms": "/docs/Appenin_Conditions_Generales_assurance_habitation_APP658.pdf",
       "ipid": "/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf"
     }
+  },
+  "demo-student": {
+    "code": "demo-student",
+    "translationKey": "demo-student",
+    "callbackUrl": "",
+    "questions": [
+      {
+        "code": "RoomCount",
+        "options": {
+          "list": [1, 2, 3]
+        }
+      },
+      {
+        "code": "Roommate",
+        "applicable": true,
+        "_comment":  "The rule for the maximum number of roommates for demo-student is the following : roomcount - 1",
+        "maximumNumbers": [{ "roomCount": 1, "value": 0 }, { "roomCount": 2, "value": 1 }, { "roomCount": 3, "value": 2 }]
+      }
+    ],
+    "offer": {
+      "simplifiedCovers": ["ACDDE", "ACINCEX", "ACVOL", "ACASSHE", "ACDEFJU", "ACRC"],
+      "pricingMatrix": [
+        [1, { "monthlyPrice": 6.00, "defaultDeductible": 120, "defaultCeiling": 3000 }],
+        [2, { "monthlyPrice": 7.50, "defaultDeductible": 120, "defaultCeiling": 5000 }],
+        [3, { "monthlyPrice": 10.00, "defaultDeductible": 120, "defaultCeiling": 7000 }]
+      ],
+      "operationCodes": ["SEMESTER1", "SEMESTER2", "FULLYEAR"],
+      "productCode": "APP999",
+      "productVersion": "2020-09-11",
+      "contractualTerms": "/docs/Appenin_Conditions_Generales_assurance_habitation_APP999.pdf",
+      "ipid": "/docs/Appenin_Document_Information_assurance_habitation_APP999.pdf"
+    }
   }
 }

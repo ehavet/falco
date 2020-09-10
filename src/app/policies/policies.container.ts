@@ -46,6 +46,11 @@ import { nodemailerTransporter } from '../../libs/nodemailer'
 import { UpdatePolicy } from './domain/update-policy.usecase'
 import { ApplySpecialOperationCodeOnPolicy } from './domain/apply-special-operation-code-on-policy.usecase'
 import { ApplyStartDateOnPolicy } from './domain/apply-start-date-on-policy.usecase'
+import { InsuranceSqlModel } from '../quotes/infrastructure/insurance-sql.model'
+import { OtherInsuredSqlModel } from '../quotes/infrastructure/other-insured-sql.model'
+import { PolicyHolderSqlModel } from '../quotes/infrastructure/policy-holder-sql.model'
+import { PropertySqlModel } from '../quotes/infrastructure/property-sql.model'
+import { RiskSqlModel } from '../quotes/infrastructure/risk-sql.model'
 const config = require('../../config')
 
 export interface Container {
@@ -115,7 +120,9 @@ export const container: Container = {
   ApplyStartDateOnPolicy: applyStartDateOnPolicy
 }
 
-export const policySqlModels: Array<any> = [PolicySqlModel, ContactSqlModel]
+export const policySqlModels: Array<any> = [
+  PolicySqlModel, ContactSqlModel, InsuranceSqlModel,
+  OtherInsuredSqlModel, PolicyHolderSqlModel, PropertySqlModel, RiskSqlModel]
 
 export function policiesRoutes () {
   return routes(container)

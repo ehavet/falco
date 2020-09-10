@@ -1,6 +1,6 @@
 import * as supertest from 'supertest'
 import { dateFaker, expect, HttpServerForTesting, newProdLikeServer } from '../../../../test-utils'
-import { QuoteSqlModel } from '../../../../../src/app/quotes/infrastructure/quote-sql.model'
+import { QuoteSqlModel } from '../../../../../src/app/quotes/infrastructure/sql-models/quote-sql-model'
 
 async function resetDb () {
   await QuoteSqlModel.destroy({ truncate: true, cascade: true })

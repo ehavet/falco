@@ -1,12 +1,13 @@
 import { QuoteSqlRepository } from '../../../../src/app/quotes/infrastructure/quote-sql.repository'
 import { Quote } from '../../../../src/app/quotes/domain/quote'
-import { QuoteSqlModel } from '../../../../src/app/quotes/infrastructure/quote-sql.model'
-import { expect } from '../../../test-utils'
-import { InsuranceSqlModel } from '../../../../src/app/quotes/infrastructure/insurance-sql.model'
-import { RiskSqlModel } from '../../../../src/app/quotes/infrastructure/risk-sql.model'
+import { config, expect } from '../../../test-utils'
 import { createQuote } from '../fixtures/quote.fixture'
 import { QuoteNotFoundError } from '../../../../src/app/quotes/domain/quote.errors'
-import { PropertySqlModel } from '../../../../src/app/quotes/infrastructure/property-sql.model'
+import { QuoteInsuranceSqlModel } from '../../../../src/app/quotes/infrastructure/sql-models/quote-insurance-sql.model'
+import { QuoteRiskSqlModel } from '../../../../src/app/quotes/infrastructure/sql-models/quote-risk-sql.model'
+import { QuotePropertySqlModel } from '../../../../src/app/quotes/infrastructure/sql-models/quote-property-sql.model'
+import { QuoteSqlModel } from '../../../../src/app/quotes/infrastructure/sql-models/quote-sql-model'
+import { getSequelize, initSequelize } from '../../../../src/libs/sequelize'
 
 async function resetDb () {
   await QuoteSqlModel.destroy({ truncate: true, cascade: true })
@@ -15,8 +16,16 @@ async function resetDb () {
 describe('Repository - Quote', async () => {
   const quoteRepository = new QuoteSqlRepository()
 
+  before(async () => {
+    await initSequelize(config)
+  })
+
   afterEach(async () => {
     await resetDb()
+  })
+
+  after(() => {
+    getSequelize().close()
   })
 
   describe('#save', async () => {
@@ -29,7 +38,7 @@ describe('Repository - Quote', async () => {
 
       // Then
       const result = await QuoteSqlModel.findAll({
-        include: [{ model: InsuranceSqlModel }, { model: RiskSqlModel, include: [{ model: PropertySqlModel }] }]
+        include: [{ model: QuoteInsuranceSqlModel }, { model: QuoteRiskSqlModel, include: [{ model: QuotePropertySqlModel }] }]
       })
 
       expect(result).to.have.lengthOf(1)

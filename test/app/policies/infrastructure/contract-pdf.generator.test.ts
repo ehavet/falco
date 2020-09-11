@@ -19,7 +19,7 @@ describe('Policies - Infra - Contract PDF Generator', async () => {
       const specificTerms = await specificTermsGenerator.generate(policy)
 
       // When
-      const subscriptionDocuments = await contractPdfGenerator.generate(policy.id, specificTerms)
+      const subscriptionDocuments = await contractPdfGenerator.generate(policy.id, policy.insurance.productCode, specificTerms)
 
       // Then
       const subscriptionDocumentsPdfBuffer = await pdftk.input(subscriptionDocuments.buffer).uncompress().output()
@@ -27,6 +27,7 @@ describe('Policies - Infra - Contract PDF Generator', async () => {
       expect(subscriptionDocumentsPdfBuffer.includes('Par cette signature, j\\222accepte les termes du contrat')).to.be.true
       expect(subscriptionDocumentsPdfBuffer.includes('(P)87.9 (AR)49.3 (TICULI\\310RES)')).to.be.true
       expect(subscriptionDocumentsPdfBuffer.includes('CONDITIONS G\\311N\\311RALES')).to.be.true
+      expect(subscriptionDocumentsPdfBuffer.includes(policy.insurance.productCode)).to.be.true
     }).timeout(10000)
   })
 

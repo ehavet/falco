@@ -167,7 +167,7 @@ describe('Policies - API - E2E', async () => {
           default_ceiling: 7000,
           currency: 'EUR',
           simplified_covers: ['ACDDE', 'ACVOL'],
-          product_code: 'MRH-Loc-Etud',
+          product_code: 'APP999',
           product_version: 'v2020-02-01',
           contractual_terms: '/path/to/contractual/terms',
           ipid: '/path/to/ipid'
@@ -241,7 +241,7 @@ describe('Policies - API - E2E', async () => {
           default_ceiling: 7000,
           currency: 'EUR',
           simplified_covers: ['ACDDE', 'ACVOL'],
-          product_code: 'MRH-Loc-Etud',
+          product_code: 'APP999',
           product_version: 'v2020-02-01',
           contractual_terms: '/path/to/contractual/terms',
           ipid: '/path/to/ipid'
@@ -352,7 +352,7 @@ describe('Policies - API - E2E', async () => {
             },
             currency: 'EUR',
             simplifiedCovers: ['ACDDE', 'ACVOL'],
-            productCode: 'MRH-Loc-Etud',
+            productCode: 'APP999',
             productVersion: 'v2020-02-01',
             contractualTerms: '/path/to/contractual/terms',
             ipid: '/path/to/ipid'
@@ -378,7 +378,7 @@ describe('Policies - API - E2E', async () => {
           default_ceiling: 7000,
           currency: 'EUR',
           simplified_covers: ['ACDDE', 'ACVOL'],
-          product_code: 'MRH-Loc-Etud',
+          product_code: 'APP999',
           product_version: 'v2020-02-01',
           contractual_terms: '/path/to/contractual/terms',
           ipid: '/path/to/ipid'
@@ -451,7 +451,7 @@ describe('Policies - API - E2E', async () => {
           default_ceiling: 7000,
           currency: 'EUR',
           simplified_covers: ['ACDDE', 'ACVOL'],
-          product_code: 'MRH-Loc-Etud',
+          product_code: 'APP999',
           product_version: 'v2020-02-01',
           contractual_terms: '/path/to/contractual/terms',
           ipid: '/path/to/ipid'

@@ -30,9 +30,8 @@ describe('Policies - Infra - Contract FS Repository', async () => {
     await fsx.emptyDir(documentsFolderPath)
     policy = createPolicyFixture({ partnerCode: 'essca' })
     policy.termEndDate = dayjs(policy.termStartDate).add(1, 'month').toDate()
-    policy.insurance.productCode = 'APP1234'
     const specificTerms: SpecificTerms = await specificTermsGenerator.generate(policy)
-    contractToSave = await contractGenerator.generate(policy.id, specificTerms)
+    contractToSave = await contractGenerator.generate(policy.id, policy.insurance.productCode, specificTerms)
     contractPdfRepository = new ContractFsRepository(config)
   })
 

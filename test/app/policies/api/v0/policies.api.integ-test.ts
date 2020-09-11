@@ -169,7 +169,7 @@ describe('Policies - API - Integration', async () => {
             default_ceiling: 7000,
             currency: 'EUR',
             simplified_covers: ['ACDDE', 'ACVOL'],
-            product_code: 'MRH-Loc-Etud',
+            product_code: 'APP999',
             product_version: 'v2020-02-01',
             contractual_terms: '/path/to/contractual/terms',
             ipid: '/path/to/ipid'
@@ -565,7 +565,7 @@ describe('Policies - API - Integration', async () => {
             default_ceiling: 7000,
             currency: 'EUR',
             simplified_covers: ['ACDDE', 'ACVOL'],
-            product_code: 'MRH-Loc-Etud',
+            product_code: 'APP999',
             product_version: 'v2020-02-01',
             contractual_terms: '/path/to/contractual/terms',
             ipid: '/path/to/ipid'
@@ -1043,7 +1043,7 @@ describe('Policies - API - Integration', async () => {
         default_ceiling: 7000,
         currency: 'EUR',
         simplified_covers: ['ACDDE', 'ACVOL'],
-        product_code: 'MRH-Loc-Etud',
+        product_code: 'APP999',
         product_version: 'v2020-02-01',
         contractual_terms: '/path/to/contractual/terms',
         ipid: '/path/to/ipid'
@@ -1260,7 +1260,7 @@ describe('Policies - API - Integration', async () => {
           default_ceiling: 7000,
           currency: 'EUR',
           simplified_covers: ['ACDDE', 'ACVOL'],
-          product_code: 'MRH-Loc-Etud',
+          product_code: 'APP999',
           product_version: 'v2020-02-01',
           contractual_terms: '/path/to/contractual/terms',
           ipid: '/path/to/ipid'
@@ -1567,7 +1567,7 @@ describe('Policies - API - Integration', async () => {
           default_ceiling: 7000,
           currency: 'EUR',
           simplified_covers: ['ACDDE', 'ACVOL'],
-          product_code: 'MRH-Loc-Etud',
+          product_code: 'APP999',
           product_version: 'v2020-02-01',
           contractual_terms: '/path/to/contractual/terms',
           ipid: '/path/to/ipid'

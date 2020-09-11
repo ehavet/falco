@@ -3,6 +3,7 @@
     "code": "studyo",
     "translationKey": "studyo",
     "callbackUrl": "",
+    "customerSupportEmail": "help@appenin.fr",
     "questions": [
       {
         "code": "RoomCount",
@@ -35,6 +36,7 @@
     "code": "essca",
     "translationKey": "essca",
     "callbackUrl": "",
+    "customerSupportEmail": "help@appenin.fr",
     "questions": [
       {
         "code": "RoomCount",

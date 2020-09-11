@@ -6,6 +6,7 @@ export function createPartnerFixture (attr: Partial<Partner> = {}): Partner {
     code: 'partnerOne',
     translationKey: 'translationKey',
     callbackUrl: 'http://partner1-callback.com',
+    customerSupportEmail: 'customer@service.fr',
     questions: [
       {
         code: Partner.Question.QuestionCode.RoomCount,

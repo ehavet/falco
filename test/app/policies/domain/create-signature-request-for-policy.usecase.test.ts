@@ -75,7 +75,7 @@ describe('Signature - Usecase - Create signature request for policy', async () =
     // Given
     policyRepository.get.withExactArgs(policyId).resolves(policy)
     specificTermsGenerator.generate.withExactArgs(policy).resolves(specificTerms)
-    contractGenerator.generate.withExactArgs(policyId, specificTerms).resolves(contract)
+    contractGenerator.generate.withExactArgs(policyId, policy.insurance.productCode, specificTerms).resolves(contract)
     contractRepository.saveTempContract.withExactArgs(contract).resolves(contractFilePath)
     signatureRequestProvider.create.withExactArgs(contractFilePath, signer)
       .resolves(expectedSignatureRequest)
@@ -101,7 +101,7 @@ describe('Signature - Usecase - Create signature request for policy', async () =
     // Given
     policyRepository.get.withExactArgs(policyId).resolves(policy)
     specificTermsGenerator.generate.withExactArgs(policy).resolves(specificTerms)
-    contractGenerator.generate.withExactArgs(policyId, specificTerms).rejects(ContractGenerationFailureError)
+    contractGenerator.generate.withExactArgs(policyId, policy.insurance.productCode, specificTerms).rejects(ContractGenerationFailureError)
     // When
     const promise: Promise<SignatureRequest> = usecase(policyId)
     // Then
@@ -113,7 +113,7 @@ describe('Signature - Usecase - Create signature request for policy', async () =
     // Given
     policyRepository.get.withExactArgs(policyId).resolves(policy)
     specificTermsGenerator.generate.withExactArgs(policy).resolves(specificTerms)
-    contractGenerator.generate.withExactArgs(policyId, specificTerms).resolves(contract)
+    contractGenerator.generate.withExactArgs(policyId, policy.insurance.productCode, specificTerms).resolves(contract)
     contractRepository.saveTempContract.withExactArgs(contract).resolves(contractFilePath)
     signatureRequestProvider.create.withExactArgs(contractFilePath, signer)
       .rejects(SignatureRequestCreationFailureError)

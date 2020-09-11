@@ -64,7 +64,7 @@ describe('Repository - Quote', async () => {
       expect(savedInsurance.defaultCeiling).to.equal(7000)
       expect(savedInsurance.currency).to.equal('EUR')
       expect(savedInsurance.simplifiedCovers).to.include('ACDDE', 'ACVOL')
-      expect(savedInsurance.productCode).to.equal('MRH-Loc-Etud')
+      expect(savedInsurance.productCode).to.equal('APP999')
       expect(savedInsurance.productVersion).to.equal('v2020-02-01')
       expect(savedInsurance.contractualTerms).to.equal('/path/to/contractual/terms')
       expect(savedInsurance.ipid).to.equal('/path/to/ipid')

@@ -80,6 +80,10 @@ export namespace Policy {
       policy.termEndDate = _computeTermEndDate(startDate, policy.nbMonthsDue)
     }
 
+    export function getProductCode (policy: Policy): string {
+      return policy.insurance.productCode
+    }
+
     function _computeTermEndDate (termStartDate: Date, durationInMonths: number): Date {
       return dayjs(termStartDate).add(durationInMonths, 'month').subtract(1, 'day').toDate()
     }

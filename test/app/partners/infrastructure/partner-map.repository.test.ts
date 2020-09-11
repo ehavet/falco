@@ -12,7 +12,7 @@ const partnerJson = {
     code: 'partnerOne',
     translationKey: 'translationKey',
     callbackUrl: 'http://partner1-callback.com',
-    customerSupportEmail: 'customer@service.fr',
+    customerSupportEmail: 'customer@support.fr',
     questions: [
       {
         code: Partner.Question.QuestionCode.RoomCount,
@@ -42,7 +42,7 @@ const partnerJson = {
     code: 'partnerTwo',
     translationKey: 'translationKey',
     callbackUrl: 'http://partner2-callback.com',
-    customerSupportEmail: 'customer@service.fr',
+    customerSupportEmail: 'customer@support.fr',
     questions: [
       {
         code: Partner.Question.QuestionCode.RoomCount,

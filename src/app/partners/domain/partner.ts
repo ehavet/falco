@@ -4,8 +4,8 @@ import { OperationCode } from '../../policies/domain/operation-code'
 export interface Partner {
     code: string,
     translationKey: string
-    callbackUrl: string,
-    customerSupportEmail: string,
+    callbackUrl: string
+    customerSupportEmail: string
     questions: Array<Partner.Question>
     offer: Partner.Offer
 }

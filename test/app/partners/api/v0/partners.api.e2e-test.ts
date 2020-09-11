@@ -19,6 +19,7 @@ describe('Partners - API - E2E', async () => {
       expect(response.body).to.deep.equal({
         code: 'studyo',
         translation_key: 'studyo',
+        customer_support_email: 'help@appenin.fr',
         questions: {
           room_count: {
             options: [1, 2, 3]

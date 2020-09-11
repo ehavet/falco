@@ -21,6 +21,7 @@ describe('Partners - API - Integ', async () => {
       const expectedResourcePartner = {
         code: 'partnerOne',
         translation_key: 'translationKey',
+        customer_support_email: 'customer@support.fr',
         questions: {
           room_count: {
             options: [1, 2, 3]

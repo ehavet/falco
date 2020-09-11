@@ -28,6 +28,7 @@ export default function (container: Container): Array<ServerRoute> {
             200: Joi.object({
               code: Joi.string().description('Partner code').example('myPartner'),
               translation_key: Joi.string().description('Partner translation key').example('myPartnerTranslationKey'),
+              customer_support_email: Joi.string().description('Partner customer support email').example('customersupport@mypartner.com'),
               questions: Joi.object({
                 room_count: Joi.object({
                   options: Joi.array().description('Possible values').example([1, 2, 3])

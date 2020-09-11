@@ -68,6 +68,7 @@
     "code": "demo-student",
     "translationKey": "demo-student",
     "callbackUrl": "",
+    "customerSupportEmail": "help@appenin.fr",
     "questions": [
       {
         "code": "RoomCount",

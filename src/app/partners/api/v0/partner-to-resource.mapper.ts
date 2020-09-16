@@ -6,6 +6,7 @@ export function partnerToResource (partner: Partner) {
   return {
     code: partner.code,
     translation_key: partner.translationKey,
+    customer_support_email: partner.customerSupportEmail,
     questions: questions
   }
 }

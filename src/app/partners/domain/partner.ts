@@ -5,6 +5,7 @@ export interface Partner {
     code: string,
     translationKey: string
     callbackUrl: string
+    customerSupportEmail: string
     questions: Array<Partner.Question>
     offer: Partner.Offer
 }

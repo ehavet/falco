@@ -52,6 +52,8 @@ import { PolicyRiskOtherPeopleSqlModel } from './infrastructure/policy-risk-othe
 import { PDFProcessor } from './infrastructure/pdf/pdf-processor'
 import { PDFtkPDFProcessor } from './infrastructure/pdf/pdftk.pdf-processor'
 import { pdfGenerationConfig } from '../../configs/pdf-generation.config'
+import { PaymentRepository } from './domain/payment/payment.repository'
+import { PaymentSqlRepository } from './infrastructure/payment/payment-sql.repository'
 const config = require('../../config')
 
 export interface Container {
@@ -82,13 +84,14 @@ const contractRepository: ContractRepository = new ContractFsRepository(config)
 const contractGenerator: ContractGenerator = new ContractPdfGenerator(pdftkPDFProcessor)
 const signatureRequestEventValidator: SignatureRequestEventValidator = new HelloSignRequestEventValidator(helloSignConfig)
 const mailer: Mailer = new Nodemailer(nodemailerTransporter)
+const paymentRepository: PaymentRepository = new PaymentSqlRepository()
 const createPaymentIntentForPolicy: CreatePaymentIntentForPolicy =
     CreatePaymentIntentForPolicy.factory(paymentProcessor, policyRepository)
 
 const sendValidationLinkToEmailAddress: SendValidationLinkToEmailAddress = emailValidationContainer.SendValidationLinkToEmailAddress
 const createPolicy: CreatePolicy = CreatePolicy.factory(policyRepository, quoteRepository, partnerRepository, sendValidationLinkToEmailAddress)
 const confirmPaymentIntentForPolicy: ConfirmPaymentIntentForPolicy =
-    ConfirmPaymentIntentForPolicy.factory(policyRepository, certificateGenerator, contractGenerator, contractRepository, mailer)
+    ConfirmPaymentIntentForPolicy.factory(policyRepository, certificateGenerator, contractGenerator, contractRepository, paymentRepository, mailer)
 const getPolicy: GetPolicy = GetPolicy.factory(policyRepository)
 const generatePolicyCertificate: GeneratePolicyCertificate = GeneratePolicyCertificate.factory(policyRepository, certificateGenerator)
 const getPolicySpecificTerms: GetPolicySpecificTerms = GetPolicySpecificTerms.factory(specificTermsRepository, specificTermsGenerator, policyRepository)

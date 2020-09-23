@@ -2,6 +2,7 @@ import { logger } from '../../../libs/logger'
 import { PaymentEventAuthenticator } from '../domain/payment-event-authenticator'
 import { StripeConfig } from '../../../configs/stripe.config'
 import { UnauthenticatedEventError } from '../domain/payment-processor.errors'
+import { Stripe } from 'stripe'
 
 export class StripeEventAuthenticator implements PaymentEventAuthenticator {
     config: StripeConfig
@@ -12,7 +13,7 @@ export class StripeEventAuthenticator implements PaymentEventAuthenticator {
     }
 
     async parse (rawPayload, signature) {
-      let event
+      let event: Stripe.Event
       try {
         event = await this.config.stripe.webhooks
           .constructEvent(

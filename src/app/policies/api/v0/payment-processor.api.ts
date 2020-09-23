@@ -4,6 +4,8 @@ import { Container } from '../../policies.container'
 import { ServerRoute } from '@hapi/hapi'
 import { PolicyNotFoundError } from '../../domain/policies.errors'
 import { UnauthenticatedEventError } from '../../domain/payment-processor.errors'
+import { ConfirmPaymentIntentCommand } from '../../domain/confirm-payment-intent-for-policy.usecase'
+import { Payment } from '../../domain/payment/payment'
 
 const TAGS = ['api', 'payment-processor']
 export default function (container: Container): Array<ServerRoute> {
@@ -44,7 +46,14 @@ export default function (container: Container): Array<ServerRoute> {
 
         if (event.type === 'payment_intent.succeeded') {
           try {
-            await container.ConfirmPaymentIntentForPolicy(event.data.object.metadata.policy_id)
+            const command: ConfirmPaymentIntentCommand = {
+              policyId: event.data.object.metadata.policy_id,
+              amount: event.data.object.amount,
+              externalId: event.data.object.id,
+              processor: Payment.Processor.STRIPE,
+              instrument: Payment.Instrument.CREDITCARD
+            }
+            await container.ConfirmPaymentIntentForPolicy(command)
             return h.response({}).code(204)
           } catch (error) {
             if (error instanceof PolicyNotFoundError) {

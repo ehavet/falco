@@ -4,6 +4,8 @@ import { PolicyNotFoundError } from '../../../../../src/app/policies/domain/poli
 import * as supertest from 'supertest'
 import { getStripePaymentIntentSucceededEvent } from '../../fixtures/stripeEvent.fixture'
 import { UnauthenticatedEventError } from '../../../../../src/app/policies/domain/payment-processor.errors'
+import { ConfirmPaymentIntentCommand } from '../../../../../src/app/policies/domain/confirm-payment-intent-for-policy.usecase'
+import { Payment } from '../../../../../src/app/policies/domain/payment/payment'
 
 describe('Payment Intent Event Handler - API - Integration', async () => {
   let httpServer: HttpServerForTesting
@@ -47,8 +49,16 @@ describe('Payment Intent Event Handler - API - Integration', async () => {
         sinon.stub(container.PaymentEventAuthenticator, 'parse')
           .withArgs(JSON.stringify(event), stripeHeaderSignature).resolves(event)
 
+        const expectedCommand: ConfirmPaymentIntentCommand = {
+          policyId,
+          amount: event.data.object.amount,
+          externalId: event.data.object.id,
+          processor: Payment.Processor.STRIPE,
+          instrument: Payment.Instrument.CREDITCARD
+        }
+
         sinon.stub(container, 'ConfirmPaymentIntentForPolicy')
-          .withArgs(policyId)
+          .withArgs(expectedCommand)
           .rejects(new PolicyNotFoundError(policyId))
 
         response = await httpServer.api()
@@ -102,8 +112,16 @@ describe('Payment Intent Event Handler - API - Integration', async () => {
         sinon.stub(container.PaymentEventAuthenticator, 'parse')
           .withArgs(JSON.stringify(event), stripeHeaderSignature).resolves(event)
 
+        const expectedCommand: ConfirmPaymentIntentCommand = {
+          policyId: 'APP463109486',
+          amount: event.data.object.amount,
+          externalId: event.data.object.id,
+          processor: Payment.Processor.STRIPE,
+          instrument: Payment.Instrument.CREDITCARD
+        }
+
         sinon.stub(container, 'ConfirmPaymentIntentForPolicy')
-          .withArgs('APP463109486')
+          .withArgs(expectedCommand)
           .rejects(new Error())
 
         response = await httpServer.api()

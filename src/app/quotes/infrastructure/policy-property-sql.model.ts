@@ -1,17 +1,15 @@
 import {
-  BelongsTo,
   Column,
-  Default, ForeignKey,
+  Default,
   Model,
   PrimaryKey,
   Table
 } from 'sequelize-typescript'
 import Sequelize from 'sequelize'
 import { v4 as uuidv4 } from 'uuid'
-import { RiskSqlModel } from './risk-sql.model'
 
-@Table({ timestamps: true, tableName: 'property', underscored: true })
-export class PropertySqlModel extends Model<PropertySqlModel> {
+@Table({ timestamps: true, tableName: 'policy_property', underscored: true })
+export class PolicyPropertySqlModel extends Model<PolicyPropertySqlModel> {
     @PrimaryKey
     @Default(uuidv4)
     @Column(Sequelize.UUIDV4)
@@ -28,11 +26,4 @@ export class PropertySqlModel extends Model<PropertySqlModel> {
 
     @Column
     city!: string
-
-    @ForeignKey(() => RiskSqlModel)
-    @Column
-    riskId!: string;
-
-    @BelongsTo(() => RiskSqlModel)
-    risk!: RiskSqlModel
 }

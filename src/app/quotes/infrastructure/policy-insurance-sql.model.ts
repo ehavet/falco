@@ -9,8 +9,8 @@ import {
 import Sequelize from 'sequelize'
 import { v4 as uuidv4 } from 'uuid'
 
-@Table({ timestamps: true, tableName: 'insurance', underscored: true })
-export class InsuranceSqlModel extends Model<InsuranceSqlModel> {
+@Table({ timestamps: true, tableName: 'policy_insurance', underscored: true })
+export class PolicyInsuranceSqlModel extends Model<PolicyInsuranceSqlModel> {
     @PrimaryKey
     @Default(uuidv4)
     @Column(Sequelize.UUIDV4)

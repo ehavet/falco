@@ -1,7 +1,7 @@
 import { Policy } from '../domain/policy'
 import { PolicySqlModel } from './policy-sql.model'
-import { RiskSqlModel } from '../../quotes/infrastructure/risk-sql.model'
-import { InsuranceSqlModel } from '../../quotes/infrastructure/insurance-sql.model'
+import { PolicyInsuranceSqlModel } from '../../quotes/infrastructure/policy-insurance-sql.model'
+import { PolicyRiskSqlModel } from '../../quotes/infrastructure/policy-risk-sql.model'
 
 export function sqlToPolicyMapper (policySql: PolicySqlModel): Policy {
   return {
@@ -10,13 +10,13 @@ export function sqlToPolicyMapper (policySql: PolicySqlModel): Policy {
     insurance: _sqlToInsuranceMapper(policySql.insurance),
     risk: _sqlToRiskMapper(policySql.risk),
     contact: {
-      firstname: policySql.contact.firstname,
-      lastname: policySql.contact.lastname,
-      address: policySql.contact.address,
-      postalCode: policySql.contact.postalCode,
-      city: policySql.contact.city,
-      email: policySql.contact.email,
-      phoneNumber: policySql.contact.phoneNumber
+      firstname: policySql.policyHolder.firstname,
+      lastname: policySql.policyHolder.lastname,
+      address: policySql.policyHolder.address,
+      postalCode: policySql.policyHolder.postalCode,
+      city: policySql.policyHolder.city,
+      email: policySql.policyHolder.email,
+      phoneNumber: policySql.policyHolder.phoneNumber
     },
     premium: policySql.premium,
     nbMonthsDue: policySql.nbMonthsDue,
@@ -31,7 +31,7 @@ export function sqlToPolicyMapper (policySql: PolicySqlModel): Policy {
   }
 }
 
-function _sqlToRiskMapper (riskSql: RiskSqlModel) {
+function _sqlToRiskMapper (riskSql: PolicyRiskSqlModel) {
   return {
     property: {
       roomCount: riskSql.property.roomCount,
@@ -40,18 +40,18 @@ function _sqlToRiskMapper (riskSql: RiskSqlModel) {
       city: riskSql.property.city
     },
     people: {
-      policyHolder: {
-        firstname: riskSql.policyHolder.firstname,
-        lastname: riskSql.policyHolder.lastname
+      person: {
+        firstname: riskSql.person.firstname,
+        lastname: riskSql.person.lastname
       },
-      otherInsured: riskSql.otherInsured.map((insured) => {
+      otherPeople: riskSql.otherPeople!.map((insured) => {
         return { firstname: insured.firstname, lastname: insured.lastname }
       })
     }
   }
 }
 
-function _sqlToInsuranceMapper (insuranceSql: InsuranceSqlModel) {
+function _sqlToInsuranceMapper (insuranceSql: PolicyInsuranceSqlModel) {
   return {
     estimate: {
       monthlyPrice: insuranceSql.monthlyPrice,

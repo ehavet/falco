@@ -96,11 +96,11 @@ describe('Policies - Domain', async () => {
           city: 'Corbeil-Essones'
         },
         people: {
-          policyHolder: {
+          person: {
             lastname: 'Dupont',
             firstname: 'Jean'
           },
-          otherInsured: [
+          otherPeople: [
             {
               lastname: 'Doe',
               firstname: 'John'
@@ -127,12 +127,12 @@ describe('Policies - Domain', async () => {
       const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository, partner)
 
       // Then
-      expect(createdPolicy.risk.people.otherInsured).to.be.empty
+      expect(createdPolicy.risk.people.otherPeople).to.be.empty
     })
 
     it('should set the contact', async () => {
       // Given
-      const expectedContact: Policy.Contact = {
+      const expectedContact: Policy.Holder = {
         lastname: 'Dupont',
         firstname: 'Jean',
         address: '13 rue du loup garou',

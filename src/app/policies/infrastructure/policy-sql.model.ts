@@ -1,8 +1,8 @@
-import { BelongsTo, Column, DataType, ForeignKey, HasOne, Model, PrimaryKey, Table } from 'sequelize-typescript'
-import { InsuranceSqlModel } from '../../quotes/infrastructure/insurance-sql.model'
-import { RiskSqlModel } from '../../quotes/infrastructure/risk-sql.model'
-import { ContactSqlModel } from './contact-sql.model'
+import { BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript'
+import { PolicyInsuranceSqlModel } from '../../quotes/infrastructure/policy-insurance-sql.model'
+import { PolicyRiskSqlModel } from '../../quotes/infrastructure/policy-risk-sql.model'
 import { Policy } from '../domain/policy'
+import { PolicyPersonSqlModel } from './policy-person-sql.model'
 
 @Table({ timestamps: true, tableName: 'policy', underscored: true })
 export class PolicySqlModel extends Model<PolicySqlModel> {
@@ -43,20 +43,24 @@ export class PolicySqlModel extends Model<PolicySqlModel> {
     @Column
     status!: Policy.Status
 
-    @ForeignKey(() => InsuranceSqlModel)
+    @ForeignKey(() => PolicyInsuranceSqlModel)
     @Column
-    insuranceId!: string
+    policyInsuranceId!: string
 
-    @BelongsTo(() => InsuranceSqlModel)
-    insurance!: InsuranceSqlModel
+    @BelongsTo(() => PolicyInsuranceSqlModel)
+    insurance!: PolicyInsuranceSqlModel
 
-    @ForeignKey(() => RiskSqlModel)
+    @ForeignKey(() => PolicyRiskSqlModel)
     @Column
-    riskId!: string;
+    policyRiskId!: string;
 
-    @BelongsTo(() => RiskSqlModel)
-    risk!: RiskSqlModel
+    @BelongsTo(() => PolicyRiskSqlModel)
+    risk!: PolicyRiskSqlModel
 
-    @HasOne(() => ContactSqlModel)
-    contact!: ContactSqlModel
+    @ForeignKey(() => PolicyPersonSqlModel)
+    @Column
+    policyHolderId!: string;
+
+    @BelongsTo(() => PolicyPersonSqlModel)
+    policyHolder!: PolicyPersonSqlModel
 }

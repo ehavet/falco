@@ -26,11 +26,11 @@ export function createPolicyFixture (attr: Partial<Policy> = {}): Policy {
         city: 'Corbeil-Essones'
       },
       people: {
-        policyHolder: {
+        person: {
           firstname: 'Jean',
           lastname: 'Dupont'
         },
-        otherInsured: [
+        otherPeople: [
           {
             firstname: 'John',
             lastname: 'Doe'

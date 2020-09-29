@@ -36,7 +36,7 @@ function _toInsurance (insurance: Quote.Insurance) {
   }
 }
 
-function _toContact (contact: Policy.Contact) {
+function _toContact (contact: Policy.Holder) {
   return {
     lastname: contact.lastname,
     firstname: contact.firstname,
@@ -58,15 +58,15 @@ function _toRisk (risk: Policy.Risk) {
     },
     people: {
       policy_holder: {
-        firstname: risk.people.policyHolder.firstname,
-        lastname: risk.people.policyHolder.lastname
+        firstname: risk.people.person.firstname,
+        lastname: risk.people.person.lastname
       },
-      other_insured: _toOtherInsured(risk.people.otherInsured)
+      other_insured: _toOtherInsured(risk.people.otherPeople)
     }
   }
 }
 
-function _toOtherInsured (otherInsured: Policy.Risk.People.OtherInsured[]) {
+function _toOtherInsured (otherInsured: Policy.Risk.People.OtherPeople[]) {
   if (otherInsured) {
     return otherInsured.map(oiDomain => {
       return {

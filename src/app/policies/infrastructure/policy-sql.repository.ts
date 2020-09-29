@@ -1,13 +1,24 @@
 import { PolicyRepository } from '../domain/policy.repository'
 import { Policy } from '../domain/policy'
 import { PolicySqlModel } from './policy-sql.model'
-import { RiskSqlModel } from '../../quotes/infrastructure/risk-sql.model'
 import { sqlToPolicyMapper } from './policy-sql.mapper'
 import { PolicyNotFoundError } from '../domain/policies.errors'
+import { PolicyPersonSqlModel } from './policy-person-sql.model'
+import { PolicyRiskSqlModel } from '../../quotes/infrastructure/policy-risk-sql.model'
 
 export class PolicySqlRepository implements PolicyRepository {
   async save (policy: Policy): Promise<Policy> {
-    const policySql = PolicySqlModel.build({
+    const persistedPerson = await PolicyPersonSqlModel.create({
+      firstname: policy.contact.firstname,
+      lastname: policy.contact.lastname,
+      address: policy.contact.address,
+      postalCode: policy.contact.postalCode,
+      city: policy.contact.city,
+      email: policy.contact.email,
+      phoneNumber: policy.contact.phoneNumber
+    })
+
+    const persistedPolicy = await PolicySqlModel.create({
       id: policy.id,
       partnerCode: policy.partnerCode,
       premium: policy.premium,
@@ -22,8 +33,8 @@ export class PolicySqlRepository implements PolicyRepository {
       status: policy.status,
       risk: {
         property: policy.risk.property,
-        policyHolder: policy.risk.people.policyHolder,
-        otherInsured: policy.risk.people.otherInsured
+        policyPersonId: persistedPerson.id,
+        otherPeople: policy.risk.people.otherPeople
       },
       insurance: {
         monthlyPrice: policy.insurance.estimate.monthlyPrice,
@@ -36,19 +47,21 @@ export class PolicySqlRepository implements PolicyRepository {
         contractualTerms: policy.insurance.contractualTerms,
         ipid: policy.insurance.ipid
       },
-      contact: policy.contact
+      policyHolderId: persistedPerson.id
     }, {
-      include: [{ all: true }, { model: RiskSqlModel, include: [{ all: true }] }]
+      include: [{ all: true }, { model: PolicyRiskSqlModel, include: [{ all: true }] }]
     })
 
-    const savedPolicy: PolicySqlModel = await policySql.save()
-    return sqlToPolicyMapper(savedPolicy)
+    persistedPolicy.policyHolder = persistedPerson
+    persistedPolicy.risk.person = persistedPerson
+
+    return sqlToPolicyMapper(persistedPolicy)
   }
 
   async get (policyId: string): Promise<Policy> {
     const policy: PolicySqlModel = await PolicySqlModel
       .findByPk(policyId, {
-        rejectOnEmpty: false, include: [{ all: true }, { model: RiskSqlModel, include: [{ all: true }] }]
+        rejectOnEmpty: false, include: [{ all: true }, { model: PolicyRiskSqlModel, include: [{ all: true }] }]
       })
     if (policy) {
       return sqlToPolicyMapper(policy)
@@ -102,7 +115,7 @@ export class PolicySqlRepository implements PolicyRepository {
       policy.id, {
         rejectOnEmpty: false,
         include: [{ all: true },
-          { model: RiskSqlModel, include: [{ all: true }] }]
+          { model: PolicyRiskSqlModel, include: [{ all: true }] }]
       })
     if (persitedPolicy) {
       persitedPolicy.premium = policy.premium

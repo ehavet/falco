@@ -38,7 +38,7 @@ export class SpecificTermsPdfGenerator implements SpecificTermsGenerator {
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[firstname]', _encodeForPdf(policy.contact.firstname))
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[lastname]', _encodeForPdf(policy.contact.lastname))
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[email]', _encodeForPdf(policy.contact.email))
-    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[other_insured]', _encodeForPdf(_formatOtherInsured(policy.risk.people.otherInsured)))
+    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[other_insured]', _encodeForPdf(_formatOtherInsured(policy.risk.people.otherPeople)))
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[address]', _encodeForPdf(policy.contact.address))
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[postal_code]', _encodeForPdf(policy.contact.postalCode.toString()))
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[city]', _encodeForPdf(policy.contact.city))

@@ -2,10 +2,11 @@ import { PolicyRepository } from '../../../../src/app/policies/domain/policy.rep
 import { PolicySqlRepository } from '../../../../src/app/policies/infrastructure/policy-sql.repository'
 import { Policy } from '../../../../src/app/policies/domain/policy'
 import { createPolicyFixture } from '../fixtures/policy.fixture'
-import { expect } from '../../../test-utils'
+import { config, expect } from '../../../test-utils'
 import { PolicySqlModel } from '../../../../src/app/policies/infrastructure/policy-sql.model'
-import { RiskSqlModel } from '../../../../src/app/quotes/infrastructure/risk-sql.model'
+import { PolicyRiskSqlModel } from '../../../../src/app/quotes/infrastructure/policy-risk-sql.model'
 import { PolicyNotFoundError } from '../../../../src/app/policies/domain/policies.errors'
+import { getSequelize, initSequelize } from '../../../../src/libs/sequelize'
 import dayjs = require('dayjs')
 
 async function resetDb () {
@@ -15,8 +16,16 @@ async function resetDb () {
 describe('Policies - Infra - Policy SQL Repository', async () => {
   const policyRepository: PolicyRepository = new PolicySqlRepository()
 
+  before(async () => {
+    await initSequelize(config)
+  })
+
   afterEach(async () => {
     await resetDb()
+  })
+
+  after(() => {
+    getSequelize().close()
   })
 
   describe('#save', async () => {
@@ -29,7 +38,7 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
 
       // Then
       const result = await PolicySqlModel.findAll({
-        include: [{ all: true }, { model: RiskSqlModel, include: [{ all: true }] }]
+        include: [{ all: true }, { model: PolicyRiskSqlModel, include: [{ all: true }] }]
       })
       expect(result).to.have.lengthOf(1)
       const savedPolicy: PolicySqlModel = result[0]

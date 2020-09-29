@@ -34,7 +34,7 @@ export function _formatNumber (number: number): string {
   return ''
 }
 
-export function _formatOtherInsured (otherInsured: Policy.Risk.People.OtherInsured[]): string {
+export function _formatOtherInsured (otherInsured: Policy.Risk.People.OtherPeople[]): string {
   if (otherInsured.length === 0) {
     return 'Aucun'
   }

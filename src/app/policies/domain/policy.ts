@@ -14,7 +14,7 @@ export interface Policy {
     partnerCode: string,
     insurance: Quote.Insurance,
     risk: Policy.Risk,
-    contact: Policy.Contact,
+    contact: Policy.Holder,
     premium: number,
     nbMonthsDue: number,
     startDate: Date,
@@ -33,7 +33,7 @@ export namespace Policy {
         people: Risk.People,
     }
 
-    export interface Contact {
+    export interface Holder {
         lastname: string,
         firstname: string,
         address: string,
@@ -130,7 +130,7 @@ export namespace Policy {
       return createPolicyCommand.startDate || new Date()
     }
 
-    function _createContact (queryContact: CreatePolicyCommand.Contact, queryRisk: CreatePolicyCommand.Risk): Policy.Contact {
+    function _createContact (queryContact: CreatePolicyCommand.Contact, queryRisk: CreatePolicyCommand.Risk): Policy.Holder {
       return {
         lastname: queryRisk.people.policyHolder.lastname,
         firstname: queryRisk.people.policyHolder.firstname,
@@ -152,8 +152,8 @@ export namespace Policy.Risk {
     }
 
     export interface People {
-        policyHolder: People.PolicyHolder,
-        otherInsured: Array<People.OtherInsured>
+        person: People.Person,
+        otherPeople: Array<People.OtherPeople>
     }
 
     export function createRisk (commandRisk: CreatePolicyCommand.Risk, quoteRisk: Quote.Risk, partner: Partner): Policy.Risk {
@@ -175,7 +175,10 @@ export namespace Policy.Risk {
           postalCode: commandRisk.property.postalCode,
           city: commandRisk.property.city
         },
-        people: commandRisk.people
+        people: {
+          person: commandRisk.people.policyHolder,
+          otherPeople: commandRisk.people.otherInsured
+        }
       }
     }
 
@@ -185,12 +188,12 @@ export namespace Policy.Risk {
 }
 
 export namespace Policy.Risk.People {
-    export interface PolicyHolder {
+    export interface Person {
         firstname: string,
         lastname: string
     }
 
-    export interface OtherInsured {
+    export interface OtherPeople {
         firstname: string,
         lastname: string
     }

@@ -39,13 +39,13 @@ const riskSchema: Joi.ObjectSchema = Joi.object({
 })
 
 const contactSchema: Joi.ObjectSchema = Joi.object({
-  address: Joi.string().required().max(100).description('Contact address').example('112 rue du chêne rouge'),
-  postal_code: Joi.number().integer().positive().required().min(0o1000).max(97680).description('Contact postal code').example(95470),
-  city: Joi.string().required().max(50).description('Contact city').example('Corbeil-Essonnes'),
-  firstname: Joi.string().required().max(100).description('Contact firstname').example('John'),
-  lastname: Joi.string().required().max(100).description('Contact lastname').example('Doe'),
-  email: Joi.string().email().required().description('Contact email').example('john.doe@email.com'),
-  phone_number: Joi.string().required().max(15).description('Contact phone number').example('+33684205510')
+  address: Joi.string().required().max(100).description('Holder address').example('112 rue du chêne rouge'),
+  postal_code: Joi.number().integer().positive().required().min(0o1000).max(97680).description('Holder postal code').example(95470),
+  city: Joi.string().required().max(50).description('Holder city').example('Corbeil-Essonnes'),
+  firstname: Joi.string().required().max(100).description('Holder firstname').example('John'),
+  lastname: Joi.string().required().max(100).description('Holder lastname').example('Doe'),
+  email: Joi.string().email().required().description('Holder email').example('john.doe@email.com'),
+  phone_number: Joi.string().required().max(15).description('Holder phone number').example('+33684205510')
 })
 
 export const policySchema: Joi.ObjectSchema = Joi.object({
@@ -63,7 +63,7 @@ export const policySchema: Joi.ObjectSchema = Joi.object({
   status: Joi.string().valid(...Object.keys(Policy.Status).map(key => Policy.Status[key])).required().description('Policy status').example('INITIATED'),
   risk: riskSchema.required().description('Policy Risks').label('Policy.Risks'),
   insurance: insuranceSchema.required().description('Policy Insurance').label('Policy.Insurance'),
-  contact: contactSchema.required().description('Policy Contact').label('Policy.Contact')
+  contact: contactSchema.required().description('Policy Holder').label('Policy.Holder')
 }).label('Policy')
 
 export const createPolicyRequestSchema: Joi.ObjectSchema = Joi.object({
@@ -90,7 +90,7 @@ export const createPolicyRequestSchema: Joi.ObjectSchema = Joi.object({
     }).required().description('Risks regarding the people')
   }).required().description('Risks'),
   contact: Joi.object({
-    email: Joi.string().email().required().description('Contact email').example('john.doe@email.com'),
-    phone_number: Joi.string().required().max(15).description('Contact phone number').example('+33684205510')
-  }).required().description('Contact')
+    email: Joi.string().email().required().description('Holder email').example('john.doe@email.com'),
+    phone_number: Joi.string().required().max(15).description('Holder phone number').example('+33684205510')
+  }).required().description('Holder')
 }).options({ stripUnknown: true })

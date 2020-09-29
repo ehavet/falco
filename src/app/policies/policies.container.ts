@@ -3,7 +3,7 @@ import paymentProcessorEventHandler from './api/v0/payment-processor.api'
 import signatureProcessorEventHandler from './api/v0/signature-processor.api'
 import { CreatePaymentIntentForPolicy } from './domain/create-payment-intent-for-policy.usecase'
 import { PolicySqlModel } from './infrastructure/policy-sql.model'
-import { ContactSqlModel } from './infrastructure/contact-sql.model'
+import { PolicyPersonSqlModel } from './infrastructure/policy-person-sql.model'
 import { StripePaymentProcessor } from './infrastructure/stripe.payment-processor'
 import { stripe } from '../../libs/stripe'
 import { PolicyRepository } from './domain/policy.repository'
@@ -46,11 +46,10 @@ import { nodemailerTransporter } from '../../libs/nodemailer'
 import { UpdatePolicy } from './domain/update-policy.usecase'
 import { ApplySpecialOperationCodeOnPolicy } from './domain/apply-special-operation-code-on-policy.usecase'
 import { ApplyStartDateOnPolicy } from './domain/apply-start-date-on-policy.usecase'
-import { InsuranceSqlModel } from '../quotes/infrastructure/insurance-sql.model'
-import { OtherInsuredSqlModel } from '../quotes/infrastructure/other-insured-sql.model'
-import { PolicyHolderSqlModel } from '../quotes/infrastructure/policy-holder-sql.model'
-import { PropertySqlModel } from '../quotes/infrastructure/property-sql.model'
-import { RiskSqlModel } from '../quotes/infrastructure/risk-sql.model'
+import { PolicyInsuranceSqlModel } from '../quotes/infrastructure/policy-insurance-sql.model'
+import { PolicyPropertySqlModel } from '../quotes/infrastructure/policy-property-sql.model'
+import { PolicyRiskSqlModel } from '../quotes/infrastructure/policy-risk-sql.model'
+import { PolicyRiskOtherPeopleSqlModel } from './infrastructure/policy-risk-other-people-sql.model'
 const config = require('../../config')
 
 export interface Container {
@@ -121,8 +120,8 @@ export const container: Container = {
 }
 
 export const policySqlModels: Array<any> = [
-  PolicySqlModel, ContactSqlModel, InsuranceSqlModel,
-  OtherInsuredSqlModel, PolicyHolderSqlModel, PropertySqlModel, RiskSqlModel]
+  PolicySqlModel, PolicyPersonSqlModel, PolicyInsuranceSqlModel,
+  PolicyRiskOtherPeopleSqlModel, PolicyPropertySqlModel, PolicyRiskSqlModel]
 
 export function policiesRoutes () {
   return routes(container)

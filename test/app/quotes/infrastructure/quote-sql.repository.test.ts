@@ -1,13 +1,12 @@
 import { QuoteSqlRepository } from '../../../../src/app/quotes/infrastructure/quote-sql.repository'
 import { Quote } from '../../../../src/app/quotes/domain/quote'
-import { config, expect } from '../../../test-utils'
+import { dbTestUtils, expect } from '../../../test-utils'
 import { createQuote } from '../fixtures/quote.fixture'
 import { QuoteNotFoundError } from '../../../../src/app/quotes/domain/quote.errors'
 import { QuoteInsuranceSqlModel } from '../../../../src/app/quotes/infrastructure/sql-models/quote-insurance-sql.model'
 import { QuoteRiskSqlModel } from '../../../../src/app/quotes/infrastructure/sql-models/quote-risk-sql.model'
 import { QuotePropertySqlModel } from '../../../../src/app/quotes/infrastructure/sql-models/quote-property-sql.model'
 import { QuoteSqlModel } from '../../../../src/app/quotes/infrastructure/sql-models/quote-sql-model'
-import { getSequelize, initSequelize } from '../../../../src/libs/sequelize'
 
 async function resetDb () {
   await QuoteSqlModel.destroy({ truncate: true, cascade: true })
@@ -17,15 +16,15 @@ describe('Repository - Quote', async () => {
   const quoteRepository = new QuoteSqlRepository()
 
   before(async () => {
-    await initSequelize(config)
+    await dbTestUtils.initDB()
+  })
+
+  after(async () => {
+    await dbTestUtils.closeDB()
   })
 
   afterEach(async () => {
     await resetDb()
-  })
-
-  after(() => {
-    getSequelize().close()
   })
 
   describe('#save', async () => {

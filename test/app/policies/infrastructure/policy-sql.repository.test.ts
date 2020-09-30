@@ -2,11 +2,10 @@ import { PolicyRepository } from '../../../../src/app/policies/domain/policy.rep
 import { PolicySqlRepository } from '../../../../src/app/policies/infrastructure/policy-sql.repository'
 import { Policy } from '../../../../src/app/policies/domain/policy'
 import { createPolicyFixture } from '../fixtures/policy.fixture'
-import { config, expect } from '../../../test-utils'
+import { dbTestUtils, expect } from '../../../test-utils'
 import { PolicySqlModel } from '../../../../src/app/policies/infrastructure/policy-sql.model'
 import { PolicyRiskSqlModel } from '../../../../src/app/quotes/infrastructure/policy-risk-sql.model'
 import { PolicyNotFoundError } from '../../../../src/app/policies/domain/policies.errors'
-import { getSequelize, initSequelize } from '../../../../src/libs/sequelize'
 import dayjs = require('dayjs')
 
 async function resetDb () {
@@ -17,15 +16,15 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
   const policyRepository: PolicyRepository = new PolicySqlRepository()
 
   before(async () => {
-    await initSequelize(config)
+    await dbTestUtils.initDB()
+  })
+
+  after(async () => {
+    await dbTestUtils.closeDB()
   })
 
   afterEach(async () => {
     await resetDb()
-  })
-
-  after(() => {
-    getSequelize().close()
   })
 
   describe('#save', async () => {

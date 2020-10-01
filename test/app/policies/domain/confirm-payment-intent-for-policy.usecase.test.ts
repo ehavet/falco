@@ -18,6 +18,7 @@ import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles
 import { Payment } from '../../../../src/app/policies/domain/payment/payment'
 import { PaymentRepository } from '../../../../src/app/policies/domain/payment/payment.repository'
 import { paymentRepositoryStub } from '../fixtures/payment-repository.test-doubles'
+import { createPaymentFixture } from '../fixtures/payment.fixture'
 
 describe('PaymentProcessor - Usecase - confirm payment intent for policy', async () => {
   const now = new Date('2020-01-05T10:09:08Z')
@@ -108,16 +109,7 @@ describe('PaymentProcessor - Usecase - confirm payment intent for policy', async
     await confirmPaymentIntentForPolicy(confirmPaymentIntentCommand)
 
     // Then
-    const payment: Payment = {
-      amount: 100000,
-      currency: Payment.Curreny.EUR,
-      processor: Payment.Processor.STRIPE,
-      instrument: Payment.Instrument.CREDITCARD,
-      externalId: 'pi_1DgjcP2eZvKYlo2CcMcqZ3qi',
-      status: Payment.Status.VALID,
-      payedAt: now,
-      policyId
-    }
+    const payment = createPaymentFixture({ policyId })
     expect(paymentRepository.save).to.have.been.calledWith(payment)
   })
 

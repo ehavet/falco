@@ -1,9 +1,12 @@
 import { PaymentRepository } from '../../domain/payment/payment.repository'
 import { Payment } from '../../domain/payment/payment'
+import { PaymentSqlModel } from './payment-sql.model'
+import { sqlToDomain } from './payment-sql.mapper'
 
 export class PaymentSqlRepository implements PaymentRepository {
-  // @ts-ignore
   async save (payment: Payment): Promise<Payment> {
-    throw new Error('Not implemented yet')
+    const savedPaymentSql = await PaymentSqlModel.create(payment)
+
+    return sqlToDomain(savedPaymentSql)
   }
 }

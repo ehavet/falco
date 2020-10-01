@@ -54,6 +54,7 @@ import { PDFtkPDFProcessor } from './infrastructure/pdf/pdftk.pdf-processor'
 import { pdfGenerationConfig } from '../../configs/pdf-generation.config'
 import { PaymentRepository } from './domain/payment/payment.repository'
 import { PaymentSqlRepository } from './infrastructure/payment/payment-sql.repository'
+import { PaymentSqlModel } from './infrastructure/payment/payment-sql.model'
 const config = require('../../config')
 
 export interface Container {
@@ -124,7 +125,9 @@ export const container: Container = {
 
 export const policySqlModels: Array<any> = [
   PolicySqlModel, PolicyPersonSqlModel, PolicyInsuranceSqlModel,
-  PolicyRiskOtherPeopleSqlModel, PolicyPropertySqlModel, PolicyRiskSqlModel]
+  PolicyRiskOtherPeopleSqlModel, PolicyPropertySqlModel, PolicyRiskSqlModel,
+  PaymentSqlModel
+]
 
 export function policiesRoutes () {
   return routes(container)

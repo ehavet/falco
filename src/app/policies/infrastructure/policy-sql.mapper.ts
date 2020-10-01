@@ -3,7 +3,7 @@ import { PolicySqlModel } from './policy-sql.model'
 import { PolicyInsuranceSqlModel } from '../../quotes/infrastructure/policy-insurance-sql.model'
 import { PolicyRiskSqlModel } from '../../quotes/infrastructure/policy-risk-sql.model'
 
-export function sqlToPolicyMapper (policySql: PolicySqlModel): Policy {
+export function sqlToDomain (policySql: PolicySqlModel): Policy {
   return {
     id: policySql.id,
     partnerCode: policySql.partnerCode,

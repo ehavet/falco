@@ -8,6 +8,7 @@ export function createValidPayment (policyId: string, externalId: string, amount
     processor: processor,
     instrument: instrument,
     externalId,
+    pspFee: 0,
     status: Payment.Status.VALID,
     payedAt: new Date(),
     cancelledAt: null,

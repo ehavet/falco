@@ -9,6 +9,7 @@ export function sqlToDomain (paymentSql: PaymentSqlModel): Payment {
     processor: paymentSql.processor,
     instrument: paymentSql.instrument,
     externalId: paymentSql.externalId,
+    pspFee: paymentSql.pspFee,
     status: paymentSql.status,
     payedAt: paymentSql.payedAt,
     cancelledAt: paymentSql.cancelledAt,

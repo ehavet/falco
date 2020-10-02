@@ -8,7 +8,7 @@ import { PolicyRepository } from '../../../../../src/app/policies/domain/policy.
 import { PolicySqlRepository } from '../../../../../src/app/policies/infrastructure/policy-sql.repository'
 import { PolicySqlModel } from '../../../../../src/app/policies/infrastructure/policy-sql.model'
 import { before } from 'mocha'
-import { createPaymentFixture } from '../../fixtures/payment.fixture'
+import { createPaymentFixture } from '../../fixtures/payment/payment.fixture'
 
 async function resetDb () {
   await PaymentSqlModel.destroy({ truncate: true })
@@ -57,6 +57,7 @@ describe('Payments - Infra - Payment SQL Repository', async () => {
       expect(paymentFromDb.processor).to.equal(paymentToSave.processor)
       expect(paymentFromDb.instrument).to.equal(paymentToSave.instrument)
       expect(paymentFromDb.externalId).to.equal(paymentToSave.externalId)
+      expect(paymentFromDb.pspFee).to.equal(paymentToSave.pspFee)
       expect(paymentFromDb.status).to.equal(paymentToSave.status)
       expect(paymentFromDb.payedAt).to.deep.equal(paymentToSave.payedAt)
       expect(paymentFromDb.cancelledAt).to.deep.equal(paymentToSave.cancelledAt)
@@ -71,6 +72,7 @@ describe('Payments - Infra - Payment SQL Repository', async () => {
       expect(savedPayment.processor).to.equal(paymentToSave.processor)
       expect(savedPayment.instrument).to.equal(paymentToSave.instrument)
       expect(savedPayment.externalId).to.equal(paymentToSave.externalId)
+      expect(savedPayment.pspFee).to.equal(paymentToSave.pspFee)
       expect(savedPayment.status).to.equal(paymentToSave.status)
       expect(savedPayment.payedAt).to.deep.equal(paymentToSave.payedAt)
       expect(savedPayment.policyId).to.equal(paymentToSave.policyId)

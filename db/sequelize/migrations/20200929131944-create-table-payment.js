@@ -25,6 +25,7 @@ module.exports = {
       processor: Sequelize.STRING,
       instrument: Sequelize.STRING,
       external_id: Sequelize.STRING,
+      psp_fee: Sequelize.INTEGER,
       status: Sequelize.STRING,
       payed_at: Sequelize.DATE,
       cancelled_at: Sequelize.DATE,

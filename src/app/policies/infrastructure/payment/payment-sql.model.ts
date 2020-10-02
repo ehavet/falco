@@ -25,6 +25,9 @@ export class PaymentSqlModel extends Model<PaymentSqlModel> {
     externalId!: string
 
     @Column
+    pspFee!: number
+
+    @Column
     status!: Payment.Status
 
     @Column

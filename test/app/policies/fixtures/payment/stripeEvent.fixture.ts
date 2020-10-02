@@ -1,4 +1,6 @@
-export function getStripePaymentIntentSucceededEvent (attr = {}) {
+import { Stripe } from 'stripe'
+
+export function getStripePaymentIntentSucceededEvent (attr = {}) : Stripe.Event {
   return {
     id: 'evt_1H3118B099cSJ3oR8KFZm575',
     object: 'event',

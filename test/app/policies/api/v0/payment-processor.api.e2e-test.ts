@@ -3,7 +3,7 @@ import { PolicySqlRepository } from '../../../../../src/app/policies/infrastruct
 import { Policy } from '../../../../../src/app/policies/domain/policy'
 import { createPolicyFixture } from '../../fixtures/policy.fixture'
 import { HttpServerForTesting, newProdLikeServer } from '../../../../utils/server.test-utils'
-import { getStripePaymentIntentSucceededEvent } from '../../fixtures/stripeEvent.fixture'
+import { getStripePaymentIntentSucceededEvent } from '../../fixtures/payment/stripeEvent.fixture'
 import { config, dateFaker, expect, sinon } from '../../../../test-utils'
 import { container } from '../../../../../src/app/policies/policies.container'
 import { ContractFsRepository } from '../../../../../src/app/policies/infrastructure/contract/contract-fs.repository'

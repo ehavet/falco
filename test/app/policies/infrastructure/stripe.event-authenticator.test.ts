@@ -1,7 +1,7 @@
 import { expect, sinon } from '../../../test-utils'
 import { StripeEventAuthenticator } from '../../../../src/app/policies/infrastructure/stripe.event-authenticator'
 import { StripeConfig } from '../../../../src/configs/stripe.config'
-import { getStripePaymentIntentSucceededEvent } from '../fixtures/stripeEvent.fixture'
+import { getStripePaymentIntentSucceededEvent } from '../fixtures/payment/stripeEvent.fixture'
 import { UnauthenticatedEventError } from '../../../../src/app/policies/domain/payment-processor.errors'
 
 describe('StripeEventAuthenticator', async () => {

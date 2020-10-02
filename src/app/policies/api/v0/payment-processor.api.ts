@@ -6,6 +6,7 @@ import { PolicyNotFoundError } from '../../domain/policies.errors'
 import { UnauthenticatedEventError } from '../../domain/payment-processor.errors'
 import { ConfirmPaymentIntentCommand } from '../../domain/confirm-payment-intent-for-policy.usecase'
 import { Payment } from '../../domain/payment/payment'
+import { Stripe } from 'stripe'
 
 const TAGS = ['api', 'payment-processor']
 export default function (container: Container): Array<ServerRoute> {
@@ -32,10 +33,10 @@ export default function (container: Container): Array<ServerRoute> {
       handler: async (request, h) => {
         const rawEvent = request.payload.toString()
         const rawSignature = request.raw.req.headers['stripe-signature']
-        let event
+        let parsedEvent: Stripe.Event
 
         try {
-          event = await container.PaymentEventAuthenticator.parse(rawEvent, rawSignature)
+          parsedEvent = await container.PaymentEventAuthenticator.parse(rawEvent, rawSignature)
         } catch (error) {
           if (error instanceof UnauthenticatedEventError) {
             throw Boom.forbidden(error.message)
@@ -44,14 +45,17 @@ export default function (container: Container): Array<ServerRoute> {
           }
         }
 
-        if (event.type === 'payment_intent.succeeded') {
+        // console.log(stripeEvent.data.object.charges.data[0].balance_transaction)
+        if (parsedEvent.type === 'payment_intent.succeeded') {
+          const paymentIntent = parsedEvent.data.object as Stripe.PaymentIntent
           try {
             const command: ConfirmPaymentIntentCommand = {
-              policyId: event.data.object.metadata.policy_id,
-              amount: event.data.object.amount,
-              externalId: event.data.object.id,
+              policyId: paymentIntent.metadata.policy_id,
+              amount: paymentIntent.amount,
+              externalId: paymentIntent.id,
               processor: Payment.Processor.STRIPE,
-              instrument: Payment.Instrument.CREDITCARD
+              instrument: Payment.Instrument.CREDITCARD,
+              rawPaymentIntent: paymentIntent
             }
             await container.ConfirmPaymentIntentForPolicy(command)
             return h.response({}).code(204)

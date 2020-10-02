@@ -2,10 +2,10 @@ import { expect, HttpServerForTesting, newMinimalServer, sinon } from '../../../
 import { container, policiesRoutes } from '../../../../../src/app/policies/policies.container'
 import { PolicyNotFoundError } from '../../../../../src/app/policies/domain/policies.errors'
 import * as supertest from 'supertest'
-import { getStripePaymentIntentSucceededEvent } from '../../fixtures/stripeEvent.fixture'
+import { getStripePaymentIntentSucceededEvent } from '../../fixtures/payment/stripeEvent.fixture'
 import { UnauthenticatedEventError } from '../../../../../src/app/policies/domain/payment-processor.errors'
-import { ConfirmPaymentIntentCommand } from '../../../../../src/app/policies/domain/confirm-payment-intent-for-policy.usecase'
-import { Payment } from '../../../../../src/app/policies/domain/payment/payment'
+import { Stripe } from 'stripe'
+import { createConfirmPaymentIntentCommandFixture } from '../../fixtures/payment/confirmPaymentIntentCommand.fixture'
 
 describe('Payment Intent Event Handler - API - Integration', async () => {
   let httpServer: HttpServerForTesting
@@ -49,13 +49,13 @@ describe('Payment Intent Event Handler - API - Integration', async () => {
         sinon.stub(container.PaymentEventAuthenticator, 'parse')
           .withArgs(JSON.stringify(event), stripeHeaderSignature).resolves(event)
 
-        const expectedCommand: ConfirmPaymentIntentCommand = {
+        const stripePaymentIntent = event.data.object as Stripe.PaymentIntent
+        const expectedCommand = createConfirmPaymentIntentCommandFixture({
           policyId,
-          amount: event.data.object.amount,
-          externalId: event.data.object.id,
-          processor: Payment.Processor.STRIPE,
-          instrument: Payment.Instrument.CREDITCARD
-        }
+          amount: stripePaymentIntent.amount,
+          externalId: stripePaymentIntent.id,
+          rawPaymentIntent: stripePaymentIntent
+        })
 
         sinon.stub(container, 'ConfirmPaymentIntentForPolicy')
           .withArgs(expectedCommand)
@@ -112,13 +112,14 @@ describe('Payment Intent Event Handler - API - Integration', async () => {
         sinon.stub(container.PaymentEventAuthenticator, 'parse')
           .withArgs(JSON.stringify(event), stripeHeaderSignature).resolves(event)
 
-        const expectedCommand: ConfirmPaymentIntentCommand = {
+        const stripePaymentIntent = event.data.object as Stripe.PaymentIntent
+
+        const expectedCommand = createConfirmPaymentIntentCommandFixture({
           policyId: 'APP463109486',
-          amount: event.data.object.amount,
-          externalId: event.data.object.id,
-          processor: Payment.Processor.STRIPE,
-          instrument: Payment.Instrument.CREDITCARD
-        }
+          amount: stripePaymentIntent.amount,
+          externalId: stripePaymentIntent.id,
+          rawPaymentIntent: stripePaymentIntent
+        })
 
         sinon.stub(container, 'ConfirmPaymentIntentForPolicy')
           .withArgs(expectedCommand)

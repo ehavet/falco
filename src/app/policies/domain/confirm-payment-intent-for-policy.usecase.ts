@@ -22,7 +22,8 @@ export interface ConfirmPaymentIntentCommand {
     amount: Payment.AmountInCents,
     externalId: string,
     processor: Payment.Processor,
-    instrument: Payment.Instrument
+    instrument: Payment.Instrument,
+    rawPaymentIntent: any
 }
 
 export namespace ConfirmPaymentIntentForPolicy {

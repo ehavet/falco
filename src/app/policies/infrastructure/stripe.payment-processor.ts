@@ -1,18 +1,18 @@
 import { PaymentProcessor } from '../domain/payment-processor'
 import { logger } from '../../../libs/logger'
+import { Stripe } from 'stripe'
 
 export class StripePaymentProcessor implements PaymentProcessor {
-    stripe
-    constructor (
-      stripe
-    ) {
-      this.stripe = stripe
+    #stripe: Stripe
+
+    constructor (stripe) {
+      this.#stripe = stripe
     }
 
     async createIntent (policyId, amount, currency) {
       let paymentIntent
       try {
-        paymentIntent = await this.stripe.paymentIntents.create({
+        paymentIntent = await this.#stripe.paymentIntents.create({
           amount: amount,
           currency: currency,
           metadata: {

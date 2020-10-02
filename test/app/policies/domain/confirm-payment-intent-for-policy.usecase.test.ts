@@ -2,10 +2,7 @@ import { SinonStubbedInstance } from 'sinon'
 import { PolicyRepository } from '../../../../src/app/policies/domain/policy.repository'
 import { dateFaker, expect, sinon } from '../../../test-utils'
 import { createOngoingPolicyFixture } from '../fixtures/policy.fixture'
-import {
-  ConfirmPaymentIntentCommand,
-  ConfirmPaymentIntentForPolicy
-} from '../../../../src/app/policies/domain/confirm-payment-intent-for-policy.usecase'
+import { ConfirmPaymentIntentForPolicy } from '../../../../src/app/policies/domain/confirm-payment-intent-for-policy.usecase'
 import { Policy } from '../../../../src/app/policies/domain/policy'
 import { CertificateGenerator } from '../../../../src/app/policies/domain/certificate/certificate.generator'
 import { Mailer } from '../../../../src/app/common-api/domain/mailer'
@@ -15,10 +12,10 @@ import { CertificateGenerationError } from '../../../../src/app/policies/domain/
 import { ContractRepository } from '../../../../src/app/policies/domain/contract/contract.repository'
 import { ContractGenerator } from '../../../../src/app/policies/domain/contract/contract.generator'
 import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles'
-import { Payment } from '../../../../src/app/policies/domain/payment/payment'
 import { PaymentRepository } from '../../../../src/app/policies/domain/payment/payment.repository'
 import { paymentRepositoryStub } from '../fixtures/payment-repository.test-doubles'
-import { createPaymentFixture } from '../fixtures/payment.fixture'
+import { createPaymentFixture } from '../fixtures/payment/payment.fixture'
+import { createConfirmPaymentIntentCommandFixture } from '../fixtures/payment/confirmPaymentIntentCommand.fixture'
 
 describe('PaymentProcessor - Usecase - confirm payment intent for policy', async () => {
   const now = new Date('2020-01-05T10:09:08Z')
@@ -68,8 +65,10 @@ describe('PaymentProcessor - Usecase - confirm payment intent for policy', async
     contractGenerator.getContractName.withArgs(policyId).returns('signedContract.pdf')
     contractRepository.getSignedContract.withArgs('signedContract.pdf').resolves({ name: 'signedContract.pdf', buffer: Buffer.from('signedContract') })
 
+    const confirmPaymentIntentCommand = createConfirmPaymentIntentCommandFixture({ policyId })
+
     // When
-    await confirmPaymentIntentForPolicy({ policyId, amount: 0, externalId: '', processor: Payment.Processor.STRIPE, instrument: Payment.Instrument.CREDITCARD })
+    await confirmPaymentIntentForPolicy(confirmPaymentIntentCommand)
 
     // Then
     expect(policyRepository.updateAfterPayment.getCall(0))
@@ -97,13 +96,7 @@ describe('PaymentProcessor - Usecase - confirm payment intent for policy', async
     contractGenerator.getContractName.withArgs(policyId).returns('signedContract.pdf')
     contractRepository.getSignedContract.withArgs('signedContract.pdf').resolves({ name: 'signedContract.pdf', buffer: Buffer.from('signedContract') })
 
-    const confirmPaymentIntentCommand : ConfirmPaymentIntentCommand = {
-      policyId,
-      amount: 100000,
-      externalId: 'pi_1DgjcP2eZvKYlo2CcMcqZ3qi',
-      processor: Payment.Processor.STRIPE,
-      instrument: Payment.Instrument.CREDITCARD
-    }
+    const confirmPaymentIntentCommand = createConfirmPaymentIntentCommandFixture({ policyId })
 
     // When
     await confirmPaymentIntentForPolicy(confirmPaymentIntentCommand)
@@ -134,8 +127,10 @@ describe('PaymentProcessor - Usecase - confirm payment intent for policy', async
     contractGenerator.getContractName.withArgs(policyId).returns('signedContract.pdf')
     contractRepository.getSignedContract.withArgs('signedContract.pdf').resolves({ name: 'signedContract.pdf', buffer: Buffer.from('signedContract') })
 
+    const confirmPaymentIntentCommand = createConfirmPaymentIntentCommandFixture({ policyId })
+
     // When
-    await confirmPaymentIntentForPolicy({ policyId, amount: 0, externalId: '', processor: Payment.Processor.STRIPE, instrument: Payment.Instrument.CREDITCARD })
+    await confirmPaymentIntentForPolicy(confirmPaymentIntentCommand)
 
     // Then
     expect(mailer.send.getCall(0))
@@ -160,8 +155,10 @@ describe('PaymentProcessor - Usecase - confirm payment intent for policy', async
     policyRepository.get.withArgs(policyId).resolves(policy)
     certificateGenerator.generate.withArgs(policy).rejects(new CertificateGenerationError(policyId))
 
+    const confirmPaymentIntentCommand = createConfirmPaymentIntentCommandFixture({ policyId })
+
     // When
-    const promise = confirmPaymentIntentForPolicy({ policyId, amount: 0, externalId: '', processor: Payment.Processor.STRIPE, instrument: Payment.Instrument.CREDITCARD })
+    const promise = confirmPaymentIntentForPolicy(confirmPaymentIntentCommand)
 
     // Then
     return expect(promise).to.be.rejectedWith(CertificateGenerationError)

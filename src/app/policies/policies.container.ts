@@ -17,8 +17,8 @@ import { ConfirmPaymentIntentForPolicy } from './domain/confirm-payment-intent-f
 import { SendValidationLinkToEmailAddress } from '../email-validations/domain/send-validation-link-to-email-address.usecase'
 import { PartnerRepository } from '../partners/domain/partner.repository'
 import { GetPolicy } from './domain/get-policy.usecase'
-import { CertificatePdfRepository } from './infrastructure/certificate-pdf/certificate-pdf.repository'
-import { CertificateRepository } from './domain/certificate/certificate.repository'
+import { CertificatePdfGenerator } from './infrastructure/certificate-pdf/certificate-pdf.generator'
+import { CertificateGenerator } from './domain/certificate/certificate.generator'
 import { GeneratePolicyCertificate } from './domain/certificate/generate-policy-certificate.usecase'
 import { StripeEventAuthenticator } from './infrastructure/stripe.event-authenticator'
 import { stripeConfig } from '../../configs/stripe.config'
@@ -72,7 +72,7 @@ const quoteRepository: QuoteRepository = quoteContainer.quoteRepository
 const paymentProcessor: StripePaymentProcessor = new StripePaymentProcessor(stripe)
 const paymentEventAuthenticator: StripeEventAuthenticator = new StripeEventAuthenticator(stripeConfig)
 const partnerRepository: PartnerRepository = partnerContainer.partnerRepository
-const certificateRepository: CertificateRepository = new CertificatePdfRepository()
+const certificateGenerator: CertificateGenerator = new CertificatePdfGenerator()
 const signatureRequestProvider: SignatureRequestProvider = new HelloSignSignatureRequestProvider(helloSignConfig, logger)
 const specificTermsRepository: SpecificTermsRepository = new SpecificTermsFSRepository(config)
 const specificTermsGenerator: SpecificTermsGenerator = new SpecificTermsPdfGenerator()
@@ -86,9 +86,9 @@ const createPaymentIntentForPolicy: CreatePaymentIntentForPolicy =
 const sendValidationLinkToEmailAddress: SendValidationLinkToEmailAddress = emailValidationContainer.SendValidationLinkToEmailAddress
 const createPolicy: CreatePolicy = CreatePolicy.factory(policyRepository, quoteRepository, partnerRepository, sendValidationLinkToEmailAddress)
 const confirmPaymentIntentForPolicy: ConfirmPaymentIntentForPolicy =
-    ConfirmPaymentIntentForPolicy.factory(policyRepository, certificateRepository, contractGenerator, contractRepository, mailer)
+    ConfirmPaymentIntentForPolicy.factory(policyRepository, certificateGenerator, contractGenerator, contractRepository, mailer)
 const getPolicy: GetPolicy = GetPolicy.factory(policyRepository)
-const generatePolicyCertificate: GeneratePolicyCertificate = GeneratePolicyCertificate.factory(policyRepository, certificateRepository)
+const generatePolicyCertificate: GeneratePolicyCertificate = GeneratePolicyCertificate.factory(policyRepository, certificateGenerator)
 const getPolicySpecificTerms: GetPolicySpecificTerms = GetPolicySpecificTerms.factory(specificTermsRepository, specificTermsGenerator, policyRepository)
 const createSignatureRequestForPolicy: CreateSignatureRequestForPolicy = CreateSignatureRequestForPolicy
   .factory(

@@ -1,15 +1,19 @@
 import pdftk from 'node-pdftk'
 import replace from 'buffer-replace'
 import * as path from 'path'
-import { CertificateRepository } from '../../domain/certificate/certificate.repository'
+import { CertificateGenerator } from '../../domain/certificate/certificate.generator'
 import { Policy } from '../../domain/policy'
 import { Certificate } from '../../domain/certificate/certificate'
 import { _encodeForPdf, _formatDate, _formatPolicyId } from '../../../common-api/infrastructure/pdf-formatter'
 
-export class CertificatePdfRepository implements CertificateRepository {
+const CERTIFICATE_TEMPLATE_FILENAME: string = 'certificate-template.pdf'
+const SPECIMEN_STAMP_FILENAME: string = 'specimen-stamp.pdf'
+const DEMO_PARTNER_CODE_PREFIX: string = 'demo-'
+
+export class CertificatePdfGenerator implements CertificateGenerator {
   async generate (policy: Policy): Promise<Certificate> {
     let certificateTemplateBuffer = await pdftk
-      .input(path.join(__dirname, 'certificate-template.pdf'))
+      .input(path.join(__dirname, CERTIFICATE_TEMPLATE_FILENAME))
       .uncompress()
       .output()
 
@@ -23,16 +27,23 @@ export class CertificatePdfRepository implements CertificateRepository {
     certificateTemplateBuffer = replace(certificateTemplateBuffer, '[[date_today]]', _encodeForPdf(_formatDate(new Date())))
     certificateTemplateBuffer = replace(certificateTemplateBuffer, '[[policy_id]]', _encodeForPdf(_formatPolicyId(policy.id)))
 
-    const filledUpCertificateBuffer = await this.reencodeProperlyPdf(certificateTemplateBuffer)
+    const filledUpCertificateBuffer = await this.reencodeToPdf(certificateTemplateBuffer, policy)
 
     return { name: this.generateFileName(policy.id), buffer: filledUpCertificateBuffer }
   }
 
-  private generateFileName (policyId: string): string {
-    return `Appenin_Attestation_assurance_habitation_${policyId}.pdf`
+  private async reencodeToPdf (certificateTemplateBuffer: Buffer, policy: Policy): Promise<Buffer> {
+    if (this.isRelatedToADemoPartner(policy)) {
+      return pdftk.input(certificateTemplateBuffer).stamp(path.join(__dirname, SPECIMEN_STAMP_FILENAME)).compress().output()
+    }
+    return pdftk.input(certificateTemplateBuffer).compress().output()
   }
 
-  private async reencodeProperlyPdf (certificateTemplateBuffer: Buffer): Promise<Buffer> {
-    return await pdftk.input(certificateTemplateBuffer).compress().output()
+  private isRelatedToADemoPartner (policy: Policy) {
+    return policy.partnerCode.startsWith(DEMO_PARTNER_CODE_PREFIX)
+  }
+
+  private generateFileName (policyId: string): string {
+    return `Appenin_Attestation_assurance_habitation_${policyId}.pdf`
   }
 }

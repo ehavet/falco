@@ -4,7 +4,7 @@ import { dateFaker, expect, sinon } from '../../../test-utils'
 import { createOngoingPolicyFixture } from '../fixtures/policy.fixture'
 import { ConfirmPaymentIntentForPolicy } from '../../../../src/app/policies/domain/confirm-payment-intent-for-policy.usecase'
 import { Policy } from '../../../../src/app/policies/domain/policy'
-import { CertificateRepository } from '../../../../src/app/policies/domain/certificate/certificate.repository'
+import { CertificateGenerator } from '../../../../src/app/policies/domain/certificate/certificate.generator'
 import { Mailer } from '../../../../src/app/common-api/domain/mailer'
 import { Certificate } from '../../../../src/app/policies/domain/certificate/certificate'
 import { expectedSubscriptionValidationEmail } from '../expectations/expected-subscription-validation-email'
@@ -16,7 +16,7 @@ import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles
 describe('PaymentProcessor - Usecase - confirm payment intent for policy', async () => {
   const now = new Date('2020-01-05T10:09:08Z')
   const policyRepository: SinonStubbedInstance<PolicyRepository> = policyRepositoryStub()
-  const certificateRepository: SinonStubbedInstance<CertificateRepository> = {
+  const certificateGenerator: SinonStubbedInstance<CertificateGenerator> = {
     generate: sinon.stub()
   }
   const contractRepository: SinonStubbedInstance<ContractRepository> = {
@@ -33,7 +33,7 @@ describe('PaymentProcessor - Usecase - confirm payment intent for policy', async
   }
 
   const confirmPaymentIntentForPolicy: ConfirmPaymentIntentForPolicy =
-      ConfirmPaymentIntentForPolicy.factory(policyRepository, certificateRepository, contractGenerator, contractRepository, mailer)
+      ConfirmPaymentIntentForPolicy.factory(policyRepository, certificateGenerator, contractGenerator, contractRepository, mailer)
 
   beforeEach(() => {
     dateFaker.setCurrentDate(now)
@@ -56,7 +56,7 @@ describe('PaymentProcessor - Usecase - confirm payment intent for policy', async
     })
     const certificate: Certificate = { name: 'filename', buffer: Buffer.alloc(1) }
     policyRepository.get.withArgs(policyId).resolves(policy)
-    certificateRepository.generate.withArgs(policy).resolves(certificate)
+    certificateGenerator.generate.withArgs(policy).resolves(certificate)
     contractGenerator.getContractName.withArgs(policyId).returns('signedContract.pdf')
     contractRepository.getSignedContract.withArgs('signedContract.pdf').resolves({ name: 'signedContract.pdf', buffer: Buffer.from('signedContract') })
 
@@ -85,7 +85,7 @@ describe('PaymentProcessor - Usecase - confirm payment intent for policy', async
     })
     const certificate: Certificate = { name: 'filename', buffer: Buffer.alloc(1) }
     policyRepository.get.withArgs(policyId).resolves(policy)
-    certificateRepository.generate.withArgs(policy).resolves(certificate)
+    certificateGenerator.generate.withArgs(policy).resolves(certificate)
     contractGenerator.getContractName.withArgs(policyId).returns('signedContract.pdf')
     contractRepository.getSignedContract.withArgs('signedContract.pdf').resolves({ name: 'signedContract.pdf', buffer: Buffer.from('signedContract') })
 
@@ -113,7 +113,7 @@ describe('PaymentProcessor - Usecase - confirm payment intent for policy', async
       }
     })
     policyRepository.get.withArgs(policyId).resolves(policy)
-    certificateRepository.generate.withArgs(policy).rejects(new CertificateGenerationError(policyId))
+    certificateGenerator.generate.withArgs(policy).rejects(new CertificateGenerationError(policyId))
     // When
     const promise = confirmPaymentIntentForPolicy(policyId)
     // Then

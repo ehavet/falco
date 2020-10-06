@@ -5,7 +5,7 @@ export interface Payment {
     processor: Payment.Processor,
     instrument: Payment.Instrument,
     externalId: string,
-    pspFee: Payment.AmountInCents,
+    pspFee: Payment.AmountInCents | null, // can be null if the value cannot be retrieved
     status: Payment.Status,
     payedAt: Date,
     cancelledAt: Date | null,

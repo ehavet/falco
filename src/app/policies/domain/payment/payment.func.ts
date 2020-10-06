@@ -1,14 +1,14 @@
 import { Payment } from './payment'
 
 export function createValidPayment (policyId: string, externalId: string, amount: Payment.AmountInCents,
-  processor: Payment.Processor, instrument: Payment.Instrument): Payment {
+  processor: Payment.Processor, instrument: Payment.Instrument, pspFee: number | null): Payment {
   return {
     amount: amount,
     currency: Payment.Curreny.EUR,
     processor: processor,
     instrument: instrument,
     externalId,
-    pspFee: 0,
+    pspFee: pspFee,
     status: Payment.Status.VALID,
     payedAt: new Date(),
     cancelledAt: null,

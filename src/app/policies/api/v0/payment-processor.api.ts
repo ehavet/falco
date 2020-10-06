@@ -45,7 +45,6 @@ export default function (container: Container): Array<ServerRoute> {
           }
         }
 
-        // console.log(stripeEvent.data.object.charges.data[0].balance_transaction)
         if (parsedEvent.type === 'payment_intent.succeeded') {
           const paymentIntent = parsedEvent.data.object as Stripe.PaymentIntent
           try {

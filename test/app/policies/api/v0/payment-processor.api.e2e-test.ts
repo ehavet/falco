@@ -14,6 +14,7 @@ import { SpecificTermsGenerator } from '../../../../../src/app/policies/domain/s
 import { SpecificTermsPdfGenerator } from '../../../../../src/app/policies/infrastructure/specific-terms-pdf/specific-terms-pdf.generator'
 import { PaymentSqlModel } from '../../../../../src/app/policies/infrastructure/payment/payment-sql.model'
 import { PolicyRepository } from '../../../../../src/app/policies/domain/policy.repository'
+import { stripeTestUtils } from '../../../../utils/stripe.test-utils'
 
 async function resetDb () {
   await PaymentSqlModel.destroy({ truncate: true })
@@ -26,11 +27,13 @@ describe('PaymentProcessor - API - E2E', async () => {
   let httpServer: HttpServerForTesting
 
   before(async () => {
+    stripeTestUtils.initStripeMock()
     dateFaker.setCurrentDate(now)
     httpServer = await newProdLikeServer()
   })
 
   after(async () => {
+    stripeTestUtils.cleanStripeMock()
     await resetDb()
   })
 
@@ -71,6 +74,7 @@ describe('PaymentProcessor - API - E2E', async () => {
           }
         }
       })
+
       sinon.stub(container.PaymentEventAuthenticator, 'parse')
         .withArgs(JSON.stringify(event), stripeHeaderSignature).resolves(event)
 
@@ -96,6 +100,7 @@ describe('PaymentProcessor - API - E2E', async () => {
       // Then
       const paymentsInDb: PaymentSqlModel[] = await PaymentSqlModel.findAll()
       expect(paymentsInDb).to.have.lengthOf(1)
+      expect(paymentsInDb[0].pspFee).to.equal(373)
     })
   })
 })

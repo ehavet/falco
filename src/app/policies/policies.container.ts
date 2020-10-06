@@ -74,7 +74,7 @@ export interface Container {
 const pdftkPDFProcessor: PDFProcessor = new PDFtkPDFProcessor(pdfGenerationConfig)
 const policyRepository: PolicyRepository = new PolicySqlRepository()
 const quoteRepository: QuoteRepository = quoteContainer.quoteRepository
-const paymentProcessor: StripePaymentProcessor = new StripePaymentProcessor(stripe)
+const paymentProcessor: StripePaymentProcessor = new StripePaymentProcessor(stripe, logger)
 const paymentEventAuthenticator: StripeEventAuthenticator = new StripeEventAuthenticator(stripeConfig)
 const partnerRepository: PartnerRepository = partnerContainer.partnerRepository
 const certificateGenerator: CertificateGenerator = new CertificatePdfGenerator(pdftkPDFProcessor)
@@ -92,7 +92,7 @@ const createPaymentIntentForPolicy: CreatePaymentIntentForPolicy =
 const sendValidationLinkToEmailAddress: SendValidationLinkToEmailAddress = emailValidationContainer.SendValidationLinkToEmailAddress
 const createPolicy: CreatePolicy = CreatePolicy.factory(policyRepository, quoteRepository, partnerRepository, sendValidationLinkToEmailAddress)
 const confirmPaymentIntentForPolicy: ConfirmPaymentIntentForPolicy =
-    ConfirmPaymentIntentForPolicy.factory(policyRepository, certificateGenerator, contractGenerator, contractRepository, paymentRepository, mailer)
+    ConfirmPaymentIntentForPolicy.factory(policyRepository, certificateGenerator, contractGenerator, contractRepository, paymentRepository, paymentProcessor, mailer)
 const getPolicy: GetPolicy = GetPolicy.factory(policyRepository)
 const generatePolicyCertificate: GeneratePolicyCertificate = GeneratePolicyCertificate.factory(policyRepository, certificateGenerator)
 const getPolicySpecificTerms: GetPolicySpecificTerms = GetPolicySpecificTerms.factory(specificTermsRepository, specificTermsGenerator, policyRepository)

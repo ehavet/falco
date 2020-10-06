@@ -16,11 +16,14 @@ import { PaymentRepository } from '../../../../src/app/policies/domain/payment/p
 import { paymentRepositoryStub } from '../fixtures/payment-repository.test-doubles'
 import { createPaymentFixture } from '../fixtures/payment/payment.fixture'
 import { createConfirmPaymentIntentCommandFixture } from '../fixtures/payment/confirmPaymentIntentCommand.fixture'
+import { PaymentProcessor } from '../../../../src/app/policies/domain/payment-processor'
+import { paymentProcessorStub } from '../fixtures/payment/payment-processor.test-doubles'
 
 describe('PaymentProcessor - Usecase - confirm payment intent for policy', async () => {
   const now = new Date('2020-01-05T10:09:08Z')
   const policyRepository: SinonStubbedInstance<PolicyRepository> = policyRepositoryStub()
   const paymentRepository: SinonStubbedInstance<PaymentRepository> = paymentRepositoryStub()
+  const paymentProcessor: SinonStubbedInstance<PaymentProcessor> = paymentProcessorStub()
   const certificateGenerator: SinonStubbedInstance<CertificateGenerator> = {
     generate: sinon.stub()
   }
@@ -38,7 +41,7 @@ describe('PaymentProcessor - Usecase - confirm payment intent for policy', async
   }
 
   const confirmPaymentIntentForPolicy: ConfirmPaymentIntentForPolicy =
-      ConfirmPaymentIntentForPolicy.factory(policyRepository, certificateGenerator, contractGenerator, contractRepository, paymentRepository, mailer)
+      ConfirmPaymentIntentForPolicy.factory(policyRepository, certificateGenerator, contractGenerator, contractRepository, paymentRepository, paymentProcessor, mailer)
 
   beforeEach(() => {
     dateFaker.setCurrentDate(now)
@@ -78,6 +81,7 @@ describe('PaymentProcessor - Usecase - confirm payment intent for policy', async
   it('should create a payment for the policy', async () => {
     // Given
     const policyId = 'p0l1cy1D'
+    const confirmPaymentIntentCommand = createConfirmPaymentIntentCommandFixture({ policyId })
     const policy: Policy = createOngoingPolicyFixture({
       id: policyId,
       contact: {
@@ -92,17 +96,16 @@ describe('PaymentProcessor - Usecase - confirm payment intent for policy', async
     })
     const certificate: Certificate = { name: 'filename', buffer: Buffer.alloc(1) }
     policyRepository.get.withArgs(policyId).resolves(policy)
+    paymentProcessor.getTransactionFee.withArgs(confirmPaymentIntentCommand.rawPaymentIntent).resolves(200)
     certificateGenerator.generate.withArgs(policy).resolves(certificate)
     contractGenerator.getContractName.withArgs(policyId).returns('signedContract.pdf')
     contractRepository.getSignedContract.withArgs('signedContract.pdf').resolves({ name: 'signedContract.pdf', buffer: Buffer.from('signedContract') })
-
-    const confirmPaymentIntentCommand = createConfirmPaymentIntentCommandFixture({ policyId })
 
     // When
     await confirmPaymentIntentForPolicy(confirmPaymentIntentCommand)
 
     // Then
-    const payment = createPaymentFixture({ policyId })
+    const payment = createPaymentFixture({ policyId, pspFee: 200 })
     expect(paymentRepository.save).to.have.been.calledWith(payment)
   })
 

@@ -12,6 +12,7 @@ import * as PaymentFunc from './payment/payment.func'
 import { PaymentRepository } from './payment/payment.repository'
 import { Contract } from './contract/contract'
 import { Certificate } from './certificate/certificate'
+import { PaymentProcessor } from './payment-processor'
 
 export interface ConfirmPaymentIntentForPolicy {
     (confirmPaymentIntentCommand: ConfirmPaymentIntentCommand): Promise<void>
@@ -34,6 +35,7 @@ export namespace ConfirmPaymentIntentForPolicy {
       contractGenerator: ContractGenerator,
       contractRepository: ContractRepository,
       paymentRepository: PaymentRepository,
+      paymentProcessor: PaymentProcessor,
       mailer: Mailer
     ): ConfirmPaymentIntentForPolicy {
       return async (confirmPaymentIntentCommand: ConfirmPaymentIntentCommand) => {
@@ -46,11 +48,30 @@ export namespace ConfirmPaymentIntentForPolicy {
 
         await policyRepository.updateAfterPayment(policyId, currentDate, currentDate, Policy.Status.Applicable)
 
-        await createNewPayment(policyId, confirmPaymentIntentCommand, paymentRepository)
+        await createNewPayment(policyId, confirmPaymentIntentCommand, paymentRepository, paymentProcessor)
 
         const certificate = await generateCertificate(policy, certificateRepository)
 
         await sendSubscriptionValidationEmail(policy, certificate, signedContract, mailer)
+      }
+    }
+
+    async function retrieveSignedContract (contractGenerator: ContractGenerator, policyId: string, contractRepository: ContractRepository): Promise<Contract> {
+      const contractFileName = contractGenerator.getContractName(policyId)
+      return await contractRepository.getSignedContract(contractFileName)
+    }
+
+    async function createNewPayment (policyId: string, confirmPaymentIntentCommand: ConfirmPaymentIntentCommand, paymentRepository: PaymentRepository, paymentProcessor: PaymentProcessor) {
+      const pspFee = await paymentProcessor.getTransactionFee(confirmPaymentIntentCommand.rawPaymentIntent)
+      const payment = PaymentFunc.createValidPayment(policyId, confirmPaymentIntentCommand.externalId, confirmPaymentIntentCommand.amount, confirmPaymentIntentCommand.processor, confirmPaymentIntentCommand.instrument, pspFee)
+      await paymentRepository.save(payment)
+    }
+
+    async function generateCertificate (policy: Policy, certificateGenerator: CertificateGenerator): Promise<Certificate> {
+      try {
+        return await certificateGenerator.generate(policy)
+      } catch (e) {
+        throw new CertificateGenerationError(policy.id)
       }
     }
 
@@ -62,24 +83,5 @@ export namespace ConfirmPaymentIntentForPolicy {
         throw new SubscriptionValidationEmailBuildError(policy.id)
       }
       await mailer.send(email)
-    }
-
-    async function generateCertificate (policy: Policy, certificateGenerator: CertificateGenerator): Promise<Certificate> {
-      try {
-        return await certificateGenerator.generate(policy)
-      } catch (e) {
-        throw new CertificateGenerationError(policy.id)
-      }
-    }
-
-    async function retrieveSignedContract (contractGenerator: ContractGenerator, policyId: string, contractRepository: ContractRepository): Promise<Contract> {
-      const contractFileName = contractGenerator.getContractName(policyId)
-      const signedContract = await contractRepository.getSignedContract(contractFileName)
-      return signedContract
-    }
-
-    async function createNewPayment (policyId: string, confirmPaymentIntentCommand: ConfirmPaymentIntentCommand, paymentRepository: PaymentRepository) {
-      const payment = PaymentFunc.createValidPayment(policyId, confirmPaymentIntentCommand.externalId, confirmPaymentIntentCommand.amount, confirmPaymentIntentCommand.processor, confirmPaymentIntentCommand.instrument)
-      await paymentRepository.save(payment)
     }
 }

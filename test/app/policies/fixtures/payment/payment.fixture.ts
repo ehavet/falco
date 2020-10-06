@@ -8,7 +8,7 @@ export function createPaymentFixture (attr: Partial<Payment> = {}): Payment {
     processor: Payment.Processor.STRIPE,
     instrument: Payment.Instrument.CREDITCARD,
     externalId: 'pi_1DgjcP2eZvKYlo2CcMcqZ3qi',
-    pspFee: 0,
+    pspFee: 150,
     status: Payment.Status.VALID,
     payedAt: now,
     cancelledAt: null,

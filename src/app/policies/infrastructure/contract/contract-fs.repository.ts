@@ -18,6 +18,7 @@ export class ContractFsRepository implements ContractRepository {
 
   async saveTempContract (contract: Contract): Promise<string> {
     const tempContractFilePath: string = this.getTempContractsFilePath(contract.name)
+    // TODO migrate to PDFTkProcessor
     await pdftk
       .input(contract.buffer)
       .compress()
@@ -28,6 +29,7 @@ export class ContractFsRepository implements ContractRepository {
 
   async saveSignedContract (contract: Contract): Promise<Contract> {
     const signedContractFilePath: string = this.getSignedContractsFilePath(contract.name)
+    // TODO migrate to PDFTkProcessor
     await pdftk
       .input(contract.buffer)
       .compress()
@@ -39,6 +41,7 @@ export class ContractFsRepository implements ContractRepository {
   async getSignedContract (contractFileName: string): Promise<Contract> {
     const contractFilePath: string = this.getSignedContractsFilePath(contractFileName)
     try {
+      // TODO migrate to PDFTkProcessor
       const buffer = await pdftk
         .input(contractFilePath)
         .output()

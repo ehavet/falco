@@ -50,6 +50,8 @@ import { PolicyInsuranceSqlModel } from '../quotes/infrastructure/policy-insuran
 import { PolicyPropertySqlModel } from '../quotes/infrastructure/policy-property-sql.model'
 import { PolicyRiskSqlModel } from '../quotes/infrastructure/policy-risk-sql.model'
 import { PolicyRiskOtherPeopleSqlModel } from './infrastructure/policy-risk-other-people-sql.model'
+import { PDFProcessor } from './infrastructure/pdf/pdf-processor'
+import { PDFtkPDFProcessor } from './infrastructure/pdf/pdftk.pdf-processor'
 const config = require('../../config')
 
 export interface Container {
@@ -67,17 +69,18 @@ export interface Container {
     ApplyStartDateOnPolicy: ApplyStartDateOnPolicy
 }
 
+const pdftkPDFProcessor: PDFProcessor = new PDFtkPDFProcessor()
 const policyRepository: PolicyRepository = new PolicySqlRepository()
 const quoteRepository: QuoteRepository = quoteContainer.quoteRepository
 const paymentProcessor: StripePaymentProcessor = new StripePaymentProcessor(stripe)
 const paymentEventAuthenticator: StripeEventAuthenticator = new StripeEventAuthenticator(stripeConfig)
 const partnerRepository: PartnerRepository = partnerContainer.partnerRepository
-const certificateGenerator: CertificateGenerator = new CertificatePdfGenerator()
+const certificateGenerator: CertificateGenerator = new CertificatePdfGenerator(pdftkPDFProcessor)
 const signatureRequestProvider: SignatureRequestProvider = new HelloSignSignatureRequestProvider(helloSignConfig, logger)
 const specificTermsRepository: SpecificTermsRepository = new SpecificTermsFSRepository(config)
-const specificTermsGenerator: SpecificTermsGenerator = new SpecificTermsPdfGenerator()
+const specificTermsGenerator: SpecificTermsGenerator = new SpecificTermsPdfGenerator(pdftkPDFProcessor)
 const contractRepository: ContractRepository = new ContractFsRepository(config)
-const contractGenerator: ContractGenerator = new ContractPdfGenerator()
+const contractGenerator: ContractGenerator = new ContractPdfGenerator(pdftkPDFProcessor)
 const signatureRequestEventValidator: SignatureRequestEventValidator = new HelloSignRequestEventValidator(helloSignConfig)
 const mailer: Mailer = new Nodemailer(nodemailerTransporter)
 const createPaymentIntentForPolicy: CreatePaymentIntentForPolicy =

@@ -1,21 +1,22 @@
-import pdftk from 'node-pdftk'
 import replace from 'buffer-replace'
 import * as path from 'path'
 import { CertificateGenerator } from '../../domain/certificate/certificate.generator'
 import { Policy } from '../../domain/policy'
 import { Certificate } from '../../domain/certificate/certificate'
 import { _encodeForPdf, _formatDate, _formatPolicyId } from '../../../common-api/infrastructure/pdf-formatter'
+import { PDFProcessor } from '../pdf/pdf-processor'
 
 const CERTIFICATE_TEMPLATE_FILENAME: string = 'certificate-template.pdf'
-const SPECIMEN_STAMP_FILENAME: string = 'specimen-stamp.pdf'
-const DEMO_PARTNER_CODE_PREFIX: string = 'demo-'
 
 export class CertificatePdfGenerator implements CertificateGenerator {
+  #pdfProcessor: PDFProcessor
+
+  constructor (pdfProcessor: PDFProcessor) {
+    this.#pdfProcessor = pdfProcessor
+  }
+
   async generate (policy: Policy): Promise<Certificate> {
-    let certificateTemplateBuffer = await pdftk
-      .input(path.join(__dirname, CERTIFICATE_TEMPLATE_FILENAME))
-      .uncompress()
-      .output()
+    let certificateTemplateBuffer = await this.#pdfProcessor.readPdfFile(path.join(__dirname, CERTIFICATE_TEMPLATE_FILENAME), policy.partnerCode)
 
     certificateTemplateBuffer = replace(certificateTemplateBuffer, '[[firstname]]', _encodeForPdf(policy.contact.firstname))
     certificateTemplateBuffer = replace(certificateTemplateBuffer, '[[lastname]]', _encodeForPdf(policy.contact.lastname))
@@ -27,20 +28,9 @@ export class CertificatePdfGenerator implements CertificateGenerator {
     certificateTemplateBuffer = replace(certificateTemplateBuffer, '[[date_today]]', _encodeForPdf(_formatDate(new Date())))
     certificateTemplateBuffer = replace(certificateTemplateBuffer, '[[policy_id]]', _encodeForPdf(_formatPolicyId(policy.id)))
 
-    const filledUpCertificateBuffer = await this.reencodeToPdf(certificateTemplateBuffer, policy)
+    const filledUpCertificateBuffer = await this.#pdfProcessor.formatPdfBufferProperly(certificateTemplateBuffer)
 
     return { name: this.generateFileName(policy.id), buffer: filledUpCertificateBuffer }
-  }
-
-  private async reencodeToPdf (certificateTemplateBuffer: Buffer, policy: Policy): Promise<Buffer> {
-    if (this.isRelatedToADemoPartner(policy)) {
-      return pdftk.input(certificateTemplateBuffer).stamp(path.join(__dirname, SPECIMEN_STAMP_FILENAME)).compress().output()
-    }
-    return pdftk.input(certificateTemplateBuffer).compress().output()
-  }
-
-  private isRelatedToADemoPartner (policy: Policy) {
-    return policy.partnerCode.startsWith(DEMO_PARTNER_CODE_PREFIX)
   }
 
   private generateFileName (policyId: string): string {

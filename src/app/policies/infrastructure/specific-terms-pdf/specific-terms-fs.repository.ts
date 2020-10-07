@@ -13,6 +13,7 @@ export class SpecificTermsFSRepository implements SpecificTermsRepository {
   async get (specificTermsName: string): Promise<SpecificTerms> {
     const specificTermsFilePath: string = this.getSpecificTermsFilePath(specificTermsName)
     try {
+      // TODO migrate to PDFTkProcessor
       const buffer = await pdftk
         .input(specificTermsFilePath)
         .output()
@@ -27,6 +28,7 @@ export class SpecificTermsFSRepository implements SpecificTermsRepository {
 
   async save (specificTerms: SpecificTerms): Promise<SpecificTerms> {
     const specificTermsFilePath: string = this.getSpecificTermsFilePath(specificTerms.name)
+    // TODO migrate to PDFTkProcessor
     await pdftk
       .input(specificTerms.buffer)
       .compress()

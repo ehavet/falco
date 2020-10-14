@@ -14,16 +14,20 @@ import {
 } from '../../../../src/app/policies/domain/specific-terms/specific-terms.errors'
 import { SpecificTermsGenerator } from '../../../../src/app/policies/domain/specific-terms/specific-terms.generator'
 import { SpecificTermsFSRepository } from '../../../../src/app/policies/infrastructure/specific-terms-pdf/specific-terms-fs.repository'
+import { PDFProcessor } from '../../../../src/app/policies/infrastructure/pdf/pdf-processor'
+import { PDFtkPDFProcessor } from '../../../../src/app/policies/infrastructure/pdf/pdftk.pdf-processor'
 
 describe('Policies - Infra - Specific terms FS Repository', async () => {
   const specificTermsFolderPath: string = config.get('FALCO_API_DOCUMENTS_STORAGE_FOLDER')
-  const specificTermsGenerator: SpecificTermsGenerator = new SpecificTermsPdfGenerator()
+  const pdfProcessor: PDFProcessor = new PDFtkPDFProcessor()
+  const specificTermsGenerator: SpecificTermsGenerator = new SpecificTermsPdfGenerator(pdfProcessor)
   let specificTermsPdfRepository : SpecificTermsRepository
   let specificTermsToSave: SpecificTerms
   let policy: Policy
 
-  beforeEach(async () => {
+  beforeEach(async function () {
     // Given
+    this.timeout(10000)
     await fsx.emptyDir(specificTermsFolderPath)
     policy = createPolicyFixture({ partnerCode: 'essca' })
     policy.termEndDate = dayjs(policy.termStartDate).add(1, 'month').toDate()

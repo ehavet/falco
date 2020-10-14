@@ -84,6 +84,10 @@ export namespace Policy {
       return policy.insurance.productCode
     }
 
+    export function getPartnerCode (policy: Policy): string {
+      return policy.partnerCode
+    }
+
     function _computeTermEndDate (termStartDate: Date, durationInMonths: number): Date {
       return dayjs(termStartDate).add(durationInMonths, 'month').subtract(1, 'day').toDate()
     }

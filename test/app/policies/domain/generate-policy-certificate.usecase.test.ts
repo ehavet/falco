@@ -3,7 +3,7 @@ import { Policy } from '../../../../src/app/policies/domain/policy'
 import { PolicyRepository } from '../../../../src/app/policies/domain/policy.repository'
 import { expect, sinon } from '../../../test-utils'
 import { SinonStubbedInstance } from 'sinon'
-import { CertificateRepository } from '../../../../src/app/policies/domain/certificate/certificate.repository'
+import { CertificateGenerator } from '../../../../src/app/policies/domain/certificate/certificate.generator'
 import { Certificate } from '../../../../src/app/policies/domain/certificate/certificate'
 import { GeneratePolicyCertificate } from '../../../../src/app/policies/domain/certificate/generate-policy-certificate.usecase'
 import { GeneratePolicyCertificateQuery } from '../../../../src/app/policies/domain/certificate/generate-policy-certificate-query'
@@ -14,12 +14,12 @@ import { PolicyCanceledError } from '../../../../src/app/policies/domain/policie
 describe('Policies - Usecase - Generate policy certificate', async () => {
   const policyRepository: SinonStubbedInstance<PolicyRepository> = policyRepositoryStub()
 
-  const certificateRepository: SinonStubbedInstance<CertificateRepository> = { generate: sinon.mock() }
+  const certificateGenerator: SinonStubbedInstance<CertificateGenerator> = { generate: sinon.mock() }
 
-  const generatePolicyCertificate: GeneratePolicyCertificate = GeneratePolicyCertificate.factory(policyRepository, certificateRepository)
+  const generatePolicyCertificate: GeneratePolicyCertificate = GeneratePolicyCertificate.factory(policyRepository, certificateGenerator)
 
   afterEach(() => {
-    certificateRepository.generate.reset()
+    certificateGenerator.generate.reset()
   })
 
   it('should return the certificate generated', async () => {
@@ -33,7 +33,7 @@ describe('Policies - Usecase - Generate policy certificate', async () => {
       name: '`Appenin_Attestation_assurance_habitation_APP854732084.pdf`',
       buffer: Buffer.from('certificate')
     }
-    certificateRepository.generate.withArgs(policyFromDb).resolves(expectedGeneratedCertificate)
+    certificateGenerator.generate.withArgs(policyFromDb).resolves(expectedGeneratedCertificate)
 
     // When
     const generatedCertificate: Certificate = await generatePolicyCertificate(generatePolicyCertificateQuery)

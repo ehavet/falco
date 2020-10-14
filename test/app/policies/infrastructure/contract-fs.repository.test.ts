@@ -15,11 +15,14 @@ import { ContractFsRepository } from '../../../../src/app/policies/infrastructur
 import { SpecificTermsGenerator } from '../../../../src/app/policies/domain/specific-terms/specific-terms.generator'
 import { SpecificTermsPdfGenerator } from '../../../../src/app/policies/infrastructure/specific-terms-pdf/specific-terms-pdf.generator'
 import { SignedContractNotFoundError } from '../../../../src/app/policies/domain/contract/contract.errors'
+import { PDFProcessor } from '../../../../src/app/policies/infrastructure/pdf/pdf-processor'
+import { PDFtkPDFProcessor } from '../../../../src/app/policies/infrastructure/pdf/pdftk.pdf-processor'
 
 describe('Policies - Infra - Contract FS Repository', async () => {
   const documentsFolderPath: string = config.get('FALCO_API_DOCUMENTS_STORAGE_FOLDER')
-  const contractGenerator: ContractGenerator = new ContractPdfGenerator()
-  const specificTermsGenerator: SpecificTermsGenerator = new SpecificTermsPdfGenerator()
+  const pdfProcessor: PDFProcessor = new PDFtkPDFProcessor()
+  const contractGenerator: ContractGenerator = new ContractPdfGenerator(pdfProcessor)
+  const specificTermsGenerator: SpecificTermsGenerator = new SpecificTermsPdfGenerator(pdfProcessor)
   let contractPdfRepository : ContractRepository
   let contractToSave: Contract
   let policy: Policy
@@ -31,7 +34,7 @@ describe('Policies - Infra - Contract FS Repository', async () => {
     policy = createPolicyFixture({ partnerCode: 'essca' })
     policy.termEndDate = dayjs(policy.termStartDate).add(1, 'month').toDate()
     const specificTerms: SpecificTerms = await specificTermsGenerator.generate(policy)
-    contractToSave = await contractGenerator.generate(policy.id, policy.insurance.productCode, specificTerms)
+    contractToSave = await contractGenerator.generate(policy.id, policy.insurance.productCode, 'partnerCode', specificTerms)
     contractPdfRepository = new ContractFsRepository(config)
   })
 

@@ -1,4 +1,3 @@
-import pdftk from 'node-pdftk'
 import replace from 'buffer-replace'
 import path from 'path'
 import { Policy } from '../../domain/policy'
@@ -6,12 +5,20 @@ import { SpecificTerms } from '../../domain/specific-terms/specific-terms'
 import {
   _encodeForPdf,
   _formatDate,
-  _formatNumber, _formatOtherInsured,
+  _formatNumber,
+  _formatOtherInsured,
   _formatPolicyId
 } from '../../../common-api/infrastructure/pdf-formatter'
 import { SpecificTermsGenerator } from '../../domain/specific-terms/specific-terms.generator'
+import { PDFProcessor } from '../pdf/pdf-processor'
 
 export class SpecificTermsPdfGenerator implements SpecificTermsGenerator {
+  #pdfProcessor: PDFProcessor
+
+  constructor (pdfProcessor: PDFProcessor) {
+    this.#pdfProcessor = pdfProcessor
+  }
+
   async generate (policy: Policy): Promise<SpecificTerms> {
     const specificTermsName: string = this.getNameFor(policy.id)
     const buffer = await this.fillupSpecificTermsTemplate(policy)
@@ -25,10 +32,7 @@ export class SpecificTermsPdfGenerator implements SpecificTermsGenerator {
 
   private async fillupSpecificTermsTemplate (policy: Policy) {
     const templateName: string = `specific-terms-template-${policy.partnerCode}.pdf`
-    let specificTermsTemplateBuffer = await pdftk
-      .input(path.join(__dirname, templateName))
-      .uncompress()
-      .output()
+    let specificTermsTemplateBuffer = await this.#pdfProcessor.readPdfFile(path.join(__dirname, templateName), policy.partnerCode)
 
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[start_date]', _encodeForPdf(_formatDate(policy.termStartDate)))
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[policy_id]', _encodeForPdf(_formatPolicyId(policy.id)))
@@ -47,12 +51,8 @@ export class SpecificTermsPdfGenerator implements SpecificTermsGenerator {
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[default_deduction]', _formatNumber(policy.insurance.estimate.defaultDeductible))
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[subscribtion_date]', _encodeForPdf(_formatDate(new Date())))
 
-    const filledUpSpecificTermsBuffer = await this.reencodeProperlyPdf(specificTermsTemplateBuffer)
+    const filledUpSpecificTermsBuffer = await this.#pdfProcessor.formatPdfBufferProperly(specificTermsTemplateBuffer)
 
     return filledUpSpecificTermsBuffer
-  }
-
-  private async reencodeProperlyPdf (certificateTemplateBuffer: Buffer): Promise<Buffer> {
-    return await pdftk.input(certificateTemplateBuffer).compress().output()
   }
 }

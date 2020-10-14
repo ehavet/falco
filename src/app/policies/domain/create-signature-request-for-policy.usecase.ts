@@ -41,7 +41,8 @@ export namespace CreateSignatureRequestForPolicy {
         await specificTermsRepository.save(specificTerms, policyId)
         try {
           const productCode = Policy.getProductCode(policy)
-          contract = await contractGenerator.generate(policyId, productCode, specificTerms)
+          const partnerCode = Policy.getPartnerCode(policy)
+          contract = await contractGenerator.generate(policyId, productCode, partnerCode, specificTerms)
         } catch (error) {
           throw new ContractGenerationFailureError(policyId)
         }

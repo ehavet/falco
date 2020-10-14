@@ -1,5 +1,5 @@
 import { PolicyRepository } from '../policy.repository'
-import { CertificateRepository } from './certificate.repository'
+import { CertificateGenerator } from './certificate.generator'
 import { GeneratePolicyCertificateQuery } from './generate-policy-certificate-query'
 import { Certificate } from './certificate'
 import { Policy } from '../policy'
@@ -12,12 +12,12 @@ export interface GeneratePolicyCertificate {
 
 export namespace GeneratePolicyCertificate {
 
-    export function factory (policyRepository: PolicyRepository, certificateRepository: CertificateRepository): GeneratePolicyCertificate {
+    export function factory (policyRepository: PolicyRepository, certificateGenerator: CertificateGenerator): GeneratePolicyCertificate {
       return async (generatePolicyCertificateQuery: GeneratePolicyCertificateQuery): Promise<Certificate> => {
         const policy: Policy = await policyRepository.get(generatePolicyCertificateQuery.policyId)
         if (Policy.isCancelled(policy)) { throw new PolicyCanceledError(policy.id) }
         if (policy.status === Policy.Status.Applicable) {
-          return certificateRepository.generate(policy)
+          return certificateGenerator.generate(policy)
         }
         throw new PolicyForbiddenCertificateGenerationError()
       }

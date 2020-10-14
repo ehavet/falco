@@ -1,17 +1,22 @@
-import pdftk from 'node-pdftk'
 import replace from 'buffer-replace'
 import * as path from 'path'
-import { CertificateRepository } from '../../domain/certificate/certificate.repository'
+import { CertificateGenerator } from '../../domain/certificate/certificate.generator'
 import { Policy } from '../../domain/policy'
 import { Certificate } from '../../domain/certificate/certificate'
 import { _encodeForPdf, _formatDate, _formatPolicyId } from '../../../common-api/infrastructure/pdf-formatter'
+import { PDFProcessor } from '../pdf/pdf-processor'
 
-export class CertificatePdfRepository implements CertificateRepository {
+const CERTIFICATE_TEMPLATE_FILENAME: string = 'certificate-template.pdf'
+
+export class CertificatePdfGenerator implements CertificateGenerator {
+  #pdfProcessor: PDFProcessor
+
+  constructor (pdfProcessor: PDFProcessor) {
+    this.#pdfProcessor = pdfProcessor
+  }
+
   async generate (policy: Policy): Promise<Certificate> {
-    let certificateTemplateBuffer = await pdftk
-      .input(path.join(__dirname, 'certificate-template.pdf'))
-      .uncompress()
-      .output()
+    let certificateTemplateBuffer = await this.#pdfProcessor.readPdfFile(path.join(__dirname, CERTIFICATE_TEMPLATE_FILENAME), policy.partnerCode)
 
     certificateTemplateBuffer = replace(certificateTemplateBuffer, '[[firstname]]', _encodeForPdf(policy.contact.firstname))
     certificateTemplateBuffer = replace(certificateTemplateBuffer, '[[lastname]]', _encodeForPdf(policy.contact.lastname))
@@ -23,16 +28,12 @@ export class CertificatePdfRepository implements CertificateRepository {
     certificateTemplateBuffer = replace(certificateTemplateBuffer, '[[date_today]]', _encodeForPdf(_formatDate(new Date())))
     certificateTemplateBuffer = replace(certificateTemplateBuffer, '[[policy_id]]', _encodeForPdf(_formatPolicyId(policy.id)))
 
-    const filledUpCertificateBuffer = await this.reencodeProperlyPdf(certificateTemplateBuffer)
+    const filledUpCertificateBuffer = await this.#pdfProcessor.formatPdfBufferProperly(certificateTemplateBuffer)
 
     return { name: this.generateFileName(policy.id), buffer: filledUpCertificateBuffer }
   }
 
   private generateFileName (policyId: string): string {
     return `Appenin_Attestation_assurance_habitation_${policyId}.pdf`
-  }
-
-  private async reencodeProperlyPdf (certificateTemplateBuffer: Buffer): Promise<Buffer> {
-    return await pdftk.input(certificateTemplateBuffer).compress().output()
   }
 }

@@ -1,6 +1,6 @@
 import { PolicyRepository } from './policy.repository'
 import { Policy } from './policy'
-import { CertificateRepository } from './certificate/certificate.repository'
+import { CertificateGenerator } from './certificate/certificate.generator'
 import { Mailer } from '../../common-api/domain/mailer'
 import { buildSubscriptionValidationEmail } from './subscription-validation.email'
 import { CertificateGenerationError } from './certificate/certificate.errors'
@@ -15,7 +15,7 @@ export interface ConfirmPaymentIntentForPolicy {
 export namespace ConfirmPaymentIntentForPolicy {
     export function factory (
       policyRepository: PolicyRepository,
-      certificateRepository: CertificateRepository,
+      certificateGenerator: CertificateGenerator,
       contractGenerator: ContractGenerator,
       contractRepository: ContractRepository,
       mailer: Mailer
@@ -27,7 +27,7 @@ export namespace ConfirmPaymentIntentForPolicy {
 
         let certificate
         try {
-          certificate = await certificateRepository.generate(policy)
+          certificate = await certificateGenerator.generate(policy)
         } catch (e) {
           throw new CertificateGenerationError(policyId)
         }

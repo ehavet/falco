@@ -28,7 +28,6 @@ import { GetPolicySpecificTermsQuery } from '../../domain/specific-terms/get-pol
 import { SpecificTerms } from '../../domain/specific-terms/specific-terms'
 import { SpecificTermsNotFoundError } from '../../domain/specific-terms/specific-terms.errors'
 import { ContractGenerationFailureError, SignatureRequestCreationFailureError, SpecificTermsGenerationFailureError } from '../../domain/signature-request.errors'
-import { UpdatePolicyCommand } from '../../domain/update-policy.usecase'
 import { OperationCodeNotApplicableError } from '../../domain/operation-code.errors'
 import { ApplySpecialOperationCodeCommand } from '../../domain/apply-special-operation-code-command'
 import { PartnerNotFoundError } from '../../../partners/domain/partner.errors'
@@ -159,57 +158,6 @@ export default function (container: Container): Array<ServerRoute> {
             throw Boom.notFound(error.message)
           }
           throw Boom.internal(error)
-        }
-      }
-    },
-    {
-      method: 'PUT',
-      path: '/v0/policies/{id}',
-      options: {
-        tags: TAGS,
-        description: 'Updates a policy',
-        validate: {
-          params: Joi.object({
-            id: Joi.string().min(12).max(12).required().description('Policy id').example('APP365094241')
-          }),
-          payload: Joi.object({
-            spec_ops_code: Joi.string().optional().description('Special code operation to apply on policy').example('MYCODE'),
-            start_date: Joi.date().required().description('Start date').example('2020-04-26')
-          })
-        },
-        response: {
-          status: {
-            200: policySchema,
-            400: HttpErrorSchema.badRequestSchema,
-            404: HttpErrorSchema.notFoundSchema,
-            409: HttpErrorSchema.conflictSchema,
-            422: HttpErrorSchema.unprocessableEntitySchema,
-            500: HttpErrorSchema.internalServerErrorSchema
-          }
-        }
-      },
-      handler: async (request, h) => {
-        const payload: any = request.payload
-        const command: UpdatePolicyCommand = {
-          policyId: request.params.id,
-          startDate: new Date(payload.start_date),
-          operationCode: payload.spec_ops_code
-        }
-        try {
-          const createdPolicy: Policy = await container.UpdatePolicy(command)
-          return h.response(policyToResource(createdPolicy)).code(200)
-        } catch (error) {
-          switch (true) {
-            case error instanceof PolicyNotFoundError:
-              throw Boom.notFound(error.message)
-            case error instanceof OperationCodeNotApplicableError:
-              throw Boom.badData(error.message)
-            case error instanceof PolicyCanceledError:
-            case error instanceof PolicyNotUpdatableError:
-              throw Boom.conflict(error.message)
-            default:
-              throw Boom.internal(error)
-          }
         }
       }
     },

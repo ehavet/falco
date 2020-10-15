@@ -43,7 +43,6 @@ import { logger } from '../../libs/logger'
 import { Mailer } from '../common-api/domain/mailer'
 import { Nodemailer } from '../common-api/infrastructure/nodemailer.mailer'
 import { nodemailerTransporter } from '../../libs/nodemailer'
-import { UpdatePolicy } from './domain/update-policy.usecase'
 import { ApplySpecialOperationCodeOnPolicy } from './domain/apply-special-operation-code-on-policy.usecase'
 import { ApplyStartDateOnPolicy } from './domain/apply-start-date-on-policy.usecase'
 import { PolicyInsuranceSqlModel } from '../quotes/infrastructure/policy-insurance-sql.model'
@@ -64,7 +63,6 @@ export interface Container {
     CreateSignatureRequestForPolicy: CreateSignatureRequestForPolicy
     GetPolicySpecificTerms: GetPolicySpecificTerms,
     ManageSignatureRequestEvent: ManageSignatureRequestEvent,
-    UpdatePolicy: UpdatePolicy,
     ApplySpecialOperationCodeOnPolicy: ApplySpecialOperationCodeOnPolicy,
     ApplyStartDateOnPolicy: ApplyStartDateOnPolicy
 }
@@ -104,7 +102,6 @@ const createSignatureRequestForPolicy: CreateSignatureRequestForPolicy = CreateS
   )
 const manageSignatureRequestEvent: ManageSignatureRequestEvent = ManageSignatureRequestEvent.factory(signatureRequestEventValidator, signatureRequestProvider, policyRepository, contractRepository, logger)
 const applySpecialOperationCodeOnPolicy: ApplySpecialOperationCodeOnPolicy = ApplySpecialOperationCodeOnPolicy.factory(policyRepository, partnerRepository)
-const updatePolicy: UpdatePolicy = UpdatePolicy.factory(policyRepository, applySpecialOperationCodeOnPolicy)
 const applyStartDateOnPolicy: ApplyStartDateOnPolicy = ApplyStartDateOnPolicy.factory(policyRepository)
 
 export const container: Container = {
@@ -117,7 +114,6 @@ export const container: Container = {
   GetPolicySpecificTerms: getPolicySpecificTerms,
   CreateSignatureRequestForPolicy: createSignatureRequestForPolicy,
   ManageSignatureRequestEvent: manageSignatureRequestEvent,
-  UpdatePolicy: updatePolicy,
   ApplySpecialOperationCodeOnPolicy: applySpecialOperationCodeOnPolicy,
   ApplyStartDateOnPolicy: applyStartDateOnPolicy
 }

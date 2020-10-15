@@ -51,13 +51,22 @@ describe('Policies - Domain', async () => {
         expect(idPrefix).to.equal('MYP')
       })
 
-      it('with 9 last characters are random numbers', async () => {
+      it('with 3 next characters are from partners product code', async () => {
         // When
         const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository, partner)
 
         // Then
-        const idSuffix: string = createdPolicy.id.substring(3, 12)
-        expect(idSuffix).to.match(/^[1-9]{9}/)
+        const idSuffix: string = createdPolicy.id.substring(3, 6)
+        expect(idSuffix).to.equal('666')
+      })
+
+      it('with 6 last characters are random numbers', async () => {
+        // When
+        const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository, partner)
+
+        // Then
+        const idSuffix: string = createdPolicy.id.substring(6, 12)
+        expect(idSuffix).to.match(/^[1-9]{6}/)
       })
 
       it('which does not already exists',

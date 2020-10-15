@@ -19,7 +19,7 @@ import { PDFtkPDFProcessor } from '../../../../src/app/policies/infrastructure/p
 
 describe('Policies - Infra - Specific terms FS Repository', async () => {
   const specificTermsFolderPath: string = config.get('FALCO_API_DOCUMENTS_STORAGE_FOLDER')
-  const pdfProcessor: PDFProcessor = new PDFtkPDFProcessor()
+  const pdfProcessor: PDFProcessor = new PDFtkPDFProcessor({ productionMode: false })
   const specificTermsGenerator: SpecificTermsGenerator = new SpecificTermsPdfGenerator(pdfProcessor)
   let specificTermsPdfRepository : SpecificTermsRepository
   let specificTermsToSave: SpecificTerms

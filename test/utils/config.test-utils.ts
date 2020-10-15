@@ -65,5 +65,7 @@ module.exports = Envie({
 
   FALCO_API_HELLO_SIGN_PRODUCTION_MODE: Joi.boolean().default(false),
 
-  FALCO_API_HELLO_SIGN_CLIENT_ID: Joi.string().default('91c073e7562d88f96d40d013c7b493ef')
+  FALCO_API_HELLO_SIGN_CLIENT_ID: Joi.string().default('91c073e7562d88f96d40d013c7b493ef'),
+
+  FALCO_API_PDF_GENERATION_PRODUCTION_MODE: Joi.boolean().default(false)
 }) as Config

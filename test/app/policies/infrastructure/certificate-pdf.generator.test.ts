@@ -9,46 +9,93 @@ import { PDFProcessor } from '../../../../src/app/policies/infrastructure/pdf/pd
 import { PDFtkPDFProcessor } from '../../../../src/app/policies/infrastructure/pdf/pdftk.pdf-processor'
 
 describe('Policies - Infra - Certificate PDF Generator', async () => {
-  const pdfProcessor: PDFProcessor = new PDFtkPDFProcessor()
-  const certificatePdfRepository : CertificateGenerator = new CertificatePdfGenerator(pdfProcessor)
+  describe('When on production mode', () => {
+    const pdfProcessor: PDFProcessor = new PDFtkPDFProcessor({ productionMode: true })
+    const certificatePdfRepository : CertificateGenerator = new CertificatePdfGenerator(pdfProcessor)
+    let certificate: Certificate
 
-  describe('For non demo partners', async () => {
-    it('should generate a new certificate with no specimen stamp on it', async () => {
+    before('generate certificate for a normal partner', async () => {
       // Given
-      const policy: Policy = createPolicyFixture()
-
+      const policy: Policy = createPolicyFixture({ partnerCode: 'appeninPartner' })
       // When
-      const certificate: Certificate = await certificatePdfRepository.generate(policy)
+      certificate = await certificatePdfRepository.generate(policy)
+    })
 
+    it('should retrieve policies information on generated certificate', async () => {
       // Then
       const certificateUncompressed = await pdftk.input(certificate.buffer).uncompress().output()
       expect(certificate.name).to.equal('Appenin_Attestation_assurance_habitation_APP753210859.pdf')
-      expect(certificateUncompressed.includes('SPECIMEN')).to.be.false
       expect(certificateUncompressed.includes('Jean Dupont')).to.be.true
       expect(certificateUncompressed.includes('13 rue du loup garou')).to.be.true
       expect(certificateUncompressed.includes('91100 Corbeil\\055Essones')).to.be.true
       expect(certificateUncompressed.includes('est assur\\351(e) par le contrat Assurance Habitation APPENIN n\\260 APP 753 210 859')).to.be.true
       expect(certificateUncompressed.includes('depuis le 05\\05701\\0572020 \\(prochaine \\351ch\\351ance le 05\\05701\\0572020\\)')).to.be.true
-    }).timeout(10000)
+    })
+
+    describe('For a partner which is not a demo partner', async () => {
+      it('should not add a specimen stamp on generated certificate', async () => {
+        // Then
+        const certificateUncompressed = await pdftk.input(certificate.buffer).uncompress().output()
+        expect(certificateUncompressed.includes('SPECIMEN')).to.be.false
+      })
+    })
+
+    describe('For a demo partner', async () => {
+      it('should add a specimen stamp on generated certificate', async () => {
+        // Given
+        const demoPolicy: Policy = createPolicyFixture({ partnerCode: 'demo-beta' })
+
+        // When
+        const demoPartnerCertificate = await certificatePdfRepository.generate(demoPolicy)
+
+        // Then
+        const certificateUncompressed = await pdftk.input(demoPartnerCertificate.buffer).uncompress().output()
+        expect(certificateUncompressed.includes('SPECIMEN')).to.be.true
+      })
+    })
   })
 
-  describe('For demo partners', async () => {
-    it('should generate a new certificate with a specimen stamp on it', async () => {
+  describe('When not on production mode', () => {
+    const pdfProcessor: PDFProcessor = new PDFtkPDFProcessor({ productionMode: false })
+    const certificatePdfRepository : CertificateGenerator = new CertificatePdfGenerator(pdfProcessor)
+    let certificate: Certificate
+    let demoPartnerCertificate: Certificate
+
+    before('generate certificate with different partners', async () => {
       // Given
-      const policy: Policy = createPolicyFixture({ partnerCode: 'demo-beta' })
+      const policy: Policy = createPolicyFixture({ partnerCode: 'appeninPartner' })
+      const demoPartnerpolicy: Policy = createPolicyFixture({ partnerCode: 'demo-beta' })
 
       // When
-      const certificate: Certificate = await certificatePdfRepository.generate(policy)
+      certificate = await certificatePdfRepository.generate(policy)
+      demoPartnerCertificate = await certificatePdfRepository.generate(demoPartnerpolicy)
+    })
 
+    it('should retrieve policies information on generated certificate', async () => {
       // Then
       const certificateUncompressed = await pdftk.input(certificate.buffer).uncompress().output()
       expect(certificate.name).to.equal('Appenin_Attestation_assurance_habitation_APP753210859.pdf')
-      expect(certificateUncompressed.includes('SPECIMEN')).to.be.true
       expect(certificateUncompressed.includes('Jean Dupont')).to.be.true
       expect(certificateUncompressed.includes('13 rue du loup garou')).to.be.true
       expect(certificateUncompressed.includes('91100 Corbeil\\055Essones')).to.be.true
       expect(certificateUncompressed.includes('est assur\\351(e) par le contrat Assurance Habitation APPENIN n\\260 APP 753 210 859')).to.be.true
       expect(certificateUncompressed.includes('depuis le 05\\05701\\0572020 \\(prochaine \\351ch\\351ance le 05\\05701\\0572020\\)')).to.be.true
-    }).timeout(10000)
+    })
+
+    describe('For a partner which is not a demo partner', async () => {
+      it('should add a specimen stamp on generated certificate', async () => {
+        // Then
+        const certificateUncompressed = await pdftk.input(certificate.buffer).uncompress().output()
+        expect(certificateUncompressed.includes('SPECIMEN')).to.be.true
+      })
+    })
+
+    describe('For a demo partners', async () => {
+      it('should add a specimen stamp on generated certificate', async () => {
+        // Then
+        const certificateUncompressed = await pdftk.input(demoPartnerCertificate.buffer).uncompress().output()
+        expect(certificateUncompressed.includes('SPECIMEN')).to.be.true
+      })
+    })
   })
 })

@@ -19,6 +19,7 @@ And make sure that :
 * You have been granted an access to the [Appenin falco-api gitlab repository](https://gitlab.com/appenin/falco-api)  
 * You have [added your ssh key to gitlab](https://docs.gitlab.com/ee/ssh/)
 * You have a `.env` file at the root of the project (you can take the `.env.example` as an example)
+* You will need to use your own Stripe/HelloSign API Key and replace it in your `.env`. See `.env.example` for more details in order to set `FALCO_API_STRIPE_API_KEY`, `FALCO_API_HELLO_SIGN_API_KEY`, `FALCO_API_HELLO_SIGN_CLIENT_ID`      
 
 ## Installation
 

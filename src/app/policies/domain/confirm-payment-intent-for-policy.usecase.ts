@@ -50,7 +50,7 @@ export namespace ConfirmPaymentIntentForPolicy {
 
         await createNewPayment(policyId, confirmPaymentIntentCommand, paymentRepository, paymentProcessor)
 
-        const certificate = await generateCertificate(policy, certificateRepository)
+        const certificate = await generateCertificate(policy, certificateGenerator)
 
         await sendSubscriptionValidationEmail(policy, certificate, signedContract, mailer)
       }

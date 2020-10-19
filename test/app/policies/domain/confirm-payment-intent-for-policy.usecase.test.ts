@@ -126,7 +126,7 @@ describe('PaymentProcessor - Usecase - confirm payment intent for policy', async
     })
     const certificate: Certificate = { name: 'filename', buffer: Buffer.alloc(1) }
     policyRepository.get.withArgs(policyId).resolves(policy)
-    certificateRepository.generate.withArgs(policy).resolves(certificate)
+    certificateGenerator.generate.withArgs(policy).resolves(certificate)
     contractGenerator.getContractName.withArgs(policyId).returns('signedContract.pdf')
     contractRepository.getSignedContract.withArgs('signedContract.pdf').resolves({ name: 'signedContract.pdf', buffer: Buffer.from('signedContract') })
 

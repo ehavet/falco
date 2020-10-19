@@ -15,6 +15,8 @@ import { SpecificTermsPdfGenerator } from '../../../../../src/app/policies/infra
 import { PaymentSqlModel } from '../../../../../src/app/policies/infrastructure/payment/payment-sql.model'
 import { PolicyRepository } from '../../../../../src/app/policies/domain/policy.repository'
 import { stripeTestUtils } from '../../../../utils/stripe.test-utils'
+import { PDFProcessor } from '../../../../../src/app/policies/infrastructure/pdf/pdf-processor'
+import { PDFtkPDFProcessor } from '../../../../../src/app/policies/infrastructure/pdf/pdftk.pdf-processor'
 
 async function resetDb () {
   await PaymentSqlModel.destroy({ truncate: true })
@@ -45,8 +47,9 @@ describe('PaymentProcessor - API - E2E', async () => {
       // Given
       this.timeout(10000)
       policyRepository = new PolicySqlRepository()
-      const contractGenerator: ContractGenerator = new ContractPdfGenerator()
-      const specificTermsGenerator: SpecificTermsGenerator = new SpecificTermsPdfGenerator()
+      const pdfProcessor: PDFProcessor = new PDFtkPDFProcessor()
+      const contractGenerator: ContractGenerator = new ContractPdfGenerator(pdfProcessor)
+      const specificTermsGenerator: SpecificTermsGenerator = new SpecificTermsPdfGenerator(pdfProcessor)
       const contractRepository = new ContractFsRepository(config)
 
       policyId = 'APP463109486'
@@ -62,7 +65,7 @@ describe('PaymentProcessor - API - E2E', async () => {
       await policyRepository.save(policy)
 
       const specificTerms: SpecificTerms = await specificTermsGenerator.generate(policy)
-      const contract = await contractGenerator.generate(policy.id, policy.insurance.productCode, specificTerms)
+      const contract = await contractGenerator.generate(policy.id, policy.insurance.productCode, policy.partnerCode, specificTerms)
       await contractRepository.saveSignedContract(contract)
 
       const stripeHeaderSignature = 'srt1p3s1gN4tUR3'

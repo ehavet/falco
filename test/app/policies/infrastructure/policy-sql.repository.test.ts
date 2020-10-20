@@ -6,7 +6,8 @@ import { dbTestUtils, expect } from '../../../test-utils'
 import { PolicySqlModel } from '../../../../src/app/policies/infrastructure/policy-sql.model'
 import { PolicyRiskSqlModel } from '../../../../src/app/quotes/infrastructure/policy-risk-sql.model'
 import { PolicyNotFoundError } from '../../../../src/app/policies/domain/policies.errors'
-import dayjs = require('dayjs')
+import { OperationCode } from '../../../../src/app/policies/domain/operation-code'
+import dayjs = require('dayjs');
 
 async function resetDb () {
   await PolicySqlModel.destroy({ truncate: true, cascade: true })
@@ -209,7 +210,7 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
   }).timeout(10000)
 
   describe('#update', async () => {
-    it('should update policy premium, nbMonthsDue, startDate, termStartDate/termEndDate', async () => {
+    it('should update policy premium, nbMonthsDue, startDate, termStartDate/termEndDate, specialOperationsCode & specialOperationsCodeAppliedAt', async () => {
       // Given
       const startDate: Date = new Date('2020-05-15T00:00:00Z')
       const endDate: Date = dayjs(startDate).add(1, 'month').toDate()
@@ -219,6 +220,8 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
       policy.startDate = startDate
       policy.termStartDate = startDate
       policy.termEndDate = endDate
+      policy.specialOperationsCode = OperationCode.SEMESTER2
+      policy.specialOperationsCodeAppliedAt = new Date('2020-10-26T00:00:00Z')
 
       // When
       await policyRepository
@@ -231,6 +234,8 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
       expect(updatedPolicy.startDate).to.deep.equal(policy.startDate)
       expect(updatedPolicy.termStartDate).to.deep.equal(policy.termStartDate)
       expect(updatedPolicy.termEndDate).to.deep.equal(policy.termEndDate)
+      expect(updatedPolicy.specialOperationsCode).to.deep.equal(policy.specialOperationsCode)
+      expect(updatedPolicy.specialOperationsCodeAppliedAt).to.deep.equal(policy.specialOperationsCodeAppliedAt)
     })
 
     it('should throw an error if the policy is not found', async () => {

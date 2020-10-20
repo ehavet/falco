@@ -18,6 +18,8 @@ export function policyToResource (policy: Policy) {
     signature_date: policy.signatureDate ? policy.signatureDate : null,
     payment_date: policy.paymentDate ? policy.paymentDate : null,
     email_validated: !!policy.emailValidationDate,
+    special_operations_code: policy.specialOperationsCode ?? null,
+    special_operations_code_applied_at: policy.specialOperationsCodeAppliedAt ?? null,
     status: policy.status
   }
 }

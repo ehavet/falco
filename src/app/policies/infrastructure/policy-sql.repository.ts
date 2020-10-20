@@ -123,6 +123,8 @@ export class PolicySqlRepository implements PolicyRepository {
       persitedPolicy.startDate = policy.startDate
       persitedPolicy.termStartDate = policy.termStartDate
       persitedPolicy.termEndDate = policy.termEndDate
+      persitedPolicy.specialOperationsCode = policy.specialOperationsCode
+      persitedPolicy.specialOperationsCodeAppliedAt = policy.specialOperationsCodeAppliedAt
       await persitedPolicy.save()
       return Promise.resolve()
     }

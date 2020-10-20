@@ -23,18 +23,8 @@ export namespace ApplySpecialOperationCodeOnPolicy {
         const partnerOperationCodes: Array<OperationCode> = await partnerRepository.getOperationCodes(policy.partnerCode)
 
         if (partnerOperationCodes.concat(OperationCode.BLANK).includes(operationCode)) {
-          switch (operationCode) {
-            case OperationCode.SEMESTER1:
-            case OperationCode.SEMESTER2:
-              Policy.applyNbMonthsDue(policy, 5)
-              break
-            case OperationCode.FULLYEAR:
-              Policy.applyNbMonthsDue(policy, 10)
-              break
-            case OperationCode.BLANK:
-              Policy.applyNbMonthsDue(policy, 12)
-          }
-          policyRepository.update(policy)
+          Policy.applySpecialOperationsCode(policy, operationCode)
+          await policyRepository.update(policy)
           return policy
         }
         throw new OperationCodeNotApplicableError(applySpecialOperationCodeCommand.operationCode, policy.partnerCode)

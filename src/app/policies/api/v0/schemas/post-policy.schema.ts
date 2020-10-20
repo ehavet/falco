@@ -63,7 +63,9 @@ export const policySchema: Joi.ObjectSchema = Joi.object({
   status: Joi.string().valid(...Object.keys(Policy.Status).map(key => Policy.Status[key])).required().description('Policy status').example('INITIATED'),
   risk: riskSchema.required().description('Policy Risks').label('Policy.Risks'),
   insurance: insuranceSchema.required().description('Policy Insurance').label('Policy.Insurance'),
-  contact: contactSchema.required().description('Policy Holder').label('Policy.Holder')
+  contact: contactSchema.required().description('Policy Holder').label('Policy.Holder'),
+  special_operations_code: Joi.string().required().allow(null).description('Operation special code applied').example('SEMESTER1'),
+  special_operations_code_applied_at: Joi.date().required().allow(null).description('Application date of operation special code').example('2020-04-25T10:09:09.000')
 }).label('Policy')
 
 export const createPolicyRequestSchema: Joi.ObjectSchema = Joi.object({

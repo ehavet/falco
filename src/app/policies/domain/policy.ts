@@ -6,6 +6,7 @@ import dayjs from '../../../libs/dayjs'
 import { Partner } from '../../partners/domain/partner'
 import * as PartnerFunc from '../../partners/domain/partner.func'
 import { PolicyStartDateConsistencyError, PolicyRiskRoommatesNotAllowedError, PolicyRiskNumberOfRoommatesError } from './policies.errors'
+import { OperationCode } from './operation-code'
 
 const DEFAULT_NUMBER_OF_MONTHS_DUE = 12
 
@@ -24,6 +25,8 @@ export interface Policy {
     paymentDate?: Date,
     subscriptionDate?: Date,
     emailValidationDate?: Date,
+    specialOperationsCode: OperationCode | null
+    specialOperationsCodeAppliedAt: Date | null
     readonly status: Policy.Status
 }
 
@@ -65,10 +68,24 @@ export namespace Policy {
       return policy.status === Policy.Status.Cancelled
     }
 
-    export function applyNbMonthsDue (policy: Policy, nbMonthsDue: number): void {
-      policy.premium = nbMonthsDue * policy.insurance.estimate.monthlyPrice
-      policy.nbMonthsDue = nbMonthsDue
-      policy.termEndDate = _computeTermEndDate(policy.startDate, nbMonthsDue)
+    export function applySpecialOperationsCode (policy: Policy, specialOperationsCode: OperationCode): void {
+      switch (specialOperationsCode) {
+        case OperationCode.SEMESTER1:
+          _applyNbMonthsDue(policy, 5)
+          _setSpecialOperationsCodeAndApplicationDate(policy, OperationCode.SEMESTER1)
+          break
+        case OperationCode.SEMESTER2:
+          _applyNbMonthsDue(policy, 5)
+          _setSpecialOperationsCodeAndApplicationDate(policy, OperationCode.SEMESTER2)
+          break
+        case OperationCode.FULLYEAR:
+          _applyNbMonthsDue(policy, 10)
+          _setSpecialOperationsCodeAndApplicationDate(policy, OperationCode.FULLYEAR)
+          break
+        case OperationCode.BLANK:
+          _applyNbMonthsDue(policy, 12)
+          _setSpecialOperationsCodeAndApplicationDate(policy)
+      }
     }
 
     export function applyStartDate (policy: Policy, startDate: Date): void {
@@ -86,10 +103,6 @@ export namespace Policy {
 
     export function getPartnerCode (policy: Policy): string {
       return policy.partnerCode
-    }
-
-    function _computeTermEndDate (termStartDate: Date, durationInMonths: number): Date {
-      return dayjs(termStartDate).add(durationInMonths, 'month').subtract(1, 'day').toDate()
     }
 
     export async function
@@ -116,7 +129,9 @@ export namespace Policy {
           paymentDate: undefined,
           subscriptionDate: undefined,
           emailValidationDate: undefined,
-          status: Policy.Status.Initiated
+          status: Policy.Status.Initiated,
+          specialOperationsCode: null,
+          specialOperationsCodeAppliedAt: null
         }
       }
 
@@ -144,6 +159,21 @@ export namespace Policy {
         email: queryContact.email,
         phoneNumber: queryContact.phoneNumber
       }
+    }
+
+    function _computeTermEndDate (termStartDate: Date, durationInMonths: number): Date {
+      return dayjs(termStartDate).add(durationInMonths, 'month').subtract(1, 'day').toDate()
+    }
+
+    function _applyNbMonthsDue (policy: Policy, nbMonthsDue: number): void {
+      policy.premium = nbMonthsDue * policy.insurance.estimate.monthlyPrice
+      policy.nbMonthsDue = nbMonthsDue
+      policy.termEndDate = _computeTermEndDate(policy.startDate, nbMonthsDue)
+    }
+
+    function _setSpecialOperationsCodeAndApplicationDate (policy: Policy, specialOperationsCode: OperationCode | null = null): void {
+      policy.specialOperationsCode = specialOperationsCode
+      policy.specialOperationsCodeAppliedAt = specialOperationsCode ? new Date() : null
     }
 }
 

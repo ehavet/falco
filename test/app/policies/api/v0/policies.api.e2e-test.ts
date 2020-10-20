@@ -67,8 +67,7 @@ describe('Policies - API - E2E', async () => {
         .send({ code: 'studyo', risk: { property: { room_count: 2 } } })
         .set('X-Consumer-Username', 'studyo')
 
-      const quoteId: string = response.body.id
-      requestParams.quote_id = quoteId
+      requestParams.quote_id = response.body.id
 
       // When
       response = await httpServer.api()
@@ -129,6 +128,8 @@ describe('Policies - API - E2E', async () => {
         term_end_date: '2021-04-04',
         subscription_date: null,
         signature_date: null,
+        special_operations_code: null,
+        special_operations_code_applied_at: null,
         payment_date: null,
         email_validated: false,
         status: 'INITIATED'
@@ -204,6 +205,8 @@ describe('Policies - API - E2E', async () => {
         subscription_date: '2020-01-05T10:09:08.000Z',
         signature_date: '2020-01-05T10:09:08.000Z',
         payment_date: '2020-01-05T10:09:08.000Z',
+        special_operations_code: null,
+        special_operations_code_applied_at: null,
         email_validated: true,
         status: 'INITIATED'
       }
@@ -287,6 +290,7 @@ describe('Policies - API - E2E', async () => {
           nbMonthsDue: 12
         }
       )
+      dateFaker.setCurrentDate(new Date('2020-01-05T10:09:08.000Z'))
       await policyRepository.save(initialPolicy)
       // When
       const response = await httpServer.api()
@@ -342,7 +346,9 @@ describe('Policies - API - E2E', async () => {
         signature_date: '2020-01-05T10:09:08.000Z',
         payment_date: '2020-01-05T10:09:08.000Z',
         email_validated: true,
-        status: 'INITIATED'
+        status: 'INITIATED',
+        special_operations_code: 'SEMESTER1',
+        special_operations_code_applied_at: '2020-01-05T10:09:08.000Z'
       }
       expect(response.body).to.deep.equal(expectedResourcePolicy)
     })
@@ -415,6 +421,8 @@ describe('Policies - API - E2E', async () => {
         signature_date: '2020-01-05T10:09:08.000Z',
         payment_date: '2020-01-05T10:09:08.000Z',
         email_validated: true,
+        special_operations_code: null,
+        special_operations_code_applied_at: null,
         status: 'INITIATED'
       }
       expect(response.body).to.deep.equal(expectedResourcePolicy)

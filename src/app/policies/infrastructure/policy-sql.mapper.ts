@@ -27,7 +27,9 @@ export function sqlToPolicyMapper (policySql: PolicySqlModel): Policy {
     paymentDate: policySql.paymentDate,
     subscriptionDate: policySql.subscriptionDate,
     emailValidationDate: policySql.emailValidationDate,
-    status: policySql.status
+    status: policySql.status,
+    specialOperationsCode: policySql.specialOperationsCode ?? null,
+    specialOperationsCodeAppliedAt: policySql.specialOperationsCodeAppliedAt ?? null
   }
 }
 

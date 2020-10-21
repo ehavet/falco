@@ -51,6 +51,7 @@ import { PolicyRiskSqlModel } from '../quotes/infrastructure/policy-risk-sql.mod
 import { PolicyRiskOtherPeopleSqlModel } from './infrastructure/policy-risk-other-people-sql.model'
 import { PDFProcessor } from './infrastructure/pdf/pdf-processor'
 import { PDFtkPDFProcessor } from './infrastructure/pdf/pdftk.pdf-processor'
+import { pdfGenerationConfig } from '../../configs/pdf-generation.config'
 const config = require('../../config')
 
 export interface Container {
@@ -67,7 +68,7 @@ export interface Container {
     ApplyStartDateOnPolicy: ApplyStartDateOnPolicy
 }
 
-const pdftkPDFProcessor: PDFProcessor = new PDFtkPDFProcessor()
+const pdftkPDFProcessor: PDFProcessor = new PDFtkPDFProcessor(pdfGenerationConfig)
 const policyRepository: PolicyRepository = new PolicySqlRepository()
 const quoteRepository: QuoteRepository = quoteContainer.quoteRepository
 const paymentProcessor: StripePaymentProcessor = new StripePaymentProcessor(stripe)

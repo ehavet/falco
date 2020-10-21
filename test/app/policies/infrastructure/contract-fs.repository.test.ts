@@ -20,7 +20,7 @@ import { PDFtkPDFProcessor } from '../../../../src/app/policies/infrastructure/p
 
 describe('Policies - Infra - Contract FS Repository', async () => {
   const documentsFolderPath: string = config.get('FALCO_API_DOCUMENTS_STORAGE_FOLDER')
-  const pdfProcessor: PDFProcessor = new PDFtkPDFProcessor()
+  const pdfProcessor: PDFProcessor = new PDFtkPDFProcessor({ productionMode: true })
   const contractGenerator: ContractGenerator = new ContractPdfGenerator(pdfProcessor)
   const specificTermsGenerator: SpecificTermsGenerator = new SpecificTermsPdfGenerator(pdfProcessor)
   let contractPdfRepository : ContractRepository

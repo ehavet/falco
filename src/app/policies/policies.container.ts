@@ -55,6 +55,7 @@ import { pdfGenerationConfig } from '../../configs/pdf-generation.config'
 import { PaymentRepository } from './domain/payment/payment.repository'
 import { PaymentSqlRepository } from './infrastructure/payment/payment-sql.repository'
 import { PaymentSqlModel } from './infrastructure/payment/payment-sql.model'
+import { PaymentPolicySqlModel } from './infrastructure/payment/payment-policy-sql.model'
 const config = require('../../config')
 
 export interface Container {
@@ -126,7 +127,7 @@ export const container: Container = {
 export const policySqlModels: Array<any> = [
   PolicySqlModel, PolicyPersonSqlModel, PolicyInsuranceSqlModel,
   PolicyRiskOtherPeopleSqlModel, PolicyPropertySqlModel, PolicyRiskSqlModel,
-  PaymentSqlModel
+  PaymentSqlModel, PaymentPolicySqlModel
 ]
 
 export function policiesRoutes () {

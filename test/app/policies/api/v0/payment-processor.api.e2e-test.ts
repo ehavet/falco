@@ -19,7 +19,7 @@ import { PDFProcessor } from '../../../../../src/app/policies/infrastructure/pdf
 import { PDFtkPDFProcessor } from '../../../../../src/app/policies/infrastructure/pdf/pdftk.pdf-processor'
 
 async function resetDb () {
-  await PaymentSqlModel.destroy({ truncate: true })
+  await PaymentSqlModel.destroy({ truncate: true, cascade: true })
   await PolicySqlModel.destroy({ truncate: true, cascade: true })
 }
 

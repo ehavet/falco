@@ -9,9 +9,11 @@ import { PolicySqlRepository } from '../../../../../src/app/policies/infrastruct
 import { PolicySqlModel } from '../../../../../src/app/policies/infrastructure/policy-sql.model'
 import { before } from 'mocha'
 import { createPaymentFixture } from '../../fixtures/payment/payment.fixture'
+import { Policy } from '../../../../../src/app/policies/domain/policy'
+import { PaymentPolicySqlModel } from '../../../../../src/app/policies/infrastructure/payment/payment-policy-sql.model'
 
 async function resetDb () {
-  await PaymentSqlModel.destroy({ truncate: true })
+  await PaymentSqlModel.destroy({ truncate: true, cascade: true })
   await PolicySqlModel.destroy({ truncate: true, cascade: true })
 }
 
@@ -34,11 +36,12 @@ describe('Payments - Infra - Payment SQL Repository', async () => {
   describe('#save', async () => {
     let paymentToSave : Payment
     let savedPayment: Payment
+    let savedPolicy: Policy
 
     before(async () => {
       // Given
       const policy = createPolicyFixture()
-      await policyRepository.save(policy)
+      savedPolicy = await policyRepository.save(policy)
 
       paymentToSave = createPaymentFixture({ policyId: policy.id })
 
@@ -61,7 +64,13 @@ describe('Payments - Infra - Payment SQL Repository', async () => {
       expect(paymentFromDb.status).to.equal(paymentToSave.status)
       expect(paymentFromDb.payedAt).to.deep.equal(paymentToSave.payedAt)
       expect(paymentFromDb.cancelledAt).to.deep.equal(paymentToSave.cancelledAt)
-      expect(paymentFromDb.policyId).to.equal(paymentToSave.policyId)
+
+      const paymentsPolicyInDb: PaymentPolicySqlModel[] = await PaymentPolicySqlModel.findAll()
+      expect(paymentsPolicyInDb).to.have.lengthOf(1)
+      const paymentPolicyInDb = paymentsPolicyInDb[0]
+      expect(paymentPolicyInDb.id).to.exist
+      expect(paymentPolicyInDb.policyId).to.equal(savedPolicy.id)
+      expect(paymentPolicyInDb.paymentId).to.equal(paymentFromDb.id)
     })
 
     it('should return the saved payment', async () => {

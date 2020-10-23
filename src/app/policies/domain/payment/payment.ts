@@ -1,7 +1,7 @@
 export interface Payment {
     id?: Payment.PaymentId,
     amount: Payment.AmountInCents,
-    currency: Payment.Curreny,
+    currency: Payment.Currency,
     processor: Payment.Processor,
     instrument: Payment.Instrument,
     externalId: string,
@@ -22,7 +22,7 @@ export namespace Payment {
         STRIPE = 'STRIPE'
     }
 
-    export enum Curreny {
+    export enum Currency {
         EUR = 'EUR'
     }
 

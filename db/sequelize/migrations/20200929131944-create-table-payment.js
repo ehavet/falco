@@ -8,18 +8,6 @@ module.exports = {
         primaryKey: true,
         allowNull: false
       },
-
-      policy_id: {
-        type: Sequelize.STRING,
-        references: {
-          model: {
-            tableName: 'policy'
-          },
-          key: 'id'
-        },
-        allowNull: false
-      },
-
       amount: Sequelize.INTEGER,
       currency: Sequelize.STRING,
       processor: Sequelize.STRING,

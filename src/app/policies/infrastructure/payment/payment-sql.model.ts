@@ -13,7 +13,7 @@ export class PaymentSqlModel extends Model<PaymentSqlModel> {
     amount!: number
 
     @Column
-    currency!: Payment.Curreny
+    currency!: Payment.Currency
 
     @Column
     processor!: Payment.Processor
@@ -35,7 +35,4 @@ export class PaymentSqlModel extends Model<PaymentSqlModel> {
 
     @Column(DataType.DATE)
     cancelledAt: Date | null = null
-
-    @Column
-    policyId!: string
 }

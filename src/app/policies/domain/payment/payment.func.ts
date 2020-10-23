@@ -4,7 +4,7 @@ export function createValidPayment (policyId: string, externalId: string, amount
   processor: Payment.Processor, instrument: Payment.Instrument, pspFee: number | null): Payment {
   return {
     amount: amount,
-    currency: Payment.Curreny.EUR,
+    currency: Payment.Currency.EUR,
     processor: processor,
     instrument: instrument,
     externalId,

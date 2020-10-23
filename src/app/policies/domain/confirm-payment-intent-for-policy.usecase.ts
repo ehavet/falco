@@ -48,7 +48,7 @@ export namespace ConfirmPaymentIntentForPolicy {
 
         await policyRepository.updateAfterPayment(policyId, currentDate, currentDate, Policy.Status.Applicable)
 
-        await createNewPayment(policyId, confirmPaymentIntentCommand, paymentRepository, paymentProcessor)
+        await createPayment(policyId, confirmPaymentIntentCommand, paymentRepository, paymentProcessor)
 
         const certificate = await generateCertificate(policy, certificateGenerator)
 
@@ -61,7 +61,7 @@ export namespace ConfirmPaymentIntentForPolicy {
       return await contractRepository.getSignedContract(contractFileName)
     }
 
-    async function createNewPayment (policyId: string, confirmPaymentIntentCommand: ConfirmPaymentIntentCommand, paymentRepository: PaymentRepository, paymentProcessor: PaymentProcessor) {
+    async function createPayment (policyId: string, confirmPaymentIntentCommand: ConfirmPaymentIntentCommand, paymentRepository: PaymentRepository, paymentProcessor: PaymentProcessor) {
       const pspFee = await paymentProcessor.getTransactionFee(confirmPaymentIntentCommand.rawPaymentIntent)
       const payment = PaymentFunc.createValidPayment(policyId, confirmPaymentIntentCommand.externalId, confirmPaymentIntentCommand.amount, confirmPaymentIntentCommand.processor, confirmPaymentIntentCommand.instrument, pspFee)
       await paymentRepository.save(payment)

@@ -1,7 +1,7 @@
 import { PaymentSqlModel } from './payment-sql.model'
 import { Payment } from '../../domain/payment/payment'
 
-export function sqlToDomain (paymentSql: PaymentSqlModel): Payment {
+export function sqlToDomain (paymentSql: PaymentSqlModel, policyId: string): Payment {
   return {
     id: paymentSql.id,
     amount: paymentSql.amount,
@@ -13,6 +13,6 @@ export function sqlToDomain (paymentSql: PaymentSqlModel): Payment {
     status: paymentSql.status,
     payedAt: paymentSql.payedAt,
     cancelledAt: paymentSql.cancelledAt,
-    policyId: paymentSql.policyId
+    policyId: policyId
   }
 }

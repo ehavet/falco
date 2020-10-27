@@ -17,7 +17,7 @@ export default function (container: Container): Array<ServerRoute> {
       path: '/internal/v0/email-validations/validate',
       options: {
         tags: TAGS,
-        description: 'Validate email addresse and return a associate callback url',
+        description: 'Validate email address and return a associate callback url',
         validate: {
           payload: Joi.object({
             token: Joi.string().min(1).required()

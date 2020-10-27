@@ -39,3 +39,12 @@ function _getQuestionOnRoommates (partner: Partner) {
     .find(question => question.code === Partner.Question.QuestionCode.Roommate)
   return roommateQuestion
 }
+
+export function isPropertyRoomCountCovered (partner: Partner, propertyRoomCount): boolean {
+  return !!partner.offer.pricingMatrix.get(propertyRoomCount)
+}
+
+export function isPropertyAllowNumberOfRoommates (partner: Partner, numberOfRoommates: number, risk: Quote.Risk): boolean {
+  const maxNumberOfRoommates = getMaxNumberOfRoommatesForProperty(partner, risk)
+  return numberOfRoommates <= maxNumberOfRoommates
+}

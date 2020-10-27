@@ -1,12 +1,26 @@
 import * as Boom from '@hapi/boom'
 import { ServerRoute } from '@hapi/hapi'
-import { GetQuoteQuery } from '../../domain/get-quote-query'
+import { CreateQuoteCommand } from '../../domain/create-quote-command'
 import { quoteToResource } from './quote-to-resource.mapper'
 import { Container } from '../../quote.container'
 import { PartnerNotFoundError } from '../../../partners/domain/partner.errors'
-import { NoPartnerInsuranceForRiskError } from '../../domain/quote.errors'
+import {
+  NoPartnerInsuranceForRiskError,
+  QuoteRiskPropertyRoomCountNotInsurableError,
+  QuoteNotFoundError,
+  QuoteRiskNumberOfRoommatesError,
+  QuoteRiskRoommatesNotAllowedError,
+  QuoteStartDateConsistencyError
+} from '../../domain/quote.errors'
 import Joi from '@hapi/joi'
 import * as HttpErrorSchema from '../../../common-api/HttpErrorSchema'
+import { quotePostRequestBodySchema } from './schemas/quotes-post-request.schema'
+import { quotePutRequestBodySchema } from './schemas/quotes-put-request.schema'
+import { quoteResponseBodySchema } from './schemas/quotes-response.schema'
+import { UpdateQuoteCommand } from '../../domain/update-quote-command'
+import { requestToUpdateQuoteCommand } from './mappers/request-to-update-quote-command.mapper'
+import { updatedQuoteToResource } from './mappers/updated-quote-to-resource.mapper'
+import { OperationCodeNotApplicableError } from '../../../policies/domain/operation-code.errors'
 
 const TAGS = ['api', 'quotes']
 
@@ -17,16 +31,9 @@ export default function (container: Container): Array<ServerRoute> {
       path: '/v0/quotes',
       options: {
         tags: TAGS,
-        description: 'Get a quote',
+        description: 'Create a quote',
         validate: {
-          payload: Joi.object({
-            code: Joi.string().required().description('Code').example('myCode'),
-            risk: Joi.object({
-              property: Joi.object({
-                room_count: Joi.number().integer().max(5).required().description('Property number of rooms').example(3)
-              }).required().description('Risks regarding the property').label('Risk.Property')
-            }).required().description('Risks').label('Risk')
-          }).options({ stripUnknown: true })
+          payload: quotePostRequestBodySchema
         },
         response: {
           status: {
@@ -59,10 +66,10 @@ export default function (container: Container): Array<ServerRoute> {
       },
       handler: async (request, h) => {
         const payload: any = request.payload
-        const getQuoteQuery: GetQuoteQuery = { partnerCode: payload.code, risk: { property: { roomCount: payload.risk.property.room_count } } }
+        const createQuoteCommand: CreateQuoteCommand = { partnerCode: payload.code, risk: { property: { roomCount: payload.risk.property.room_count } } }
 
         try {
-          const quote = await container.GetQuote(getQuoteQuery)
+          const quote = await container.CreateQuote(createQuoteCommand)
           const quoteAsResource = quoteToResource(quote)
           return h.response(quoteAsResource).code(201)
         } catch (error) {
@@ -76,6 +83,53 @@ export default function (container: Container): Array<ServerRoute> {
           throw Boom.internal(error)
         }
       }
+    },
+    {
+      method: 'PUT',
+      path: '/v0/quotes/{id}',
+      options: {
+        tags: TAGS,
+        description: 'Update a quote',
+        validate: {
+          params: Joi.object({
+            id: Joi.string().min(6).max(12).required().description('Quote id').example('DU6C73X')
+          }),
+          payload: quotePutRequestBodySchema
+        },
+        response: {
+          status: {
+            201: quoteResponseBodySchema,
+            400: HttpErrorSchema.badRequestSchema,
+            404: HttpErrorSchema.notFoundSchema,
+            422: HttpErrorSchema.unprocessableEntitySchema,
+            500: HttpErrorSchema.internalServerErrorSchema
+          }
+        }
+      },
+      handler: async (request, h) => {
+        const updateQuoteCommand: UpdateQuoteCommand = requestToUpdateQuoteCommand(request)
+
+        try {
+          const quote = await container.UpdateQuote(updateQuoteCommand)
+          const quoteAsResource = updatedQuoteToResource(quote)
+          return h.response(quoteAsResource).code(200)
+        } catch (error) {
+          switch (true) {
+            case error instanceof PartnerNotFoundError:
+            case error instanceof QuoteNotFoundError:
+              throw Boom.notFound(error.message)
+            case error instanceof QuoteRiskPropertyRoomCountNotInsurableError:
+            case error instanceof OperationCodeNotApplicableError:
+            case error instanceof QuoteStartDateConsistencyError:
+            case error instanceof QuoteRiskRoommatesNotAllowedError:
+            case error instanceof QuoteRiskNumberOfRoommatesError:
+              throw Boom.badData(error.message)
+            default:
+              throw Boom.internal(error)
+          }
+        }
+      }
     }
+
   ]
 }

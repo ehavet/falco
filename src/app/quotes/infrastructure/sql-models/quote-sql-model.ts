@@ -1,6 +1,7 @@
-import { BelongsTo, Column, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript'
+import { BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript'
 import { QuoteInsuranceSqlModel } from './quote-insurance-sql.model'
 import { QuoteRiskSqlModel } from './quote-risk-sql.model'
+import { QuotePersonSqlModel } from './quote-person-sql.model'
 
 @Table({ timestamps: true, tableName: 'quote', underscored: true })
 export class QuoteSqlModel extends Model<QuoteSqlModel> {
@@ -10,6 +11,21 @@ export class QuoteSqlModel extends Model<QuoteSqlModel> {
 
     @Column
     partnerCode!: string
+
+    @Column
+    premium!: number
+
+    @Column
+    nbMonthsDue!: number
+
+    @Column({ type: DataType.DATEONLY })
+    startDate!: Date
+
+    @Column({ type: DataType.DATEONLY })
+    termStartDate!: Date
+
+    @Column({ type: DataType.DATEONLY })
+    termEndDate!: Date
 
     @ForeignKey(() => QuoteInsuranceSqlModel)
     @Column
@@ -24,4 +40,11 @@ export class QuoteSqlModel extends Model<QuoteSqlModel> {
 
     @BelongsTo(() => QuoteRiskSqlModel)
     risk!: QuoteRiskSqlModel
+
+    @ForeignKey(() => QuotePersonSqlModel)
+    @Column
+    policyHolderId?: string;
+
+    @BelongsTo(() => QuotePersonSqlModel)
+    policyHolder?: QuotePersonSqlModel
 }

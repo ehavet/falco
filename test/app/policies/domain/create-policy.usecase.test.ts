@@ -5,7 +5,7 @@ import { CreatePolicy } from '../../../../src/app/policies/domain/create-policy.
 import { Quote } from '../../../../src/app/quotes/domain/quote'
 import { QuoteRepository } from '../../../../src/app/quotes/domain/quote.repository'
 import { SinonStubbedInstance } from 'sinon'
-import { createQuote } from '../../quotes/fixtures/quote.fixture'
+import { createQuoteFixture } from '../../quotes/fixtures/quote.fixture'
 import { createCreatePolicyCommand } from '../fixtures/createPolicyCommand.fixture'
 import { PolicyRepository } from '../../../../src/app/policies/domain/policy.repository'
 import { createOngoingPolicyFixture } from '../fixtures/policy.fixture'
@@ -19,10 +19,10 @@ import Question = Partner.Question
 
 describe('Policies - Usecase - Create policy', async () => {
   const now = new Date('2020-01-05T10:09:08Z')
-  const quote: Quote = createQuote()
+  const quote: Quote = createQuoteFixture()
   const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({ quoteId: quote.id, startDate: null })
   const policyRepository: SinonStubbedInstance<PolicyRepository> = policyRepositoryStub()
-  const quoteRepository: SinonStubbedInstance<QuoteRepository> = { save: sinon.stub(), get: sinon.stub() }
+  const quoteRepository: SinonStubbedInstance<QuoteRepository> = { save: sinon.stub(), get: sinon.stub(), update: sinon.stub() }
   const partnerRepository: SinonStubbedInstance<PartnerRepository> = { getByCode: sinon.stub(), getOffer: sinon.stub(), getCallbackUrl: sinon.stub(), getOperationCodes: sinon.stub() }
   const sendValidationLinkToEmailAddress = sinon.stub()
   const createPolicy: CreatePolicy = CreatePolicy.factory(policyRepository, quoteRepository, partnerRepository, sendValidationLinkToEmailAddress)

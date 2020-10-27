@@ -1,5 +1,5 @@
 import { Policy } from '../../../domain/policy'
-import dayjs from 'dayjs'
+import dayjs from '../../../../../libs/dayjs'
 import { Quote } from '../../../../quotes/domain/quote'
 
 export function policyToResource (policy: Policy) {

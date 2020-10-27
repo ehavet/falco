@@ -1,18 +1,35 @@
 import { Partner } from '../../partners/domain/partner'
-import { NoPartnerInsuranceForRiskError } from './quote.errors'
+import { QuoteRiskPropertyRoomCountNotInsurableError, QuoteRiskNumberOfRoommatesError, QuoteRiskRoommatesNotAllowedError, QuoteStartDateConsistencyError } from './quote.errors'
 import { generate } from 'randomstring'
+import { UpdateQuoteCommand } from './update-quote-command'
+import dayjs from '../../../libs/dayjs'
+import * as PartnerFunc from '../../partners/domain/partner.func'
+import { OperationCode } from '../../policies/domain/operation-code'
+import { OperationCodeNotApplicableError } from '../../policies/domain/operation-code.errors'
+import { SpecialOperation } from '../../common-api/domain/special-operation.func'
+import { CreateQuoteCommand } from './create-quote-command'
+
+const DEFAULT_NUMBER_MONTHS_DUE = 12
 
 export interface Quote {
     id: string,
     partnerCode: string,
     risk: Quote.Risk,
     insurance: Quote.Insurance
+    policyHolder?: Quote.PolicyHolder,
+    premium: number,
+    nbMonthsDue: number,
+    startDate?: Date,
+    termStartDate?: Date,
+    termEndDate?: Date
 }
 
 export namespace Quote {
 
     export interface Risk {
-        property: Risk.Property
+        property: Risk.Property,
+        person?: Risk.Person
+        otherPeople?: Array<Risk.Person>
     }
 
     export interface Insurance {
@@ -25,11 +42,113 @@ export namespace Quote {
         ipid: string
     }
 
-    export function getInsurance (risk: Risk, partnerOffer: Partner.Offer, partnerCode: string): Insurance {
+    export function create (command: CreateQuoteCommand, partnerOffer: Partner.Offer): Quote {
+      const insurance: Insurance = getInsurance(command.risk, partnerOffer)
+
+      return {
+        id: nextId(),
+        partnerCode: command.partnerCode,
+        risk: command.risk,
+        insurance: insurance,
+        nbMonthsDue: DEFAULT_NUMBER_MONTHS_DUE,
+        premium: DEFAULT_NUMBER_MONTHS_DUE * insurance.estimate.monthlyPrice
+      }
+    }
+
+    export function update (quote: Quote, partner: Partner, command: UpdateQuoteCommand, partnerAvailableCodes: Array<OperationCode>): Quote {
+      quote.risk = _buildQuoteRisk(command.risk, partner)
+      quote.insurance = getInsurance(quote.risk, partner.offer)
+      quote.policyHolder = _buildQuotePolicyHolder(command)
+      _applyStartDate(quote, command.startDate)
+      _applyOperationCode(quote, partnerAvailableCodes, command.specOpsCode)
+      return quote
+    }
+
+    function _buildQuotePolicyHolder (command: UpdateQuoteCommand): Quote.PolicyHolder {
+      return {
+        firstname: command.risk.person?.firstname,
+        lastname: command.risk.person?.lastname,
+        address: command.risk.property.address,
+        postalCode: command.risk.property.postalCode,
+        city: command.risk.property.city,
+        email: command.policyHolder?.email,
+        phoneNumber: command.policyHolder?.phoneNumber
+      }
+    }
+
+    function _buildQuoteRisk (risk: UpdateQuoteCommand.Risk, partner: Partner) {
+      const roomCount: number = risk.property.roomCount
+      const numberOfRoommates: number|null = risk.otherPeople ? risk.otherPeople?.length : null
+
+      if (!PartnerFunc.isPropertyRoomCountCovered(partner, roomCount)) {
+        throw new QuoteRiskPropertyRoomCountNotInsurableError(roomCount)
+      }
+
+      if (numberOfRoommates) {
+        if (!PartnerFunc.isPropertyAllowNumberOfRoommates(partner, numberOfRoommates, risk)) {
+          const maxRoommatesForProperty: number = PartnerFunc.getMaxNumberOfRoommatesForProperty(partner, risk)
+          if (maxRoommatesForProperty === 0) { throw new QuoteRiskRoommatesNotAllowedError(roomCount) }
+          throw new QuoteRiskNumberOfRoommatesError(maxRoommatesForProperty, roomCount)
+        }
+      }
+
+      return {
+        property: {
+          roomCount: risk.property.roomCount,
+          address: risk.property.address ? risk.property.address : undefined,
+          postalCode: risk.property.postalCode ? risk.property.postalCode : undefined,
+          city: risk.property.city ? risk.property.city : undefined
+        },
+        person: risk.person ? {
+          firstname: risk.person.firstname,
+          lastname: risk.person.lastname
+        } : undefined,
+        otherPeople: risk.otherPeople ? risk.otherPeople.map(person => {
+          return { firstname: person.firstname, lastname: person.lastname }
+        }) : undefined
+      }
+    }
+
+    export function applyNbMonthsDue (quote: Quote, nbMonthsDue: number): void {
+      if (quote.startDate) {
+        quote.premium = nbMonthsDue * quote.insurance.estimate.monthlyPrice
+        quote.nbMonthsDue = nbMonthsDue
+        quote.termEndDate = _computeTermEndDate(quote.startDate, nbMonthsDue)
+      }
+    }
+
+    function _computeTermEndDate (termStartDate: Date, durationInMonths: number): Date {
+      termStartDate.setUTCHours(0, 0, 0, 0)
+      const termEndDate: Date = dayjs(termStartDate).utc()
+        .add(durationInMonths, 'month')
+        .subtract(1, 'day').toDate()
+      return termEndDate
+    }
+
+    function _applyStartDate (quote: Quote, startDate?: Date): void {
+      const now: Date = new Date()
+      startDate = startDate || now
+      startDate.setUTCHours(0, 0, 0, 0)
+
+      const currentDate = _getUtcDayjsDate(now)
+      const updatedStartDate = _getUtcDayjsDate(startDate)
+
+      if (updatedStartDate.isBefore(currentDate)) throw new QuoteStartDateConsistencyError()
+      quote.startDate = startDate
+      quote.termStartDate = startDate
+      quote.termEndDate = _computeTermEndDate(startDate, quote.nbMonthsDue)
+    }
+
+    function _getUtcDayjsDate (date: Date): dayjs.Dayjs {
+      date.setUTCHours(0, 0, 0, 0)
+      return dayjs(date).utc()
+    }
+
+    export function getInsurance (risk: Risk, partnerOffer: Partner.Offer): Insurance {
       const estimate: Insurance.Estimate | undefined = partnerOffer.pricingMatrix.get(risk.property.roomCount)
 
       if (estimate === undefined) {
-        throw new NoPartnerInsuranceForRiskError(partnerCode, risk)
+        throw new QuoteRiskPropertyRoomCountNotInsurableError(risk.property.roomCount)
       }
 
       return <Insurance>{
@@ -47,11 +166,49 @@ export namespace Quote {
       return generate({ length: 7, charset: 'alphanumeric', readable: true, capitalization: 'uppercase' })
     }
 
+    export interface PolicyHolder {
+        firstname?: string,
+        lastname?: string,
+        address?: string,
+        postalCode?: string,
+        city?: string,
+        email?: string,
+        phoneNumber?: string,
+        emailValidatedAt?: Date
+    }
+
+    function _applyOperationCode (quote: Quote, partnerApplicableCodes: Array<OperationCode>, codeToApply?: string): Quote {
+      const operationCode: OperationCode = SpecialOperation.inferOperationCode(codeToApply)
+      if (partnerApplicableCodes.concat(OperationCode.BLANK).includes(operationCode)) {
+        switch (operationCode) {
+          case OperationCode.SEMESTER1:
+          case OperationCode.SEMESTER2:
+            Quote.applyNbMonthsDue(quote, 5)
+            break
+          case OperationCode.FULLYEAR:
+            Quote.applyNbMonthsDue(quote, 10)
+            break
+          case OperationCode.BLANK:
+            Quote.applyNbMonthsDue(quote, 12)
+        }
+      } else {
+        throw new OperationCodeNotApplicableError(codeToApply!, quote.partnerCode)
+      }
+      return quote
+    }
 }
 
 export namespace Quote.Risk {
     export interface Property {
         roomCount: number
+        address?: string
+        postalCode?: string
+        city?: string
+    }
+
+    export interface Person {
+        firstname: string,
+        lastname: string
     }
 }
 

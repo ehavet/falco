@@ -204,6 +204,8 @@ describe('Policies - API - Integration', async () => {
           signature_date: null,
           payment_date: null,
           email_validated: false,
+          special_operations_code: null,
+          special_operations_code_applied_at: null,
           status: 'INITIATED'
         }
 
@@ -600,7 +602,9 @@ describe('Policies - API - Integration', async () => {
           signature_date: '2020-01-05T10:09:08.000Z',
           payment_date: '2020-01-05T10:09:08.000Z',
           email_validated: true,
-          status: 'INITIATED'
+          status: 'INITIATED',
+          special_operations_code: null,
+          special_operations_code_applied_at: null
         }
         expect(response.body).to.deep.equal(expectedResourcePolicy)
       })
@@ -1087,6 +1091,8 @@ describe('Policies - API - Integration', async () => {
         signature_date: '2020-01-05T10:09:08.000Z',
         payment_date: '2020-01-05T10:09:08.000Z',
         email_validated: true,
+        special_operations_code: null,
+        special_operations_code_applied_at: null,
         status: 'INITIATED'
       }
 
@@ -1394,6 +1400,8 @@ describe('Policies - API - Integration', async () => {
         signature_date: '2020-01-05T10:09:08.000Z',
         payment_date: '2020-01-05T10:09:08.000Z',
         email_validated: true,
+        special_operations_code: null,
+        special_operations_code_applied_at: null,
         status: 'INITIATED'
       }
 

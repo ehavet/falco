@@ -3,6 +3,7 @@ import { PolicyInsuranceSqlModel } from '../../quotes/infrastructure/policy-insu
 import { PolicyRiskSqlModel } from '../../quotes/infrastructure/policy-risk-sql.model'
 import { Policy } from '../domain/policy'
 import { PolicyPersonSqlModel } from './policy-person-sql.model'
+import { OperationCode } from '../domain/operation-code'
 
 @Table({ timestamps: true, tableName: 'policy', underscored: true })
 export class PolicySqlModel extends Model<PolicySqlModel> {
@@ -42,6 +43,14 @@ export class PolicySqlModel extends Model<PolicySqlModel> {
 
     @Column
     status!: Policy.Status
+
+    @Column({
+      type: DataType.STRING
+    })
+    specialOperationsCode!: OperationCode | null
+
+    @Column({ type: DataType.DATE })
+    specialOperationsCodeAppliedAt!: Date | null
 
     @ForeignKey(() => PolicyInsuranceSqlModel)
     @Column

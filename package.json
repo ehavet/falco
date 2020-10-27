@@ -13,6 +13,7 @@
     "prebuild": "rm -rf dist",
     "build": "tsc && copyfiles -u 1 ./src/app/**/*.pdf ./dist/",
     "lint": "eslint '{src,test}/**/*.ts'",
+    "lint:fix": "yarn lint --fix",
     "db:migrate": "sequelize db:migrate",
     "db:migrate:undo": "sequelize db:migrate:undo",
     "db:seed": "sequelize db:seed:undo:all && sequelize db:seed:all",

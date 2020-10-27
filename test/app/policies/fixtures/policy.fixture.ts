@@ -56,6 +56,8 @@ export function createPolicyFixture (attr: Partial<Policy> = {}): Policy {
     signatureDate: now,
     paymentDate: now,
     emailValidationDate: now,
+    specialOperationsCodeAppliedAt: null,
+    specialOperationsCode: null,
     status: Policy.Status.Initiated,
     ...attr
   }

@@ -224,7 +224,7 @@ describe('Policies - API - Integration', async () => {
 
         // Then
         expect(response).to.have.property('statusCode', 404)
-        expect(response.body).to.have.property('message', 'Quote with id 3E76DJ2 cannot be found')
+        expect(response.body).to.have.property('message', 'Could not find quote with id : 3E76DJ2')
       })
     })
 

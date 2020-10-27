@@ -1,13 +1,13 @@
 import { expect, sinon } from '../../../test-utils'
-import { GetQuote } from '../../../../src/app/quotes/domain/get-quote.usecase'
 import { Quote } from '../../../../src/app/quotes/domain/quote'
-import { GetQuoteQuery } from '../../../../src/app/quotes/domain/get-quote-query'
+import { CreateQuoteCommand } from '../../../../src/app/quotes/domain/create-quote-command'
 import { Partner } from '../../../../src/app/partners/domain/partner'
-import { NoPartnerInsuranceForRiskError } from '../../../../src/app/quotes/domain/quote.errors'
+import { QuoteRiskPropertyRoomCountNotInsurableError } from '../../../../src/app/quotes/domain/quote.errors'
+import { CreateQuote } from '../../../../src/app/quotes/domain/create-quote.usecase'
 
-describe('Usecase - Get Quote', async () => {
-  let getQuote
-  const quoteRepository = { save: sinon.mock(), get: sinon.stub() }
+describe('Quotes - Usecase - Create Quote', async () => {
+  let createQuote
+  const quoteRepository = { save: sinon.mock(), get: sinon.stub(), update: sinon.stub }
   const partnerRepository = { getByCode: sinon.stub(), getOffer: sinon.stub(), getCallbackUrl: sinon.stub(), getOperationCodes: sinon.stub() }
   const partnerOffer : Partner.Offer = {
     pricingMatrix: new Map([
@@ -41,12 +41,14 @@ describe('Usecase - Get Quote', async () => {
       productVersion: '1.0',
       contractualTerms: '/path/to/contractual/terms',
       ipid: '/path/to/ipid'
-    }
+    },
+    nbMonthsDue: 12,
+    premium: 69.84
   }
 
   beforeEach(() => {
     partnerRepository.getOffer.withArgs('myPartner').returns(partnerOffer)
-    getQuote = GetQuote.factory(quoteRepository, partnerRepository)
+    createQuote = CreateQuote.factory(quoteRepository, partnerRepository)
   })
 
   afterEach(() => {
@@ -59,7 +61,7 @@ describe('Usecase - Get Quote', async () => {
       quoteRepository.save.resolves()
 
       // When
-      const quote: Quote = await getQuote({ partnerCode: 'myPartner', risk: { property: { roomCount: 2 } } })
+      const quote: Quote = await createQuote({ partnerCode: 'myPartner', risk: { property: { roomCount: 2 } } })
 
       // Then
       expect(quote).to.deep.include({ partnerCode: expectedQuote.partnerCode })
@@ -68,13 +70,13 @@ describe('Usecase - Get Quote', async () => {
 
     it('with the insurance', async () => {
       // Given
-      const getQuoteQuery: GetQuoteQuery = { partnerCode: 'myPartner', risk: { property: { roomCount: 2 } } }
+      const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', risk: { property: { roomCount: 2 } } }
       const expectedInsurance: Quote.Insurance = expectedQuote.insurance
 
       quoteRepository.save.resolves()
 
       // When
-      const quote: Quote = await getQuote(getQuoteQuery)
+      const quote: Quote = await createQuote(createQuoteCommand)
 
       // Then
       expect(quote).to.deep.include({ insurance: expectedInsurance })
@@ -83,12 +85,12 @@ describe('Usecase - Get Quote', async () => {
     describe('with a generated alphanumerical id that', async () => {
       it('has 7 characters', async () => {
         // Given
-        const getQuoteQuery: GetQuoteQuery = { partnerCode: 'myPartner', risk: { property: { roomCount: 2 } } }
+        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', risk: { property: { roomCount: 2 } } }
 
         quoteRepository.save.resolves()
 
         // When
-        const quote: Quote = await getQuote(getQuoteQuery)
+        const quote: Quote = await createQuote(createQuoteCommand)
 
         // Then
         expect(quote.id.length).to.equal(7)
@@ -96,12 +98,12 @@ describe('Usecase - Get Quote', async () => {
 
       it('has no I nor l nor O nor 0', async () => {
         // Given
-        const getQuoteQuery: GetQuoteQuery = { partnerCode: 'myPartner', risk: { property: { roomCount: 2 } } }
+        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', risk: { property: { roomCount: 2 } } }
 
         quoteRepository.save.resolves()
 
         // When
-        const quote: Quote = await getQuote(getQuoteQuery)
+        const quote: Quote = await createQuote(createQuoteCommand)
 
         // Then
         expect(quote.id).to.not.have.string('O')
@@ -112,12 +114,12 @@ describe('Usecase - Get Quote', async () => {
 
       it('is returned within the quote', async () => {
         // Given
-        const getQuoteQuery: GetQuoteQuery = { partnerCode: 'myPartner', risk: { property: { roomCount: 2 } } }
+        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', risk: { property: { roomCount: 2 } } }
 
         quoteRepository.save.resolves()
 
         // When
-        const quote: Quote = await getQuote(getQuoteQuery)
+        const quote: Quote = await createQuote(createQuoteCommand)
 
         // Then
         expect(quote).to.include.keys('id')
@@ -127,11 +129,11 @@ describe('Usecase - Get Quote', async () => {
 
   it('should save the quote', async () => {
     // Given
-    const getQuoteQuery: GetQuoteQuery = { partnerCode: 'myPartner', risk: { property: { roomCount: 2 } } }
+    const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', risk: { property: { roomCount: 2 } } }
     quoteRepository.save.resolves()
 
     // When
-    const quote = await getQuote(getQuoteQuery)
+    const quote = await createQuote(createQuoteCommand)
 
     // Then
     const saveSpy = quoteRepository.save.getCall(0)
@@ -141,16 +143,16 @@ describe('Usecase - Get Quote', async () => {
 
   it('should throw an error if there is no insurance for the given risk', async () => {
     // Given
-    const getQuoteQuery: GetQuoteQuery = { partnerCode: 'myPartner', risk: { property: { roomCount: 3 } } }
+    const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', risk: { property: { roomCount: 3 } } }
 
     // When
-    const quotePromise = getQuote(getQuoteQuery)
+    const quotePromise = createQuote(createQuoteCommand)
 
     // Then
     return expect(quotePromise)
       .to.be.rejectedWith(
-        NoPartnerInsuranceForRiskError,
-        'Partner with code myPartner does not have an insurance for risk {"property":{"roomCount":3}}'
+        QuoteRiskPropertyRoomCountNotInsurableError,
+        '3 room(s) property is not insurable'
       )
   })
 })

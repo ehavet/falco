@@ -1,7 +1,7 @@
 import { dateFaker, expect } from '../../../test-utils'
 import { Policy } from '../../../../src/app/policies/domain/policy'
 import { Quote } from '../../../../src/app/quotes/domain/quote'
-import { createQuote } from '../../quotes/fixtures/quote.fixture'
+import { createQuoteFixture } from '../../quotes/fixtures/quote.fixture'
 import { CreatePolicyCommand } from '../../../../src/app/policies/domain/create-policy-command'
 import { createCreatePolicyCommand } from '../fixtures/createPolicyCommand.fixture'
 import { PolicyRepository } from '../../../../src/app/policies/domain/policy.repository'
@@ -17,7 +17,7 @@ describe('Policies - Domain', async () => {
     const now = new Date('2020-02-29T10:09:08Z')
     const expectedTermEndDate = new Date('2021-04-04T10:09:08.000Z')
     const policyRepository: SinonStubbedInstance<PolicyRepository> = policyRepositoryStub()
-    const quote: Quote = createQuote()
+    const quote: Quote = createQuoteFixture()
     let partner: Partner
     let createPolicyCommand: CreatePolicyCommand
 

@@ -1,4 +1,4 @@
-export interface GetQuoteQuery {
+export interface CreateQuoteCommand {
     partnerCode: string,
     risk: {
         property: {

@@ -1,5 +1,5 @@
 import routes from './api/v0/quotes.api'
-import { GetQuote } from './domain/get-quote.usecase'
+import { CreateQuote } from './domain/create-quote.usecase'
 import { QuoteSqlRepository } from './infrastructure/quote-sql.repository'
 import { QuoteRepository } from './domain/quote.repository'
 import { PartnerRepository } from '../partners/domain/partner.repository'
@@ -10,18 +10,22 @@ import { QuotePropertySqlModel } from './infrastructure/sql-models/quote-propert
 import { QuoteRiskOtherPeopleSqlModel } from './infrastructure/sql-models/quote-risk-other-people-sql.model'
 import { QuotePersonSqlModel } from './infrastructure/sql-models/quote-person-sql.model'
 import { QuoteSqlModel } from './infrastructure/sql-models/quote-sql-model'
+import { UpdateQuote } from './domain/update-quote.usecase'
 
 export interface Container {
-  GetQuote: GetQuote
+  CreateQuote: CreateQuote
+  UpdateQuote: UpdateQuote
   quoteRepository: QuoteRepository
 }
 
 const partnerRepository: PartnerRepository = partnerContainer.partnerRepository
 const quoteRepository: QuoteRepository = new QuoteSqlRepository()
-const getQuote: GetQuote = GetQuote.factory(quoteRepository, partnerRepository)
+const createQuote: CreateQuote = CreateQuote.factory(quoteRepository, partnerRepository)
+const updateQuote: UpdateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
 
 export const container: Container = {
-  GetQuote: getQuote,
+  CreateQuote: createQuote,
+  UpdateQuote: updateQuote,
   quoteRepository: quoteRepository
 }
 

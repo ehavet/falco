@@ -25,7 +25,6 @@ export namespace Partner {
     }
 
     export type RoomCount = number
-
 }
 
 export namespace Partner.Question {

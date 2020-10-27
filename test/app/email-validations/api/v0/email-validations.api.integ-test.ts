@@ -19,7 +19,8 @@ describe('Email Validations - API - Integ', async () => {
       const expectedCallbackUrlResource = { callback_url: 'http://callback.url.com' }
       const validationCallbackUri: ValidationCallbackUri = { callbackUrl: 'http://callback.url.com' }
 
-      beforeEach(async () => {
+      beforeEach(async function () {
+        this.timeout(10000)
         sinon.stub(container, 'GetValidationCallbackUriFromToken')
           .withArgs({ token: 'Yofl0qsXdbJ3dgZXzSFLV5/3v/nbeGqPWns/Q==' })
           .resolves(validationCallbackUri)

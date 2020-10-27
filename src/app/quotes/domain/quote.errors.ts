@@ -10,8 +10,40 @@ export class NoPartnerInsuranceForRiskError extends Error {
 
 export class QuoteNotFoundError extends Error {
   constructor (quoteId: string) {
-    const message: string = `Quote with id ${quoteId} cannot be found`
+    const message: string = `Could not find quote with id : ${quoteId}`
     super(message)
     this.name = 'QuoteNotFoundError'
+  }
+}
+
+export class QuoteRiskPropertyRoomCountNotInsurableError extends Error {
+  constructor (roomCount: number) {
+    const message: string = `${roomCount} room(s) property is not insurable`
+    super(message)
+    this.name = 'QuoteRiskPropertyRoomCountNotInsurableError'
+  }
+}
+
+export class QuoteStartDateConsistencyError extends Error {
+  constructor () {
+    const message: string = 'Start date cannot be earlier than today'
+    super(message)
+    this.name = 'QuoteStartDateConsistencyError'
+  }
+}
+
+export class QuoteRiskRoommatesNotAllowedError extends Error {
+  constructor (roomCount: number) {
+    const message: string = `${roomCount} room(s) property does not allow roommates`
+    super(message)
+    this.name = 'QuoteRiskRoommatesNotAllowedError'
+  }
+}
+
+export class QuoteRiskNumberOfRoommatesError extends Error {
+  constructor (maxRoommateNumber: number, roomCount: number) {
+    const message: string = `${roomCount} room(s) property allows a maximum of ${maxRoommateNumber} roommate(s)`
+    super(message)
+    this.name = 'QuoteRiskNumberOfRoommatesError'
   }
 }

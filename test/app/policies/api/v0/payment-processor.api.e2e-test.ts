@@ -47,7 +47,7 @@ describe('PaymentProcessor - API - E2E', async () => {
       // Given
       this.timeout(10000)
       policyRepository = new PolicySqlRepository()
-      const pdfProcessor: PDFProcessor = new PDFtkPDFProcessor()
+      const pdfProcessor: PDFProcessor = new PDFtkPDFProcessor({ productionMode: false })
       const contractGenerator: ContractGenerator = new ContractPdfGenerator(pdfProcessor)
       const specificTermsGenerator: SpecificTermsGenerator = new SpecificTermsPdfGenerator(pdfProcessor)
       const contractRepository = new ContractFsRepository(config)

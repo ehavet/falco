@@ -59,7 +59,7 @@ export class QuoteSqlRepository implements QuoteRepository {
     quoteSql.policyHolder = personSql
     quoteSql.risk.person = personSql
 
-    return sqlToQuoteMapper(quoteSql)
+    return sqlToDomain(quoteSql)
   }
 
   async get (quoteId: string): Promise<Quote> {
@@ -184,6 +184,6 @@ export class QuoteSqlRepository implements QuoteRepository {
     updatedQuoteSql.risk.otherPeople = otherPeopleResult
     updatedQuoteSql.policyHolder = updatedPolicyHoldersResult[1][0]
 
-    return sqlToQuoteMapper(updatedQuoteSql)
+    return sqlToDomain(updatedQuoteSql)
   }
 }

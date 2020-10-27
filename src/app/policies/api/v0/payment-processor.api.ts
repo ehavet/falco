@@ -4,9 +4,8 @@ import { Container } from '../../policies.container'
 import { ServerRoute } from '@hapi/hapi'
 import { PolicyNotFoundError } from '../../domain/policies.errors'
 import { UnauthenticatedEventError } from '../../domain/payment-processor.errors'
-import { ConfirmPaymentIntentCommand } from '../../domain/confirm-payment-intent-for-policy.usecase'
-import { Payment } from '../../domain/payment/payment'
 import { Stripe } from 'stripe'
+import { requestToConfirmPaymentIntentCommand } from './mappers/create-confirm-payment-intent-command.mapper'
 
 const TAGS = ['api', 'payment-processor']
 export default function (container: Container): Array<ServerRoute> {
@@ -48,14 +47,7 @@ export default function (container: Container): Array<ServerRoute> {
         if (parsedEvent.type === 'payment_intent.succeeded') {
           const paymentIntent = parsedEvent.data.object as Stripe.PaymentIntent
           try {
-            const command: ConfirmPaymentIntentCommand = {
-              policyId: paymentIntent.metadata.policy_id,
-              amount: paymentIntent.amount,
-              externalId: paymentIntent.id,
-              processor: Payment.Processor.STRIPE,
-              instrument: Payment.Instrument.CREDITCARD,
-              rawPaymentIntent: paymentIntent
-            }
+            const command = requestToConfirmPaymentIntentCommand(paymentIntent)
             await container.ConfirmPaymentIntentForPolicy(command)
             return h.response({}).code(204)
           } catch (error) {
@@ -65,9 +57,9 @@ export default function (container: Container): Array<ServerRoute> {
               throw Boom.internal(error)
             }
           }
-        } else {
-          throw Boom.forbidden()
         }
+
+        throw Boom.forbidden()
       }
     }
   ]

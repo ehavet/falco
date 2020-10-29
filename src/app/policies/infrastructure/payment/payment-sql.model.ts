@@ -19,7 +19,7 @@ export class PaymentSqlModel extends Model<PaymentSqlModel> {
     processor!: Payment.Processor
 
     @Column
-    instrument!: Payment.Instrument
+    method!: Payment.Method
 
     @Column
     externalId!: string

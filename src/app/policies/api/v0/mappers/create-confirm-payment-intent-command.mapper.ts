@@ -8,7 +8,7 @@ export function requestToConfirmPaymentIntentCommand (paymentIntent: Stripe.Paym
     amount: paymentIntent.amount,
     externalId: paymentIntent.id,
     processor: Payment.Processor.STRIPE,
-    instrument: Payment.Instrument.CREDITCARD,
+    method: Payment.Method.CREDITCARD,
     rawPaymentIntent: paymentIntent
   }
 }

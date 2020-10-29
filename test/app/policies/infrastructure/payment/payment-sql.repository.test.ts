@@ -34,7 +34,7 @@ describe('Payments - Infra - Payment SQL Repository', async () => {
   })
 
   describe('#save', async () => {
-    let paymentToSave : Payment
+    let paymentToSave: Payment
     let savedPayment: Payment
     let savedPolicy: Policy
 
@@ -58,7 +58,7 @@ describe('Payments - Infra - Payment SQL Repository', async () => {
       expect(paymentFromDb.amount).to.equal(paymentToSave.amount)
       expect(paymentFromDb.currency).to.equal(paymentToSave.currency)
       expect(paymentFromDb.processor).to.equal(paymentToSave.processor)
-      expect(paymentFromDb.instrument).to.equal(paymentToSave.instrument)
+      expect(paymentFromDb.method).to.equal(paymentToSave.method)
       expect(paymentFromDb.externalId).to.equal(paymentToSave.externalId)
       expect(paymentFromDb.pspFee).to.equal(paymentToSave.pspFee)
       expect(paymentFromDb.status).to.equal(paymentToSave.status)
@@ -79,7 +79,7 @@ describe('Payments - Infra - Payment SQL Repository', async () => {
       expect(savedPayment.amount).to.equal(paymentToSave.amount)
       expect(savedPayment.currency).to.equal(paymentToSave.currency)
       expect(savedPayment.processor).to.equal(paymentToSave.processor)
-      expect(savedPayment.instrument).to.equal(paymentToSave.instrument)
+      expect(savedPayment.method).to.equal(paymentToSave.method)
       expect(savedPayment.externalId).to.equal(paymentToSave.externalId)
       expect(savedPayment.pspFee).to.equal(paymentToSave.pspFee)
       expect(savedPayment.status).to.equal(paymentToSave.status)

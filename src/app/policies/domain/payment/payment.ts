@@ -3,7 +3,7 @@ export interface Payment {
     amount: Payment.AmountInCents,
     currency: Payment.Currency,
     processor: Payment.Processor,
-    instrument: Payment.Instrument,
+    method: Payment.Method,
     externalId: string,
     pspFee: Payment.AmountInCents | null, // can be null if the value cannot be retrieved
     status: Payment.Status,
@@ -26,7 +26,7 @@ export namespace Payment {
         EUR = 'EUR'
     }
 
-    export enum Instrument {
+    export enum Method {
         CREDITCARD = 'CREDITCARD'
     }
 

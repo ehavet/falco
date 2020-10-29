@@ -23,7 +23,7 @@ export interface ConfirmPaymentIntentCommand {
     amount: Payment.AmountInCents,
     externalId: string,
     processor: Payment.Processor,
-    instrument: Payment.Instrument,
+    method: Payment.Method,
     rawPaymentIntent: any
 }
 
@@ -63,7 +63,7 @@ export namespace ConfirmPaymentIntentForPolicy {
 
     async function createPayment (policyId: string, confirmPaymentIntentCommand: ConfirmPaymentIntentCommand, paymentRepository: PaymentRepository, paymentProcessor: PaymentProcessor) {
       const pspFee = await paymentProcessor.getTransactionFee(confirmPaymentIntentCommand.rawPaymentIntent)
-      const payment = PaymentFunc.createValidPayment(policyId, confirmPaymentIntentCommand.externalId, confirmPaymentIntentCommand.amount, confirmPaymentIntentCommand.processor, confirmPaymentIntentCommand.instrument, pspFee)
+      const payment = PaymentFunc.createValidPayment(policyId, confirmPaymentIntentCommand.externalId, confirmPaymentIntentCommand.amount, confirmPaymentIntentCommand.processor, confirmPaymentIntentCommand.method, pspFee)
       await paymentRepository.save(payment)
     }
 

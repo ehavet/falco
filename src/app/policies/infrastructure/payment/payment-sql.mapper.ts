@@ -7,7 +7,7 @@ export function sqlToDomain (paymentSql: PaymentSqlModel, policyId: string): Pay
     amount: paymentSql.amount,
     currency: paymentSql.currency,
     processor: paymentSql.processor,
-    instrument: paymentSql.instrument,
+    method: paymentSql.method,
     externalId: paymentSql.externalId,
     pspFee: paymentSql.pspFee,
     status: paymentSql.status,

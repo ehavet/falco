@@ -47,7 +47,7 @@ currency (toujours EUR)
 
 processor (toujours STRIPE)
 
-instrument (toujours CREDITCARD)
+method (toujours CREDITCARD)
 
 external_id (un identifiant issu de Stripe)
 

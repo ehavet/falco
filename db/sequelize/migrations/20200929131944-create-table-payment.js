@@ -11,7 +11,7 @@ module.exports = {
       amount: Sequelize.INTEGER,
       currency: Sequelize.STRING,
       processor: Sequelize.STRING,
-      instrument: Sequelize.STRING,
+      method: Sequelize.STRING,
       external_id: Sequelize.STRING,
       psp_fee: Sequelize.INTEGER,
       status: Sequelize.STRING,

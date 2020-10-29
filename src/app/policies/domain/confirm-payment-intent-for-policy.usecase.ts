@@ -7,41 +7,81 @@ import { CertificateGenerationError } from './certificate/certificate.errors'
 import { SubscriptionValidationEmailBuildError } from './subcription-validation-email.errors'
 import { ContractRepository } from './contract/contract.repository'
 import { ContractGenerator } from './contract/contract.generator'
+import { Payment } from './payment/payment'
+import * as PaymentFunc from './payment/payment.func'
+import { PaymentRepository } from './payment/payment.repository'
+import { Contract } from './contract/contract'
+import { Certificate } from './certificate/certificate'
+import { PaymentProcessor } from './payment-processor'
 
 export interface ConfirmPaymentIntentForPolicy {
-    (policyId: string): Promise<void>
+    (confirmPaymentIntentCommand: ConfirmPaymentIntentCommand): Promise<void>
+}
+
+export interface ConfirmPaymentIntentCommand {
+    policyId: string,
+    amount: Payment.AmountInCents,
+    externalId: string,
+    processor: Payment.Processor,
+    method: Payment.Method,
+    rawPaymentIntent: any
 }
 
 export namespace ConfirmPaymentIntentForPolicy {
+
     export function factory (
       policyRepository: PolicyRepository,
       certificateGenerator: CertificateGenerator,
       contractGenerator: ContractGenerator,
       contractRepository: ContractRepository,
+      paymentRepository: PaymentRepository,
+      paymentProcessor: PaymentProcessor,
       mailer: Mailer
     ): ConfirmPaymentIntentForPolicy {
-      return async (policyId: string) => {
+      return async (confirmPaymentIntentCommand: ConfirmPaymentIntentCommand) => {
         const currentDate: Date = new Date()
-        await policyRepository.updateAfterPayment(policyId, currentDate, currentDate, Policy.Status.Applicable)
+        const policyId = confirmPaymentIntentCommand.policyId
+
         const policy = await policyRepository.get(policyId)
 
-        let certificate
-        try {
-          certificate = await certificateGenerator.generate(policy)
-        } catch (e) {
-          throw new CertificateGenerationError(policyId)
-        }
+        const signedContract = await retrieveSignedContract(contractGenerator, policyId, contractRepository)
 
-        const contractFileName = contractGenerator.getContractName(policyId)
-        const signedContract = await contractRepository.getSignedContract(contractFileName)
+        await policyRepository.updateAfterPayment(policyId, currentDate, currentDate, Policy.Status.Applicable)
 
-        let email
-        try {
-          email = buildSubscriptionValidationEmail(policy.contact.email, certificate, signedContract)
-        } catch (e) {
-          throw new SubscriptionValidationEmailBuildError(policyId)
-        }
-        await mailer.send(email)
+        await createPayment(policyId, confirmPaymentIntentCommand, paymentRepository, paymentProcessor)
+
+        const certificate = await generateCertificate(policy, certificateGenerator)
+
+        await sendSubscriptionValidationEmail(policy, certificate, signedContract, mailer)
       }
+    }
+
+    async function retrieveSignedContract (contractGenerator: ContractGenerator, policyId: string, contractRepository: ContractRepository): Promise<Contract> {
+      const contractFileName = contractGenerator.getContractName(policyId)
+      return await contractRepository.getSignedContract(contractFileName)
+    }
+
+    async function createPayment (policyId: string, confirmPaymentIntentCommand: ConfirmPaymentIntentCommand, paymentRepository: PaymentRepository, paymentProcessor: PaymentProcessor) {
+      const pspFee = await paymentProcessor.getTransactionFee(confirmPaymentIntentCommand.rawPaymentIntent)
+      const payment = PaymentFunc.createValidPayment(policyId, confirmPaymentIntentCommand.externalId, confirmPaymentIntentCommand.amount, confirmPaymentIntentCommand.processor, confirmPaymentIntentCommand.method, pspFee)
+      await paymentRepository.save(payment)
+    }
+
+    async function generateCertificate (policy: Policy, certificateGenerator: CertificateGenerator): Promise<Certificate> {
+      try {
+        return await certificateGenerator.generate(policy)
+      } catch (e) {
+        throw new CertificateGenerationError(policy.id)
+      }
+    }
+
+    async function sendSubscriptionValidationEmail (policy: Policy, certificate: Certificate, signedContract: Contract, mailer: Mailer): Promise<void> {
+      let email
+      try {
+        email = buildSubscriptionValidationEmail(policy.contact.email, certificate, signedContract)
+      } catch (e) {
+        throw new SubscriptionValidationEmailBuildError(policy.id)
+      }
+      await mailer.send(email)
     }
 }

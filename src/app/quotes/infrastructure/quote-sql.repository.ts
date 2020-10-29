@@ -1,6 +1,6 @@
 import { QuoteRepository } from '../domain/quote.repository'
 import { Quote } from '../domain/quote'
-import { sqlToQuoteMapper } from './quote-sql.mapper'
+import { sqlToDomain } from './quote-sql.mapper'
 import { QuoteNotFoundError } from '../domain/quote.errors'
 import { QuoteInsuranceSqlModel } from './sql-models/quote-insurance-sql.model'
 import { QuoteRiskSqlModel } from './sql-models/quote-risk-sql.model'
@@ -59,7 +59,7 @@ export class QuoteSqlRepository implements QuoteRepository {
     quoteSql.policyHolder = personSql
     quoteSql.risk.person = personSql
 
-    return sqlToQuoteMapper(quoteSql)
+    return sqlToDomain(quoteSql)
   }
 
   async get (quoteId: string): Promise<Quote> {
@@ -69,7 +69,7 @@ export class QuoteSqlRepository implements QuoteRepository {
         rejectOnEmpty: false
       })
     if (quoteSql) {
-      return sqlToQuoteMapper(quoteSql)
+      return sqlToDomain(quoteSql)
     }
     throw new QuoteNotFoundError(quoteId)
   }
@@ -184,6 +184,6 @@ export class QuoteSqlRepository implements QuoteRepository {
     updatedQuoteSql.risk.otherPeople = otherPeopleResult
     updatedQuoteSql.policyHolder = updatedPolicyHoldersResult[1][0]
 
-    return sqlToQuoteMapper(updatedQuoteSql)
+    return sqlToDomain(updatedQuoteSql)
   }
 }

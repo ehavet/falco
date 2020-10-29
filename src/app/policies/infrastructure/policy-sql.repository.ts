@@ -1,7 +1,7 @@
 import { PolicyRepository } from '../domain/policy.repository'
 import { Policy } from '../domain/policy'
 import { PolicySqlModel } from './policy-sql.model'
-import { sqlToPolicyMapper } from './policy-sql.mapper'
+import { sqlToDomain } from './policy-sql.mapper'
 import { PolicyNotFoundError } from '../domain/policies.errors'
 import { PolicyPersonSqlModel } from './policy-person-sql.model'
 import { PolicyRiskSqlModel } from '../../quotes/infrastructure/policy-risk-sql.model'
@@ -55,7 +55,7 @@ export class PolicySqlRepository implements PolicyRepository {
     persistedPolicy.policyHolder = persistedPerson
     persistedPolicy.risk.person = persistedPerson
 
-    return sqlToPolicyMapper(persistedPolicy)
+    return sqlToDomain(persistedPolicy)
   }
 
   async get (policyId: string): Promise<Policy> {
@@ -64,7 +64,7 @@ export class PolicySqlRepository implements PolicyRepository {
         rejectOnEmpty: false, include: [{ all: true }, { model: PolicyRiskSqlModel, include: [{ all: true }] }]
       })
     if (policy) {
-      return sqlToPolicyMapper(policy)
+      return sqlToDomain(policy)
     }
     throw new PolicyNotFoundError(policyId)
   }

@@ -2,8 +2,10 @@ import { expect, HttpServerForTesting, newMinimalServer, sinon } from '../../../
 import { container, policiesRoutes } from '../../../../../src/app/policies/policies.container'
 import { PolicyNotFoundError } from '../../../../../src/app/policies/domain/policies.errors'
 import * as supertest from 'supertest'
-import { getStripePaymentIntentSucceededEvent } from '../../fixtures/stripeEvent.fixture'
+import { getStripePaymentIntentSucceededEvent } from '../../fixtures/payment/stripeEvent.fixture'
 import { UnauthenticatedEventError } from '../../../../../src/app/policies/domain/payment-processor.errors'
+import { Stripe } from 'stripe'
+import { createConfirmPaymentIntentCommandFixture } from '../../fixtures/payment/confirmPaymentIntentCommand.fixture'
 
 describe('Payment Intent Event Handler - API - Integration', async () => {
   let httpServer: HttpServerForTesting
@@ -47,8 +49,16 @@ describe('Payment Intent Event Handler - API - Integration', async () => {
         sinon.stub(container.PaymentEventAuthenticator, 'parse')
           .withArgs(JSON.stringify(event), stripeHeaderSignature).resolves(event)
 
+        const stripePaymentIntent = event.data.object as Stripe.PaymentIntent
+        const expectedCommand = createConfirmPaymentIntentCommandFixture({
+          policyId,
+          amount: stripePaymentIntent.amount,
+          externalId: stripePaymentIntent.id,
+          rawPaymentIntent: stripePaymentIntent
+        })
+
         sinon.stub(container, 'ConfirmPaymentIntentForPolicy')
-          .withArgs(policyId)
+          .withArgs(expectedCommand)
           .rejects(new PolicyNotFoundError(policyId))
 
         response = await httpServer.api()
@@ -102,8 +112,17 @@ describe('Payment Intent Event Handler - API - Integration', async () => {
         sinon.stub(container.PaymentEventAuthenticator, 'parse')
           .withArgs(JSON.stringify(event), stripeHeaderSignature).resolves(event)
 
+        const stripePaymentIntent = event.data.object as Stripe.PaymentIntent
+
+        const expectedCommand = createConfirmPaymentIntentCommandFixture({
+          policyId: 'APP463109486',
+          amount: stripePaymentIntent.amount,
+          externalId: stripePaymentIntent.id,
+          rawPaymentIntent: stripePaymentIntent
+        })
+
         sinon.stub(container, 'ConfirmPaymentIntentForPolicy')
-          .withArgs('APP463109486')
+          .withArgs(expectedCommand)
           .rejects(new Error())
 
         response = await httpServer.api()

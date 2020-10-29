@@ -52,6 +52,10 @@ import { PolicyRiskOtherPeopleSqlModel } from './infrastructure/policy-risk-othe
 import { PDFProcessor } from './infrastructure/pdf/pdf-processor'
 import { PDFtkPDFProcessor } from './infrastructure/pdf/pdftk.pdf-processor'
 import { pdfGenerationConfig } from '../../configs/pdf-generation.config'
+import { PaymentRepository } from './domain/payment/payment.repository'
+import { PaymentSqlRepository } from './infrastructure/payment/payment-sql.repository'
+import { PaymentSqlModel } from './infrastructure/payment/payment-sql.model'
+import { PaymentPolicySqlModel } from './infrastructure/payment/payment-policy-sql.model'
 const config = require('../../config')
 
 export interface Container {
@@ -71,7 +75,7 @@ export interface Container {
 const pdftkPDFProcessor: PDFProcessor = new PDFtkPDFProcessor(pdfGenerationConfig)
 const policyRepository: PolicyRepository = new PolicySqlRepository()
 const quoteRepository: QuoteRepository = quoteContainer.quoteRepository
-const paymentProcessor: StripePaymentProcessor = new StripePaymentProcessor(stripe)
+const paymentProcessor: StripePaymentProcessor = new StripePaymentProcessor(stripe, logger)
 const paymentEventAuthenticator: StripeEventAuthenticator = new StripeEventAuthenticator(stripeConfig)
 const partnerRepository: PartnerRepository = partnerContainer.partnerRepository
 const certificateGenerator: CertificateGenerator = new CertificatePdfGenerator(pdftkPDFProcessor)
@@ -82,13 +86,14 @@ const contractRepository: ContractRepository = new ContractFsRepository(config)
 const contractGenerator: ContractGenerator = new ContractPdfGenerator(pdftkPDFProcessor)
 const signatureRequestEventValidator: SignatureRequestEventValidator = new HelloSignRequestEventValidator(helloSignConfig)
 const mailer: Mailer = new Nodemailer(nodemailerTransporter)
+const paymentRepository: PaymentRepository = new PaymentSqlRepository()
 const createPaymentIntentForPolicy: CreatePaymentIntentForPolicy =
     CreatePaymentIntentForPolicy.factory(paymentProcessor, policyRepository)
 
 const sendValidationLinkToEmailAddress: SendValidationLinkToEmailAddress = emailValidationContainer.SendValidationLinkToEmailAddress
 const createPolicy: CreatePolicy = CreatePolicy.factory(policyRepository, quoteRepository, partnerRepository, sendValidationLinkToEmailAddress)
 const confirmPaymentIntentForPolicy: ConfirmPaymentIntentForPolicy =
-    ConfirmPaymentIntentForPolicy.factory(policyRepository, certificateGenerator, contractGenerator, contractRepository, mailer)
+    ConfirmPaymentIntentForPolicy.factory(policyRepository, certificateGenerator, contractGenerator, contractRepository, paymentRepository, paymentProcessor, mailer)
 const getPolicy: GetPolicy = GetPolicy.factory(policyRepository)
 const generatePolicyCertificate: GeneratePolicyCertificate = GeneratePolicyCertificate.factory(policyRepository, certificateGenerator)
 const getPolicySpecificTerms: GetPolicySpecificTerms = GetPolicySpecificTerms.factory(specificTermsRepository, specificTermsGenerator, policyRepository)
@@ -121,7 +126,9 @@ export const container: Container = {
 
 export const policySqlModels: Array<any> = [
   PolicySqlModel, PolicyPersonSqlModel, PolicyInsuranceSqlModel,
-  PolicyRiskOtherPeopleSqlModel, PolicyPropertySqlModel, PolicyRiskSqlModel]
+  PolicyRiskOtherPeopleSqlModel, PolicyPropertySqlModel, PolicyRiskSqlModel,
+  PaymentSqlModel, PaymentPolicySqlModel
+]
 
 export function policiesRoutes () {
   return routes(container)

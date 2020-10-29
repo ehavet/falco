@@ -4,6 +4,8 @@ import { Container } from '../../policies.container'
 import { ServerRoute } from '@hapi/hapi'
 import { PolicyNotFoundError } from '../../domain/policies.errors'
 import { UnauthenticatedEventError } from '../../domain/payment-processor.errors'
+import { Stripe } from 'stripe'
+import { requestToConfirmPaymentIntentCommand } from './mappers/create-confirm-payment-intent-command.mapper'
 
 const TAGS = ['api', 'payment-processor']
 export default function (container: Container): Array<ServerRoute> {
@@ -30,10 +32,10 @@ export default function (container: Container): Array<ServerRoute> {
       handler: async (request, h) => {
         const rawEvent = request.payload.toString()
         const rawSignature = request.raw.req.headers['stripe-signature']
-        let event
+        let parsedEvent: Stripe.Event
 
         try {
-          event = await container.PaymentEventAuthenticator.parse(rawEvent, rawSignature)
+          parsedEvent = await container.PaymentEventAuthenticator.parse(rawEvent, rawSignature)
         } catch (error) {
           if (error instanceof UnauthenticatedEventError) {
             throw Boom.forbidden(error.message)
@@ -42,9 +44,11 @@ export default function (container: Container): Array<ServerRoute> {
           }
         }
 
-        if (event.type === 'payment_intent.succeeded') {
+        if (parsedEvent.type === 'payment_intent.succeeded') {
+          const paymentIntent = parsedEvent.data.object as Stripe.PaymentIntent
           try {
-            await container.ConfirmPaymentIntentForPolicy(event.data.object.metadata.policy_id)
+            const command = requestToConfirmPaymentIntentCommand(paymentIntent)
+            await container.ConfirmPaymentIntentForPolicy(command)
             return h.response({}).code(204)
           } catch (error) {
             if (error instanceof PolicyNotFoundError) {
@@ -53,9 +57,9 @@ export default function (container: Container): Array<ServerRoute> {
               throw Boom.internal(error)
             }
           }
-        } else {
-          throw Boom.forbidden()
         }
+
+        throw Boom.forbidden()
       }
     }
   ]

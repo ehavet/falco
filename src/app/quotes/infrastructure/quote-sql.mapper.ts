@@ -2,7 +2,7 @@ import { Quote } from '../domain/quote'
 import { QuoteSqlModel } from './sql-models/quote-sql-model'
 import { QuotePersonSqlModel } from './sql-models/quote-person-sql.model'
 
-export function sqlToQuoteMapper (quoteSql: QuoteSqlModel): Quote {
+export function sqlToDomain (quoteSql: QuoteSqlModel): Quote {
   return {
     id: quoteSql.id,
     partnerCode: quoteSql.partnerCode,

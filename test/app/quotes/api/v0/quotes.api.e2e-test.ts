@@ -211,4 +211,36 @@ describe('Http API quotes e2e', async () => {
       })
     })
   })
+
+  describe('POST /v0/quotes/{id}/policy-holder/send-email-validation-email', () => {
+    let response: supertest.Response
+    let quoteRepository: QuoteRepository
+    const quoteId: string = 'UD65X3A'
+
+    beforeEach(async () => {
+      quoteRepository = new QuoteSqlRepository()
+      const quote: Quote = createQuoteFixture(
+        {
+          id: quoteId,
+          partnerCode: 'studyo'
+        }
+      )
+      await quoteRepository.save(quote)
+    })
+
+    afterEach(async () => {
+      await resetDb()
+    })
+
+    it('should send email validation email to quote policy holder', async () => {
+      // When
+      response = await httpServer.api()
+        .post(`/v0/quotes/${quoteId}/policy-holder/send-email-validation-email`)
+        .set('X-Consumer-Username', 'studyo')
+
+      // Then
+      expect(response.status).is.equal(204)
+      expect(response.body).to.be.empty
+    })
+  })
 })

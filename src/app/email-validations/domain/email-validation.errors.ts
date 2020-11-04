@@ -13,3 +13,11 @@ export class BadEmailValidationToken extends Error {
     this.name = 'BadEmailValidationToken'
   }
 }
+
+export class EmailValidationQueryConsistencyError extends Error {
+  constructor () {
+    const message: string = 'Inconsistent email validation query'
+    super(message)
+    this.name = 'EmailValidationQueryConsistencyError'
+  }
+}

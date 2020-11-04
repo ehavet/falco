@@ -4,6 +4,8 @@ import { Mailer } from '../../common-api/domain/mailer'
 import { ValidationLinkConfig } from '../../../configs/validation-link.config'
 import * as querystring from 'querystring'
 import { buildValidationLinkEmail } from './validation-link.email'
+import { EmailValidationQueryConsistencyError } from './email-validation.errors'
+import { ValidationTokenPayload } from './validation-token-payload'
 
 export interface SendValidationLinkToEmailAddress {
     (emailValidationQuery: EmailValidationQuery): Promise<void>
@@ -16,12 +18,18 @@ export namespace SendValidationLinkToEmailAddress {
       config: ValidationLinkConfig
     ): SendValidationLinkToEmailAddress {
       return async (emailValidationQuery: EmailValidationQuery) => {
+        if (_isQueryInconsistent(emailValidationQuery)) { throw new EmailValidationQueryConsistencyError() }
         const validationTokens = _buildValidationTokens(emailValidationQuery, config, encrypter)
         const emailValidationUriFr: string = _getEmailValidationUri(config.baseUrl, validationTokens.fr)
         const emailValidationUriEn: string = _getEmailValidationUri(config.baseUrl, validationTokens.en)
         await mailer.send(buildValidationLinkEmail(emailValidationQuery.email, emailValidationUriFr, emailValidationUriEn))
       }
     }
+}
+
+function _isQueryInconsistent (emailValidationQuery: EmailValidationQuery) {
+  return !!(emailValidationQuery.policyId && emailValidationQuery.quoteId) ||
+      !(emailValidationQuery.policyId || emailValidationQuery.quoteId)
 }
 
 function _getExpirationDate (validityPeriodInMonth: number): Date {
@@ -59,18 +67,22 @@ function _buildValidationTokenPayload (
   emailValidationQuery: EmailValidationQuery,
   config: ValidationLinkConfig,
   locale: string
-) {
-  return {
+): ValidationTokenPayload {
+  const payload: ValidationTokenPayload = {
     email: emailValidationQuery.email,
-    callbackUrl: _getCallbackUrl(emailValidationQuery.callbackUrl, locale, emailValidationQuery.partnerCode, emailValidationQuery.policyId, config),
-    policyId: emailValidationQuery.policyId,
+    callbackUrl: _getCallbackUrl(emailValidationQuery, locale, config),
     expiredAt: _getExpirationDate(config.validityPeriodinMonth)
   }
+  if (emailValidationQuery.policyId) payload.policyId = emailValidationQuery.policyId
+  if (emailValidationQuery.quoteId) payload.quoteId = emailValidationQuery.quoteId
+  return payload
 }
 
-function _getCallbackUrl (callbackUrl: string, locale: string, partnerCode: string, policyId: string, config: ValidationLinkConfig) : string {
-  if (callbackUrl && callbackUrl.length > 0) {
-    return `${callbackUrl}`
+function _getCallbackUrl (query: EmailValidationQuery, locale: string, config: ValidationLinkConfig) : string {
+  if (query.callbackUrl && query.callbackUrl.length > 0) { return `${query.callbackUrl}` }
+  if (query.policyId) {
+    return `${config.frontUrl}/${locale}/${query.partnerCode}/${config.frontCallbackPageRoute}?policy_id=${query.policyId}`
+  } else {
+    return `${config.frontUrl}/${locale}/${query.partnerCode}/${config.frontCallbackPageRoute}?quote_id=${query.quoteId}`
   }
-  return `${config.frontUrl}/${locale}/${partnerCode}/${config.frontCallbackPageRoute}?policy_id=${policyId}`
 }

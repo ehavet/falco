@@ -6,7 +6,7 @@ import { dbTestUtils, expect } from '../../../test-utils'
 import { PolicySqlModel } from '../../../../src/app/policies/infrastructure/policy-sql.model'
 import { PolicyRiskSqlModel } from '../../../../src/app/quotes/infrastructure/policy-risk-sql.model'
 import { PolicyNotFoundError } from '../../../../src/app/policies/domain/policies.errors'
-import { OperationCode } from '../../../../src/app/policies/domain/operation-code'
+import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
 import dayjs = require('dayjs');
 
 async function resetDb () {

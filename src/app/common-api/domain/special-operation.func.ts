@@ -1,4 +1,4 @@
-import { OperationCode } from '../../policies/domain/operation-code'
+import { OperationCode } from './operation-code'
 
 export namespace SpecialOperation {
 

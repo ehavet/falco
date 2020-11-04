@@ -1,5 +1,5 @@
 import { Partner } from '../../../../src/app/partners/domain/partner'
-import { OperationCode } from '../../../../src/app/policies/domain/operation-code'
+import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
 
 export function createPartnerFixture (attr: Partial<Partner> = {}): Partner {
   return {

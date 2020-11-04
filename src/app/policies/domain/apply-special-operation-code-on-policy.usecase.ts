@@ -1,6 +1,6 @@
 import { ApplySpecialOperationCodeCommand } from './apply-special-operation-code-command'
 import { PolicyRepository } from './policy.repository'
-import { OperationCode } from './operation-code'
+import { OperationCode } from '../../common-api/domain/operation-code'
 import { PartnerRepository } from '../../partners/domain/partner.repository'
 import { OperationCodeNotApplicableError } from './operation-code.errors'
 import { Policy } from './policy'

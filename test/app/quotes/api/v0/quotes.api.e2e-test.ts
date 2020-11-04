@@ -59,15 +59,47 @@ describe('Http API quotes e2e', async () => {
       })
     })
 
+    it('should return the quote with special operations code', async () => {
+      // When
+      response = await httpServer.api()
+        .post('/v0/quotes')
+        .send({ code: 'essca', risk: { property: { room_count: 2 } }, spec_ops_code: 'SEMESTER1' })
+        .set('X-Consumer-Username', 'essca')
+
+      // Then
+      expect(response.body).to.deep.equal({
+        id: response.body.id,
+        risk: {
+          property: {
+            room_count: 2
+          }
+        },
+        insurance: {
+          monthly_price: 6.34,
+          currency: 'EUR',
+          default_deductible: 120,
+          default_ceiling: 3000,
+          simplified_covers: ['ACDDE', 'ACINCEX', 'ACVOL', 'ACASSHE', 'ACDEFJU', 'ACRC'],
+          product_code: 'APP658',
+          product_version: '2020-07-15',
+          contractual_terms: '/docs/Appenin_Conditions_Generales_assurance_habitation_APP658.pdf',
+          ipid: '/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf'
+        },
+        special_operations_code: 'SEMESTER1',
+        special_operations_code_applied_at: '2020-04-18T10:09:08.000Z',
+        code: 'essca'
+      })
+    })
+
     it('should save the quote', async () => {
       // When
       response = await httpServer.api()
         .post('/v0/quotes')
-        .send({ code: 'partnerCode', risk: { property: { room_count: 2 } } })
-        .set('X-Consumer-Username', 'partnerCode')
+        .send({ code: 'essca', risk: { property: { room_count: 2 } } })
+        .set('X-Consumer-Username', 'essca')
 
       // Then
-      const savedQuote = QuoteSqlModel.findByPk(response.body.id)
+      const savedQuote = await QuoteSqlModel.findByPk(response.body.id)
       expect(savedQuote).not.to.be.undefined
     })
   })

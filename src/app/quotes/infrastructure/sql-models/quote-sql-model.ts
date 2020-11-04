@@ -18,6 +18,16 @@ export class QuoteSqlModel extends Model<QuoteSqlModel> {
     @Column
     nbMonthsDue!: number
 
+    @Column({
+      type: DataType.STRING
+    })
+    specialOperationsCode!: string | null
+
+    @Column({
+      type: DataType.DATEONLY
+    })
+    specialOperationsCodeAppliedAt!: Date | null
+
     @Column({ type: DataType.DATEONLY })
     startDate!: Date
 

@@ -124,7 +124,9 @@ describe('Repository - Quote', async () => {
     it('should update a given quote then return it', async () => {
       // Given
       const validationDate: Date = new Date('2020-01-13T00:00:00Z')
-      const initialQuote: Quote = createQuoteFixture({ id: 'RF85D4S' })
+      const initialQuote: Quote = createQuoteFixture({
+        id: 'RF85D4S'
+      })
       const updatedQuote: Quote = createQuoteFixture({
         id: 'RF85D4S',
         premium: 101,
@@ -173,7 +175,9 @@ describe('Repository - Quote', async () => {
           email: 'updated@email.com',
           phoneNumber: '+UPD4T3DPHON3',
           emailValidatedAt: validationDate
-        }
+        },
+        specialOperationsCode: 'SEMESTER1',
+        specialOperationsCodeAppliedAt: new Date('2020-01-05T00:00:00Z')
       })
       await quoteRepository.save(initialQuote)
 

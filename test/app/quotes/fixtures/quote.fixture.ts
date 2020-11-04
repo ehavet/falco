@@ -50,6 +50,8 @@ export function createQuoteFixture (attr:Partial<Quote> = {}): Quote {
     },
     premium: 69.84,
     nbMonthsDue: 12,
+    specialOperationsCode: undefined,
+    specialOperationsCodeAppliedAt: undefined,
     startDate: now,
     termStartDate: now,
     termEndDate: now,

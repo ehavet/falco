@@ -13,7 +13,7 @@ import { SinonStubbedInstance } from 'sinon'
 import { QuoteRiskPropertyRoomCountNotInsurableError, QuoteNotFoundError, QuoteRiskNumberOfRoommatesError, QuoteRiskRoommatesNotAllowedError, QuoteStartDateConsistencyError } from '../../../../src/app/quotes/domain/quote.errors'
 import { PartnerRepository } from '../../../../src/app/partners/domain/partner.repository'
 import { createPartnerFixture } from '../../partners/fixtures/partner.fixture'
-import { OperationCode } from '../../../../src/app/policies/domain/operation-code'
+import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
 import { OperationCodeNotApplicableError } from '../../../../src/app/policies/domain/operation-code.errors'
 import { Partner } from '../../../../src/app/partners/domain/partner'
 import { partnerRepositoryStub } from '../../partners/fixtures/partner-repository.test-doubles'
@@ -149,6 +149,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
     const expectedQuote: Quote = createQuoteFixture({
       id: quoteId,
       partnerCode: partnerCode,
+      nbMonthsDue: 10,
+      premium: 58.2,
       risk: {
         property: {
           roomCount: 1,
@@ -172,7 +174,11 @@ describe('Quotes - Usecase - Update Quote', async () => {
         phoneNumber: '+66666666666',
         emailValidatedAt: undefined
       },
-      termEndDate: new Date('2021-01-04T00:00:00.000Z')
+      specialOperationsCode: 'FULLYEAR',
+      specialOperationsCodeAppliedAt: new Date('2020-01-05T00:00:00.000Z'),
+      startDate: new Date('2020-01-05T00:00:00.000Z'),
+      termStartDate: new Date('2020-01-05T00:00:00.000Z'),
+      termEndDate: new Date('2020-11-04T00:00:00.000Z')
     })
 
     const updateQuoteCommand: UpdateQuoteCommand = {
@@ -193,7 +199,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
         email: 'henoch@book.com',
         phoneNumber: '+66666666666'
       },
-      startDate: now
+      startDate: now,
+      specOpsCode: 'FULLYEAR'
     }
 
     quoteRepository.update.withArgs(expectedQuote).resolves(expectedQuote)
@@ -272,6 +279,10 @@ describe('Quotes - Usecase - Update Quote', async () => {
         partnerCode: 'myPartner',
         premium: 29.1,
         nbMonthsDue: 5,
+        specialOperationsCode: 'SEMESTER1',
+        specialOperationsCodeAppliedAt: new Date('2020-01-05T00:00:00.000Z'),
+        startDate: new Date('2020-01-05T00:00:00.000Z'),
+        termStartDate: new Date('2020-01-05T00:00:00.000Z'),
         termEndDate: new Date('2020-06-04T00:00:00.000Z')
       }
     )
@@ -295,6 +306,10 @@ describe('Quotes - Usecase - Update Quote', async () => {
         partnerCode: 'myPartner',
         premium: 29.1,
         nbMonthsDue: 5,
+        specialOperationsCode: 'SEMESTER2',
+        specialOperationsCodeAppliedAt: new Date('2020-01-05T00:00:00.000Z'),
+        startDate: new Date('2020-01-05T00:00:00.000Z'),
+        termStartDate: new Date('2020-01-05T00:00:00.000Z'),
         termEndDate: new Date('2020-06-04T00:00:00.000Z')
       }
     )
@@ -318,6 +333,10 @@ describe('Quotes - Usecase - Update Quote', async () => {
         partnerCode: 'myPartner',
         premium: 58.2,
         nbMonthsDue: 10,
+        specialOperationsCode: 'FULLYEAR',
+        specialOperationsCodeAppliedAt: new Date('2020-01-05T00:00:00.000Z'),
+        startDate: new Date('2020-01-05T00:00:00.000Z'),
+        termStartDate: new Date('2020-01-05T00:00:00.000Z'),
         termEndDate: new Date('2020-11-04T00:00:00.000Z')
       }
     )
@@ -341,6 +360,10 @@ describe('Quotes - Usecase - Update Quote', async () => {
         partnerCode: 'myPartner',
         premium: 69.84,
         nbMonthsDue: 12,
+        specialOperationsCode: undefined,
+        specialOperationsCodeAppliedAt: undefined,
+        startDate: new Date('2020-01-05T00:00:00.000Z'),
+        termStartDate: new Date('2020-01-05T00:00:00.000Z'),
         termEndDate: new Date('2021-01-04T00:00:00.000Z')
       }
     )
@@ -364,6 +387,10 @@ describe('Quotes - Usecase - Update Quote', async () => {
         partnerCode: 'myPartner',
         premium: 69.84,
         nbMonthsDue: 12,
+        specialOperationsCode: undefined,
+        specialOperationsCodeAppliedAt: undefined,
+        startDate: new Date('2020-01-05T00:00:00.000Z'),
+        termStartDate: new Date('2020-01-05T00:00:00.000Z'),
         termEndDate: new Date('2021-01-04T00:00:00.000Z')
       }
     )
@@ -383,6 +410,10 @@ describe('Quotes - Usecase - Update Quote', async () => {
         id: 'UDQUOT3',
         partnerCode: 'myPartner',
         nbMonthsDue: 10,
+        specialOperationsCode: 'FULLYEAR',
+        specialOperationsCodeAppliedAt: new Date('2020-01-05T00:00:00.000Z'),
+        startDate: new Date('2020-01-05T00:00:00.000Z'),
+        termStartDate: new Date('2020-01-05T00:00:00.000Z'),
         premium: 58.2,
         termEndDate: new Date('2020-11-04T00:00:00.000Z')
       }
@@ -424,7 +455,11 @@ describe('Quotes - Usecase - Update Quote', async () => {
         partnerCode: 'myPartner',
         startDate: new Date('2020-07-01T00:00:00.000Z'),
         termStartDate: new Date('2020-07-01T00:00:00.000Z'),
-        termEndDate: new Date('2021-06-30T00:00:00.000Z')
+        termEndDate: new Date('2021-06-30T00:00:00.000Z'),
+        premium: 69.84,
+        nbMonthsDue: 12,
+        specialOperationsCode: undefined,
+        specialOperationsCodeAppliedAt: undefined
       }
     )
     quoteRepository.get.withArgs(quoteId).resolves(quote)

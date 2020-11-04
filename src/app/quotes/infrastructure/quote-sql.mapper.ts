@@ -11,6 +11,8 @@ export function sqlToDomain (quoteSql: QuoteSqlModel): Quote {
     startDate: new Date(quoteSql.startDate),
     termStartDate: new Date(quoteSql.termStartDate),
     termEndDate: new Date(quoteSql.termEndDate),
+    specialOperationsCode: quoteSql.specialOperationsCode || undefined,
+    specialOperationsCodeAppliedAt: quoteSql.specialOperationsCodeAppliedAt ? new Date(quoteSql.specialOperationsCodeAppliedAt) : undefined,
     risk: _sqlToRiskMapper(quoteSql),
     insurance: _sqlToInsuranceMapper(quoteSql),
     policyHolder: (quoteSql.policyHolder) ? _sqlToPolicyHolderMapper(quoteSql.policyHolder) : undefined

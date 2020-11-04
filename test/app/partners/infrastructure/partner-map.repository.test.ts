@@ -4,7 +4,7 @@ import { PartnerNotFoundError } from '../../../../src/app/partners/domain/partne
 import { Partner } from '../../../../src/app/partners/domain/partner'
 import { Quote } from '../../../../src/app/quotes/domain/quote'
 import { PartnerRepository } from '../../../../src/app/partners/domain/partner.repository'
-import { OperationCode } from '../../../../src/app/policies/domain/operation-code'
+import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
 import { createPartnerFixture } from '../fixtures/partner.fixture'
 
 const partnerJson = {

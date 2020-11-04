@@ -6,7 +6,7 @@ import dayjs from '../../../libs/dayjs'
 import { Partner } from '../../partners/domain/partner'
 import * as PartnerFunc from '../../partners/domain/partner.func'
 import { PolicyStartDateConsistencyError, PolicyRiskRoommatesNotAllowedError, PolicyRiskNumberOfRoommatesError } from './policies.errors'
-import { OperationCode } from './operation-code'
+import { OperationCode } from '../../common-api/domain/operation-code'
 
 const DEFAULT_NUMBER_OF_MONTHS_DUE = 12
 

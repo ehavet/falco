@@ -24,16 +24,24 @@ export namespace GetValidationCallbackUriFromToken {
         }
         throw error
       }
-      const validationTokenPayload: ValidationTokenPayload =
-            _buildValidationTokenPayload(validationTokenPayloadString)
 
-      if (_isTokenExpired(validationTokenPayload)) {
+      const validationTokenPayload: ValidationTokenPayload = _buildValidationTokenPayload(validationTokenPayloadString)
+
+      if (ValidationTokenPayload.isTokenInconsistent(validationTokenPayload)) {
+        throw new BadEmailValidationToken(validationToken.token)
+      }
+
+      if (ValidationTokenPayload.isTokenExpired(validationTokenPayload)) {
         throw new ExpiredEmailValidationTokenError(validationToken.token)
       }
 
-      const policy: Policy = await policyRepository.get(validationTokenPayload.policyId)
-      if (Policy.emailNotValidatedYet(policy)) {
-        await policyRepository.setEmailValidationDate(validationTokenPayload.policyId, new Date())
+      if (validationTokenPayload.policyId) {
+        const policy: Policy = await policyRepository.get(validationTokenPayload.policyId)
+        if (Policy.emailNotValidatedYet(policy)) {
+          await policyRepository.setEmailValidationDate(validationTokenPayload.policyId, new Date())
+        }
+      } else {
+        throw Error('not implemented')
       }
 
       return { callbackUrl: validationTokenPayload.callbackUrl }
@@ -47,10 +55,7 @@ function _buildValidationTokenPayload (validationTokenPayloadString: string): Va
     email: validationTokenPayloadJson.email,
     callbackUrl: validationTokenPayloadJson.callbackUrl,
     policyId: validationTokenPayloadJson.policyId,
+    quoteId: validationTokenPayloadJson.quoteId,
     expiredAt: new Date(validationTokenPayloadJson.expiredAt)
   }
-}
-
-function _isTokenExpired (validationTokenPayload: ValidationTokenPayload) {
-  return (validationTokenPayload.expiredAt < new Date())
 }

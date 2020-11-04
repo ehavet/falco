@@ -9,7 +9,7 @@ import {
   QuoteNotFoundError,
   QuoteRiskNumberOfRoommatesError,
   QuoteRiskRoommatesNotAllowedError,
-  QuoteStartDateConsistencyError
+  QuoteStartDateConsistencyError, QuotePolicyHolderEmailNotFoundError
 } from '../../../../../src/app/quotes/domain/quote.errors'
 import { createQuoteFixture, createQuoteInsuranceFixture, createQuoteRiskFixture, createUpdateQuoteCommandFixture, createUpdateQuoteCommandRiskFixture, createUpdateQuotePayloadFixture } from '../../fixtures/quote.fixture'
 import { UpdateQuoteCommand } from '../../../../../src/app/quotes/domain/update-quote-command'
@@ -167,6 +167,93 @@ describe('Http API - Quotes - Integ', async () => {
         response = await httpServer.api()
           .post('/v0/quotes')
           .send({ code: 'myPartner', risk: { property: {} } })
+          .set('X-Consumer-Username', 'myPartner')
+
+        expect(response).to.have.property('statusCode', 400)
+      })
+    })
+  })
+
+  describe('POST /v0/quotes/{id}/policy-holder/send-email-validation-email', () => {
+    let response: supertest.Response
+    const quoteId: string = 'QU0T31D'
+
+    describe('when success', () => {
+      it('should call usecase then reply with status 204', async () => {
+        // Given
+        sinon.stub(container, 'SendValidationLinkEmailToQuotePolicyHolder').withArgs(quoteId).resolves()
+        // When
+        response = await httpServer.api()
+          .post(`/v0/quotes/${quoteId}/policy-holder/send-email-validation-email`)
+          .set('X-Consumer-Username', 'myPartner')
+        // Then
+        expect(response).to.have.property('statusCode', 204)
+      })
+    })
+
+    describe('when QuoteNotFoundError is thrown by usecase', () => {
+      it('should reply with status 404', async () => {
+        // Given
+        const quoteId: string = 'QU0T31D'
+        sinon.stub(container, 'SendValidationLinkEmailToQuotePolicyHolder')
+          .withArgs(quoteId).rejects(new QuoteNotFoundError(quoteId))
+
+        // When
+        response = await httpServer.api()
+          .post(`/v0/quotes/${quoteId}/policy-holder/send-email-validation-email`)
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 404)
+        expect(response.body).to.have.property('message', `Could not find quote with id : ${quoteId}`)
+      })
+    })
+
+    describe('when PartnerNotFoundError is thrown by usecase', () => {
+      it('should reply with status 500', async () => {
+        // Given
+        const quoteId: string = 'QU0T31D'
+        const partnerCode: string = 'myPartner'
+        sinon.stub(container, 'SendValidationLinkEmailToQuotePolicyHolder')
+          .withArgs(quoteId).rejects(new PartnerNotFoundError(partnerCode))
+
+        // When
+        response = await httpServer.api()
+          .post(`/v0/quotes/${quoteId}/policy-holder/send-email-validation-email`)
+          .set('X-Consumer-Username', partnerCode)
+
+        // Then
+        expect(response).to.have.property('statusCode', 500)
+        expect(response.body).to.have.property('message', 'An internal server error occurred')
+      })
+    })
+
+    describe('when QuotePolicyHolderEmailNotFoundError is thrown by usecase', () => {
+      it('should reply with status 409', async () => {
+        // Given
+        const quoteId: string = 'QU0T31D'
+        sinon.stub(container, 'SendValidationLinkEmailToQuotePolicyHolder')
+          .withArgs(quoteId).rejects(new QuotePolicyHolderEmailNotFoundError(quoteId))
+
+        // When
+        response = await httpServer.api()
+          .post(`/v0/quotes/${quoteId}/policy-holder/send-email-validation-email`)
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 409)
+        expect(response.body).to.have.property('message', `Could not find email address for policy holder attached to quote with id : ${quoteId}`)
+      })
+    })
+
+    describe('when a validation error occurred', () => {
+      it('should reply with status 400', async () => {
+        // Given
+        const wrongQuoteId: string = 'QuoteIdT00L0NGT00L0NGT00L0NGT00L0NGT00L0NG'
+
+        // When
+        response = await httpServer.api()
+          .post(`/v0/quotes/${wrongQuoteId}/policy-holder/send-email-validation-email`)
           .set('X-Consumer-Username', 'myPartner')
 
         expect(response).to.have.property('statusCode', 400)

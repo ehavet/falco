@@ -196,6 +196,10 @@ export namespace Quote {
       }
       return quote
     }
+
+    export function isPolicyHolderEmailUndefined (quote: Quote): boolean {
+      return !quote.policyHolder?.email
+    }
 }
 
 export namespace Quote.Risk {

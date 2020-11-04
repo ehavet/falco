@@ -1,10 +1,12 @@
 import * as Boom from '@hapi/boom'
+import * as HttpErrorSchema from '../../../common-api/HttpErrorSchema'
 import { ServerRoute } from '@hapi/hapi'
 import { CreateQuoteCommand } from '../../domain/create-quote-command'
 import { quoteToResource } from './quote-to-resource.mapper'
 import { Container } from '../../quote.container'
 import { PartnerNotFoundError } from '../../../partners/domain/partner.errors'
 import {
+  QuotePolicyHolderEmailNotFoundError,
   NoPartnerInsuranceForRiskError,
   QuoteRiskPropertyRoomCountNotInsurableError,
   QuoteNotFoundError,
@@ -13,14 +15,13 @@ import {
   QuoteStartDateConsistencyError
 } from '../../domain/quote.errors'
 import Joi from '@hapi/joi'
-import * as HttpErrorSchema from '../../../common-api/HttpErrorSchema'
-import { quotePostRequestBodySchema } from './schemas/quotes-post-request.schema'
-import { quotePutRequestBodySchema } from './schemas/quotes-put-request.schema'
-import { quoteResponseBodySchema } from './schemas/quotes-response.schema'
 import { UpdateQuoteCommand } from '../../domain/update-quote-command'
-import { requestToUpdateQuoteCommand } from './mappers/request-to-update-quote-command.mapper'
 import { updatedQuoteToResource } from './mappers/updated-quote-to-resource.mapper'
 import { OperationCodeNotApplicableError } from '../../../policies/domain/operation-code.errors'
+import { quoteResponseBodySchema } from './schemas/quotes-response.schema'
+import { quotePutRequestBodySchema } from './schemas/quotes-put-request.schema'
+import { quotePostRequestBodySchema } from './schemas/quotes-post-request.schema'
+import { requestToUpdateQuoteCommand } from './mappers/request-to-update-quote-command.mapper'
 
 const TAGS = ['api', 'quotes']
 
@@ -85,6 +86,44 @@ export default function (container: Container): Array<ServerRoute> {
       }
     },
     {
+      method: 'POST',
+      path: '/v0/quotes/{id}/policy-holder/send-email-validation-email',
+      options: {
+        tags: TAGS,
+        description: 'send an email with a link to validate quote policy holder email address',
+        validate: {
+          params: Joi.object({
+            id: Joi.string().min(6).max(12).required().description('Quote id').example('DU6C73X')
+          })
+        },
+        response: {
+          status: {
+            204: Joi.object({}),
+            400: HttpErrorSchema.badRequestSchema,
+            404: HttpErrorSchema.notFoundSchema,
+            409: HttpErrorSchema.conflictSchema,
+            500: HttpErrorSchema.internalServerErrorSchema
+          }
+        }
+      },
+      handler: async (request, h) => {
+        try {
+          const quoteId: string = request.params.id
+          await container.SendValidationLinkEmailToQuotePolicyHolder(quoteId)
+          return h.response({}).code(204)
+        } catch (error) {
+          switch (true) {
+            case error instanceof QuoteNotFoundError:
+              throw Boom.notFound(error.message)
+            case error instanceof QuotePolicyHolderEmailNotFoundError:
+              throw Boom.conflict(error.message)
+            default:
+              throw Boom.internal(error.message)
+          }
+        }
+      }
+    },
+    {
       method: 'PUT',
       path: '/v0/quotes/{id}',
       options: {
@@ -130,6 +169,5 @@ export default function (container: Container): Array<ServerRoute> {
         }
       }
     }
-
   ]
 }

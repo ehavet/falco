@@ -16,6 +16,14 @@ export class QuoteNotFoundError extends Error {
   }
 }
 
+export class QuotePolicyHolderEmailNotFoundError extends Error {
+  constructor (quoteId: string) {
+    const message: string = `Could not find email address for policy holder attached to quote with id : ${quoteId}`
+    super(message)
+    this.name = 'QuotePolicyHolderEmailNotFoundError'
+  }
+}
+
 export class QuoteRiskPropertyRoomCountNotInsurableError extends Error {
   constructor (roomCount: number) {
     const message: string = `${roomCount} room(s) property is not insurable`

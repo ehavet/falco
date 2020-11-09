@@ -14,7 +14,10 @@ export function quoteToResource (quote: Quote) {
 function _toRisk (risk: Quote.Risk) {
   return {
     property: {
-      room_count: risk.property.roomCount
+      room_count: risk.property.roomCount,
+      address: risk.property.address,
+      postal_code: risk.property.postalCode ? parseInt(risk.property.postalCode) : undefined,
+      city: risk.property.city
     }
   }
 }

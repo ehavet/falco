@@ -33,7 +33,7 @@ describe('Http API quotes e2e', async () => {
       // When
       response = await httpServer.api()
         .post('/v0/quotes')
-        .send({ code: 'studyo', risk: { property: { room_count: 2 } } })
+        .send({ code: 'studyo', risk: { property: { room_count: 2, address: '15 Rue Des Amandiers', postal_code: 91110, city: 'Les Ulysses' } } })
         .set('X-Consumer-Username', 'studyo')
 
       // Then
@@ -41,7 +41,10 @@ describe('Http API quotes e2e', async () => {
         id: response.body.id,
         risk: {
           property: {
-            room_count: 2
+            room_count: 2,
+            address: '15 Rue Des Amandiers',
+            postal_code: 91110,
+            city: 'Les Ulysses'
           }
         },
         insurance: {

@@ -8,7 +8,7 @@ import { quoteRepositoryMock } from '../fixtures/quote-repository.test-doubles'
 import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
 
 describe('Quotes - Usecase - Create Quote', async () => {
-  let createQuote
+  let createQuote: CreateQuote
   const quoteRepository = quoteRepositoryMock()
   const partnerRepository = { getByCode: sinon.stub(), getOffer: sinon.stub(), getCallbackUrl: sinon.stub(), getOperationCodes: sinon.stub() }
   const partnerOffer : Partner.Offer = {
@@ -30,7 +30,10 @@ describe('Quotes - Usecase - Create Quote', async () => {
     partnerCode: 'myPartner',
     risk: {
       property: {
-        roomCount: 2
+        roomCount: 2,
+        address: '15 Rue Des Amandiers',
+        postalCode: '91110',
+        city: 'Les Ulysses'
       }
     },
     insurance: {
@@ -69,7 +72,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
       quoteRepository.save.resolves()
 
       // When
-      const quote: Quote = await createQuote({ partnerCode: 'myPartner', risk: { property: { roomCount: 2 } } })
+      const quote: Quote = await createQuote({ partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses' } } })
 
       // Then
       expect(quote).to.deep.include({ partnerCode: expectedQuote.partnerCode })
@@ -155,7 +158,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
 
   it('should save the quote', async () => {
     // Given
-    const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2 } } }
+    const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses' } } }
     quoteRepository.save.resolves()
 
     // When

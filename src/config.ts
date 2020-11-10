@@ -1,4 +1,5 @@
 import { Envie, Joi } from 'envie'
+
 require('dotenv').config()
 
 export type Config = Map<string, any>
@@ -44,5 +45,7 @@ module.exports = Envie({
 
   FALCO_API_HELLO_SIGN_PRODUCTION_MODE: Joi.boolean(),
 
-  FALCO_API_HELLO_SIGN_CLIENT_ID: Joi.string()
+  FALCO_API_HELLO_SIGN_CLIENT_ID: Joi.string(),
+
+  FALCO_API_PDF_GENERATION_PRODUCTION_MODE: Joi.boolean()
 }) as Config

@@ -12,6 +12,7 @@ import { OperationCode } from '../../../../src/app/policies/domain/operation-cod
 import { OperationCodeNotApplicableError } from '../../../../src/app/policies/domain/operation-code.errors'
 import { Partner } from '../../../../src/app/partners/domain/partner'
 import { partnerRepositoryStub } from '../../partners/fixtures/partner-repository.test-doubles'
+import { quoteRepositoryStub } from '../fixtures/quote-repository.test-doubles'
 
 describe('Quotes - Usecase - Update Quote', async () => {
   const now: Date = new Date('2020-01-05T00:00:00Z')
@@ -25,7 +26,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
   beforeEach(() => {
     dateFaker.setCurrentDate(now)
     quote = createQuoteFixture({ id: quoteId, partnerCode: partnerCode })
-    quoteRepository = { save: sinon.stub(), get: sinon.stub(), update: sinon.mock() }
+    quoteRepository = quoteRepositoryStub({ update: sinon.mock() })
     partnerRepository = partnerRepositoryStub()
     partnerRepository.getByCode.withArgs(partnerCode).resolves(createPartnerFixture(
       {
@@ -169,7 +170,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
         postalCode: '66666',
         city: 'Babylone',
         email: 'henoch@book.com',
-        phoneNumber: '+66666666666'
+        phoneNumber: '+66666666666',
+        emailValidatedAt: undefined
       },
       startDate: new Date('2020-01-05T00:00:00.000Z'),
       termStartDate: new Date('2020-01-05T00:00:00.000Z'),

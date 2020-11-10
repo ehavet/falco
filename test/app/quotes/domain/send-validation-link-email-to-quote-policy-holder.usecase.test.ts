@@ -8,9 +8,10 @@ import { QuoteRepository } from '../../../../src/app/quotes/domain/quote.reposit
 import { PartnerRepository } from '../../../../src/app/partners/domain/partner.repository'
 import { QuoteNotFoundError, QuotePolicyHolderEmailNotFoundError } from '../../../../src/app/quotes/domain/quote.errors'
 import { PartnerNotFoundError } from '../../../../src/app/partners/domain/partner.errors'
+import { quoteRepositoryStub } from '../fixtures/quote-repository.test-doubles'
 
 describe('Usecase - Send an email validation link email to quote policy holder', async () => {
-  const quoteRepository: SinonStubbedInstance<QuoteRepository> = { save: sinon.stub(), get: sinon.stub(), update: sinon.mock() }
+  const quoteRepository: SinonStubbedInstance<QuoteRepository> = quoteRepositoryStub()
   const partnerRepository: SinonStubbedInstance<PartnerRepository> = partnerRepositoryStub()
   const sendValidationLinkToEmailAddress = sinon.stub()
   const quoteId: string = 'QU0T31D'

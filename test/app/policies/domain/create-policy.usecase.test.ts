@@ -15,6 +15,7 @@ import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles
 import { createPartnerFixture } from '../../partners/fixtures/partner.fixture'
 import { PolicyRiskRoommatesNotAllowedError } from '../../../../src/app/policies/domain/policies.errors'
 import { Partner } from '../../../../src/app/partners/domain/partner'
+import { quoteRepositoryStub } from '../../quotes/fixtures/quote-repository.test-doubles'
 import Question = Partner.Question
 
 describe('Policies - Usecase - Create policy', async () => {
@@ -22,7 +23,7 @@ describe('Policies - Usecase - Create policy', async () => {
   const quote: Quote = createQuoteFixture()
   const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({ quoteId: quote.id, startDate: null })
   const policyRepository: SinonStubbedInstance<PolicyRepository> = policyRepositoryStub()
-  const quoteRepository: SinonStubbedInstance<QuoteRepository> = { save: sinon.stub(), get: sinon.stub(), update: sinon.stub() }
+  const quoteRepository: SinonStubbedInstance<QuoteRepository> = quoteRepositoryStub()
   const partnerRepository: SinonStubbedInstance<PartnerRepository> = { getByCode: sinon.stub(), getOffer: sinon.stub(), getCallbackUrl: sinon.stub(), getOperationCodes: sinon.stub() }
   const sendValidationLinkToEmailAddress = sinon.stub()
   const createPolicy: CreatePolicy = CreatePolicy.factory(policyRepository, quoteRepository, partnerRepository, sendValidationLinkToEmailAddress)

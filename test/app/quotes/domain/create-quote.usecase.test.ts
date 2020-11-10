@@ -4,10 +4,11 @@ import { CreateQuoteCommand } from '../../../../src/app/quotes/domain/create-quo
 import { Partner } from '../../../../src/app/partners/domain/partner'
 import { QuoteRiskPropertyRoomCountNotInsurableError } from '../../../../src/app/quotes/domain/quote.errors'
 import { CreateQuote } from '../../../../src/app/quotes/domain/create-quote.usecase'
+import { quoteRepositoryMock } from '../fixtures/quote-repository.test-doubles'
 
 describe('Quotes - Usecase - Create Quote', async () => {
   let createQuote
-  const quoteRepository = { save: sinon.mock(), get: sinon.stub(), update: sinon.stub }
+  const quoteRepository = quoteRepositoryMock()
   const partnerRepository = { getByCode: sinon.stub(), getOffer: sinon.stub(), getCallbackUrl: sinon.stub(), getOperationCodes: sinon.stub() }
   const partnerOffer : Partner.Offer = {
     pricingMatrix: new Map([

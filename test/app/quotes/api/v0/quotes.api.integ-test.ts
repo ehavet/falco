@@ -325,7 +325,8 @@ describe('Http API - Quotes - Integ', async () => {
           postal_code: '91100',
           city: 'Kyukamura',
           email: 'jeanjean@email.com',
-          phone_number: '+33684205510'
+          phone_number: '+33684205510',
+          email_validated_at: null
         },
         nb_months_due: 12,
         premium: 120,

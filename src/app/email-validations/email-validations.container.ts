@@ -10,6 +10,8 @@ import { validationLinkConfig } from '../../configs/validation-link.config'
 import { nodemailerTransporter } from '../../libs/nodemailer'
 import { PolicyRepository } from '../policies/domain/policy.repository'
 import { PolicySqlRepository } from '../policies/infrastructure/policy-sql.repository'
+import { QuoteRepository } from '../quotes/domain/quote.repository'
+import { QuoteSqlRepository } from '../quotes/infrastructure/quote-sql.repository'
 
 export interface Container {
     SendValidationLinkToEmailAddress: SendValidationLinkToEmailAddress
@@ -21,9 +23,10 @@ export interface Container {
 const policyRepository: PolicyRepository = new PolicySqlRepository()
 const mailer: Mailer = new Nodemailer(nodemailerTransporter)
 const crypter: Crypter = new CryptoCrypter(cryptoConfig)
+const quoteRepository: QuoteRepository = new QuoteSqlRepository()
 
 const sendValidationLinkToEmailAddress: SendValidationLinkToEmailAddress = SendValidationLinkToEmailAddress.factory(crypter, mailer, validationLinkConfig)
-const getValidationCallbackUriFromToken: GetValidationCallbackUriFromToken = GetValidationCallbackUriFromToken.factory(crypter, policyRepository)
+const getValidationCallbackUriFromToken: GetValidationCallbackUriFromToken = GetValidationCallbackUriFromToken.factory(crypter, policyRepository, quoteRepository)
 
 export const container: Container = {
   SendValidationLinkToEmailAddress: sendValidationLinkToEmailAddress,

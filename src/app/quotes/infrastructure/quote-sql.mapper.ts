@@ -66,6 +66,7 @@ function _sqlToPolicyHolderMapper (quotePersonSql: QuotePersonSqlModel) {
     postalCode: sql.postalCode ? sql.postalCode : undefined,
     city: sql.city ? sql.city : undefined,
     email: sql.email ? sql.email : undefined,
-    phoneNumber: sql.phoneNumber ? sql.phoneNumber : undefined
+    phoneNumber: sql.phoneNumber ? sql.phoneNumber : undefined,
+    emailValidatedAt: sql.emailValidatedAt ? sql.emailValidatedAt : undefined
   }
 }

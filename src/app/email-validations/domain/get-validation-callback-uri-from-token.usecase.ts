@@ -6,13 +6,19 @@ import { ExpiredEmailValidationTokenError, BadEmailValidationToken } from './ema
 import { BadDecryptError } from '../infrastructure/crypto.crypter'
 import { PolicyRepository } from '../../policies/domain/policy.repository'
 import { Policy } from '../../policies/domain/policy'
+import { QuoteRepository } from '../../quotes/domain/quote.repository'
+import { Quote } from '../../quotes/domain/quote'
 
 export interface GetValidationCallbackUriFromToken {
-    (validationToken: ValidationToken): Promise<ValidationCallbackUri>
+  (validationToken: ValidationToken): Promise<ValidationCallbackUri>
 }
 
 export namespace GetValidationCallbackUriFromToken {
-  export function factory (decrypter: Crypter, policyRepository: PolicyRepository): GetValidationCallbackUriFromToken {
+  export function factory (
+    decrypter: Crypter,
+    policyRepository: PolicyRepository,
+    quoteRepository: QuoteRepository
+  ): GetValidationCallbackUriFromToken {
     return async (validationToken: ValidationToken) => {
       let validationTokenPayloadString: string
 
@@ -37,11 +43,15 @@ export namespace GetValidationCallbackUriFromToken {
 
       if (validationTokenPayload.policyId) {
         const policy: Policy = await policyRepository.get(validationTokenPayload.policyId)
-        if (Policy.emailNotValidatedYet(policy)) {
-          await policyRepository.setEmailValidationDate(validationTokenPayload.policyId, new Date())
+        if (Policy.isEmailNotValidated(policy)) {
+          await policyRepository.setEmailValidatedAt(validationTokenPayload.policyId, new Date())
         }
-      } else {
-        throw Error('not implemented')
+      } else if (validationTokenPayload.quoteId) {
+        const quote: Quote = await quoteRepository.get(validationTokenPayload.quoteId)
+        if (Quote.isEmailNoValidated(quote)) {
+          Quote.setPolicyHolderEmailValidatedAt(quote, new Date())
+          await quoteRepository.update(quote)
+        }
       }
 
       return { callbackUrl: validationTokenPayload.callbackUrl }

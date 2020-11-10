@@ -45,13 +45,28 @@ export function createQuoteFixture (attr:Partial<Quote> = {}): Quote {
       postalCode: '91100',
       city: 'Kyukamura',
       email: 'jeanjean@email.com',
-      phoneNumber: '+33684205510'
+      phoneNumber: '+33684205510',
+      emailValidatedAt: undefined
     },
     premium: 120,
     nbMonthsDue: 10,
     startDate: now,
     termStartDate: now,
     termEndDate: now,
+    ...attr
+  }
+}
+
+export function createQuotePolicyHolderFixture (attr:Partial<Quote.PolicyHolder> = {}): Quote.PolicyHolder {
+  return {
+    firstname: 'Jean-Jean',
+    lastname: 'Lapin',
+    address: '88 rue des prairies',
+    postalCode: '91100',
+    city: 'Kyukamura',
+    email: 'jeanjean@email.com',
+    phoneNumber: '+33684205510',
+    emailValidatedAt: undefined,
     ...attr
   }
 }

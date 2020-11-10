@@ -5,9 +5,11 @@ import { createQuoteFixture } from '../fixtures/quote.fixture'
 import { QuoteNotFoundError } from '../../../../src/app/quotes/domain/quote.errors'
 import { QuoteRiskSqlModel } from '../../../../src/app/quotes/infrastructure/sql-models/quote-risk-sql.model'
 import { QuoteSqlModel } from '../../../../src/app/quotes/infrastructure/sql-models/quote-sql-model'
+import { QuotePersonSqlModel } from '../../../../src/app/quotes/infrastructure/sql-models/quote-person-sql.model'
 
 async function resetDb () {
   await QuoteSqlModel.destroy({ truncate: true, cascade: true })
+  await QuotePersonSqlModel.destroy({ truncate: true, cascade: true })
 }
 
 describe('Repository - Quote', async () => {
@@ -28,7 +30,9 @@ describe('Repository - Quote', async () => {
   describe('#save', async () => {
     it('should save the quote into the db', async () => {
       // Given
-      const expectedQuote: Quote = createQuoteFixture({ id: 'RF85D4S' })
+      const expectedQuote: Quote = createQuoteFixture({
+        id: 'RF85D4S'
+      })
 
       // When
       const quote = await quoteRepository.save(expectedQuote)
@@ -93,7 +97,9 @@ describe('Repository - Quote', async () => {
   describe('#get', async () => {
     it('should return the found quote', async () => {
       // Given
-      const expectedQuote: Quote = createQuoteFixture({ id: 'DC82S0V' })
+      const expectedQuote: Quote = createQuoteFixture({
+        id: 'DC82S0V'
+      })
       await quoteRepository.save(expectedQuote)
 
       // When
@@ -117,6 +123,7 @@ describe('Repository - Quote', async () => {
   describe('#update', async () => {
     it('should update a given quote then return it', async () => {
       // Given
+      const validationDate: Date = new Date('2020-01-13T00:00:00Z')
       const initialQuote: Quote = createQuoteFixture({ id: 'RF85D4S' })
       const updatedQuote: Quote = createQuoteFixture({
         id: 'RF85D4S',
@@ -164,7 +171,8 @@ describe('Repository - Quote', async () => {
           postalCode: '66666',
           city: 'updated policy holder city',
           email: 'updated@email.com',
-          phoneNumber: '+UPD4T3DPHON3'
+          phoneNumber: '+UPD4T3DPHON3',
+          emailValidatedAt: validationDate
         }
       })
       await quoteRepository.save(initialQuote)
@@ -218,6 +226,7 @@ describe('Repository - Quote', async () => {
       expect(savedPolicyHolder.city).to.equal('updated policy holder city')
       expect(savedPolicyHolder.email).to.equal('updated@email.com')
       expect(savedPolicyHolder.phoneNumber).to.equal('+UPD4T3DPHON3')
+      expect(savedPolicyHolder.emailValidatedAt).to.deep.equal(validationDate)
     })
 
     it('should update with null when undefined quote values', async () => {

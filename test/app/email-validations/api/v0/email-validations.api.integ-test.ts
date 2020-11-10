@@ -4,6 +4,7 @@ import { container, emailValidationsRoutes } from '../../../../../src/app/email-
 import { ValidationCallbackUri } from '../../../../../src/app/email-validations/domain/validation-callback-uri'
 import { ExpiredEmailValidationTokenError } from '../../../../../src/app/email-validations/domain/email-validation.errors'
 import { PolicyNotFoundError } from '../../../../../src/app/policies/domain/policies.errors'
+import { QuoteNotFoundError } from '../../../../../src/app/quotes/domain/quote.errors'
 
 describe('Email Validations - API - Integ', async () => {
   let httpServer: HttpServerForTesting
@@ -86,6 +87,25 @@ describe('Email Validations - API - Integ', async () => {
         sinon.stub(container, 'GetValidationCallbackUriFromToken')
           .withArgs({ token: 'Yofl0qsXdbJ3dgZXzSFLV5/3v/nbeGqPWns/Q==' })
           .rejects(new PolicyNotFoundError('APP374522902'))
+
+        // When
+        response = await httpServer.api()
+          .post('/internal/v0/email-validations/validate')
+          .send({
+            token: 'Yofl0qsXdbJ3dgZXzSFLV5/3v/nbeGqPWns/Q=='
+          })
+
+        // Then
+        expect(response).to.have.property('statusCode', 422)
+      })
+    })
+
+    describe('when the quote associated to the validation does not exists', () => {
+      it('should reply with status 422', async () => {
+        // Given
+        sinon.stub(container, 'GetValidationCallbackUriFromToken')
+          .withArgs({ token: 'Yofl0qsXdbJ3dgZXzSFLV5/3v/nbeGqPWns/Q==' })
+          .rejects(new QuoteNotFoundError('QU0T34522902'))
 
         // When
         response = await httpServer.api()

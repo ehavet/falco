@@ -58,13 +58,18 @@ export namespace Quote {
     export function update (quote: Quote, partner: Partner, command: UpdateQuoteCommand, partnerAvailableCodes: Array<OperationCode>): Quote {
       quote.risk = _buildQuoteRisk(command.risk, partner)
       quote.insurance = getInsurance(quote.risk, partner.offer)
-      quote.policyHolder = _buildQuotePolicyHolder(command)
+      quote.policyHolder = _buildQuotePolicyHolder(quote, command)
       _applyStartDate(quote, command.startDate)
       _applyOperationCode(quote, partnerAvailableCodes, command.specOpsCode)
       return quote
     }
 
-    function _buildQuotePolicyHolder (command: UpdateQuoteCommand): Quote.PolicyHolder {
+    export function setPolicyHolderEmailValidatedAt (quote: Quote, date: Date): Quote {
+        quote.policyHolder!.emailValidatedAt = date
+        return quote
+    }
+
+    function _buildQuotePolicyHolder (quote: Quote, command: UpdateQuoteCommand): Quote.PolicyHolder {
       return {
         firstname: command.risk.person?.firstname,
         lastname: command.risk.person?.lastname,
@@ -72,7 +77,8 @@ export namespace Quote {
         postalCode: command.risk.property.postalCode,
         city: command.risk.property.city,
         email: command.policyHolder?.email,
-        phoneNumber: command.policyHolder?.phoneNumber
+        phoneNumber: command.policyHolder?.phoneNumber,
+        emailValidatedAt: quote.policyHolder!.emailValidatedAt
       }
     }
 
@@ -199,6 +205,10 @@ export namespace Quote {
 
     export function isPolicyHolderEmailUndefined (quote: Quote): boolean {
       return !quote.policyHolder?.email
+    }
+
+    export function isEmailNoValidated (quote: Quote): boolean {
+      return quote.policyHolder?.emailValidatedAt === undefined || quote.policyHolder?.emailValidatedAt === null
     }
 }
 

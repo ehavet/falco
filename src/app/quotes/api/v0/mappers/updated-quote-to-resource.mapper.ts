@@ -63,6 +63,7 @@ function _toPolicyHolder (policyHolder: Quote.PolicyHolder) {
     postal_code: policyHolder.postalCode ? policyHolder.postalCode : null,
     city: policyHolder.city ? policyHolder.city : null,
     email: policyHolder.email ? policyHolder.email : null,
-    phone_number: policyHolder.phoneNumber ? policyHolder.phoneNumber : null
+    phone_number: policyHolder.phoneNumber ? policyHolder.phoneNumber : null,
+    email_validated_at: policyHolder.emailValidatedAt ? policyHolder.emailValidatedAt : null
   }
 }

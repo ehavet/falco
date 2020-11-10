@@ -26,7 +26,7 @@ describe('Policies - Usecase - Get Policy Specific Terms', async () => {
     save: sinon.stub(),
     isIdAvailable: sinon.stub(),
     get: sinon.stub(),
-    setEmailValidationDate: sinon.stub(),
+    setEmailValidatedAt: sinon.stub(),
     updateAfterPayment: sinon.stub(),
     updateAfterSignature: sinon.stub(),
     update: sinon.stub()

@@ -39,7 +39,8 @@ export const quoteResponseBodySchema: Joi.ObjectSchema = Joi.object({
     postal_code: Joi.number().integer().positive().min(0o1000).max(97680).description('Property postal code').example(95470),
     city: Joi.string().max(50).description('Property city').example('Corbeil-Essonnes'),
     email: Joi.string().email().description('Policy holder email').example('john.doe@email.com'),
-    phone_number: Joi.string().max(15).description('Policy holder phone number').example('+33684205510')
+    phone_number: Joi.string().max(15).description('Policy holder phone number').example('+33684205510'),
+    email_validated_at: Joi.date().description('Email validation date').example('2020-04-25T10:09:09.000')
   }).optional().description('Policy holder contact'),
   start_date: Joi.date().description('Start date').example('2020-04-26'),
   term_start_date: Joi.date().description('Term start date').example('2020-04-26'),

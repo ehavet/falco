@@ -75,7 +75,7 @@ export class PolicySqlRepository implements PolicyRepository {
     return true
   }
 
-  async setEmailValidationDate (policyId: string, date: Date): Promise<void> {
+  async setEmailValidatedAt (policyId: string, date: Date): Promise<void> {
     const policy: PolicySqlModel = await PolicySqlModel.findByPk(policyId, { rejectOnEmpty: false })
     if (policy) {
       policy.emailValidationDate = date

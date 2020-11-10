@@ -169,7 +169,8 @@ export class QuoteSqlRepository implements QuoteRepository {
         postalCode: (quote.policyHolder && quote.policyHolder.postalCode) ? quote.policyHolder.postalCode : null,
         city: (quote.policyHolder && quote.policyHolder.city) ? quote.policyHolder.city : null,
         email: (quote.policyHolder && quote.policyHolder.email) ? quote.policyHolder.email : null,
-        phoneNumber: (quote.policyHolder && quote.policyHolder.phoneNumber) ? quote.policyHolder.phoneNumber : null
+        phoneNumber: (quote.policyHolder && quote.policyHolder.phoneNumber) ? quote.policyHolder.phoneNumber : null,
+        emailValidatedAt: (quote.policyHolder && quote.policyHolder.emailValidatedAt) ? quote.policyHolder.emailValidatedAt : null
       },
       {
         where: { id: updatedQuoteSql.policyHolderId },

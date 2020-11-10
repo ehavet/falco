@@ -54,7 +54,7 @@ export namespace Policy {
         Cancelled = 'CANCELLED'
     }
 
-    export function emailNotValidatedYet (policy: Policy): boolean {
+    export function isEmailNotValidated (policy: Policy): boolean {
       return policy.emailValidationDate === undefined || policy.emailValidationDate === null
     }
 

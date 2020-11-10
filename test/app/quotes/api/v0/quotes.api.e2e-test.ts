@@ -184,7 +184,8 @@ describe('Http API quotes e2e', async () => {
           firstname: 'Jeannot',
           lastname: 'Lapin',
           phone_number: '+33684205510',
-          postal_code: '91100'
+          postal_code: '91100',
+          email_validated_at: null
         },
         premium: 90,
         risk: {

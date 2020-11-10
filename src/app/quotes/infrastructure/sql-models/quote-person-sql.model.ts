@@ -28,7 +28,7 @@ export class QuotePersonSqlModel extends Model<QuotePersonSqlModel> {
     email!: string
 
     @Column
-    emailValidationDate?: Date
+    emailValidatedAt?: Date
 
     @Column
     phoneNumber!: string

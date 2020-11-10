@@ -115,7 +115,7 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
     })
   }).timeout(10000)
 
-  describe('#setEmailValidationDate', async () => {
+  describe('#setEmailValidatedAt', async () => {
     it('should update the policy email validation date', async () => {
       // Given
       const emailValidationDate: Date = new Date('2020-01-05T10:38:19Z')
@@ -123,7 +123,7 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
       await policyRepository.save(policyInDb)
 
       // When
-      await policyRepository.setEmailValidationDate(policyInDb.id, emailValidationDate)
+      await policyRepository.setEmailValidatedAt(policyInDb.id, emailValidationDate)
 
       // Then
       const updatedPolicy: Policy = await policyRepository.get(policyInDb.id)
@@ -137,7 +137,7 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
       await policyRepository.save(policyInDb)
 
       // When
-      const promise = policyRepository.setEmailValidationDate('UNKNOWN_ID', emailValidationDate)
+      const promise = policyRepository.setEmailValidatedAt('UNKNOWN_ID', emailValidationDate)
 
       // Then
       return expect(promise).to.be.rejectedWith(PolicyNotFoundError)

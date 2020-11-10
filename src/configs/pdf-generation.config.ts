@@ -5,5 +5,5 @@ export interface PDFGenerationConfig {
 }
 
 export const pdfGenerationConfig: PDFGenerationConfig = {
-  productionMode: !config.get('FALCO_API_PDF_GENERATION_PRODUCTION_MODE')
+  productionMode: config.get('FALCO_API_PDF_GENERATION_PRODUCTION_MODE')
 }

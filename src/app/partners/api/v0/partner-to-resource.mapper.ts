@@ -7,7 +7,8 @@ export function partnerToResource (partner: Partner) {
     code: partner.code,
     translation_key: partner.translationKey,
     customer_support_email: partner.customerSupportEmail,
-    questions: questions
+    questions: questions,
+    can_be_contacted_for_not_proposed_rooms: partner.canBeContactedForNotProposedRooms
   }
 }
 

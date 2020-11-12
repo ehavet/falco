@@ -32,7 +32,8 @@ describe('Partners - API - E2E', async () => {
               { room_count: 3, value: 2 }
             ]
           }
-        }
+        },
+        can_be_contacted_for_not_proposed_rooms: false
       })
     })
   })

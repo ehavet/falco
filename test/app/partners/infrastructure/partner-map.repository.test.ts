@@ -36,7 +36,8 @@ const partnerJson = {
       productVersion: '1.0',
       contractualTerms: '/path/to/contractual/terms',
       ipid: '/path/to/ipid'
-    }
+    },
+    canBeContactedForNotProposedRooms: false
   },
   partnerTwo: {
     code: 'partnerTwo',

@@ -33,7 +33,8 @@ describe('Partners - API - Integ', async () => {
               { room_count: 2, value: 1 },
               { room_count: 3, value: 2 }]
           }
-        }
+        },
+        can_be_contacted_for_not_proposed_rooms: false
       }
 
       beforeEach(async () => {
@@ -46,7 +47,7 @@ describe('Partners - API - Integ', async () => {
         expect(response).to.have.property('statusCode', 200)
       })
 
-      it('should return an empty object', async () => {
+      it('should return a partner object', async () => {
         expect(response.body).to.deep.equal(expectedResourcePartner)
       })
     })

@@ -7,7 +7,8 @@ export interface Partner {
     callbackUrl: string
     customerSupportEmail: string
     questions: Array<Partner.Question>
-    offer: Partner.Offer
+    offer: Partner.Offer,
+    canBeContactedForNotProposedRooms: boolean
 }
 
 export namespace Partner {

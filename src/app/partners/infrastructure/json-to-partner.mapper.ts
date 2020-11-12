@@ -12,7 +12,8 @@ export function toPartner (partnerJson: any) : Partner {
     callbackUrl: partnerJson.callbackUrl,
     customerSupportEmail: partnerJson.customerSupportEmail,
     questions: questions,
-    offer: offer
+    offer: offer,
+    canBeContactedForNotProposedRooms: partnerJson.canBeContactedForNotProposedRooms
   }
 }
 

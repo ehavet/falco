@@ -35,6 +35,7 @@ export function createPartnerFixture (attr: Partial<Partner> = {}): Partner {
       ipid: '/path/to/ipid',
       operationCodes: [OperationCode.SEMESTER1, OperationCode.FULLYEAR]
     },
+    canBeContactedForNotProposedRooms: false,
     ...attr
   }
 }

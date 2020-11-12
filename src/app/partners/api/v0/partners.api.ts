@@ -42,7 +42,8 @@ export default function (container: Container): Array<ServerRoute> {
                     }).optional().description('Number Maximum of roommates for one room count')
                   ).description('Number maxixmum of roommates regarding the different partner room counts. Only present if the question is applicable.')
                 }).description('Question about the possibility of roommates for the insured property')
-              }).description('List of questions to ask for the quote')
+              }).description('List of questions to ask for the quote'),
+              can_be_contacted_for_not_proposed_rooms: Joi.boolean().description('Display if the partner can be contacted for not proposed rooms').example(true)
             }).label('Partner'),
             400: HttpErrorSchema.badRequestSchema,
             404: HttpErrorSchema.notFoundSchema,

@@ -30,7 +30,8 @@
       "productVersion": "2020-07-15",
       "contractualTerms": "/docs/Appenin_Conditions_Generales_assurance_habitation_APP658.pdf",
       "ipid": "/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf"
-    }
+    },
+    "canBeContactedForNotProposedRooms": false
   },
   "essca": {
     "code": "essca",
@@ -61,7 +62,8 @@
       "productCode": "APP658",
       "productVersion": "2020-07-15",
       "contractualTerms": "/docs/Appenin_Conditions_Generales_assurance_habitation_APP658.pdf",
-      "ipid": "/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf"
+      "ipid": "/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf",
+      "canBeContactedForNotProposedRooms": true
     }
   },
   "demo-student": {
@@ -94,7 +96,8 @@
       "productCode": "APP999",
       "productVersion": "2020-09-11",
       "contractualTerms": "/docs/Appenin_Conditions_Generales_assurance_habitation_APP999.pdf",
-      "ipid": "/docs/Appenin_Document_Information_assurance_habitation_APP999.pdf"
+      "ipid": "/docs/Appenin_Document_Information_assurance_habitation_APP999.pdf",
+      "canBeContactedForNotProposedRooms": false
     }
   }
 }

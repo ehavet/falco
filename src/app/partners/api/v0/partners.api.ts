@@ -31,7 +31,8 @@ export default function (container: Container): Array<ServerRoute> {
               customer_support_email: Joi.string().description('Partner customer support email').example('customersupport@mypartner.com'),
               questions: Joi.object({
                 room_count: Joi.object({
-                  options: Joi.array().description('Possible values').example([1, 2, 3])
+                  options: Joi.array().description('Possible values').example([1, 2, 3]),
+                  manage_other_cases: Joi.boolean().description('Manage other cases for not proposed rooms').example(true)
                 }).description('Question about the number of rooms of the property'),
                 roommate: Joi.object({
                   applicable: Joi.boolean().description('Define if the question is applicable for the partner. If not, do not ask the question to the subscriber otherwise an error could be thrown when creating a policy').example(false),
@@ -42,8 +43,7 @@ export default function (container: Container): Array<ServerRoute> {
                     }).optional().description('Number Maximum of roommates for one room count')
                   ).description('Number maxixmum of roommates regarding the different partner room counts. Only present if the question is applicable.')
                 }).description('Question about the possibility of roommates for the insured property')
-              }).description('List of questions to ask for the quote'),
-              can_be_contacted_for_not_proposed_rooms: Joi.boolean().description('Display if the partner can be contacted for not proposed rooms').example(true)
+              }).description('List of questions to ask for the quote')
             }).label('Partner'),
             400: HttpErrorSchema.badRequestSchema,
             404: HttpErrorSchema.notFoundSchema,

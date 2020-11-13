@@ -12,8 +12,7 @@ export function toPartner (partnerJson: any) : Partner {
     callbackUrl: partnerJson.callbackUrl,
     customerSupportEmail: partnerJson.customerSupportEmail,
     questions: questions,
-    offer: offer,
-    canBeContactedForNotProposedRooms: partnerJson.canBeContactedForNotProposedRooms
+    offer: offer
   }
 }
 
@@ -35,7 +34,8 @@ function _toRoomCountQuestion (jsonQuestion: any) {
     code: Partner.Question.QuestionCode.RoomCount,
     options: {
       list: jsonQuestion.options.list
-    }
+    },
+    manageOtherCases: jsonQuestion.manageOtherCases
   }
 
   return question

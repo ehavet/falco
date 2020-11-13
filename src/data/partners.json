@@ -9,7 +9,8 @@
         "code": "RoomCount",
         "options": {
           "list": [1, 2, 3]
-        }
+        },
+        "manageOtherCases": false
       },
       {
         "code": "Roommate",
@@ -30,8 +31,7 @@
       "productVersion": "2020-07-15",
       "contractualTerms": "/docs/Appenin_Conditions_Generales_assurance_habitation_APP658.pdf",
       "ipid": "/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf"
-    },
-    "canBeContactedForNotProposedRooms": false
+    }
   },
   "essca": {
     "code": "essca",
@@ -47,6 +47,7 @@
       },
       {
         "code": "Roommate",
+        "manageOtherCases": true,
         "applicable": false,
         "_comment":  "There is no maximum number of roommates here because Essca does not allow roommates"
       }
@@ -62,8 +63,7 @@
       "productCode": "APP658",
       "productVersion": "2020-07-15",
       "contractualTerms": "/docs/Appenin_Conditions_Generales_assurance_habitation_APP658.pdf",
-      "ipid": "/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf",
-      "canBeContactedForNotProposedRooms": true
+      "ipid": "/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf"
     }
   },
   "demo-student": {
@@ -81,6 +81,7 @@
       {
         "code": "Roommate",
         "applicable": true,
+        "manageOtherCases": false,
         "_comment":  "The rule for the maximum number of roommates for demo-student is the following : roomcount - 1",
         "maximumNumbers": [{ "roomCount": 1, "value": 0 }, { "roomCount": 2, "value": 1 }, { "roomCount": 3, "value": 2 }]
       }
@@ -96,8 +97,7 @@
       "productCode": "APP999",
       "productVersion": "2020-09-11",
       "contractualTerms": "/docs/Appenin_Conditions_Generales_assurance_habitation_APP999.pdf",
-      "ipid": "/docs/Appenin_Document_Information_assurance_habitation_APP999.pdf",
-      "canBeContactedForNotProposedRooms": false
+      "ipid": "/docs/Appenin_Document_Information_assurance_habitation_APP999.pdf"
     }
   }
 }

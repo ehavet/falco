@@ -7,8 +7,7 @@ export interface Partner {
     callbackUrl: string
     customerSupportEmail: string
     questions: Array<Partner.Question>
-    offer: Partner.Offer,
-    canBeContactedForNotProposedRooms: boolean
+    offer: Partner.Offer
 }
 
 export namespace Partner {
@@ -32,6 +31,7 @@ export namespace Partner.Question {
     export interface RoomCountQuestion {
         code: QuestionCode,
         options: ListOptions<RoomCount>,
+        manageOtherCases: boolean
     }
 
     export interface RoommateQuestion {

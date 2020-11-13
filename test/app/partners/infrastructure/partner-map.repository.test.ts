@@ -18,7 +18,8 @@ const partnerJson = {
         code: Partner.Question.QuestionCode.RoomCount,
         options: {
           list: [1, 2, 3]
-        }
+        },
+        manageOtherCases: false
       },
       {
         code: Partner.Question.QuestionCode.Roommate,
@@ -36,8 +37,7 @@ const partnerJson = {
       productVersion: '1.0',
       contractualTerms: '/path/to/contractual/terms',
       ipid: '/path/to/ipid'
-    },
-    canBeContactedForNotProposedRooms: false
+    }
   },
   partnerTwo: {
     code: 'partnerTwo',

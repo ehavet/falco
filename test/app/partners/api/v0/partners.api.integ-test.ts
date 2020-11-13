@@ -24,7 +24,8 @@ describe('Partners - API - Integ', async () => {
         customer_support_email: 'customer@support.fr',
         questions: {
           room_count: {
-            options: [1, 2, 3]
+            options: [1, 2, 3],
+            manage_other_cases: false
           },
           roommate: {
             applicable: true,
@@ -33,8 +34,7 @@ describe('Partners - API - Integ', async () => {
               { room_count: 2, value: 1 },
               { room_count: 3, value: 2 }]
           }
-        },
-        can_be_contacted_for_not_proposed_rooms: false
+        }
       }
 
       beforeEach(async () => {

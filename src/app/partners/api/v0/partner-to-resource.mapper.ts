@@ -7,8 +7,7 @@ export function partnerToResource (partner: Partner) {
     code: partner.code,
     translation_key: partner.translationKey,
     customer_support_email: partner.customerSupportEmail,
-    questions: questions,
-    can_be_contacted_for_not_proposed_rooms: partner.canBeContactedForNotProposedRooms
+    questions: questions
   }
 }
 
@@ -28,7 +27,8 @@ function _toQuestions (jsonQuestions: any) {
 function _toRoomCountQuestion (jsonQuestion: any) {
   return {
     room_count: {
-      options: jsonQuestion.options.list
+      options: jsonQuestion.options.list,
+      manage_other_cases: jsonQuestion.manageOtherCases
     }
   }
 }

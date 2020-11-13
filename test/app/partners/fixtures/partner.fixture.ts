@@ -12,7 +12,8 @@ export function createPartnerFixture (attr: Partial<Partner> = {}): Partner {
         code: Partner.Question.QuestionCode.RoomCount,
         options: {
           list: [1, 2, 3]
-        }
+        },
+        manageOtherCases: false
       },
       {
         code: Partner.Question.QuestionCode.Roommate,
@@ -35,7 +36,6 @@ export function createPartnerFixture (attr: Partial<Partner> = {}): Partner {
       ipid: '/path/to/ipid',
       operationCodes: [OperationCode.SEMESTER1, OperationCode.FULLYEAR]
     },
-    canBeContactedForNotProposedRooms: false,
     ...attr
   }
 }

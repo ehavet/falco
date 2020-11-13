@@ -33,6 +33,47 @@
       "ipid": "/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf"
     }
   },
+  "e-mobilia-alternant": {
+    "code": "e-mobilia-alternant",
+    "translationKey": "e-mobilia-alternant",
+    "callbackUrl": "",
+    "customerSupportEmail": "help@appenin.fr",
+    "questions": [
+      {
+        "code": "RoomCount",
+        "options": {
+          "list": [1, 2, 3]
+        },
+        "manageOtherCases": true
+      },
+      {
+        "code": "Roommate",
+        "applicable": true,
+        "_comment":  "The rule for the maximum number of roommates for e-mobilia is the following : roomcount - 1",
+        "maximumNumbers": [{ "roomCount": 1, "value": 0 }, { "roomCount": 2, "value": 1 }, { "roomCount": 3, "value": 2 }]
+      }
+    ],
+    "offer": {
+      "simplifiedCovers": [
+        "ACDDE",
+        "ACINCEX",
+        "ACVOL",
+        "ACASSHE",
+        "ACDEFJU",
+        "ACRC"
+      ],
+      "pricingMatrix": [
+        [1, { "monthlyPrice": 7.50, "defaultDeductible": 120, "defaultCeiling": 5000 }],
+        [2, { "monthlyPrice": 9.00, "defaultDeductible": 120, "defaultCeiling": 7000 }],
+        [3, { "monthlyPrice": 11.00, "defaultDeductible": 120, "defaultCeiling": 9000 }]
+      ],
+      "operationCodes": [],
+      "productCode": "APP658",
+      "productVersion": "2020-11-13",
+      "contractualTerms": "/docs/Appenin_Conditions_Generales_assurance_habitation_APP658.pdf",
+      "ipid": "/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf"
+    }
+  },
   "essca": {
     "code": "essca",
     "translationKey": "essca",

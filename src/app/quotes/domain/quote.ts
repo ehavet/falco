@@ -78,7 +78,7 @@ export namespace Quote {
         city: command.risk.property.city,
         email: command.policyHolder?.email,
         phoneNumber: command.policyHolder?.phoneNumber,
-        emailValidatedAt: quote.policyHolder!.emailValidatedAt
+        emailValidatedAt: _isUpdatedPolicyHolderEmail(quote, command) ? undefined : quote.policyHolder!.emailValidatedAt
       }
     }
 
@@ -121,6 +121,10 @@ export namespace Quote {
         quote.nbMonthsDue = nbMonthsDue
         quote.termEndDate = _computeTermEndDate(quote.startDate, nbMonthsDue)
       }
+    }
+
+    export function _isUpdatedPolicyHolderEmail (quote: Quote, updateQuoteCommand: UpdateQuoteCommand): boolean {
+      return !(quote.policyHolder!.email === updateQuoteCommand.policyHolder!.email)
     }
 
     function _computeTermEndDate (termStartDate: Date, durationInMonths: number): Date {

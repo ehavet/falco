@@ -48,8 +48,8 @@ export function createQuoteFixture (attr:Partial<Quote> = {}): Quote {
       phoneNumber: '+33684205510',
       emailValidatedAt: undefined
     },
-    premium: 120,
-    nbMonthsDue: 10,
+    premium: 69.84,
+    nbMonthsDue: 12,
     startDate: now,
     termStartDate: now,
     termEndDate: now,
@@ -126,8 +126,8 @@ export function createUpdateQuoteCommandFixture (attr:Partial<UpdateQuoteCommand
       },
       otherPeople: [
         {
-          firstname: 'Samy',
-          lastname: 'Aza'
+          firstname: 'John',
+          lastname: 'Doe'
         }
       ]
     },
@@ -136,6 +136,14 @@ export function createUpdateQuoteCommandFixture (attr:Partial<UpdateQuoteCommand
       phoneNumber: '+33684205510'
     },
     startDate: now,
+    ...attr
+  }
+}
+
+export function createUpdateQuoteCommandPolicyHolderFixture (attr:Partial<UpdateQuoteCommand.PolicyHolder> = {}): UpdateQuoteCommand.PolicyHolder {
+  return {
+    email: 'jeanjean@email.com',
+    phoneNumber: '+33684205510',
     ...attr
   }
 }

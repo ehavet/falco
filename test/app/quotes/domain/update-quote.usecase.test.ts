@@ -2,9 +2,14 @@ import { dateFaker, expect, sinon } from '../../../test-utils'
 import { UpdateQuoteCommand } from '../../../../src/app/quotes/domain/update-quote-command'
 import { UpdateQuote } from '../../../../src/app/quotes/domain/update-quote.usecase'
 import { Quote } from '../../../../src/app/quotes/domain/quote'
-import { createQuoteFixture, createQuoteInsuranceFixture, createQuoteRiskFixture, createUpdateQuoteCommandFixture, createUpdateQuoteCommandRiskFixture } from '../fixtures/quote.fixture'
+import {
+  createQuoteFixture,
+  createQuotePolicyHolderFixture,
+  createUpdateQuoteCommandFixture,
+  createUpdateQuoteCommandPolicyHolderFixture,
+  createUpdateQuoteCommandRiskFixture
+} from '../fixtures/quote.fixture'
 import { SinonStubbedInstance } from 'sinon'
-import { QuoteRepository } from '../../../../src/app/quotes/domain/quote.repository'
 import { QuoteRiskPropertyRoomCountNotInsurableError, QuoteNotFoundError, QuoteRiskNumberOfRoommatesError, QuoteRiskRoommatesNotAllowedError, QuoteStartDateConsistencyError } from '../../../../src/app/quotes/domain/quote.errors'
 import { PartnerRepository } from '../../../../src/app/partners/domain/partner.repository'
 import { createPartnerFixture } from '../../partners/fixtures/partner.fixture'
@@ -17,7 +22,7 @@ import { quoteRepositoryStub } from '../fixtures/quote-repository.test-doubles'
 describe('Quotes - Usecase - Update Quote', async () => {
   const now: Date = new Date('2020-01-05T00:00:00Z')
   let updateQuote: UpdateQuote
-  let quoteRepository: SinonStubbedInstance<QuoteRepository>
+  let quoteRepository
   let partnerRepository: SinonStubbedInstance<PartnerRepository>
   let quote: Quote
   const quoteId: string = 'UDQUOT3'
@@ -52,11 +57,11 @@ describe('Quotes - Usecase - Update Quote', async () => {
           simplifiedCovers: ['ACDDE', 'ACVOL'],
           pricingMatrix: new Map([
             [1, { monthlyPrice: 5.82, defaultDeductible: 150, defaultCeiling: 7000 }],
-            [2, { monthlyPrice: 10, defaultDeductible: 100, defaultCeiling: 1000 }],
-            [3, { monthlyPrice: 10, defaultDeductible: 100, defaultCeiling: 1000 }]
+            [2, { monthlyPrice: 5.82, defaultDeductible: 150, defaultCeiling: 7000 }],
+            [3, { monthlyPrice: 5.82, defaultDeductible: 150, defaultCeiling: 7000 }]
           ]),
           productCode: 'APP999',
-          productVersion: '1.0',
+          productVersion: 'v2020-02-01',
           contractualTerms: '/path/to/contractual/terms',
           ipid: '/path/to/ipid',
           operationCodes: [OperationCode.SEMESTER1, OperationCode.FULLYEAR]
@@ -144,8 +149,6 @@ describe('Quotes - Usecase - Update Quote', async () => {
     const expectedQuote: Quote = createQuoteFixture({
       id: quoteId,
       partnerCode: partnerCode,
-      premium: 58.2,
-      nbMonthsDue: 10,
       risk: {
         property: {
           roomCount: 1,
@@ -159,10 +162,6 @@ describe('Quotes - Usecase - Update Quote', async () => {
         },
         otherPeople: undefined
       },
-      insurance: createQuoteInsuranceFixture({
-        productVersion: '1.0',
-        estimate: { defaultCeiling: 7000, defaultDeductible: 150, monthlyPrice: 5.82 }
-      }),
       policyHolder: {
         firstname: 'Lucie',
         lastname: 'Fer',
@@ -173,9 +172,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
         phoneNumber: '+66666666666',
         emailValidatedAt: undefined
       },
-      startDate: new Date('2020-01-05T00:00:00.000Z'),
-      termStartDate: new Date('2020-01-05T00:00:00.000Z'),
-      termEndDate: new Date('2020-11-04T00:00:00.000Z')
+      termEndDate: new Date('2021-01-04T00:00:00.000Z')
     })
 
     const updateQuoteCommand: UpdateQuoteCommand = {
@@ -196,8 +193,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
         email: 'henoch@book.com',
         phoneNumber: '+66666666666'
       },
-      startDate: now,
-      specOpsCode: 'FULLYEAR'
+      startDate: now
     }
 
     quoteRepository.update.withArgs(expectedQuote).resolves(expectedQuote)
@@ -274,23 +270,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
       {
         id: 'UDQUOT3',
         partnerCode: 'myPartner',
-        risk: createQuoteRiskFixture({
-          otherPeople: [
-            { firstname: 'Samy', lastname: 'Aza' }
-          ]
-        }),
-        insurance: createQuoteInsuranceFixture({
-          estimate: {
-            monthlyPrice: 10,
-            defaultDeductible: 100,
-            defaultCeiling: 1000
-          },
-          productVersion: '1.0'
-        }),
-        premium: 50,
+        premium: 29.1,
         nbMonthsDue: 5,
-        startDate: new Date('2020-01-05T00:00:00.000Z'),
-        termStartDate: new Date('2020-01-05T00:00:00.000Z'),
         termEndDate: new Date('2020-06-04T00:00:00.000Z')
       }
     )
@@ -312,23 +293,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
       {
         id: 'UDQUOT3',
         partnerCode: 'myPartner',
-        risk: createQuoteRiskFixture({
-          otherPeople: [
-            { firstname: 'Samy', lastname: 'Aza' }
-          ]
-        }),
-        insurance: createQuoteInsuranceFixture({
-          estimate: {
-            monthlyPrice: 10,
-            defaultDeductible: 100,
-            defaultCeiling: 1000
-          },
-          productVersion: '1.0'
-        }),
-        premium: 50,
+        premium: 29.1,
         nbMonthsDue: 5,
-        startDate: new Date('2020-01-05T00:00:00.000Z'),
-        termStartDate: new Date('2020-01-05T00:00:00.000Z'),
         termEndDate: new Date('2020-06-04T00:00:00.000Z')
       }
     )
@@ -350,23 +316,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
       {
         id: 'UDQUOT3',
         partnerCode: 'myPartner',
-        risk: createQuoteRiskFixture({
-          otherPeople: [
-            { firstname: 'Samy', lastname: 'Aza' }
-          ]
-        }),
-        insurance: createQuoteInsuranceFixture({
-          estimate: {
-            monthlyPrice: 10,
-            defaultDeductible: 100,
-            defaultCeiling: 1000
-          },
-          productVersion: '1.0'
-        }),
-        premium: 100,
+        premium: 58.2,
         nbMonthsDue: 10,
-        startDate: new Date('2020-01-05T00:00:00.000Z'),
-        termStartDate: new Date('2020-01-05T00:00:00.000Z'),
         termEndDate: new Date('2020-11-04T00:00:00.000Z')
       }
     )
@@ -388,23 +339,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
       {
         id: 'UDQUOT3',
         partnerCode: 'myPartner',
-        risk: createQuoteRiskFixture({
-          otherPeople: [
-            { firstname: 'Samy', lastname: 'Aza' }
-          ]
-        }),
-        insurance: createQuoteInsuranceFixture({
-          estimate: {
-            monthlyPrice: 10,
-            defaultDeductible: 100,
-            defaultCeiling: 1000
-          },
-          productVersion: '1.0'
-        }),
-        premium: 120,
+        premium: 69.84,
         nbMonthsDue: 12,
-        startDate: new Date('2020-01-05T00:00:00.000Z'),
-        termStartDate: new Date('2020-01-05T00:00:00.000Z'),
         termEndDate: new Date('2021-01-04T00:00:00.000Z')
       }
     )
@@ -426,23 +362,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
       {
         id: 'UDQUOT3',
         partnerCode: 'myPartner',
-        risk: createQuoteRiskFixture({
-          otherPeople: [
-            { firstname: 'Samy', lastname: 'Aza' }
-          ]
-        }),
-        insurance: createQuoteInsuranceFixture({
-          estimate: {
-            monthlyPrice: 10,
-            defaultDeductible: 100,
-            defaultCeiling: 1000
-          },
-          productVersion: '1.0'
-        }),
-        premium: 120,
+        premium: 69.84,
         nbMonthsDue: 12,
-        startDate: new Date('2020-01-05T00:00:00.000Z'),
-        termStartDate: new Date('2020-01-05T00:00:00.000Z'),
         termEndDate: new Date('2021-01-04T00:00:00.000Z')
       }
     )
@@ -455,45 +376,30 @@ describe('Quotes - Usecase - Update Quote', async () => {
     sinon.assert.calledWithExactly(quoteRepository.update, updatedQuote)
   })
 
-  it('should apply operation code when valid code contains spaces or non alphanumeric characters', async () => {
-    // Given
+  describe('should apply operation code when valid code contains spaces or non alphanumeric characters', async () => {
+    const codesList = ['FULL   YEAR', 'FULL_YEAR', 'FULL.YEAR', 'fullyear', 'full@year', 'FUll!ç&Year']
     const updatedQuote = createQuoteFixture(
       {
         id: 'UDQUOT3',
         partnerCode: 'myPartner',
-        risk: createQuoteRiskFixture({
-          otherPeople: [
-            { firstname: 'Samy', lastname: 'Aza' }
-          ]
-        }),
-        insurance: createQuoteInsuranceFixture({
-          estimate: {
-            monthlyPrice: 10,
-            defaultDeductible: 100,
-            defaultCeiling: 1000
-          },
-          productVersion: '1.0'
-        }),
-        premium: 100,
         nbMonthsDue: 10,
-        startDate: new Date('2020-01-05T00:00:00.000Z'),
-        termStartDate: new Date('2020-01-05T00:00:00.000Z'),
+        premium: 58.2,
         termEndDate: new Date('2020-11-04T00:00:00.000Z')
       }
     )
 
-    quoteRepository.get.withArgs(quoteId).resolves(quote)
-    quoteRepository.update = sinon.stub()
-    quoteRepository.update.withArgs(updatedQuote).resolves(updatedQuote)
-    updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
-
-    const codesList = ['FULL   YEAR', 'FULL_YEAR', 'FULL.YEAR', 'fullyear', 'full@year', 'FUll!ç&Year']
     codesList.forEach(async (code) => {
-    // When
-      const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId, specOpsCode: code })
-      const result = await updateQuote(updateQuoteCommand)
-      // Then
-      expect(result).to.deep.equal(updatedQuote)
+      it(`when ${code} is passed as special operations code`, async () => {
+        // Given
+        quoteRepository.get.withArgs(quoteId).resolves(quote)
+        quoteRepository.update.withArgs(updatedQuote).resolves()
+        updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+        const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId, specOpsCode: code })
+        // When
+        await updateQuote(updateQuoteCommand)
+        // Then
+        quoteRepository.update.verify()
+      })
     })
   })
 
@@ -502,11 +408,9 @@ describe('Quotes - Usecase - Update Quote', async () => {
     const earlierThanTodayDate: Date = new Date('2009-01-27')
     quoteRepository.get.withArgs(quoteId).resolves(quote)
     updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
-
     // When
     const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId, startDate: earlierThanTodayDate })
     const promise = updateQuote(updateQuoteCommand)
-
     // Then
     return expect(promise).to.be.rejectedWith(QuoteStartDateConsistencyError)
   })
@@ -520,22 +424,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
         partnerCode: 'myPartner',
         startDate: new Date('2020-07-01T00:00:00.000Z'),
         termStartDate: new Date('2020-07-01T00:00:00.000Z'),
-        termEndDate: new Date('2021-06-30T00:00:00.000Z'),
-        premium: 120,
-        nbMonthsDue: 12,
-        insurance: createQuoteInsuranceFixture({
-          contractualTerms: '/path/to/contractual/terms',
-          currency: 'EUR',
-          estimate: { defaultCeiling: 1000, defaultDeductible: 100, monthlyPrice: 10 },
-          ipid: '/path/to/ipid',
-          productCode: 'APP999',
-          productVersion: '1.0',
-          simplifiedCovers: ['ACDDE', 'ACVOL']
-        }),
-        risk: createQuoteRiskFixture({
-          otherPeople: [{ firstname: 'Samy', lastname: 'Aza' }],
-          person: { firstname: 'Jean-Jean', lastname: 'Lapin' }
-        })
+        termEndDate: new Date('2021-06-30T00:00:00.000Z')
       }
     )
     quoteRepository.get.withArgs(quoteId).resolves(quote)
@@ -546,6 +435,46 @@ describe('Quotes - Usecase - Update Quote', async () => {
     const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId, startDate: updatedStartDate })
     await updateQuote(updateQuoteCommand)
 
+    // Then
+    sinon.assert.calledWithExactly(quoteRepository.update, updatedQuote)
+  })
+
+  it('should reset emailValidatedAt when email is updated', async () => {
+    // Given
+    const quote = createQuoteFixture(
+      {
+        id: 'UDQUOT3',
+        policyHolder: createQuotePolicyHolderFixture({
+          email: 'former@email.com',
+          emailValidatedAt: new Date('2022-01-13T00:00:00.000Z')
+        })
+      }
+    )
+
+    const updatedQuote = createQuoteFixture(
+      {
+        id: 'UDQUOT3',
+        partnerCode: 'myPartner',
+        termEndDate: new Date('2021-01-04T00:00:00.000Z'),
+        policyHolder: createQuotePolicyHolderFixture({
+          email: 'updated@email.com',
+          emailValidatedAt: undefined
+        })
+      }
+    )
+    quoteRepository.get.withArgs(quoteId).resolves(quote)
+    quoteRepository.update.withArgs(updatedQuote).resolves()
+    updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+
+    const updateQuoteCommand = createUpdateQuoteCommandFixture({
+      id: quoteId,
+      policyHolder: createUpdateQuoteCommandPolicyHolderFixture({
+        email: 'updated@email.com'
+      })
+    })
+
+    // When
+    await updateQuote(updateQuoteCommand)
     // Then
     sinon.assert.calledWithExactly(quoteRepository.update, updatedQuote)
   })

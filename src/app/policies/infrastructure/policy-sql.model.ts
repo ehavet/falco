@@ -3,7 +3,7 @@ import { PolicyInsuranceSqlModel } from '../../quotes/infrastructure/policy-insu
 import { PolicyRiskSqlModel } from '../../quotes/infrastructure/policy-risk-sql.model'
 import { Policy } from '../domain/policy'
 import { PolicyPersonSqlModel } from './policy-person-sql.model'
-import { OperationCode } from '../domain/operation-code'
+import { OperationCode } from '../../common-api/domain/operation-code'
 
 @Table({ timestamps: true, tableName: 'policy', underscored: true })
 export class PolicySqlModel extends Model<PolicySqlModel> {

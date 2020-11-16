@@ -3,7 +3,7 @@ import { PolicyCanceledError, PolicyNotFoundError, PolicyNotUpdatableError } fro
 import { SinonStubbedInstance } from 'sinon'
 import { PolicyRepository } from '../../../../src/app/policies/domain/policy.repository'
 import { PartnerRepository } from '../../../../src/app/partners/domain/partner.repository'
-import { OperationCode } from '../../../../src/app/policies/domain/operation-code'
+import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
 import { createPolicyFixture } from '../fixtures/policy.fixture'
 import { OperationCodeNotApplicableError } from '../../../../src/app/policies/domain/operation-code.errors'
 import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles'

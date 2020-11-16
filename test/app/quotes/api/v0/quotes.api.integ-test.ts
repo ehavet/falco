@@ -75,7 +75,7 @@ describe('Http API - Quotes - Integ', async () => {
 
       beforeEach(async () => {
         // Given
-        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode: 'myPartner', risk: quote.risk }).resolves(quote)
+        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode: 'myPartner', specOpsCode: 'BLANK', risk: quote.risk }).resolves(quote)
 
         // When
         response = await httpServer.api()
@@ -88,7 +88,7 @@ describe('Http API - Quotes - Integ', async () => {
         expect(response).to.have.property('statusCode', 201)
       })
 
-      it('should the created quote', async () => {
+      it('should return the created quote', async () => {
         expect(response.body).to.deep.equal(expectedResourceQuote)
       })
     })
@@ -98,7 +98,8 @@ describe('Http API - Quotes - Integ', async () => {
         // Given
         const partnerCode: string = 'unknownPartner'
         const risk = { property: { roomCount: 2 } }
-        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk }).rejects(new PartnerNotFoundError(partnerCode))
+        const specOpsCode = 'BLANK'
+        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, specOpsCode }).rejects(new PartnerNotFoundError(partnerCode))
 
         // When
         response = await httpServer.api()
@@ -117,7 +118,8 @@ describe('Http API - Quotes - Integ', async () => {
         // Given
         const partnerCode: string = 'myPartner'
         const risk = { property: { roomCount: 2 } }
-        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk }).rejects(new NoPartnerInsuranceForRiskError(partnerCode, risk))
+        const specOpsCode = 'BLANK'
+        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, specOpsCode }).rejects(new NoPartnerInsuranceForRiskError(partnerCode, risk))
 
         // When
         response = await httpServer.api()

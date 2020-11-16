@@ -41,6 +41,8 @@ export default function (container: Container): Array<ServerRoute> {
             201: Joi.object({
               id: Joi.string().description('Quote id').example('DU6C73X'),
               code: Joi.string().description('Code').example('myCode'),
+              special_operations_code: Joi.string().allow(null).description('Operation special code applied').example('CODEPROMO1'),
+              special_operations_code_applied_at: Joi.date().allow(null).description('Application date of operation special code').example('1957-03-02T10:09:09.000'),
               risk: Joi.object({
                 property: Joi.object({
                   room_count: Joi.number().integer().description('Property number of rooms').example(3)
@@ -67,7 +69,13 @@ export default function (container: Container): Array<ServerRoute> {
       },
       handler: async (request, h) => {
         const payload: any = request.payload
-        const createQuoteCommand: CreateQuoteCommand = { partnerCode: payload.code, risk: { property: { roomCount: payload.risk.property.room_count } } }
+        const createQuoteCommand: CreateQuoteCommand = {
+          partnerCode: payload.code,
+          specOpsCode: payload.spec_ops_code,
+          risk: {
+            property: { roomCount: payload.risk.property.room_count }
+          }
+        }
 
         try {
           const quote = await container.CreateQuote(createQuoteCommand)

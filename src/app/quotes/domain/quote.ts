@@ -4,7 +4,7 @@ import { generate } from 'randomstring'
 import { UpdateQuoteCommand } from './update-quote-command'
 import dayjs from '../../../libs/dayjs'
 import * as PartnerFunc from '../../partners/domain/partner.func'
-import { OperationCode } from '../../policies/domain/operation-code'
+import { OperationCode } from '../../common-api/domain/operation-code'
 import { OperationCodeNotApplicableError } from '../../policies/domain/operation-code.errors'
 import { SpecialOperation } from '../../common-api/domain/special-operation.func'
 import { CreateQuoteCommand } from './create-quote-command'
@@ -14,6 +14,8 @@ const DEFAULT_NUMBER_MONTHS_DUE = 12
 export interface Quote {
     id: string,
     partnerCode: string,
+    specialOperationsCode?: string,
+    specialOperationsCodeAppliedAt?: Date
     risk: Quote.Risk,
     insurance: Quote.Insurance
     policyHolder?: Quote.PolicyHolder,
@@ -42,17 +44,36 @@ export namespace Quote {
         ipid: string
     }
 
+    export interface PolicyHolder {
+        firstname?: string,
+        lastname?: string,
+        address?: string,
+        postalCode?: string,
+        city?: string,
+        email?: string,
+        phoneNumber?: string,
+        emailValidatedAt?: Date
+    }
+
     export function create (command: CreateQuoteCommand, partnerOffer: Partner.Offer): Quote {
       const insurance: Insurance = getInsurance(command.risk, partnerOffer)
 
-      return {
+      const nbMonthsDue = DEFAULT_NUMBER_MONTHS_DUE
+
+      const quote = {
         id: nextId(),
         partnerCode: command.partnerCode,
         risk: command.risk,
         insurance: insurance,
-        nbMonthsDue: DEFAULT_NUMBER_MONTHS_DUE,
-        premium: DEFAULT_NUMBER_MONTHS_DUE * insurance.estimate.monthlyPrice
+        specialOperationsCode: undefined,
+        specialOperationsCodeAppliedAt: undefined,
+        nbMonthsDue: nbMonthsDue,
+        premium: nbMonthsDue * insurance.estimate.monthlyPrice
       }
+
+      _applyOperationCode(quote, partnerOffer.operationCodes, command.specOpsCode)
+
+      return quote
     }
 
     export function update (quote: Quote, partner: Partner, command: UpdateQuoteCommand, partnerAvailableCodes: Array<OperationCode>): Quote {
@@ -116,9 +137,10 @@ export namespace Quote {
     }
 
     export function applyNbMonthsDue (quote: Quote, nbMonthsDue: number): void {
+      quote.premium = nbMonthsDue * quote.insurance.estimate.monthlyPrice
+      quote.nbMonthsDue = nbMonthsDue
+
       if (quote.startDate) {
-        quote.premium = nbMonthsDue * quote.insurance.estimate.monthlyPrice
-        quote.nbMonthsDue = nbMonthsDue
         quote.termEndDate = _computeTermEndDate(quote.startDate, nbMonthsDue)
       }
     }
@@ -176,17 +198,6 @@ export namespace Quote {
       return generate({ length: 7, charset: 'alphanumeric', readable: true, capitalization: 'uppercase' })
     }
 
-    export interface PolicyHolder {
-        firstname?: string,
-        lastname?: string,
-        address?: string,
-        postalCode?: string,
-        city?: string,
-        email?: string,
-        phoneNumber?: string,
-        emailValidatedAt?: Date
-    }
-
     function _applyOperationCode (quote: Quote, partnerApplicableCodes: Array<OperationCode>, codeToApply?: string): Quote {
       const operationCode: OperationCode = SpecialOperation.inferOperationCode(codeToApply)
       if (partnerApplicableCodes.concat(OperationCode.BLANK).includes(operationCode)) {
@@ -194,12 +205,18 @@ export namespace Quote {
           case OperationCode.SEMESTER1:
           case OperationCode.SEMESTER2:
             Quote.applyNbMonthsDue(quote, 5)
+            quote.specialOperationsCode = operationCode
+            quote.specialOperationsCodeAppliedAt = new Date()
             break
           case OperationCode.FULLYEAR:
             Quote.applyNbMonthsDue(quote, 10)
+            quote.specialOperationsCode = operationCode
+            quote.specialOperationsCodeAppliedAt = new Date()
             break
           case OperationCode.BLANK:
             Quote.applyNbMonthsDue(quote, 12)
+            quote.specialOperationsCode = undefined
+            quote.specialOperationsCodeAppliedAt = undefined
         }
       } else {
         throw new OperationCodeNotApplicableError(codeToApply!, quote.partnerCode)

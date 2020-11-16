@@ -82,7 +82,9 @@ export class QuoteSqlRepository implements QuoteRepository {
         nbMonthsDue: quote.nbMonthsDue,
         startDate: quote.startDate,
         termStartDate: quote.termStartDate,
-        termEndDate: quote.termEndDate
+        termEndDate: quote.termEndDate,
+        specialOperationsCode: quote.specialOperationsCode,
+        specialOperationsCodeAppliedAt: quote.specialOperationsCodeAppliedAt
       },
       {
         where: { id: quote.id },

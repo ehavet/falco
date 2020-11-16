@@ -1,10 +1,11 @@
-import { expect, sinon } from '../../../test-utils'
+import { dateFaker, expect, sinon } from '../../../test-utils'
 import { Quote } from '../../../../src/app/quotes/domain/quote'
 import { CreateQuoteCommand } from '../../../../src/app/quotes/domain/create-quote-command'
 import { Partner } from '../../../../src/app/partners/domain/partner'
 import { QuoteRiskPropertyRoomCountNotInsurableError } from '../../../../src/app/quotes/domain/quote.errors'
 import { CreateQuote } from '../../../../src/app/quotes/domain/create-quote.usecase'
 import { quoteRepositoryMock } from '../fixtures/quote-repository.test-doubles'
+import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
 
 describe('Quotes - Usecase - Create Quote', async () => {
   let createQuote
@@ -20,7 +21,9 @@ describe('Quotes - Usecase - Create Quote', async () => {
     productVersion: '1.0',
     contractualTerms: '/path/to/contractual/terms',
     ipid: '/path/to/ipid',
-    operationCodes: []
+    operationCodes: [
+      OperationCode.SEMESTER1
+    ]
   }
   const expectedQuote: Quote = {
     id: '',
@@ -44,10 +47,14 @@ describe('Quotes - Usecase - Create Quote', async () => {
       ipid: '/path/to/ipid'
     },
     nbMonthsDue: 12,
-    premium: 69.84
+    premium: 69.84,
+    specialOperationsCode: undefined,
+    specialOperationsCodeAppliedAt: undefined
   }
+  const now = new Date('2020-04-18T10:09:08Z')
 
   beforeEach(() => {
+    dateFaker.setCurrentDate(now)
     partnerRepository.getOffer.withArgs('myPartner').returns(partnerOffer)
     createQuote = CreateQuote.factory(quoteRepository, partnerRepository)
   })
@@ -71,7 +78,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
 
     it('with the insurance', async () => {
       // Given
-      const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', risk: { property: { roomCount: 2 } } }
+      const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2 } } }
       const expectedInsurance: Quote.Insurance = expectedQuote.insurance
 
       quoteRepository.save.resolves()
@@ -83,10 +90,28 @@ describe('Quotes - Usecase - Create Quote', async () => {
       expect(quote).to.deep.include({ insurance: expectedInsurance })
     })
 
+    it('with the special operations code applied', async () => {
+      // Given
+      const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.SEMESTER1, risk: { property: { roomCount: 2 } } }
+
+      quoteRepository.save.resolves()
+
+      // When
+      const quote: Quote = await createQuote(createQuoteCommand)
+
+      // Then
+      expect(quote).to.deep.include({
+        specialOperationsCode: 'SEMESTER1',
+        specialOperationsCodeAppliedAt: now,
+        nbMonthsDue: 5,
+        premium: 29.1
+      })
+    })
+
     describe('with a generated alphanumerical id that', async () => {
       it('has 7 characters', async () => {
         // Given
-        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', risk: { property: { roomCount: 2 } } }
+        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2 } } }
 
         quoteRepository.save.resolves()
 
@@ -99,7 +124,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
 
       it('has no I nor l nor O nor 0', async () => {
         // Given
-        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', risk: { property: { roomCount: 2 } } }
+        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2 } } }
 
         quoteRepository.save.resolves()
 
@@ -115,7 +140,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
 
       it('is returned within the quote', async () => {
         // Given
-        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', risk: { property: { roomCount: 2 } } }
+        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2 } } }
 
         quoteRepository.save.resolves()
 
@@ -130,7 +155,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
 
   it('should save the quote', async () => {
     // Given
-    const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', risk: { property: { roomCount: 2 } } }
+    const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2 } } }
     quoteRepository.save.resolves()
 
     // When
@@ -144,7 +169,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
 
   it('should throw an error if there is no insurance for the given risk', async () => {
     // Given
-    const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', risk: { property: { roomCount: 3 } } }
+    const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 3 } } }
 
     // When
     const quotePromise = createQuote(createQuoteCommand)

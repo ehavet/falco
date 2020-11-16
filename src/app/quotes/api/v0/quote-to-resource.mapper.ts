@@ -4,6 +4,8 @@ export function quoteToResource (quote: Quote) {
   return {
     id: quote.id,
     code: quote.partnerCode,
+    special_operations_code: quote.specialOperationsCode,
+    special_operations_code_applied_at: quote.specialOperationsCodeAppliedAt ? new Date(quote.specialOperationsCodeAppliedAt) : undefined,
     risk: _toRisk(quote.risk),
     insurance: _toInsurance(quote.insurance)
   }

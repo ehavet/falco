@@ -3,7 +3,7 @@ import { Quote } from './quote'
 import { QuoteRepository } from './quote.repository'
 import { PartnerRepository } from '../../partners/domain/partner.repository'
 import { Partner } from '../../partners/domain/partner'
-import { OperationCode } from '../../policies/domain/operation-code'
+import { OperationCode } from '../../common-api/domain/operation-code'
 
 export interface UpdateQuote {
     (updateQuoteCommand: UpdateQuoteCommand): Promise<Quote>

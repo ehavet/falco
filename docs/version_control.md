@@ -42,6 +42,14 @@ Example: `[FEATURE] Retrieve a quote from its id`
 
 An additional description can be added if necessary.
 
+### Rules
+
+ - The merge request must be link to a Gitlab issue
+ - 1 approval is mandatory in order to merge the merge request
+ - More approvals can be requested by the creator of the merge request if needed (complexe features, need of specific expertise, ...)
+ - The comments have to be resolved by or in agreement with the person who created them, and not directly by the creator of the pull request 
+
+
 ###### Best practices
 
  - Think about doing synchronous code reviews : after a colleague has submitted some comments, a face to face conversation can help better understanding some remarks made and solving them quickly instead of countless back and forth

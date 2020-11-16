@@ -31,7 +31,10 @@ describe('Http API - Quotes - Integ', async () => {
         partnerCode: 'myPartner',
         risk: {
           property: {
-            roomCount: 2
+            roomCount: 2,
+            address: '52 Rue Beaubourg',
+            postalCode: '75003',
+            city: 'Paris'
           }
         },
         insurance: {
@@ -56,7 +59,10 @@ describe('Http API - Quotes - Integ', async () => {
         id: 'UD65X3A',
         risk: {
           property: {
-            room_count: 2
+            room_count: 2,
+            address: '52 Rue Beaubourg',
+            postal_code: 75003,
+            city: 'Paris'
           }
         },
         insurance: {
@@ -80,11 +86,21 @@ describe('Http API - Quotes - Integ', async () => {
         // When
         response = await httpServer.api()
           .post('/v0/quotes')
-          .send({ code: 'myPartner', risk: { property: { room_count: 2 } } })
+          .send({
+            code: 'myPartner',
+            risk: {
+              property: {
+                room_count: 2,
+                address: '52 Rue Beaubourg',
+                postal_code: '75003',
+                city: 'Paris'
+              }
+            }
+          })
           .set('X-Consumer-Username', 'myPartner')
       })
 
-      it('should reply with status 200', async () => {
+      it('should reply with status 201', async () => {
         expect(response).to.have.property('statusCode', 201)
       })
 
@@ -97,14 +113,31 @@ describe('Http API - Quotes - Integ', async () => {
       it('should reply with status 404', async () => {
         // Given
         const partnerCode: string = 'unknownPartner'
-        const risk = { property: { roomCount: 2 } }
+        const risk = {
+          property: {
+            roomCount: 2,
+            address: '52 Rue Beaubourg',
+            postalCode: '75003',
+            city: 'Paris'
+          }
+        }
         const specOpsCode = 'BLANK'
         sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, specOpsCode }).rejects(new PartnerNotFoundError(partnerCode))
 
         // When
         response = await httpServer.api()
           .post('/v0/quotes')
-          .send({ code: partnerCode, risk: { property: { room_count: 2 } } })
+          .send({
+            code: partnerCode,
+            risk: {
+              property: {
+                room_count: 2,
+                address: '52 Rue Beaubourg',
+                postal_code: 75003,
+                city: 'Paris'
+              }
+            }
+          })
           .set('X-Consumer-Username', partnerCode)
 
         // Then
@@ -117,7 +150,7 @@ describe('Http API - Quotes - Integ', async () => {
       it('should reply with status 422', async () => {
         // Given
         const partnerCode: string = 'myPartner'
-        const risk = { property: { roomCount: 2 } }
+        const risk = { property: { roomCount: 2, postalCode: undefined, city: undefined, address: undefined } }
         const specOpsCode = 'BLANK'
         sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, specOpsCode }).rejects(new NoPartnerInsuranceForRiskError(partnerCode, risk))
 

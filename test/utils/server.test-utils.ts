@@ -21,6 +21,8 @@ export const newProdLikeServer = async (): Promise<HttpServerForTesting> => {
 // Useful for specific api tests with mocked dependencies
 export const newMinimalServer = (routesToTest: ServerRoute[]): HttpServerForTesting => {
   const hapiServer = new Server()
+  // uncommented this line if you want to activate logs on test
+  // hapiServer.events.on({ name: 'request', tags: true, filter: { tags: ['handler', 'error'], all: true } }, listenHandlerErrorsEvents(logger))
   hapiServer.route(routesToTest)
   return new HapiHttpServerForTesting(hapiServer)
 }

@@ -5,7 +5,10 @@ export interface CreateQuoteCommand {
     specOpsCode: OperationCode
     risk: {
         property: {
-            roomCount: number
+            roomCount: number,
+            address?: string,
+            postalCode?: string,
+            city?: string,
         }
     }
 }

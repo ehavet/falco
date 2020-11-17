@@ -24,7 +24,8 @@ describe('Partners - API - Integ', async () => {
         customer_support_email: 'customer@support.fr',
         questions: {
           room_count: {
-            options: [1, 2, 3]
+            options: [1, 2, 3],
+            manage_other_cases: false
           },
           roommate: {
             applicable: true,
@@ -46,7 +47,7 @@ describe('Partners - API - Integ', async () => {
         expect(response).to.have.property('statusCode', 200)
       })
 
-      it('should return an empty object', async () => {
+      it('should return a partner object', async () => {
         expect(response.body).to.deep.equal(expectedResourcePartner)
       })
     })

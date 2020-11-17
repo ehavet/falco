@@ -22,7 +22,8 @@ describe('Partners - API - E2E', async () => {
         customer_support_email: 'help@appenin.fr',
         questions: {
           room_count: {
-            options: [1, 2, 3]
+            options: [1, 2, 3],
+            manage_other_cases: false
           },
           roommate: {
             applicable: true,

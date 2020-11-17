@@ -41,7 +41,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
             code: Partner.Question.QuestionCode.RoomCount,
             options: {
               list: [1, 2, 3]
-            }
+            },
+            manageOtherCases: false
           },
           {
             code: Partner.Question.QuestionCode.Roommate,

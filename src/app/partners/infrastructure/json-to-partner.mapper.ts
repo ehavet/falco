@@ -34,7 +34,8 @@ function _toRoomCountQuestion (jsonQuestion: any) {
     code: Partner.Question.QuestionCode.RoomCount,
     options: {
       list: jsonQuestion.options.list
-    }
+    },
+    manageOtherCases: jsonQuestion.manageOtherCases
   }
 
   return question

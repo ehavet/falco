@@ -4,7 +4,7 @@ import { SpecificTerms } from '../../domain/specific-terms/specific-terms'
 import { ContractGenerator } from '../../domain/contract/contract.generator'
 import { PDFProcessor } from '../pdf/pdf-processor'
 
-const SIGNATURE_PAGE_FILE_NAME = 'Appenin_Page_Signature_07_20.pdf'
+const SIGNATURE_PAGE_FILE_NAME = 'Appenin_Page_Signature.pdf'
 
 export class ContractPdfGenerator implements ContractGenerator {
   #pdfProcessor: PDFProcessor

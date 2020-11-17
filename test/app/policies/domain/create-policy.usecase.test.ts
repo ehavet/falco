@@ -13,7 +13,10 @@ import { EmailValidationQuery } from '../../../../src/app/email-validations/doma
 import { PartnerRepository } from '../../../../src/app/partners/domain/partner.repository'
 import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles'
 import { createPartnerFixture } from '../../partners/fixtures/partner.fixture'
-import { PolicyRiskRoommatesNotAllowedError } from '../../../../src/app/policies/domain/policies.errors'
+import {
+  PolicyRiskPropertyMissingFieldError,
+  PolicyRiskRoommatesNotAllowedError
+} from '../../../../src/app/policies/domain/policies.errors'
 import { Partner } from '../../../../src/app/partners/domain/partner'
 import { quoteRepositoryStub } from '../../quotes/fixtures/quote-repository.test-doubles'
 import Question = Partner.Question
@@ -51,6 +54,9 @@ describe('Policies - Usecase - Create policy', async () => {
     const saveSpy = policyRepository.save.getCall(0)
     expectedPolicy.id = saveSpy.args[0].id
     expectedPolicy.termEndDate = saveSpy.args[0].termEndDate
+    expectedPolicy.risk.property.address = '88 rue des prairies'
+    expectedPolicy.risk.property.postalCode = 91100
+    expectedPolicy.risk.property.city = 'Kyukamura'
     return expect(saveSpy).to.have.been.calledWith(expectedPolicy)
   })
 
@@ -109,5 +115,35 @@ describe('Policies - Usecase - Create policy', async () => {
 
     // Then
     return expect(promise).to.be.rejectedWith(PolicyRiskRoommatesNotAllowedError)
+  })
+
+  it('should throw an error if address is not complete in a quote or command', async () => {
+    // Given
+    const policyCommand = createCreatePolicyCommand({
+      risk: {
+        property: {
+          roomCount: 2,
+          address: undefined,
+          postalCode: undefined,
+          city: undefined
+        }
+      }
+    } as any)
+    quoteRepository.get.withArgs(policyCommand.quoteId).resolves(createQuoteFixture({
+      risk: {
+        property: {
+          roomCount: 2,
+          address: undefined,
+          postalCode: undefined,
+          city: undefined
+        }
+      }
+    } as any))
+
+    // When
+    const promise = createPolicy(policyCommand)
+
+    // Then
+    return expect(promise).to.be.rejectedWith(PolicyRiskPropertyMissingFieldError)
   })
 })

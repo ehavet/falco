@@ -231,6 +231,11 @@ export namespace Quote {
     export function isEmailNoValidated (quote: Quote): boolean {
       return quote.policyHolder?.emailValidatedAt === undefined || quote.policyHolder?.emailValidatedAt === null
     }
+
+    export function isPolicyRiskPropertyAddressMissing (quote: Quote): boolean { return !quote.risk.property.address }
+    export function isPolicyRiskPropertyPostalCodeMissing (quote: Quote): boolean { return !quote.risk.property.postalCode }
+    export function isPolicyRiskPropertyCityMissing (quote: Quote): boolean { return !quote.risk.property.city }
+
 }
 
 export namespace Quote.Risk {

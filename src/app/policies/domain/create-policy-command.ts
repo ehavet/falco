@@ -20,9 +20,9 @@ export namespace CreatePolicyCommand {
 
 export namespace CreatePolicyCommand.Risk {
     export interface Property {
-        address: string,
-        postalCode: number,
-        city: string
+        address: string | undefined,
+        postalCode: number | undefined,
+        city: string | undefined
     }
 
     export interface People {

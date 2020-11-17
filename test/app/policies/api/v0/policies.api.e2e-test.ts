@@ -64,7 +64,17 @@ describe('Policies - API - E2E', async () => {
       dateFaker.setCurrentDate(now)
       response = await httpServer.api()
         .post('/v0/quotes')
-        .send({ code: 'studyo', risk: { property: { room_count: 2 } } })
+        .send({
+          code: 'studyo',
+          risk: {
+            property: {
+              room_count: 2,
+              address: '88 rue des prairies',
+              postal_code: '91100',
+              city: 'Kyukamura'
+            }
+          }
+        })
         .set('X-Consumer-Username', 'studyo')
 
       requestParams.quote_id = response.body.id
@@ -95,9 +105,9 @@ describe('Policies - API - E2E', async () => {
         risk: {
           property: {
             room_count: 2,
-            address: '13 rue du loup garou',
+            address: '88 rue des prairies',
             postal_code: 91100,
-            city: 'Corbeil-Essones'
+            city: 'Kyukamura'
           },
           people: {
             other_insured: [

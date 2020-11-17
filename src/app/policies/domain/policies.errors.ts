@@ -63,3 +63,11 @@ export class PolicyRiskNumberOfRoommatesError extends Error {
     this.name = 'PolicyRiskNumberOfRoommatesError'
   }
 }
+
+export class PolicyRiskPropertyMissingFieldError extends Error {
+  constructor (quoteId: string, fieldName: string) {
+    const message: string = `Quote ${quoteId} risk property ${fieldName} should be completed`
+    super(message)
+    this.name = 'PolicyRiskPropertyMissingFieldError'
+  }
+}

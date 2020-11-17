@@ -7,7 +7,11 @@ import { createCreatePolicyCommand } from '../fixtures/createPolicyCommand.fixtu
 import { PolicyRepository } from '../../../../src/app/policies/domain/policy.repository'
 import { SinonStubbedInstance } from 'sinon'
 import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles'
-import { PolicyRiskRoommatesNotAllowedError, PolicyRiskNumberOfRoommatesError } from '../../../../src/app/policies/domain/policies.errors'
+import {
+  PolicyRiskRoommatesNotAllowedError,
+  PolicyRiskNumberOfRoommatesError,
+  PolicyRiskPropertyMissingFieldError
+} from '../../../../src/app/policies/domain/policies.errors'
 import { createPartnerFixture } from '../../partners/fixtures/partner.fixture'
 import { Partner } from '../../../../src/app/partners/domain/partner'
 import Question = Partner.Question
@@ -100,9 +104,9 @@ describe('Policies - Domain', async () => {
       const expectedRisk: Policy.Risk = {
         property: {
           roomCount: 2,
-          address: '13 rue du loup garou',
+          address: '88 rue des prairies',
           postalCode: 91100,
-          city: 'Corbeil-Essones'
+          city: 'Kyukamura'
         },
         people: {
           person: {
@@ -287,6 +291,84 @@ describe('Policies - Domain', async () => {
 
       // Then
       return expect(promise).to.be.rejectedWith(PolicyRiskNumberOfRoommatesError, 'A property of 2 room(s) allows a maximum of 0 roommate(s)')
+    })
+
+    it('should take the address, postalCode and city from the policy', async () => {
+      const quoteWithoutAddress: Quote = createQuoteFixture({
+        risk: {
+          property: {
+            roomCount: 2,
+            address: undefined,
+            postalCode: undefined,
+            city: undefined
+          }
+        }
+      } as any)
+      const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({ quoteId: quoteWithoutAddress.id })
+
+      const promise = await Policy.create(createPolicyCommand, quoteWithoutAddress, policyRepository, partner)
+
+      expect(promise.risk.property.address).to.be.equal(createPolicyCommand.risk.property.address)
+      expect(promise.risk.property.postalCode).to.be.equal(createPolicyCommand.risk.property.postalCode)
+      expect(promise.risk.property.city).to.be.equal(createPolicyCommand.risk.property.city)
+    })
+    it('should take the address, postalCode and city from the quote', async () => {
+      const quoteWithAddress: Quote = createQuoteFixture({
+        risk: {
+          property: {
+            roomCount: 2,
+            address: 'Rue de la Nouvelle Quote',
+            postalCode: 75019,
+            city: 'QuoteCity'
+          }
+        }
+      } as any)
+      const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({ quoteId: quoteWithAddress.id })
+
+      const promise = await Policy.create(createPolicyCommand, quoteWithAddress, policyRepository, partner)
+
+      expect(promise.risk.property.address).to.be.equal(quoteWithAddress.risk.property.address)
+      expect(promise.risk.property.postalCode).to.be.equal(quoteWithAddress.risk.property.postalCode)
+      expect(promise.risk.property.city).to.be.equal(quoteWithAddress.risk.property.city)
+    })
+
+    it('should throw an error if the address, postalCode and city not present from quote or policy', async () => {
+      const quoteWithoutAddress: Quote = createQuoteFixture({
+        risk: {
+          property: {
+            roomCount: 2,
+            address: undefined,
+            postalCode: undefined,
+            city: undefined
+          }
+        }
+      } as any)
+      const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({
+        quoteId: quoteWithoutAddress.id,
+        risk: {
+          property: {
+            address: undefined,
+            postalCode: undefined,
+            city: undefined
+          },
+          people: {
+            policyHolder: {
+              lastname: 'Dupont',
+              firstname: 'Jean'
+            },
+            otherInsured: [
+              {
+                lastname: 'Doe',
+                firstname: 'John'
+              }
+            ]
+          }
+        }
+      } as any)
+
+      const promise = Policy.create(createPolicyCommand, quoteWithoutAddress, policyRepository, partner)
+
+      expect(promise).to.be.rejectedWith(PolicyRiskPropertyMissingFieldError)
     })
   })
 })

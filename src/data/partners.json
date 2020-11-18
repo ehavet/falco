@@ -84,11 +84,11 @@
         "code": "RoomCount",
         "options": {
           "list": [1, 2, 3]
-        }
+        },
+        "manageOtherCases": true
       },
       {
         "code": "Roommate",
-        "manageOtherCases": true,
         "applicable": false,
         "_comment":  "There is no maximum number of roommates here because Essca does not allow roommates"
       }
@@ -117,12 +117,12 @@
         "code": "RoomCount",
         "options": {
           "list": [1, 2, 3]
-        }
+        },
+        "manageOtherCases": false
       },
       {
         "code": "Roommate",
         "applicable": true,
-        "manageOtherCases": false,
         "_comment":  "The rule for the maximum number of roommates for demo-student is the following : roomcount - 1",
         "maximumNumbers": [{ "roomCount": 1, "value": 0 }, { "roomCount": 2, "value": 1 }, { "roomCount": 3, "value": 2 }]
       }

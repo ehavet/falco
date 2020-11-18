@@ -6,11 +6,11 @@ import { quoteToResource } from './quote-to-resource.mapper'
 import { Container } from '../../quote.container'
 import { PartnerNotFoundError } from '../../../partners/domain/partner.errors'
 import {
-  QuotePolicyHolderEmailNotFoundError,
   NoPartnerInsuranceForRiskError,
-  QuoteRiskPropertyRoomCountNotInsurableError,
   QuoteNotFoundError,
+  QuotePolicyHolderEmailNotFoundError,
   QuoteRiskNumberOfRoommatesError,
+  QuoteRiskPropertyRoomCountNotInsurableError,
   QuoteRiskRoommatesNotAllowedError,
   QuoteStartDateConsistencyError
 } from '../../domain/quote.errors'
@@ -23,6 +23,8 @@ import { quotePutRequestBodySchema } from './schemas/quotes-put-request.schema'
 import { quotePostRequestBodySchema } from './schemas/quotes-post-request.schema'
 import { requestToUpdateQuoteCommand } from './mappers/request-to-update-quote-command.mapper'
 import { requestToCreateQuoteCommand } from './mappers/request-to-create-quote-command.mapper'
+import { GetQuoteById } from '../../domain/get-quote-by-id.usecase'
+import GetQuoteByIdQuery = GetQuoteById.GetQuoteByIdQuery
 
 const TAGS = ['api', 'quotes']
 
@@ -142,7 +144,7 @@ export default function (container: Container): Array<ServerRoute> {
         },
         response: {
           status: {
-            201: quoteResponseBodySchema,
+            200: quoteResponseBodySchema,
             400: HttpErrorSchema.badRequestSchema,
             404: HttpErrorSchema.notFoundSchema,
             422: HttpErrorSchema.unprocessableEntitySchema,
@@ -168,6 +170,43 @@ export default function (container: Container): Array<ServerRoute> {
             case error instanceof QuoteRiskRoommatesNotAllowedError:
             case error instanceof QuoteRiskNumberOfRoommatesError:
               throw Boom.badData(error.message)
+            default:
+              throw Boom.internal(error)
+          }
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/v0/quotes/{id}',
+      options: {
+        tags: TAGS,
+        description: 'Gets a quote',
+        validate: {
+          params: Joi.object({
+            id: Joi.string().min(6).max(12).required().description('Quote id').example('DU6C73X')
+          })
+        },
+        response: {
+          status: {
+            200: quoteResponseBodySchema,
+            400: HttpErrorSchema.badRequestSchema,
+            404: HttpErrorSchema.notFoundSchema,
+            500: HttpErrorSchema.internalServerErrorSchema
+          }
+        }
+      },
+      handler: async (request, h) => {
+        const query: GetQuoteByIdQuery = { quoteId: request.params.id }
+
+        try {
+          const quote = await container.GetQuoteById(query)
+          const quoteAsResource = updatedQuoteToResource(quote)
+          return h.response(quoteAsResource).code(200)
+        } catch (error) {
+          switch (true) {
+            case error instanceof QuoteNotFoundError:
+              throw Boom.notFound(error.message)
             default:
               throw Boom.internal(error)
           }

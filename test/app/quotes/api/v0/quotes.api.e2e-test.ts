@@ -10,7 +10,7 @@ async function resetDb () {
   await QuoteSqlModel.destroy({ truncate: true, cascade: true })
 }
 
-describe('Http API quotes e2e', async () => {
+describe('Quotes - API - E2E', async () => {
   let httpServer: HttpServerForTesting
 
   before(async () => {
@@ -247,6 +247,75 @@ describe('Http API quotes e2e', async () => {
         term_end_date: '2021-03-04',
         term_start_date: '2020-03-05'
       })
+    })
+  })
+
+  describe('GET /v0/quotes/{id}', () => {
+    afterEach(async () => {
+      await resetDb()
+    })
+    it('should return the quote matching the gicen quoteId', async () => {
+      // Given
+      const quoteRepository = new QuoteSqlRepository()
+      const quote: Quote = createQuoteFixture()
+      await quoteRepository.save(quote)
+
+      const expectedResourceQuote = {
+        id: 'UD65X3A',
+        code: 'myPartner',
+        risk: {
+          property: {
+            room_count: 2,
+            address: '88 rue des prairies',
+            postal_code: '91100',
+            city: 'Kyukamura'
+          },
+          person: {
+            firstname: 'Jean-Jean',
+            lastname: 'Lapin'
+          },
+          other_people: [
+            {
+              firstname: 'John',
+              lastname: 'Doe'
+            }
+          ]
+        },
+        insurance: {
+          monthly_price: 5.82,
+          default_deductible: 150,
+          default_cap: 7000,
+          currency: 'EUR',
+          simplified_covers: ['ACDDE', 'ACVOL'],
+          product_code: 'APP999',
+          product_version: 'v2020-02-01',
+          contractual_terms: '/path/to/contractual/terms',
+          ipid: '/path/to/ipid'
+        },
+        policy_holder: {
+          firstname: 'Jean-Jean',
+          lastname: 'Lapin',
+          address: '88 rue des prairies',
+          postal_code: '91100',
+          city: 'Kyukamura',
+          email: 'jeanjean@email.com',
+          phone_number: '+33684205510',
+          email_validated_at: null
+        },
+        premium: 69.84,
+        nb_months_due: 12,
+        start_date: '2020-01-05',
+        term_end_date: '2020-01-05',
+        term_start_date: '2020-01-05'
+      }
+
+      // When
+      const response: supertest.Response = await httpServer.api()
+        .get(`/v0/quotes/${quote.id}`)
+        .set('X-Consumer-Username', 'studyo')
+
+      // Then
+      expect(response.body).to.deep.equal(expectedResourceQuote)
     })
   })
 

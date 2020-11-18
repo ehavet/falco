@@ -394,19 +394,6 @@ describe('Policies - API - Integration', async () => {
           expect(response).to.have.property('statusCode', 400)
         })
 
-        it('but no property', async () => {
-          // Given
-          delete requestParams.risk.property
-
-          // When
-          response = await httpServer.api()
-            .post('/v0/policies')
-            .send(requestParams)
-            .set('X-Consumer-Username', 'myPartner')
-
-          expect(response).to.have.property('statusCode', 400)
-        })
-
         it('but no policy holder', async () => {
           // Given
           delete requestParams.risk.people.policy_holder

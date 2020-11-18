@@ -6,9 +6,10 @@ export function requestToCreatePolicyCommand (payload): CreatePolicyCommand {
     quoteId: payload.quote_id,
     risk: {
       property: {
-        address: payload.risk.property.address,
-        postalCode: payload.risk.property.postal_code,
-        city: payload.risk.property.city
+        address: payload.risk.property?.address,
+        // eslint-disable-next-line camelcase
+        postalCode: payload.risk.property?.postal_code,
+        city: payload.risk.property?.city
       },
       people: {
         policyHolder: {

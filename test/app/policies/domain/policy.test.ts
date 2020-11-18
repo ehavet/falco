@@ -148,9 +148,9 @@ describe('Policies - Domain', async () => {
       const expectedContact: Policy.Holder = {
         lastname: 'Dupont',
         firstname: 'Jean',
-        address: '13 rue du loup garou',
+        address: '88 rue des prairies',
         postalCode: 91100,
-        city: 'Corbeil-Essones',
+        city: 'Kyukamura',
         email: 'jeandupont@email.com',
         phoneNumber: '+33684205510'
       }
@@ -293,7 +293,7 @@ describe('Policies - Domain', async () => {
       return expect(promise).to.be.rejectedWith(PolicyRiskNumberOfRoommatesError, 'A property of 2 room(s) allows a maximum of 0 roommate(s)')
     })
 
-    it('should take the address, postalCode and city from the policy', async () => {
+    it('should take the address, postalCode and city from the command when quote address is empty', async () => {
       const quoteWithoutAddress: Quote = createQuoteFixture({
         risk: {
           property: {
@@ -306,13 +306,13 @@ describe('Policies - Domain', async () => {
       } as any)
       const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({ quoteId: quoteWithoutAddress.id })
 
-      const promise = await Policy.create(createPolicyCommand, quoteWithoutAddress, policyRepository, partner)
+      const policy = await Policy.create(createPolicyCommand, quoteWithoutAddress, policyRepository, partner)
 
-      expect(promise.risk.property.address).to.be.equal(createPolicyCommand.risk.property.address)
-      expect(promise.risk.property.postalCode).to.be.equal(createPolicyCommand.risk.property.postalCode)
-      expect(promise.risk.property.city).to.be.equal(createPolicyCommand.risk.property.city)
+      expect(policy.risk.property.address).to.be.equal(createPolicyCommand.risk.property.address)
+      expect(policy.risk.property.postalCode).to.be.equal(createPolicyCommand.risk.property.postalCode)
+      expect(policy.risk.property.city).to.be.equal(createPolicyCommand.risk.property.city)
     })
-    it('should take the address, postalCode and city from the quote', async () => {
+    it('should take the address, postalCode and city from the quote when they are present', async () => {
       const quoteWithAddress: Quote = createQuoteFixture({
         risk: {
           property: {
@@ -325,11 +325,11 @@ describe('Policies - Domain', async () => {
       } as any)
       const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({ quoteId: quoteWithAddress.id })
 
-      const promise = await Policy.create(createPolicyCommand, quoteWithAddress, policyRepository, partner)
+      const policy = await Policy.create(createPolicyCommand, quoteWithAddress, policyRepository, partner)
 
-      expect(promise.risk.property.address).to.be.equal(quoteWithAddress.risk.property.address)
-      expect(promise.risk.property.postalCode).to.be.equal(quoteWithAddress.risk.property.postalCode)
-      expect(promise.risk.property.city).to.be.equal(quoteWithAddress.risk.property.city)
+      expect(policy.risk.property.address).to.be.equal(quoteWithAddress.risk.property.address)
+      expect(policy.risk.property.postalCode).to.be.equal(quoteWithAddress.risk.property.postalCode)
+      expect(policy.risk.property.city).to.be.equal(quoteWithAddress.risk.property.city)
     })
 
     it('should throw an error if the address, postalCode and city not present from quote or policy', async () => {

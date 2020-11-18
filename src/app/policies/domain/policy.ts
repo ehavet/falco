@@ -123,7 +123,7 @@ export namespace Policy {
           partnerCode: createPolicyCommand.partnerCode,
           insurance: quote.insurance,
           risk,
-          contact: _createContact(createPolicyCommand.contact, createPolicyCommand.risk),
+          contact: _createContact(createPolicyCommand.contact, createPolicyCommand.risk, quote.risk),
           nbMonthsDue: DEFAULT_NUMBER_OF_MONTHS_DUE,
           premium: DEFAULT_NUMBER_OF_MONTHS_DUE * quote.insurance.estimate.monthlyPrice,
           startDate,
@@ -153,13 +153,13 @@ export namespace Policy {
       return createPolicyCommand.startDate || new Date()
     }
 
-    function _createContact (queryContact: CreatePolicyCommand.Contact, queryRisk: CreatePolicyCommand.Risk): Policy.Holder {
+    function _createContact (queryContact: CreatePolicyCommand.Contact, queryRisk: CreatePolicyCommand.Risk, quoteRisk: Quote.Risk): Policy.Holder {
       return {
         lastname: queryRisk.people.policyHolder.lastname,
         firstname: queryRisk.people.policyHolder.firstname,
-        address: queryRisk.property.address!,
-        postalCode: queryRisk.property.postalCode!,
-        city: queryRisk.property.city!,
+        address: quoteRisk.property.address || queryRisk.property.address!,
+        postalCode: quoteRisk.property.postalCode ? parseInt(quoteRisk.property.postalCode) : queryRisk.property.postalCode!,
+        city: quoteRisk.property.city || queryRisk.property.city!,
         email: queryContact.email,
         phoneNumber: queryContact.phoneNumber
       }
@@ -181,13 +181,13 @@ export namespace Policy {
     }
 
     function _addressIsMissingFromQuoteAndCommand (quote: Quote, createPolicyCommand: CreatePolicyCommand): boolean {
-      return (Quote.isPolicyRiskPropertyAddressMissing(quote) && !createPolicyCommand.risk.property.address)
+      return (Quote.isPolicyRiskPropertyAddressMissing(quote) && CreatePolicyCommand.isRiskPropertyAddressMissing(createPolicyCommand))
     }
     function _postalCodeIsMissingFromQuoteAndCommand (quote: Quote, createPolicyCommand: CreatePolicyCommand): boolean {
-      return (Quote.isPolicyRiskPropertyPostalCodeMissing(quote) && !createPolicyCommand.risk.property.postalCode)
+      return (Quote.isPolicyRiskPropertyPostalCodeMissing(quote) && CreatePolicyCommand.isRiskPropertyPostalCodeMissing(createPolicyCommand))
     }
     function _cityIsMissingFromQuoteAndCommand (quote: Quote, createPolicyCommand: CreatePolicyCommand): boolean {
-      return (Quote.isPolicyRiskPropertyAddressMissing(quote) && !createPolicyCommand.risk.property.city)
+      return (Quote.isPolicyRiskPropertyAddressMissing(quote) && CreatePolicyCommand.isRiskPropertyCityMissing(createPolicyCommand))
     }
 
 }

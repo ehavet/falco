@@ -70,7 +70,7 @@ describe('Policies - API - E2E', async () => {
             property: {
               room_count: 2,
               address: '88 rue des prairies',
-              postal_code: '91100',
+              postal_code: 91100,
               city: 'Kyukamura'
             }
           }
@@ -125,9 +125,9 @@ describe('Policies - API - E2E', async () => {
         contact: {
           lastname: 'Dupont',
           firstname: 'Jean',
-          address: '13 rue du loup garou',
+          address: '88 rue des prairies',
           postal_code: 91100,
-          city: 'Corbeil-Essones',
+          city: 'Kyukamura',
           email: 'jeandupont@email.com',
           phone_number: '+33684205510'
         },

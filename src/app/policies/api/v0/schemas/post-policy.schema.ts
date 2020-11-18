@@ -77,7 +77,7 @@ export const createPolicyRequestSchema: Joi.ObjectSchema = Joi.object({
       address: Joi.string().optional().max(100).description('Property address').example('112 rue du chêne rouge'),
       postal_code: Joi.number().integer().positive().optional().min(0o1000).max(97680).description('Property postal code').example(95470),
       city: Joi.string().optional().max(50).description('Property city').example('Corbeil-Essonnes')
-    }).required().description('Risks regarding the property'),
+    }).optional().description('Risks regarding the property'),
     people: Joi.object({
       policy_holder: Joi.object({
         firstname: Joi.string().required().max(100).description('Policy holders firstname').example('John'),

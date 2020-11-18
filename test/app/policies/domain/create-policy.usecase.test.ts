@@ -57,6 +57,10 @@ describe('Policies - Usecase - Create policy', async () => {
     expectedPolicy.risk.property.address = '88 rue des prairies'
     expectedPolicy.risk.property.postalCode = 91100
     expectedPolicy.risk.property.city = 'Kyukamura'
+
+    expectedPolicy.contact.address = '88 rue des prairies'
+    expectedPolicy.contact.postalCode = 91100
+    expectedPolicy.contact.city = 'Kyukamura'
     return expect(saveSpy).to.have.been.calledWith(expectedPolicy)
   })
 

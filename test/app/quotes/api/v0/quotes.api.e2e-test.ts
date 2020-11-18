@@ -254,7 +254,7 @@ describe('Quotes - API - E2E', async () => {
     afterEach(async () => {
       await resetDb()
     })
-    it('should return the quote matching the gicen quoteId', async () => {
+    it('should return the quote matching the given quoteId', async () => {
       // Given
       const quoteRepository = new QuoteSqlRepository()
       const quote: Quote = createQuoteFixture()

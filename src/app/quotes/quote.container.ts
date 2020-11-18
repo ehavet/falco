@@ -13,10 +13,12 @@ import { QuotePersonSqlModel } from './infrastructure/sql-models/quote-person-sq
 import { QuoteSqlModel } from './infrastructure/sql-models/quote-sql-model'
 import { UpdateQuote } from './domain/update-quote.usecase'
 import { SendValidationLinkEmailToQuotePolicyHolder } from './domain/send-validation-link-email-to-quote-policy-holder.usecase'
+import { GetQuoteById } from './domain/get-quote-by-id.usecase'
 
 export interface Container {
   CreateQuote: CreateQuote
   UpdateQuote: UpdateQuote
+  GetQuoteById: GetQuoteById
   quoteRepository: QuoteRepository
   SendValidationLinkEmailToQuotePolicyHolder: SendValidationLinkEmailToQuotePolicyHolder
 }
@@ -31,10 +33,12 @@ const sendEmailValidationLinkToQuotePolicyHolder: SendValidationLinkEmailToQuote
     )
 const createQuote: CreateQuote = CreateQuote.factory(quoteRepository, partnerRepository)
 const updateQuote: UpdateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+const getQuoteById: GetQuoteById = GetQuoteById.factory(quoteRepository)
 
 export const container: Container = {
   CreateQuote: createQuote,
   UpdateQuote: updateQuote,
+  GetQuoteById: getQuoteById,
   quoteRepository: quoteRepository,
   SendValidationLinkEmailToQuotePolicyHolder: sendEmailValidationLinkToQuotePolicyHolder
 }

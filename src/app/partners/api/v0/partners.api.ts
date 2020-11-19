@@ -7,15 +7,12 @@ import { PartnerNotFoundError } from '../../domain/partner.errors'
 import * as HttpErrorSchema from '../../../common-api/HttpErrorSchema'
 import { partnerToResource } from './partner-to-resource.mapper'
 
-const TAGS = ['api', 'partners']
-
 export default function (container: Container): Array<ServerRoute> {
   return [
     {
       method: 'GET',
       path: '/internal/v0/partners/{id}',
       options: {
-        tags: TAGS,
         description: 'Information for a specific partner',
         validate: {
           params: Joi.object({

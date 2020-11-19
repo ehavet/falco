@@ -12,7 +12,8 @@ import {
   PolicyNotFoundError,
   PolicyNotUpdatableError,
   PolicyStartDateConsistencyError,
-  PolicyRiskRoommatesNotAllowedError
+  PolicyRiskRoommatesNotAllowedError,
+  PolicyRiskPropertyMissingFieldError
 } from '../../domain/policies.errors'
 import { QuoteNotFoundError } from '../../../quotes/domain/quote.errors'
 import { CreatePolicyCommand } from '../../domain/create-policy-command'
@@ -121,9 +122,12 @@ export default function (container: Container): Array<ServerRoute> {
             throw Boom.notFound(error.message)
           }
           if (error instanceof PolicyRiskRoommatesNotAllowedError ||
-              error instanceof PolicyRiskNumberOfRoommatesError) {
+              error instanceof PolicyRiskNumberOfRoommatesError ||
+              error instanceof PolicyRiskPropertyMissingFieldError
+          ) {
             throw Boom.badData(error.message)
           }
+
           throw Boom.internal(error)
         }
       }

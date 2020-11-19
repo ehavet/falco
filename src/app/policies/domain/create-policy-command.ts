@@ -16,13 +16,25 @@ export namespace CreatePolicyCommand {
         email: string,
         phoneNumber: string
     }
+
+    export function isRiskPropertyAddressMissing (command: CreatePolicyCommand): boolean {
+      return !command.risk.property.address
+    }
+
+    export function isRiskPropertyPostalCodeMissing (command: CreatePolicyCommand): boolean {
+      return !command.risk.property.postalCode
+    }
+
+    export function isRiskPropertyCityMissing (command: CreatePolicyCommand): boolean {
+      return !command.risk.property.city
+    }
 }
 
 export namespace CreatePolicyCommand.Risk {
     export interface Property {
-        address: string,
-        postalCode: number,
-        city: string
+        address: string | undefined,
+        postalCode: number | undefined,
+        city: string | undefined
     }
 
     export interface People {

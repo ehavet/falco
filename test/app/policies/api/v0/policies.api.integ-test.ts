@@ -394,60 +394,6 @@ describe('Policies - API - Integration', async () => {
           expect(response).to.have.property('statusCode', 400)
         })
 
-        it('but no property', async () => {
-          // Given
-          delete requestParams.risk.property
-
-          // When
-          response = await httpServer.api()
-            .post('/v0/policies')
-            .send(requestParams)
-            .set('X-Consumer-Username', 'myPartner')
-
-          expect(response).to.have.property('statusCode', 400)
-        })
-
-        describe('and a property but', async () => {
-          it('but no address', async () => {
-            // Given
-            delete requestParams.risk.property.address
-
-            // When
-            response = await httpServer.api()
-              .post('/v0/policies')
-              .send(requestParams)
-              .set('X-Consumer-Username', 'myPartner')
-
-            expect(response).to.have.property('statusCode', 400)
-          })
-
-          it('but no postal_code', async () => {
-            // Given
-            delete requestParams.risk.property.postal_code
-
-            // When
-            response = await httpServer.api()
-              .post('/v0/policies')
-              .send(requestParams)
-              .set('X-Consumer-Username', 'myPartner')
-
-            expect(response).to.have.property('statusCode', 400)
-          })
-
-          it('but no city', async () => {
-            // Given
-            delete requestParams.risk.property.city
-
-            // When
-            response = await httpServer.api()
-              .post('/v0/policies')
-              .send(requestParams)
-              .set('X-Consumer-Username', 'myPartner')
-
-            expect(response).to.have.property('statusCode', 400)
-          })
-        })
-
         it('but no policy holder', async () => {
           // Given
           delete requestParams.risk.people.policy_holder

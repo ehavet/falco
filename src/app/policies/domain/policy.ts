@@ -5,7 +5,7 @@ import { PolicyRepository } from './policy.repository'
 import dayjs from '../../../libs/dayjs'
 import { Partner } from '../../partners/domain/partner'
 import * as PartnerFunc from '../../partners/domain/partner.func'
-import { PolicyStartDateConsistencyError, PolicyRiskRoommatesNotAllowedError, PolicyRiskNumberOfRoommatesError } from './policies.errors'
+import { PolicyStartDateConsistencyError, PolicyRiskRoommatesNotAllowedError, PolicyRiskNumberOfRoommatesError, PolicyRiskPropertyMissingFieldError } from './policies.errors'
 import { OperationCode } from '../../common-api/domain/operation-code'
 
 const DEFAULT_NUMBER_OF_MONTHS_DUE = 12
@@ -111,6 +111,10 @@ export namespace Policy {
       const productCode: string = PartnerFunc.getProductCode(partner)
       const generatedId: string = _generateId(partnerCode, productCode)
       if (await policyRepository.isIdAvailable(generatedId)) {
+        if (_addressIsMissingFromQuoteAndCommand(quote, createPolicyCommand)) throw new PolicyRiskPropertyMissingFieldError(quote.id, 'address')
+        if (_postalCodeIsMissingFromQuoteAndCommand(quote, createPolicyCommand)) throw new PolicyRiskPropertyMissingFieldError(quote.id, 'postalCode')
+        if (_cityIsMissingFromQuoteAndCommand(quote, createPolicyCommand)) throw new PolicyRiskPropertyMissingFieldError(quote.id, 'city')
+
         // eslint-disable-next-line no-use-before-define
         const risk = Risk.createRisk(createPolicyCommand.risk, quote.risk, partner)
         const startDate: Date = _getStartDate(createPolicyCommand)
@@ -119,7 +123,7 @@ export namespace Policy {
           partnerCode: createPolicyCommand.partnerCode,
           insurance: quote.insurance,
           risk,
-          contact: _createContact(createPolicyCommand.contact, createPolicyCommand.risk),
+          contact: _createContact(createPolicyCommand.contact, createPolicyCommand.risk, quote.risk),
           nbMonthsDue: DEFAULT_NUMBER_OF_MONTHS_DUE,
           premium: DEFAULT_NUMBER_OF_MONTHS_DUE * quote.insurance.estimate.monthlyPrice,
           startDate,
@@ -149,13 +153,13 @@ export namespace Policy {
       return createPolicyCommand.startDate || new Date()
     }
 
-    function _createContact (queryContact: CreatePolicyCommand.Contact, queryRisk: CreatePolicyCommand.Risk): Policy.Holder {
+    function _createContact (queryContact: CreatePolicyCommand.Contact, queryRisk: CreatePolicyCommand.Risk, quoteRisk: Quote.Risk): Policy.Holder {
       return {
         lastname: queryRisk.people.policyHolder.lastname,
         firstname: queryRisk.people.policyHolder.firstname,
-        address: queryRisk.property.address,
-        postalCode: queryRisk.property.postalCode,
-        city: queryRisk.property.city,
+        address: quoteRisk.property.address || queryRisk.property.address!,
+        postalCode: quoteRisk.property.postalCode ? parseInt(quoteRisk.property.postalCode) : queryRisk.property.postalCode!,
+        city: quoteRisk.property.city || queryRisk.property.city!,
         email: queryContact.email,
         phoneNumber: queryContact.phoneNumber
       }
@@ -175,6 +179,17 @@ export namespace Policy {
       policy.specialOperationsCode = specialOperationsCode
       policy.specialOperationsCodeAppliedAt = specialOperationsCode ? new Date() : null
     }
+
+    function _addressIsMissingFromQuoteAndCommand (quote: Quote, createPolicyCommand: CreatePolicyCommand): boolean {
+      return (Quote.isPolicyRiskPropertyAddressMissing(quote) && CreatePolicyCommand.isRiskPropertyAddressMissing(createPolicyCommand))
+    }
+    function _postalCodeIsMissingFromQuoteAndCommand (quote: Quote, createPolicyCommand: CreatePolicyCommand): boolean {
+      return (Quote.isPolicyRiskPropertyPostalCodeMissing(quote) && CreatePolicyCommand.isRiskPropertyPostalCodeMissing(createPolicyCommand))
+    }
+    function _cityIsMissingFromQuoteAndCommand (quote: Quote, createPolicyCommand: CreatePolicyCommand): boolean {
+      return (Quote.isPolicyRiskPropertyAddressMissing(quote) && CreatePolicyCommand.isRiskPropertyCityMissing(createPolicyCommand))
+    }
+
 }
 
 export namespace Policy.Risk {
@@ -202,12 +217,16 @@ export namespace Policy.Risk {
         }
       }
 
+      const postalCode = quoteRisk.property.postalCode
+        ? parseInt(quoteRisk.property.postalCode)
+        : commandRisk.property.postalCode as number
+
       return {
         property: {
           roomCount: quoteRisk.property.roomCount,
-          address: commandRisk.property.address,
-          postalCode: commandRisk.property.postalCode,
-          city: commandRisk.property.city
+          address: quoteRisk.property.address || commandRisk.property.address as string,
+          postalCode,
+          city: quoteRisk.property.city || commandRisk.property.city as string
         },
         people: {
           person: commandRisk.people.policyHolder,

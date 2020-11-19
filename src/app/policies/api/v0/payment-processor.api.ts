@@ -7,7 +7,6 @@ import { UnauthenticatedEventError } from '../../domain/payment-processor.errors
 import { Stripe } from 'stripe'
 import { requestToConfirmPaymentIntentCommand } from './mappers/create-confirm-payment-intent-command.mapper'
 
-const TAGS = ['api', 'payment-processor']
 export default function (container: Container): Array<ServerRoute> {
   return [
     {
@@ -18,7 +17,6 @@ export default function (container: Container): Array<ServerRoute> {
           output: 'data',
           parse: false
         },
-        tags: TAGS,
         description: 'Listen for payment processor notifications',
         response: {
           status: {

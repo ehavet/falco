@@ -6,15 +6,12 @@ import * as Boom from '@hapi/boom'
 import { DatabaseInitializationError } from '../../../common-api/domain/database.errors'
 import { ApplicationVersion } from '../../domain/application-version'
 
-const TAGS = ['api', 'health-checks']
-
 export default function (container: Container): Array<ServerRoute> {
   return [
     {
       method: 'GET',
       path: '/probes/readiness',
       options: {
-        tags: TAGS,
         description: 'return application readiness status',
         response: {
           status: {
@@ -41,7 +38,6 @@ export default function (container: Container): Array<ServerRoute> {
       method: 'GET',
       path: '/probes/version',
       options: {
-        tags: TAGS,
         description: 'return application version',
         response: {
           status: {

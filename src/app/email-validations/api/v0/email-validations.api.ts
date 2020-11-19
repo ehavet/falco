@@ -9,15 +9,12 @@ import { ExpiredEmailValidationTokenError, BadEmailValidationToken } from '../..
 import { PolicyNotFoundError } from '../../../policies/domain/policies.errors'
 import { QuoteNotFoundError } from '../../../quotes/domain/quote.errors'
 
-const TAGS = ['api', 'email-validations']
-
 export default function (container: Container): Array<ServerRoute> {
   return [
     {
       method: 'POST',
       path: '/internal/v0/email-validations/validate',
       options: {
-        tags: TAGS,
         description: 'Validate email address and return a associate callback url',
         validate: {
           payload: Joi.object({

@@ -1,11 +1,12 @@
 import { EmailValidationQuery } from './email-validation-query'
 import { Crypter } from './crypter'
-import { Mailer } from '../../common-api/domain/mailer'
+import { Email, Mailer } from '../../common-api/domain/mailer'
 import { ValidationLinkConfig } from '../../../configs/validation-link.config'
 import * as querystring from 'querystring'
-import { buildValidationLinkEmail } from './validation-link.email'
 import { EmailValidationQueryConsistencyError } from './email-validation.errors'
 import { ValidationTokenPayload } from './validation-token-payload'
+import { HtmlTemplateEngine } from '../../common-api/domain/html-template-engine'
+import { buildValidationLinkEmail } from './email-validation-link.email'
 
 export interface SendValidationLinkToEmailAddress {
     (emailValidationQuery: EmailValidationQuery): Promise<void>
@@ -15,14 +16,22 @@ export namespace SendValidationLinkToEmailAddress {
     export function factory (
       encrypter: Crypter,
       mailer: Mailer,
-      config: ValidationLinkConfig
+      config: ValidationLinkConfig,
+      htmlTemplateEngine: HtmlTemplateEngine
     ): SendValidationLinkToEmailAddress {
       return async (emailValidationQuery: EmailValidationQuery) => {
         if (_isQueryInconsistent(emailValidationQuery)) { throw new EmailValidationQueryConsistencyError() }
         const validationTokens = _buildValidationTokens(emailValidationQuery, config, encrypter)
         const emailValidationUriFr: string = _getEmailValidationUri(config.baseUrl, validationTokens.fr)
         const emailValidationUriEn: string = _getEmailValidationUri(config.baseUrl, validationTokens.en)
-        await mailer.send(buildValidationLinkEmail(emailValidationQuery.email, emailValidationUriFr, emailValidationUriEn))
+        const validationLinkEmail: Email = await buildValidationLinkEmail(
+          htmlTemplateEngine,
+          emailValidationQuery.email,
+          emailValidationUriFr,
+          emailValidationUriEn
+        )
+
+        await mailer.send(validationLinkEmail)
       }
     }
 }

@@ -7,7 +7,7 @@ import { Policy } from '../../../../src/app/policies/domain/policy'
 import { CertificateGenerator } from '../../../../src/app/policies/domain/certificate/certificate.generator'
 import { Mailer } from '../../../../src/app/common-api/domain/mailer'
 import { Certificate } from '../../../../src/app/policies/domain/certificate/certificate'
-import { expectedSubscriptionValidationEmail } from '../expectations/expected-subscription-validation-email'
+import { expectedSubscriptionValidationEmailMessage } from '../expectations/expected-subscription-validation-email-message'
 import { CertificateGenerationError } from '../../../../src/app/policies/domain/certificate/certificate.errors'
 import { ContractRepository } from '../../../../src/app/policies/domain/contract/contract.repository'
 import { ContractGenerator } from '../../../../src/app/policies/domain/contract/contract.generator'
@@ -37,14 +37,19 @@ describe('PaymentProcessor - Usecase - confirm payment intent for policy', async
     getContractName: sinon.stub()
   }
   const mailer: SinonStubbedInstance<Mailer> = {
-    send: sinon.stub()
+    send: sinon.mock()
   }
+  const templateEngine = { render: sinon.stub() }
 
   const confirmPaymentIntentForPolicy: ConfirmPaymentIntentForPolicy =
-      ConfirmPaymentIntentForPolicy.factory(policyRepository, certificateGenerator, contractGenerator, contractRepository, paymentRepository, paymentProcessor, mailer)
+      ConfirmPaymentIntentForPolicy.factory(policyRepository, certificateGenerator, contractGenerator, contractRepository, paymentRepository, paymentProcessor, mailer, templateEngine)
 
   beforeEach(() => {
     dateFaker.setCurrentDate(now)
+  })
+
+  afterEach(() => {
+    mailer.send.reset()
   })
 
   it('Should update the policy', async () => {
@@ -129,6 +134,7 @@ describe('PaymentProcessor - Usecase - confirm payment intent for policy', async
     certificateGenerator.generate.withArgs(policy).resolves(certificate)
     contractGenerator.getContractName.withArgs(policyId).returns('signedContract.pdf')
     contractRepository.getSignedContract.withArgs('signedContract.pdf').resolves({ name: 'signedContract.pdf', buffer: Buffer.from('signedContract') })
+    templateEngine.render.withArgs('email-congratulations').resolves(expectedSubscriptionValidationEmailMessage)
 
     const confirmPaymentIntentCommand = createConfirmPaymentIntentCommandFixture({ policyId })
 
@@ -136,8 +142,17 @@ describe('PaymentProcessor - Usecase - confirm payment intent for policy', async
     await confirmPaymentIntentForPolicy(confirmPaymentIntentCommand)
 
     // Then
-    expect(mailer.send.getCall(0))
-      .to.have.been.calledWith(expectedSubscriptionValidationEmail)
+    sinon.assert.calledOnceWithExactly(mailer.send, {
+      sender: '"Appenin Assurance" <moncontrat@appenin.fr>',
+      recipient: 'test@email.com',
+      subject: 'Appenin - vos documents contractuels / your contractual documents',
+      cc: 'notif-souscription@appenin.fr',
+      messageHtml: expectedSubscriptionValidationEmailMessage,
+      attachments: [
+        { filename: 'filename', content: Buffer.alloc(1) },
+        { filename: 'signedContract.pdf', content: Buffer.from('signedContract') }
+      ]
+    })
   })
 
   it('Should throw CertificateGenerationError when certificate generation failed', async () => {

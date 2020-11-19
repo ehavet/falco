@@ -2,9 +2,7 @@ import { PolicyRepository } from './policy.repository'
 import { Policy } from './policy'
 import { CertificateGenerator } from './certificate/certificate.generator'
 import { Mailer } from '../../common-api/domain/mailer'
-import { buildSubscriptionValidationEmail } from './subscription-validation.email'
 import { CertificateGenerationError } from './certificate/certificate.errors'
-import { SubscriptionValidationEmailBuildError } from './subcription-validation-email.errors'
 import { ContractRepository } from './contract/contract.repository'
 import { ContractGenerator } from './contract/contract.generator'
 import { Payment } from './payment/payment'
@@ -13,6 +11,8 @@ import { PaymentRepository } from './payment/payment.repository'
 import { Contract } from './contract/contract'
 import { Certificate } from './certificate/certificate'
 import { PaymentProcessor } from './payment-processor'
+import { HtmlTemplateEngine } from '../../common-api/domain/html-template-engine'
+import { buildSubscriptionValidationEmail, SubscriptionValidationEmail } from '../../email-validations/domain/subscription-validation.email'
 
 export interface ConfirmPaymentIntentForPolicy {
     (confirmPaymentIntentCommand: ConfirmPaymentIntentCommand): Promise<void>
@@ -36,23 +36,20 @@ export namespace ConfirmPaymentIntentForPolicy {
       contractRepository: ContractRepository,
       paymentRepository: PaymentRepository,
       paymentProcessor: PaymentProcessor,
-      mailer: Mailer
+      mailer: Mailer,
+      htmlTemplateEngine: HtmlTemplateEngine
     ): ConfirmPaymentIntentForPolicy {
       return async (confirmPaymentIntentCommand: ConfirmPaymentIntentCommand) => {
         const currentDate: Date = new Date()
         const policyId = confirmPaymentIntentCommand.policyId
-
         const policy = await policyRepository.get(policyId)
-
         const signedContract = await retrieveSignedContract(contractGenerator, policyId, contractRepository)
-
         await policyRepository.updateAfterPayment(policyId, currentDate, currentDate, Policy.Status.Applicable)
-
         await createPayment(policyId, confirmPaymentIntentCommand, paymentRepository, paymentProcessor)
-
         const certificate = await generateCertificate(policy, certificateGenerator)
+        const email: SubscriptionValidationEmail = await buildSubscriptionValidationEmail(policy, certificate, signedContract, htmlTemplateEngine)
 
-        await sendSubscriptionValidationEmail(policy, certificate, signedContract, mailer)
+        await mailer.send(email)
       }
     }
 
@@ -73,15 +70,5 @@ export namespace ConfirmPaymentIntentForPolicy {
       } catch (e) {
         throw new CertificateGenerationError(policy.id)
       }
-    }
-
-    async function sendSubscriptionValidationEmail (policy: Policy, certificate: Certificate, signedContract: Contract, mailer: Mailer): Promise<void> {
-      let email
-      try {
-        email = buildSubscriptionValidationEmail(policy.contact.email, certificate, signedContract)
-      } catch (e) {
-        throw new SubscriptionValidationEmailBuildError(policy.id)
-      }
-      await mailer.send(email)
     }
 }

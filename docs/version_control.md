@@ -15,9 +15,7 @@ Before creating your working branch, do not forget to retrieve the last changes 
  If not possible, another solution could be to create a first merge request with the code you have created that can be integrated, and then do a second one later on with the rest of the code.
  Do not hesitate to contact a team member to discuss it.
 
-## Naming conventions
-
-### Branches
+## Branches
 
 The naming of the branches needs to follow a specific convention :
 
@@ -29,24 +27,7 @@ prefix : `feature`, `bugfix`, `tech`, `doc`
 
 Examples : `feature/55-get-quote-repository`, `feature/55-get-quote-usecase`, `tech/32-install-yarn`
 
-
-## Merge Requests
-
-When creating a merge request, the name must follow the following convention : 
-
-`[<PREFIX>] <Description>`
-
-PREFIX : `FEATURE`, `BUGFIX`, `TECH`, `DOC`
-
-Example: `[FEATURE] Retrieve a quote from its id`
-
-An additional description can be added if necessary.
-
-###### Best practices
-
- - Think about doing synchronous code reviews : after a colleague has submitted some comments, a face to face conversation can help better understanding some remarks made and solving them quickly instead of countless back and forth
-
-## Commit
+## Commits
 
 Each commit must have at least a message describing succinctly what work has been done.
 
@@ -65,3 +46,28 @@ By changing the buffer type from `utf8` to `binary`, it solved the error.
 
  - Atomic commits : doing small commits focused on consistent small parts of code can help developers in their daily development by enhancing organization, understanding or reviewing compared to big commits with many different changes
  - Following the [Conventional Commit Convention](https://www.conventionalcommits.org/) is a way to improve the commit messages readability ang global codebase understanding
+
+
+## Merge Requests
+
+When creating a merge request, the name must follow the following convention : 
+
+`[<PREFIX>] <Description>`
+
+PREFIX : `FEATURE`, `BUGFIX`, `TECH`, `DOC`
+
+Example: `[FEATURE] Retrieve a quote from its id`
+
+An additional description can be added if necessary.
+
+### Rules
+
+ - The merge request must be link to a Gitlab issue
+ - 1 approval is mandatory in order to merge the merge request
+ - More approvals can be requested by the creator of the merge request if needed (complexe features, need of specific expertise, ...)
+ - The comments have to be resolved by or in agreement with the person who created them, and not directly by the creator of the pull request 
+
+
+###### Best practices
+
+ - Think about doing synchronous code reviews : after a colleague has submitted some comments, a face to face conversation can help better understanding some remarks made and solving them quickly instead of countless back and forth

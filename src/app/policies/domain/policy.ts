@@ -187,7 +187,7 @@ export namespace Policy {
       return (Quote.isPolicyRiskPropertyPostalCodeMissing(quote) && CreatePolicyCommand.isRiskPropertyPostalCodeMissing(createPolicyCommand))
     }
     function _cityIsMissingFromQuoteAndCommand (quote: Quote, createPolicyCommand: CreatePolicyCommand): boolean {
-      return (Quote.isPolicyRiskPropertyAddressMissing(quote) && CreatePolicyCommand.isRiskPropertyCityMissing(createPolicyCommand))
+      return (Quote.isPolicyRiskPropertyCityMissing(quote) && CreatePolicyCommand.isRiskPropertyCityMissing(createPolicyCommand))
     }
 
 }

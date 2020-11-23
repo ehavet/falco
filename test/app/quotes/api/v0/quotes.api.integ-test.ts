@@ -644,7 +644,7 @@ describe('Http API - Quotes - Integ', async () => {
 
       beforeEach(async () => {
         // Given
-        sinon.stub(container, 'GetQuoteById').withArgs({ quoteId: expectedResourceQuote.id }).resolves(quote)
+        sinon.stub(container, 'GetQuoteById').withArgs({ quoteId: expectedResourceQuote.id, partnerCode: 'myPartner' }).resolves(quote)
 
         // When
         response = await httpServer.api()
@@ -665,7 +665,7 @@ describe('Http API - Quotes - Integ', async () => {
       it('should reply with status 404', async () => {
         // Given
         const quoteId: string = 'UNKNOWN'
-        sinon.stub(container, 'GetQuoteById').withArgs({ quoteId }).rejects(new QuoteNotFoundError(quoteId))
+        sinon.stub(container, 'GetQuoteById').withArgs({ quoteId, partnerCode: 'myPartner' }).rejects(new QuoteNotFoundError(quoteId))
 
         // When
         const response = await httpServer.api()

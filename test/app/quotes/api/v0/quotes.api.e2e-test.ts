@@ -262,7 +262,7 @@ describe('Quotes - API - E2E', async () => {
 
       const expectedResourceQuote = {
         id: 'UD65X3A',
-        code: 'myPartner',
+        code: quote.partnerCode,
         risk: {
           property: {
             room_count: 2,

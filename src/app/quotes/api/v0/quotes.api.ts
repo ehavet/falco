@@ -197,7 +197,9 @@ export default function (container: Container): Array<ServerRoute> {
         }
       },
       handler: async (request, h) => {
-        const query: GetQuoteByIdQuery = { quoteId: request.params.id }
+        const headers: any = request.headers
+        const partnerCode: string = headers['x-consumer-username']
+        const query: GetQuoteByIdQuery = { quoteId: request.params.id, partnerCode }
 
         try {
           const quote = await container.GetQuoteById(query)

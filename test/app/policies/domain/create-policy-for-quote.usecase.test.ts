@@ -34,7 +34,7 @@ describe('Policies - Usecase - Create policy for quote', async () => {
         property: {
           roomCount: 2,
           address: '88 rue des prairies',
-          postalCode: 91100,
+          postalCode: '91100',
           city: 'Kyukamura'
         },
         people: {
@@ -46,7 +46,7 @@ describe('Policies - Usecase - Create policy for quote', async () => {
         firstname: 'Jean-Jean',
         lastname: 'Lapin',
         address: '88 rue des prairies',
-        postalCode: 91100,
+        postalCode: '91100',
         city: 'Kyukamura',
         email: 'jeanjean@email.com',
         phoneNumber: '+33684205510'

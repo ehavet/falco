@@ -26,7 +26,7 @@ export class PolicyPersonSqlModel extends Model<PolicyPersonSqlModel> {
     address!: string
 
     @Column
-    postalCode!: number
+    postalCode!: string
 
     @Column
     city!: string

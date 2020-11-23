@@ -49,7 +49,7 @@ export namespace Policy {
         lastname: string,
         firstname: string,
         address: string,
-        postalCode: number,
+        postalCode: string,
         city: string,
         email: string,
         phoneNumber: string
@@ -203,7 +203,7 @@ function _createContact (queryContact: CreatePolicyCommand.Contact, queryRisk: C
     lastname: queryRisk.people.policyHolder.lastname,
     firstname: queryRisk.people.policyHolder.firstname,
     address: quoteRisk.property.address || queryRisk.property.address!,
-    postalCode: quoteRisk.property.postalCode ? parseInt(quoteRisk.property.postalCode) : queryRisk.property.postalCode!,
+    postalCode: quoteRisk.property.postalCode ? quoteRisk.property.postalCode : queryRisk.property.postalCode!,
     city: quoteRisk.property.city || queryRisk.property.city!,
     email: queryContact.email,
     phoneNumber: queryContact.phoneNumber
@@ -225,7 +225,7 @@ function _createHolderFromQuotePolicyHolder (quotePolicyHolder: Quote.PolicyHold
     lastname: quotePolicyHolder.lastname!,
     firstname: quotePolicyHolder.firstname!,
     address: quotePolicyHolder.address!,
-    postalCode: parseInt(quotePolicyHolder.postalCode!),
+    postalCode: quotePolicyHolder.postalCode!,
     city: quotePolicyHolder.city!,
     email: quotePolicyHolder.email!,
     phoneNumber: quotePolicyHolder.phoneNumber!
@@ -253,7 +253,7 @@ export namespace Policy.Risk {
     export interface Property {
         roomCount: number,
         address: string,
-        postalCode: number,
+        postalCode: string,
         city: string
     }
 
@@ -275,8 +275,8 @@ export namespace Policy.Risk {
       }
 
       const postalCode = quoteRisk.property.postalCode
-        ? parseInt(quoteRisk.property.postalCode)
-        : commandRisk.property.postalCode as number
+        ? quoteRisk.property.postalCode
+        : commandRisk.property.postalCode!
 
       return {
         property: {
@@ -301,7 +301,7 @@ export namespace Policy.Risk {
         property: {
           roomCount: quoteRisk.property.roomCount,
           address: quoteRisk.property.address!,
-          postalCode: parseInt(quoteRisk.property.postalCode!),
+          postalCode: quoteRisk.property.postalCode!,
           city: quoteRisk.property.city!
         },
         people: {

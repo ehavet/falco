@@ -70,7 +70,7 @@ describe('Policies - API v0 - E2E', async () => {
             property: {
               room_count: 2,
               address: '88 rue des prairies',
-              postal_code: 91100,
+              postal_code: '01100',
               city: 'Kyukamura'
             }
           }
@@ -83,7 +83,7 @@ describe('Policies - API v0 - E2E', async () => {
       response = await httpServer.api()
         .post('/v0/policies')
         .send(requestParams)
-        .set('X-Consumer-Username', 'myPartner')
+        .set('X-Consumer-Username', 'studyo')
     })
 
     it('should return the policy', async () => {
@@ -106,7 +106,7 @@ describe('Policies - API v0 - E2E', async () => {
           property: {
             room_count: 2,
             address: '88 rue des prairies',
-            postal_code: 91100,
+            postal_code: '01100',
             city: 'Kyukamura'
           },
           people: {
@@ -126,7 +126,7 @@ describe('Policies - API v0 - E2E', async () => {
           lastname: 'Dupont',
           firstname: 'Jean',
           address: '88 rue des prairies',
-          postal_code: 91100,
+          postal_code: '01100',
           city: 'Kyukamura',
           email: 'jeandupont@email.com',
           phone_number: '+33684205510'
@@ -187,7 +187,7 @@ describe('Policies - API v0 - E2E', async () => {
           property: {
             room_count: 2,
             address: '13 rue du loup garou',
-            postal_code: 91100,
+            postal_code: '91100',
             city: 'Corbeil-Essonnes'
           },
           people: {
@@ -202,7 +202,7 @@ describe('Policies - API v0 - E2E', async () => {
           lastname: 'Dupont',
           firstname: 'Jean',
           address: '13 rue du loup garou',
-          postal_code: 91100,
+          postal_code: '91100',
           city: 'Corbeil-Essonnes',
           email: 'jeandupont@email.com',
           phone_number: '+33684205510'
@@ -327,7 +327,7 @@ describe('Policies - API v0 - E2E', async () => {
           property: {
             room_count: 2,
             address: '13 rue du loup garou',
-            postal_code: 91100,
+            postal_code: '91100',
             city: 'Corbeil-Essonnes'
           },
           people: {
@@ -342,7 +342,7 @@ describe('Policies - API v0 - E2E', async () => {
           lastname: 'Dupont',
           firstname: 'Jean',
           address: '13 rue du loup garou',
-          postal_code: 91100,
+          postal_code: '91100',
           city: 'Corbeil-Essonnes',
           email: 'jeandupont@email.com',
           phone_number: '+33684205510'
@@ -402,7 +402,7 @@ describe('Policies - API v0 - E2E', async () => {
           property: {
             room_count: 2,
             address: '13 rue du loup garou',
-            postal_code: 91100,
+            postal_code: '91100',
             city: 'Corbeil-Essonnes'
           },
           people: {
@@ -417,7 +417,7 @@ describe('Policies - API v0 - E2E', async () => {
           lastname: 'Dupont',
           firstname: 'Jean',
           address: '13 rue du loup garou',
-          postal_code: 91100,
+          postal_code: '91100',
           city: 'Corbeil-Essonnes',
           email: 'jeandupont@email.com',
           phone_number: '+33684205510'

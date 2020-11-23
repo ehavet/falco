@@ -105,7 +105,7 @@ describe('Policies - Domain', async () => {
         property: {
           roomCount: 2,
           address: '88 rue des prairies',
-          postalCode: 91100,
+          postalCode: '91100',
           city: 'Kyukamura'
         },
         people: {
@@ -149,7 +149,7 @@ describe('Policies - Domain', async () => {
         lastname: 'Dupont',
         firstname: 'Jean',
         address: '88 rue des prairies',
-        postalCode: 91100,
+        postalCode: '91100',
         city: 'Kyukamura',
         email: 'jeandupont@email.com',
         phoneNumber: '+33684205510'
@@ -319,7 +319,7 @@ describe('Policies - Domain', async () => {
           property: {
             roomCount: 2,
             address: 'Rue de la Nouvelle Quote',
-            postalCode: 75019,
+            postalCode: '75019',
             city: 'QuoteCity'
           }
         }

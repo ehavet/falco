@@ -56,7 +56,7 @@ describe('PaymentProcessor - Usecase - confirm payment intent for policy', async
         firstname: 'Jean',
         lastname: 'Dupont',
         address: '13 rue du loup garou',
-        postalCode: 75001,
+        postalCode: '75001',
         city: 'paris',
         email: 'test@email.com',
         phoneNumber: '+33684205510'
@@ -88,7 +88,7 @@ describe('PaymentProcessor - Usecase - confirm payment intent for policy', async
         firstname: 'Jean',
         lastname: 'Dupont',
         address: '13 rue du loup garou',
-        postalCode: 75001,
+        postalCode: '75001',
         city: 'paris',
         email: 'test@email.com',
         phoneNumber: '+33684205510'
@@ -118,7 +118,7 @@ describe('PaymentProcessor - Usecase - confirm payment intent for policy', async
         firstname: 'Jean',
         lastname: 'Dupont',
         address: '13 rue du loup garou',
-        postalCode: 75001,
+        postalCode: '75001',
         city: 'paris',
         email: 'test@email.com',
         phoneNumber: '+33684205510'
@@ -149,7 +149,7 @@ describe('PaymentProcessor - Usecase - confirm payment intent for policy', async
         firstname: 'Jean',
         lastname: 'Dupont',
         address: '13 rue du loup garou',
-        postalCode: 75001,
+        postalCode: '75001',
         city: 'paris',
         email: 'test@email.com',
         phoneNumber: '+33684205510'

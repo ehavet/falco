@@ -33,7 +33,7 @@ export namespace CreatePolicyCommand {
 export namespace CreatePolicyCommand.Risk {
     export interface Property {
         address: string | undefined,
-        postalCode: number | undefined,
+        postalCode: string | undefined,
         city: string | undefined
     }
 

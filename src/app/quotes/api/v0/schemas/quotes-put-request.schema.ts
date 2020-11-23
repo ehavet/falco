@@ -1,4 +1,4 @@
-import Joi from '@hapi/joi'
+import Joi from 'joi'
 import { POSTALCODE_REGEX } from '../../../../common-api/domain/regexp'
 
 export const quotePutRequestBodySchema: Joi.ObjectSchema = Joi.object({

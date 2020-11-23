@@ -1,4 +1,4 @@
-import Joi from '@hapi/joi'
+import Joi from 'joi'
 import { ServerRoute } from '@hapi/hapi'
 import * as HttpErrorSchema from '../../../common-api/HttpErrorSchema'
 import * as Boom from '@hapi/boom'

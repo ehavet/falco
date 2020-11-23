@@ -1,4 +1,4 @@
-import Joi from '@hapi/joi'
+import Joi from 'joi'
 
 const commonSchema: Joi.ObjectSchema = Joi.object().keys({
   statusCode: Joi.number(),

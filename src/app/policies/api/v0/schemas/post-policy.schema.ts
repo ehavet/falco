@@ -1,4 +1,4 @@
-import Joi from '@hapi/joi'
+import Joi from 'joi'
 import { Policy } from '../../../domain/policy'
 import { POSTALCODE_REGEX } from '../../../../common-api/domain/regexp'
 

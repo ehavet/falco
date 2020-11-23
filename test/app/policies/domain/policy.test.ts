@@ -312,6 +312,7 @@ describe('Policies - Domain', async () => {
       expect(policy.risk.property.postalCode).to.be.equal(createPolicyCommand.risk.property.postalCode)
       expect(policy.risk.property.city).to.be.equal(createPolicyCommand.risk.property.city)
     })
+
     it('should take the address, postalCode and city from the quote when they are present', async () => {
       const quoteWithAddress: Quote = createQuoteFixture({
         risk: {
@@ -332,43 +333,87 @@ describe('Policies - Domain', async () => {
       expect(policy.risk.property.city).to.be.equal(quoteWithAddress.risk.property.city)
     })
 
-    it('should throw an error if the address, postalCode and city not present from quote or policy', async () => {
-      const quoteWithoutAddress: Quote = createQuoteFixture({
-        risk: {
-          property: {
-            roomCount: 2,
-            address: undefined,
-            postalCode: undefined,
-            city: undefined
+    describe('should throw an error if', () => {
+      it('city is not present from quote and policy', async () => {
+        const quoteWithoutCity: Quote = createQuoteFixture({
+          risk: {
+            property: {
+              roomCount: 2,
+              address: '28 Rue des Acacias',
+              postalCode: '91100',
+              city: undefined
+            }
           }
-        }
-      } as any)
-      const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({
-        quoteId: quoteWithoutAddress.id,
-        risk: {
-          property: {
-            address: undefined,
-            postalCode: undefined,
-            city: undefined
-          },
-          people: {
-            policyHolder: {
-              lastname: 'Dupont',
-              firstname: 'Jean'
-            },
-            otherInsured: [
-              {
-                lastname: 'Doe',
-                firstname: 'John'
-              }
-            ]
+        } as any)
+        const createPolicyCommandWithoutCity: CreatePolicyCommand = createCreatePolicyCommand({
+          quoteId: quoteWithoutCity.id,
+          risk: {
+            property: {
+              address: '28 Rue des Acacias',
+              postalCode: '91110',
+              city: undefined
+            }
           }
-        }
-      } as any)
+        } as any)
 
-      const promise = Policy.create(createPolicyCommand, quoteWithoutAddress, policyRepository, partner)
+        const promise = Policy.create(createPolicyCommandWithoutCity, quoteWithoutCity, policyRepository, partner)
 
-      expect(promise).to.be.rejectedWith(PolicyRiskPropertyMissingFieldError)
+        return expect(promise).to.be.rejectedWith(PolicyRiskPropertyMissingFieldError, `Quote ${quoteWithoutCity.id} risk property city should be completed`)
+      })
+
+      it('address is not present from quote and policy', async () => {
+        const quoteWithoutAddress: Quote = createQuoteFixture({
+          risk: {
+            property: {
+              roomCount: 2,
+              address: undefined,
+              postalCode: '91100',
+              city: 'Villabe'
+            }
+          }
+        } as any)
+        const createPolicyCommandWithoutAddress: CreatePolicyCommand = createCreatePolicyCommand({
+          quoteId: quoteWithoutAddress.id,
+          risk: {
+            property: {
+              address: undefined,
+              postalCode: '91100',
+              city: 'Villabe'
+            }
+          }
+        } as any)
+
+        const promise = Policy.create(createPolicyCommandWithoutAddress, quoteWithoutAddress, policyRepository, partner)
+
+        return expect(promise).to.be.rejectedWith(PolicyRiskPropertyMissingFieldError, `Quote ${quoteWithoutAddress.id} risk property address should be completed`)
+      })
+
+      it('postalCode is not present from quote and policy', async () => {
+        const quoteWithoutPostalCode: Quote = createQuoteFixture({
+          risk: {
+            property: {
+              roomCount: 2,
+              address: '28 Rue des Acacias',
+              postalCode: undefined,
+              city: 'Villabe'
+            }
+          }
+        } as any)
+        const createPolicyCommandWithoutPostalCode: CreatePolicyCommand = createCreatePolicyCommand({
+          quoteId: quoteWithoutPostalCode.id,
+          risk: {
+            property: {
+              address: '28 Rue des Acacias',
+              postalCode: undefined,
+              city: 'Villabe'
+            }
+          }
+        } as any)
+
+        const promise = Policy.create(createPolicyCommandWithoutPostalCode, quoteWithoutPostalCode, policyRepository, partner)
+
+        return expect(promise).to.be.rejectedWith(PolicyRiskPropertyMissingFieldError, `Quote ${quoteWithoutPostalCode.id} risk property postalCode should be completed`)
+      })
     })
   })
 })

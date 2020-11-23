@@ -4,12 +4,12 @@ import * as supertest from 'supertest'
 import { signatureRequestEventFixture } from '../../fixtures/signatureRequestEvent.fixture'
 import { signatureRequestEventJSONFixture } from '../../fixtures/signatureRequestEventJSON.fixture'
 
-describe('Signature Event Handler - API v0 - Integration', async () => {
+describe('Signature Event Handler - API v1 - Integration', async () => {
   let httpServer: HttpServerForTesting
 
   const signatureRequestEvent = signatureRequestEventFixture()
 
-  describe('POST /internal/v0/signature-processor/event-handler/', async () => {
+  describe('POST /internal/v1/signature-processor/event-handler/', async () => {
     let response: supertest.Response
 
     before(async () => {
@@ -20,7 +20,7 @@ describe('Signature Event Handler - API v0 - Integration', async () => {
       sinon.stub(container, 'ManageSignatureRequestEvent').withArgs({ event: signatureRequestEvent }).resolves()
 
       response = await httpServer.api()
-        .post('/internal/v0/signature-processor/event-handler/')
+        .post('/internal/v1/signature-processor/event-handler/')
         .type('multipart/form-data')
         .field('json', JSON.stringify(signatureRequestEventJSONFixture()))
 

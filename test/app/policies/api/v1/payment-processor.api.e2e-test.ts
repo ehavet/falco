@@ -25,7 +25,7 @@ async function resetDb () {
 
 const now = new Date('2034-06-05T00:00:00Z')
 
-describe('PaymentProcessor - API v0 - E2E', async () => {
+describe('PaymentProcessor - API v1 - E2E', async () => {
   let httpServer: HttpServerForTesting
 
   before(async () => {
@@ -39,7 +39,7 @@ describe('PaymentProcessor - API v0 - E2E', async () => {
     await resetDb()
   })
 
-  describe('POST /internal/v0/payment-processor/event-handler/', async () => {
+  describe('POST /internal/v1/payment-processor/event-handler/', async () => {
     let policyRepository: PolicyRepository
     let policyId: string
 
@@ -86,7 +86,7 @@ describe('PaymentProcessor - API v0 - E2E', async () => {
 
       // When
       await httpServer.api()
-        .post('/internal/v0/payment-processor/event-handler/')
+        .post('/internal/v1/payment-processor/event-handler/')
         .set('stripe-signature', stripeHeaderSignature)
         .send(event)
     })

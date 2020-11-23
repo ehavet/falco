@@ -1,6 +1,9 @@
-import routes from './api/v0/policies.api'
-import paymentProcessorEventHandler from './api/v0/payment-processor.api'
-import signatureProcessorEventHandler from './api/v0/signature-processor.api'
+import PoliciesRoutesV0 from './api/v0/policies.api'
+import paymentProcessorEventHandlerV0 from './api/v0/payment-processor.api'
+import signatureProcessorEventHandlerV0 from './api/v0/signature-processor.api'
+import PoliciesRoutesV1 from './api/v1/policies.api'
+import paymentProcessorEventHandlerV1 from './api/v1/payment-processor.api'
+import signatureProcessorEventHandlerV1 from './api/v1/signature-processor.api'
 import { CreatePaymentIntentForPolicy } from './domain/create-payment-intent-for-policy.usecase'
 import { PolicySqlModel } from './infrastructure/policy-sql.model'
 import { PolicyPersonSqlModel } from './infrastructure/policy-person-sql.model'
@@ -56,6 +59,7 @@ import { PaymentRepository } from './domain/payment/payment.repository'
 import { PaymentSqlRepository } from './infrastructure/payment/payment-sql.repository'
 import { PaymentSqlModel } from './infrastructure/payment/payment-sql.model'
 import { PaymentPolicySqlModel } from './infrastructure/payment/payment-policy-sql.model'
+import { CreatePolicyForQuote } from './domain/create-policy-for-quote.usecase'
 const config = require('../../config')
 
 export interface Container {
@@ -69,7 +73,8 @@ export interface Container {
     GetPolicySpecificTerms: GetPolicySpecificTerms,
     ManageSignatureRequestEvent: ManageSignatureRequestEvent,
     ApplySpecialOperationCodeOnPolicy: ApplySpecialOperationCodeOnPolicy,
-    ApplyStartDateOnPolicy: ApplyStartDateOnPolicy
+    ApplyStartDateOnPolicy: ApplyStartDateOnPolicy,
+    CreatePolicyForQuote: CreatePolicyForQuote
 }
 
 const pdftkPDFProcessor: PDFProcessor = new PDFtkPDFProcessor(pdfGenerationConfig)
@@ -109,6 +114,7 @@ const createSignatureRequestForPolicy: CreateSignatureRequestForPolicy = CreateS
 const manageSignatureRequestEvent: ManageSignatureRequestEvent = ManageSignatureRequestEvent.factory(signatureRequestEventValidator, signatureRequestProvider, policyRepository, contractRepository, logger)
 const applySpecialOperationCodeOnPolicy: ApplySpecialOperationCodeOnPolicy = ApplySpecialOperationCodeOnPolicy.factory(policyRepository, partnerRepository)
 const applyStartDateOnPolicy: ApplyStartDateOnPolicy = ApplyStartDateOnPolicy.factory(policyRepository)
+const createPolicyForQuote: CreatePolicyForQuote = CreatePolicyForQuote.factory(policyRepository, quoteRepository)
 
 export const container: Container = {
   CreatePaymentIntentForPolicy: createPaymentIntentForPolicy,
@@ -121,7 +127,8 @@ export const container: Container = {
   CreateSignatureRequestForPolicy: createSignatureRequestForPolicy,
   ManageSignatureRequestEvent: manageSignatureRequestEvent,
   ApplySpecialOperationCodeOnPolicy: applySpecialOperationCodeOnPolicy,
-  ApplyStartDateOnPolicy: applyStartDateOnPolicy
+  ApplyStartDateOnPolicy: applyStartDateOnPolicy,
+  CreatePolicyForQuote: createPolicyForQuote
 }
 
 export const policySqlModels: Array<any> = [
@@ -131,7 +138,10 @@ export const policySqlModels: Array<any> = [
 ]
 
 export function policiesRoutes () {
-  return routes(container)
-    .concat(paymentProcessorEventHandler(container))
-    .concat(signatureProcessorEventHandler(container))
+  return PoliciesRoutesV0(container)
+    .concat(paymentProcessorEventHandlerV0(container))
+    .concat(signatureProcessorEventHandlerV0(container))
+    .concat(PoliciesRoutesV1(container))
+    .concat(paymentProcessorEventHandlerV1(container))
+    .concat(signatureProcessorEventHandlerV1(container))
 }

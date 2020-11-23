@@ -46,7 +46,7 @@ describe('Policies - Infra - Specific terms PDF Generator', () => {
       expect(specificTermsUncompressed.includes('jeandupont\\100email\\056com')).to.be.true
       expect(specificTermsUncompressed.includes('John Doe')).to.be.true
       expect(specificTermsUncompressed.includes('13 rue du loup garou')).to.be.true
-      expect(specificTermsUncompressed.includes('91100 Corbeil\\055Essones')).to.be.true
+      expect(specificTermsUncompressed.includes('91100 Corbeil\\055Essonnes')).to.be.true
       expect(specificTermsUncompressed.includes('Votre logement est compos\\351 de 2 pi\\350ce\\(s\\) principale\\(s\\)')).to.be.true
       expect(specificTermsUncompressed.includes('valeur mobili\\350re par \\351v\\351nement : 7 000 \\200')).to.be.true
       expect(specificTermsUncompressed.includes('pour les autres garanties de protection de vos biens : 150 \\200')).to.be.true
@@ -100,7 +100,7 @@ describe('Policies - Infra - Specific terms PDF Generator', () => {
       expect(specificTermsUncompressed.includes('jeandupont\\100email\\056com')).to.be.true
       expect(specificTermsUncompressed.includes('John Doe')).to.be.true
       expect(specificTermsUncompressed.includes('13 rue du loup garou')).to.be.true
-      expect(specificTermsUncompressed.includes('91100 Corbeil\\055Essones')).to.be.true
+      expect(specificTermsUncompressed.includes('91100 Corbeil\\055Essonnes')).to.be.true
       expect(specificTermsUncompressed.includes('Votre logement est compos\\351 de 2 pi\\350ce\\(s\\) principale\\(s\\)')).to.be.true
       expect(specificTermsUncompressed.includes('valeur mobili\\350re par \\351v\\351nement : 7 000 \\200')).to.be.true
       expect(specificTermsUncompressed.includes('pour les autres garanties de protection de vos biens : 150 \\200')).to.be.true

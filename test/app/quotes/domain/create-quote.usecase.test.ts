@@ -22,7 +22,9 @@ describe('Quotes - Usecase - Create Quote', async () => {
     contractualTerms: '/path/to/contractual/terms',
     ipid: '/path/to/ipid',
     operationCodes: [
-      OperationCode.SEMESTER1
+      OperationCode.SEMESTER1,
+      OperationCode.SEMESTER2,
+      OperationCode.FULLYEAR
     ]
   }
   const expectedQuote: Quote = {
@@ -51,8 +53,8 @@ describe('Quotes - Usecase - Create Quote', async () => {
     },
     nbMonthsDue: 12,
     premium: 69.84,
-    specialOperationsCode: undefined,
-    specialOperationsCodeAppliedAt: undefined
+    specialOperationsCode: null,
+    specialOperationsCodeAppliedAt: null
   }
   const now = new Date('2020-04-18T10:09:08Z')
 
@@ -93,21 +95,77 @@ describe('Quotes - Usecase - Create Quote', async () => {
       expect(quote).to.deep.include({ insurance: expectedInsurance })
     })
 
-    it('with the special operations code applied', async () => {
-      // Given
-      const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.SEMESTER1, risk: { property: { roomCount: 2 } } }
+    describe('with the special operations code', async () => {
+      it('SEMESTER1 setting the number of months due to 5', async () => {
+        // Given
+        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.SEMESTER1, risk: { property: { roomCount: 2 } } }
 
-      quoteRepository.save.resolves()
+        quoteRepository.save.resolves()
 
-      // When
-      const quote: Quote = await createQuote(createQuoteCommand)
+        // When
+        const quote: Quote = await createQuote(createQuoteCommand)
 
-      // Then
-      expect(quote).to.deep.include({
-        specialOperationsCode: 'SEMESTER1',
-        specialOperationsCodeAppliedAt: now,
-        nbMonthsDue: 5,
-        premium: 29.1
+        // Then
+        expect(quote).to.deep.include({
+          specialOperationsCode: 'SEMESTER1',
+          specialOperationsCodeAppliedAt: now,
+          nbMonthsDue: 5,
+          premium: 29.1
+        })
+      })
+
+      it('SEMESTER2 setting the number of months due to 5', async () => {
+        // Given
+        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.SEMESTER2, risk: { property: { roomCount: 2 } } }
+
+        quoteRepository.save.resolves()
+
+        // When
+        const quote: Quote = await createQuote(createQuoteCommand)
+
+        // Then
+        expect(quote).to.deep.include({
+          specialOperationsCode: 'SEMESTER2',
+          specialOperationsCodeAppliedAt: now,
+          nbMonthsDue: 5,
+          premium: 29.1
+        })
+      })
+
+      it('FULLYEAR setting the number of months due to 10', async () => {
+        // Given
+        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.FULLYEAR, risk: { property: { roomCount: 2 } } }
+
+        quoteRepository.save.resolves()
+
+        // When
+        const quote: Quote = await createQuote(createQuoteCommand)
+
+        // Then
+        expect(quote).to.deep.include({
+          specialOperationsCode: 'FULLYEAR',
+          specialOperationsCodeAppliedAt: now,
+          nbMonthsDue: 10,
+          premium: 58.2
+        })
+      })
+
+      it('BLANK setting the number of months due to 12', async () => {
+        // Given
+        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2 } } }
+
+        quoteRepository.save.resolves()
+
+        // When
+        const quote: Quote = await createQuote(createQuoteCommand)
+
+        // Then
+        expect(quote).to.deep.include({
+          specialOperationsCode: null,
+          specialOperationsCodeAppliedAt: null,
+          nbMonthsDue: 12,
+          premium: 69.84
+        })
       })
     })
 
@@ -167,7 +225,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
     // Then
     const saveSpy = quoteRepository.save.getCall(0)
     expectedQuote.id = quote.id
-    return expect(saveSpy.calledWith(expectedQuote)).to.be.true
+    return expect(saveSpy).to.have.been.calledWith(expectedQuote)
   })
 
   it('should throw an error if there is no insurance for the given risk', async () => {

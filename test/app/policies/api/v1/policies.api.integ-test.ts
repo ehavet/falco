@@ -7,14 +7,17 @@ import {
   PolicyNotFoundError,
   PolicyNotUpdatableError,
   PolicyStartDateConsistencyError,
-  PolicyRiskNumberOfRoommatesError,
-  PolicyRiskRoommatesNotAllowedError,
   PolicyCanceledError,
-  PolicyAlreadyPaidError
+  PolicyAlreadyPaidError,
+  PolicyHolderMissingError,
+  PolicyRiskPersonMissingError,
+  PolicyHolderEmailValidationError,
+  PolicyHolderMissingPropertyError,
+  PolicyRiskPropertyMissingFieldError, CreatePolicyQuotePartnerOwnershipError
 } from '../../../../../src/app/policies/domain/policies.errors'
 import { Policy } from '../../../../../src/app/policies/domain/policy'
 import { createOngoingPolicyFixture, createPolicyFixture } from '../../fixtures/policy.fixture'
-import { createPolicyApiRequestFixture } from '../../fixtures/createPolicyApiRequest.fixture'
+import { createPolicyApiRequestFixture, createPolicyApiRequestFixtureV1 } from '../../fixtures/createPolicyApiRequest.fixture'
 import { QuoteNotFoundError } from '../../../../../src/app/quotes/domain/quote.errors'
 import { GetPolicyQuery } from '../../../../../src/app/policies/domain/get-policy-query'
 import { Certificate } from '../../../../../src/app/policies/domain/certificate/certificate'
@@ -27,15 +30,16 @@ import { ApplySpecialOperationCodeCommand } from '../../../../../src/app/policie
 import { PartnerNotFoundError } from '../../../../../src/app/partners/domain/partner.errors'
 import { ApplyStartDateOnPolicyCommand } from '../../../../../src/app/policies/domain/apply-start-date-on-policy.usecase'
 import { PolicyForbiddenCertificateGenerationError } from '../../../../../src/app/policies/domain/certificate/certificate.errors'
+import { CreatePolicyForQuoteCommand } from '../../../../../src/app/policies/domain/create-policy-for-quote-command'
 
-describe('Policies - API v0 - Integration', async () => {
+describe('Policies - API v1 - Integration', async () => {
   let httpServer: HttpServerForTesting
 
   before(async () => {
     httpServer = await newMinimalServer(policiesRoutes())
   })
 
-  describe('POST /v0/policies/:id/payment-intents', async () => {
+  describe('POST /v1/policies/:id/payment-intents', async () => {
     let response: supertest.Response
 
     describe('when success', () => {
@@ -51,7 +55,7 @@ describe('Policies - API v0 - Integration', async () => {
           .resolves(expectedPaymentIntent)
 
         response = await httpServer.api()
-          .post('/v0/policies/p0l1cy1d/payment-intents')
+          .post('/v1/policies/p0l1cy1d/payment-intents')
       })
 
       it('should reply with status 201', async () => {
@@ -71,7 +75,7 @@ describe('Policies - API v0 - Integration', async () => {
           .rejects(new PolicyNotFoundError(policyId))
 
         response = await httpServer.api()
-          .post('/v0/policies/p0l1cy1d/payment-intents')
+          .post('/v1/policies/p0l1cy1d/payment-intents')
 
         expect(response).to.have.property('statusCode', 404)
         expect(response.body).to.have.property('message', `Could not find policy with id : ${policyId}`)
@@ -86,7 +90,7 @@ describe('Policies - API v0 - Integration', async () => {
           .rejects(new PolicyCanceledError(policyId))
 
         response = await httpServer.api()
-          .post('/v0/policies/p0l1cy1d/payment-intents')
+          .post('/v1/policies/p0l1cy1d/payment-intents')
 
         expect(response).to.have.property('statusCode', 409)
         expect(response.body).to.have.property('message', `The policy ${policyId} has been canceled`)
@@ -101,7 +105,7 @@ describe('Policies - API v0 - Integration', async () => {
           .rejects(new PolicyAlreadyPaidError(policyId))
 
         response = await httpServer.api()
-          .post('/v0/policies/p0l1cy1d/payment-intents')
+          .post('/v1/policies/p0l1cy1d/payment-intents')
 
         expect(response).to.have.property('statusCode', 409)
         expect(response.body).to.have.property('message', `The policy ${policyId} has already been paid`)
@@ -115,7 +119,7 @@ describe('Policies - API v0 - Integration', async () => {
           .rejects(new Error())
 
         response = await httpServer.api()
-          .post('/v0/policies/p0l1cy1d/payment-intents')
+          .post('/v1/policies/p0l1cy1d/payment-intents')
 
         expect(response).to.have.property('statusCode', 500)
       })
@@ -124,7 +128,7 @@ describe('Policies - API v0 - Integration', async () => {
     describe('when there is a validation error', () => {
       it('should reply with status 400 when wrong policy id format', async () => {
         response = await httpServer.api()
-          .post('/v0/policies/01234567890123456789' +
+          .post('/v1/policies/01234567890123456789' +
               '012345678901234567890123456789' +
               '012345678901234567890123456789' +
               '01234567890123456789_T00_L0NG_1D/payment-intents')
@@ -134,25 +138,26 @@ describe('Policies - API v0 - Integration', async () => {
     })
   })
 
-  describe('POST /v0/policies', async () => {
+  describe('POST /v1/policies', async () => {
     let response: supertest.Response
-    const requestParams: any = createPolicyApiRequestFixture()
+    const requestParams: any = createPolicyApiRequestFixtureV1()
 
     describe('when the policy is created', async () => {
-      const policy: Policy = createOngoingPolicyFixture()
+      const policy: Policy = createOngoingPolicyFixture({ emailValidationDate: new Date('2020-01-05T00:00:00.000Z') })
+      const command: CreatePolicyForQuoteCommand = { partnerCode: 'myPartner', quoteId: requestParams.quote_id }
 
       beforeEach(async () => {
         // Given
-        sinon.stub(container, 'CreatePolicy').resolves(policy)
+        sinon.stub(container, 'CreatePolicyForQuote').withArgs(command).resolves(policy)
 
         // When
         response = await httpServer.api()
-          .post('/v0/policies')
+          .post('/v1/policies')
           .send(requestParams)
           .set('X-Consumer-Username', 'myPartner')
       })
 
-      it('should reply with status 200', async () => {
+      it('should reply with status 201', async () => {
         expect(response).to.have.property('statusCode', 201)
       })
 
@@ -163,7 +168,7 @@ describe('Policies - API v0 - Integration', async () => {
           insurance: {
             monthly_price: 5.82,
             default_deductible: 150,
-            default_ceiling: 7000,
+            default_cap: 7000,
             currency: 'EUR',
             simplified_covers: ['ACDDE', 'ACVOL'],
             product_code: 'APP999',
@@ -178,32 +183,30 @@ describe('Policies - API v0 - Integration', async () => {
               postal_code: 91100,
               city: 'Corbeil-Essonnes'
             },
-            people: {
-              policy_holder: {
-                firstname: 'Jean',
-                lastname: 'Dupont'
-              },
-              other_insured: [{ firstname: 'John', lastname: 'Doe' }]
-            }
+            person: {
+              firstname: 'Jean',
+              lastname: 'Dupont'
+            },
+            other_people: [{ firstname: 'John', lastname: 'Doe' }]
           },
-          contact: {
+          policy_holder: {
             lastname: 'Dupont',
             firstname: 'Jean',
             address: '13 rue du loup garou',
             postal_code: 91100,
             city: 'Corbeil-Essonnes',
             email: 'jeandupont@email.com',
-            phone_number: '+33684205510'
+            phone_number: '+33684205510',
+            email_validated_at: '2020-01-05T00:00:00.000Z'
           },
           nb_months_due: 12,
           premium: 69.84,
           start_date: '2020-01-05',
           term_start_date: '2020-01-05',
           term_end_date: '2020-01-05',
-          subscription_date: null,
-          signature_date: null,
-          payment_date: null,
-          email_validated: false,
+          subscribed_at: null,
+          signed_at: null,
+          paid_at: null,
           special_operations_code: null,
           special_operations_code_applied_at: null,
           status: 'INITIATED'
@@ -213,65 +216,42 @@ describe('Policies - API v0 - Integration', async () => {
       })
     })
 
-    describe('when the quote is not found', async () => {
-      it('should return a 404', async () => {
-        // Given
-        sinon.stub(container, 'CreatePolicy').rejects(new QuoteNotFoundError(requestParams.quote_id))
+    describe('when the usecase throw an error', async () => {
+      const errors = [
+        { instance: new QuoteNotFoundError(requestParams.quote_id), expectedStatus: 404 },
+        { instance: new PolicyHolderMissingError(requestParams.quote_id), expectedStatus: 422 },
+        { instance: new PolicyRiskPersonMissingError(requestParams.quote_id), expectedStatus: 422 },
+        { instance: new PolicyHolderMissingPropertyError(requestParams.quote_id, 'propertyName'), expectedStatus: 422 },
+        { instance: new PolicyHolderEmailValidationError(requestParams.quote_id), expectedStatus: 422 },
+        { instance: new PolicyRiskPropertyMissingFieldError(requestParams.quote_id, 'propertyName'), expectedStatus: 422 },
+        { instance: new CreatePolicyQuotePartnerOwnershipError(requestParams.quote_id, 'myPartner'), expectedStatus: 422 }
+      ]
 
-        // When
-        response = await httpServer.api()
-          .post('/v0/policies')
-          .send(requestParams)
-          .set('X-Consumer-Username', 'myPartner')
+      errors.forEach(async (error) => {
+        it(`${error.instance.constructor.name} should return a ${error.expectedStatus} status`, async () => {
+          // Given
+          sinon.stub(container, 'CreatePolicyForQuote').rejects(error.instance)
 
-        // Then
-        expect(response).to.have.property('statusCode', 404)
-        expect(response.body).to.have.property('message', 'Could not find quote with id : 3E76DJ2')
-      })
-    })
+          // When
+          response = await httpServer.api()
+            .post('/v1/policies')
+            .send(requestParams)
+            .set('X-Consumer-Username', 'myPartner')
 
-    describe('when there are roommates but the partner does not allow it', async () => {
-      it('should return a 422', async () => {
-        // Given
-        sinon.stub(container, 'CreatePolicy').rejects(new PolicyRiskRoommatesNotAllowedError())
-
-        // When
-        response = await httpServer.api()
-          .post('/v0/policies')
-          .send(requestParams)
-          .set('X-Consumer-Username', 'myPartner')
-
-        // Then
-        expect(response).to.have.property('statusCode', 422)
-        expect(response.body).to.have.property('message', 'Adding roommates is not allowed')
-      })
-    })
-
-    describe('when the number of roommates is incorrect regarding the partner', async () => {
-      it('should return a 422', async () => {
-        // Given
-        sinon.stub(container, 'CreatePolicy').rejects(new PolicyRiskNumberOfRoommatesError(2, 1))
-
-        // When
-        response = await httpServer.api()
-          .post('/v0/policies')
-          .send(requestParams)
-          .set('X-Consumer-Username', 'myPartner')
-
-        // Then
-        expect(response).to.have.property('statusCode', 422)
-        expect(response.body).to.have.property('message', 'A property of 1 room(s) allows a maximum of 2 roommate(s)')
+          // Then
+          expect(response).to.have.property('statusCode', error.expectedStatus)
+        })
       })
     })
 
     describe('when there is an internal error', async () => {
       it('should return a 500', async () => {
         // Given
-        sinon.stub(container, 'CreatePolicy').rejects(new Error())
+        sinon.stub(container, 'CreatePolicyForQuote').rejects(new Error())
 
         // When
         response = await httpServer.api()
-          .post('/v0/policies')
+          .post('/v1/policies')
           .send(requestParams)
           .set('X-Consumer-Username', 'myPartner')
 
@@ -287,199 +267,22 @@ describe('Policies - API v0 - Integration', async () => {
         requestParams = createPolicyApiRequestFixture()
       })
 
-      it('should reply with status 400 when there is no code', async () => {
-        // Given
-        delete requestParams.code
-
-        // When
-        response = await httpServer.api()
-          .post('/v0/policies')
-          .send(requestParams)
-          .set('X-Consumer-Username', 'myPartner')
-
-        expect(response).to.have.property('statusCode', 400)
-      })
-
       it('should reply with status 400 when there is no quote_id', async () => {
         // Given
         delete requestParams.quote_id
 
         // When
         response = await httpServer.api()
-          .post('/v0/policies')
+          .post('/v1/policies')
           .send(requestParams)
           .set('X-Consumer-Username', 'myPartner')
 
         expect(response).to.have.property('statusCode', 400)
-      })
-
-      it('should reply with status 400 when start_date is not a date', async () => {
-        // Given
-        requestParams.start_date = 'not a date'
-
-        // When
-        response = await httpServer.api()
-          .post('/v0/policies')
-          .send(requestParams)
-          .set('X-Consumer-Username', 'myPartner')
-
-        expect(response).to.have.property('statusCode', 400)
-      })
-
-      it('should reply with status 400 when there is no contact', async () => {
-        // Given
-        delete requestParams.contact
-
-        // When
-        response = await httpServer.api()
-          .post('/v0/policies')
-          .send(requestParams)
-          .set('X-Consumer-Username', 'myPartner')
-
-        expect(response).to.have.property('statusCode', 400)
-      })
-
-      describe('should reply with status 400 when there is a contact but', async () => {
-        it('no email', async () => {
-          // Given
-          delete requestParams.contact.email
-
-          // When
-          response = await httpServer.api()
-            .post('/v0/policies')
-            .send(requestParams)
-            .set('X-Consumer-Username', 'myPartner')
-
-          expect(response).to.have.property('statusCode', 400)
-        })
-
-        it('no phone_number', async () => {
-          // Given
-          delete requestParams.contact.phone_number
-
-          // When
-          response = await httpServer.api()
-            .post('/v0/policies')
-            .send(requestParams)
-            .set('X-Consumer-Username', 'myPartner')
-
-          expect(response).to.have.property('statusCode', 400)
-        })
-      })
-
-      it('should reply with status 400 when there is no risk', async () => {
-        // Given
-        delete requestParams.risk
-
-        // When
-        response = await httpServer.api()
-          .post('/v0/policies')
-          .send(requestParams)
-          .set('X-Consumer-Username', 'myPartner')
-
-        expect(response).to.have.property('statusCode', 400)
-      })
-
-      describe('should reply with status 400 when there is a risk', async () => {
-        it('but no people', async () => {
-          // Given
-          delete requestParams.risk.people
-
-          // When
-          response = await httpServer.api()
-            .post('/v0/policies')
-            .send(requestParams)
-            .set('X-Consumer-Username', 'myPartner')
-
-          expect(response).to.have.property('statusCode', 400)
-        })
-
-        it('but no policy holder', async () => {
-          // Given
-          delete requestParams.risk.people.policy_holder
-
-          // When
-          response = await httpServer.api()
-            .post('/v0/policies')
-            .send(requestParams)
-            .set('X-Consumer-Username', 'myPartner')
-
-          expect(response).to.have.property('statusCode', 400)
-        })
-
-        describe('and a policy holder', async () => {
-          it('but no firstname', async () => {
-            // Given
-            delete requestParams.risk.people.policy_holder.firstname
-
-            // When
-            response = await httpServer.api()
-              .post('/v0/policies')
-              .send(requestParams)
-              .set('X-Consumer-Username', 'myPartner')
-
-            expect(response).to.have.property('statusCode', 400)
-          })
-
-          it('but no lastname', async () => {
-            // Given
-            delete requestParams.risk.people.policy_holder.lastname
-
-            // When
-            response = await httpServer.api()
-              .post('/v0/policies')
-              .send(requestParams)
-              .set('X-Consumer-Username', 'myPartner')
-
-            expect(response).to.have.property('statusCode', 400)
-          })
-        })
-
-        describe('and an other insured but', async () => {
-          it('but no firstname', async () => {
-            // Given
-            delete requestParams.risk.people.other_insured[0].firstname
-
-            // When
-            response = await httpServer.api()
-              .post('/v0/policies')
-              .send(requestParams)
-              .set('X-Consumer-Username', 'myPartner')
-
-            expect(response).to.have.property('statusCode', 400)
-          })
-
-          it('but no lastname', async () => {
-            // Given
-            delete requestParams.risk.people.other_insured[0].lastname
-
-            // When
-            response = await httpServer.api()
-              .post('/v0/policies')
-              .send(requestParams)
-              .set('X-Consumer-Username', 'myPartner')
-
-            expect(response).to.have.property('statusCode', 400)
-          })
-        })
-
-        it('no phone_number', async () => {
-          // Given
-          delete requestParams.contact.phone_number
-
-          // When
-          response = await httpServer.api()
-            .post('/v0/policies')
-            .send(requestParams)
-            .set('X-Consumer-Username', 'myPartner')
-
-          expect(response).to.have.property('statusCode', 400)
-        })
       })
     })
   })
 
-  describe('GET /v0/policies/:id', async () => {
+  describe('GET /v1/policies/:id', async () => {
     let response: supertest.Response
 
     describe('when the policy is found', async () => {
@@ -491,7 +294,7 @@ describe('Policies - API v0 - Integration', async () => {
         sinon.stub(container, 'GetPolicy').withArgs(getPolicyQuery).resolves(expectedPolicy)
 
         // When
-        response = await httpServer.api().get(`/v0/policies/${policyId}`).set('X-Consumer-Username', 'myPartner')
+        response = await httpServer.api().get(`/v1/policies/${policyId}`).set('X-Consumer-Username', 'myPartner')
       })
 
       it('should reply with status 200', async () => {
@@ -507,7 +310,7 @@ describe('Policies - API v0 - Integration', async () => {
           insurance: {
             monthly_price: 5.82,
             default_deductible: 150,
-            default_ceiling: 7000,
+            default_cap: 7000,
             currency: 'EUR',
             simplified_covers: ['ACDDE', 'ACVOL'],
             product_code: 'APP999',
@@ -522,32 +325,30 @@ describe('Policies - API v0 - Integration', async () => {
               postal_code: 91100,
               city: 'Corbeil-Essonnes'
             },
-            people: {
-              policy_holder: {
-                firstname: 'Jean',
-                lastname: 'Dupont'
-              },
-              other_insured: [{ firstname: 'John', lastname: 'Doe' }]
-            }
+            person: {
+              firstname: 'Jean',
+              lastname: 'Dupont'
+            },
+            other_people: [{ firstname: 'John', lastname: 'Doe' }]
           },
-          contact: {
+          policy_holder: {
             lastname: 'Dupont',
             firstname: 'Jean',
             address: '13 rue du loup garou',
             postal_code: 91100,
             city: 'Corbeil-Essonnes',
             email: 'jeandupont@email.com',
-            phone_number: '+33684205510'
+            phone_number: '+33684205510',
+            email_validated_at: '2020-01-05T00:00:00.000Z'
           },
           nb_months_due: 12,
           premium: 69.84,
           start_date: '2020-01-05',
           term_start_date: '2020-01-05',
           term_end_date: '2020-01-05',
-          subscription_date: '2020-01-05T00:00:00.000Z',
-          signature_date: '2020-01-05T00:00:00.000Z',
-          payment_date: '2020-01-05T00:00:00.000Z',
-          email_validated: true,
+          subscribed_at: '2020-01-05T00:00:00.000Z',
+          signed_at: '2020-01-05T00:00:00.000Z',
+          paid_at: '2020-01-05T00:00:00.000Z',
           status: 'INITIATED',
           special_operations_code: null,
           special_operations_code_applied_at: null
@@ -564,7 +365,7 @@ describe('Policies - API v0 - Integration', async () => {
         sinon.stub(container, 'GetPolicy').withArgs(getPolicyQuery).rejects(new Error())
 
         // When
-        const response = await httpServer.api().get(`/v0/policies/${policyId}`).set('X-Consumer-Username', 'myPartner')
+        const response = await httpServer.api().get(`/v1/policies/${policyId}`).set('X-Consumer-Username', 'myPartner')
 
         // Then
         expect(response).to.have.property('statusCode', 500)
@@ -579,7 +380,7 @@ describe('Policies - API v0 - Integration', async () => {
         sinon.stub(container, 'GetPolicy').withArgs(getPolicyQuery).rejects(new PolicyNotFoundError(policyId))
 
         // When
-        const response = await httpServer.api().get(`/v0/policies/${policyId}`).set('X-Consumer-Username', 'myPartner')
+        const response = await httpServer.api().get(`/v1/policies/${policyId}`).set('X-Consumer-Username', 'myPartner')
 
         // Then
         expect(response).to.have.property('statusCode', 404)
@@ -590,14 +391,14 @@ describe('Policies - API v0 - Integration', async () => {
     describe('when there is a validation error', () => {
       it('should reply with status 400 when the policy id is not 12 characters', async () => {
         // When
-        const response = await httpServer.api().get('/v0/policies/WRONG').set('X-Consumer-Username', 'myPartner')
+        const response = await httpServer.api().get('/v1/policies/WRONG').set('X-Consumer-Username', 'myPartner')
 
         expect(response).to.have.property('statusCode', 400)
       })
     })
   })
 
-  describe('POST /v0/policies/id/certificates', async () => {
+  describe('POST /v1/policies/id/certificates', async () => {
     let response: supertest.Response
 
     describe('when the certificate is created', async () => {
@@ -612,7 +413,7 @@ describe('Policies - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post('/v0/policies/APP753210859/certificates')
+          .post('/v1/policies/APP753210859/certificates')
           .set('X-Consumer-Username', 'myPartner')
       })
 
@@ -639,7 +440,7 @@ describe('Policies - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post('/v0/policies/APP753210859/certificates')
+          .post('/v1/policies/APP753210859/certificates')
           .set('X-Consumer-Username', 'myPartner')
 
         // Then
@@ -655,7 +456,7 @@ describe('Policies - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post('/v0/policies/APP753210859/certificates')
+          .post('/v1/policies/APP753210859/certificates')
           .set('X-Consumer-Username', 'myPartner')
 
         // Then
@@ -671,7 +472,7 @@ describe('Policies - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post('/v0/policies/APP753210859/certificates')
+          .post('/v1/policies/APP753210859/certificates')
           .set('X-Consumer-Username', 'myPartner')
 
         // Then
@@ -684,7 +485,7 @@ describe('Policies - API v0 - Integration', async () => {
       it('should reply with status 400 when the policy id has not 12 chars', async () => {
         // When
         response = await httpServer.api()
-          .post('/v0/policies/APP3465/certificates')
+          .post('/v1/policies/APP3465/certificates')
           .set('X-Consumer-Username', 'myPartner')
 
         expect(response).to.have.property('statusCode', 400)
@@ -698,7 +499,7 @@ describe('Policies - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post('/v0/policies/APP753210859/certificates')
+          .post('/v1/policies/APP753210859/certificates')
           .set('X-Consumer-Username', 'myPartner')
 
         // Then
@@ -707,7 +508,7 @@ describe('Policies - API v0 - Integration', async () => {
     })
   })
 
-  describe('GET /v0/policies/id/specific-terms', async () => {
+  describe('GET /v1/policies/id/specific-terms', async () => {
     let response: supertest.Response
 
     describe('when the specific terms are found', async () => {
@@ -722,7 +523,7 @@ describe('Policies - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .get('/v0/policies/APP753210859/specific-terms')
+          .get('/v1/policies/APP753210859/specific-terms')
           .set('X-Consumer-Username', 'myPartner')
       })
 
@@ -749,7 +550,7 @@ describe('Policies - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .get('/v0/policies/APP753210859/specific-terms')
+          .get('/v1/policies/APP753210859/specific-terms')
           .set('X-Consumer-Username', 'myPartner')
 
         // Then
@@ -765,7 +566,7 @@ describe('Policies - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .get('/v0/policies/APP753210859/specific-terms')
+          .get('/v1/policies/APP753210859/specific-terms')
           .set('X-Consumer-Username', 'myPartner')
 
         // Then
@@ -781,7 +582,7 @@ describe('Policies - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .get('/v0/policies/APP753210859/specific-terms')
+          .get('/v1/policies/APP753210859/specific-terms')
           .set('X-Consumer-Username', 'myPartner')
 
         // Then
@@ -794,7 +595,7 @@ describe('Policies - API v0 - Integration', async () => {
       it('should reply with status 400 when the policy id has not 12 chars', async () => {
         // When
         response = await httpServer.api()
-          .get('/v0/policies/APP7532159/specific-terms')
+          .get('/v1/policies/APP7532159/specific-terms')
           .set('X-Consumer-Username', 'myPartner')
 
         expect(response).to.have.property('statusCode', 400)
@@ -808,7 +609,7 @@ describe('Policies - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .get('/v0/policies/APP753210859/specific-terms')
+          .get('/v1/policies/APP753210859/specific-terms')
           .set('X-Consumer-Username', 'myPartner')
 
         // Then
@@ -817,7 +618,7 @@ describe('Policies - API v0 - Integration', async () => {
     })
   })
 
-  describe('POST /v0/policies/id/signature-request', async () => {
+  describe('POST /v1/policies/id/signature-request', async () => {
     let response: supertest.Response
 
     describe('when success', async () => {
@@ -832,7 +633,7 @@ describe('Policies - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post('/v0/policies/APP753210859/signature-request')
+          .post('/v1/policies/APP753210859/signature-request')
           .set('X-Consumer-Username', 'myPartner')
       })
 
@@ -849,7 +650,7 @@ describe('Policies - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post('/v0/policies/APP753210859/signature-request')
+          .post('/v1/policies/APP753210859/signature-request')
           .set('X-Consumer-Username', 'myPartner')
 
         // Then
@@ -865,7 +666,7 @@ describe('Policies - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post('/v0/policies/APP753210859/signature-request')
+          .post('/v1/policies/APP753210859/signature-request')
           .set('X-Consumer-Username', 'myPartner')
 
         // Then
@@ -880,7 +681,7 @@ describe('Policies - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post('/v0/policies/APP753210859/signature-request')
+          .post('/v1/policies/APP753210859/signature-request')
           .set('X-Consumer-Username', 'myPartner')
 
         // Then
@@ -895,7 +696,7 @@ describe('Policies - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post('/v0/policies/APP753210859/signature-request')
+          .post('/v1/policies/APP753210859/signature-request')
           .set('X-Consumer-Username', 'myPartner')
 
         // Then
@@ -910,7 +711,7 @@ describe('Policies - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post('/v0/policies/APP753210859/signature-request')
+          .post('/v1/policies/APP753210859/signature-request')
           .set('X-Consumer-Username', 'myPartner')
 
         // Then
@@ -926,7 +727,7 @@ describe('Policies - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post('/v0/policies/APP753210859/signature-request')
+          .post('/v1/policies/APP753210859/signature-request')
           .set('X-Consumer-Username', 'myPartner')
 
         // Then
@@ -942,7 +743,7 @@ describe('Policies - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post('/v0/policies/APP753210859/signature-request')
+          .post('/v1/policies/APP753210859/signature-request')
           .set('X-Consumer-Username', 'myPartner')
 
         // Then
@@ -955,7 +756,7 @@ describe('Policies - API v0 - Integration', async () => {
       it('should reply with status 400 when the policy id has not 12 chars', async () => {
         // When
         response = await httpServer.api()
-          .post('/v0/policies/APP02/signature-request')
+          .post('/v1/policies/APP02/signature-request')
           .set('X-Consumer-Username', 'myPartner')
 
         expect(response).to.have.property('statusCode', 400)
@@ -969,7 +770,7 @@ describe('Policies - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post('/v0/policies/APP753210859/signature-request')
+          .post('/v1/policies/APP753210859/signature-request')
           .set('X-Consumer-Username', 'myPartner')
 
         // Then
@@ -978,7 +779,7 @@ describe('Policies - API v0 - Integration', async () => {
     })
   })
 
-  describe('POST /v0/policies/id/apply-spec-ops-code', async () => {
+  describe('POST /v1/policies/id/apply-spec-ops-code', async () => {
     let response: supertest.Response
 
     describe('when success', () => {
@@ -996,7 +797,7 @@ describe('Policies - API v0 - Integration', async () => {
         insurance: {
           monthly_price: 5.82,
           default_deductible: 150,
-          default_ceiling: 7000,
+          default_cap: 7000,
           currency: 'EUR',
           simplified_covers: ['ACDDE', 'ACVOL'],
           product_code: 'APP999',
@@ -1011,32 +812,30 @@ describe('Policies - API v0 - Integration', async () => {
             postal_code: 91100,
             city: 'Corbeil-Essonnes'
           },
-          people: {
-            policy_holder: {
-              firstname: 'Jean',
-              lastname: 'Dupont'
-            },
-            other_insured: [{ firstname: 'John', lastname: 'Doe' }]
-          }
+          person: {
+            firstname: 'Jean',
+            lastname: 'Dupont'
+          },
+          other_people: [{ firstname: 'John', lastname: 'Doe' }]
         },
-        contact: {
+        policy_holder: {
           lastname: 'Dupont',
           firstname: 'Jean',
           address: '13 rue du loup garou',
           postal_code: 91100,
           city: 'Corbeil-Essonnes',
           email: 'jeandupont@email.com',
-          phone_number: '+33684205510'
+          phone_number: '+33684205510',
+          email_validated_at: '2020-01-05T00:00:00.000Z'
         },
         nb_months_due: 12,
         premium: 69.84,
         start_date: '2020-01-05',
         term_start_date: '2020-01-05',
         term_end_date: '2020-01-05',
-        subscription_date: '2020-01-05T00:00:00.000Z',
-        signature_date: '2020-01-05T00:00:00.000Z',
-        payment_date: '2020-01-05T00:00:00.000Z',
-        email_validated: true,
+        subscribed_at: '2020-01-05T00:00:00.000Z',
+        signed_at: '2020-01-05T00:00:00.000Z',
+        paid_at: '2020-01-05T00:00:00.000Z',
         special_operations_code: null,
         special_operations_code_applied_at: null,
         status: 'INITIATED'
@@ -1048,7 +847,7 @@ describe('Policies - API v0 - Integration', async () => {
           .resolves(policy)
 
         response = await httpServer.api()
-          .post(`/v0/policies/${policyId}/apply-spec-ops-code`)
+          .post(`/v1/policies/${policyId}/apply-spec-ops-code`)
           .send({
             spec_ops_code: 'SEMESTER1'
           })
@@ -1078,7 +877,7 @@ describe('Policies - API v0 - Integration', async () => {
           .resolves(policy)
 
         response = await httpServer.api()
-          .post(`/v0/policies/${policyId}/apply-spec-ops-code`)
+          .post(`/v1/policies/${policyId}/apply-spec-ops-code`)
           .send({
             spec_ops_code: ''
           })
@@ -1102,7 +901,7 @@ describe('Policies - API v0 - Integration', async () => {
           .resolves(policy)
 
         response = await httpServer.api()
-          .post(`/v0/policies/${policyId}/apply-spec-ops-code`)
+          .post(`/v1/policies/${policyId}/apply-spec-ops-code`)
           .send({
             spec_ops_code: null
           })
@@ -1126,7 +925,7 @@ describe('Policies - API v0 - Integration', async () => {
           .resolves(policy)
 
         response = await httpServer.api()
-          .post(`/v0/policies/${policyId}/apply-spec-ops-code`)
+          .post(`/v1/policies/${policyId}/apply-spec-ops-code`)
           .send({
             spec_ops_code: '     '
           })
@@ -1146,7 +945,7 @@ describe('Policies - API v0 - Integration', async () => {
           .rejects(new PolicyNotFoundError(command.policyId))
 
         response = await httpServer.api()
-          .post(`/v0/policies/${command.policyId}/apply-spec-ops-code`)
+          .post(`/v1/policies/${command.policyId}/apply-spec-ops-code`)
           .send({
             spec_ops_code: 'SEMESTER1'
           })
@@ -1167,7 +966,7 @@ describe('Policies - API v0 - Integration', async () => {
           .rejects(new PolicyCanceledError(command.policyId))
 
         response = await httpServer.api()
-          .post(`/v0/policies/${command.policyId}/apply-spec-ops-code`)
+          .post(`/v1/policies/${command.policyId}/apply-spec-ops-code`)
           .send({
             spec_ops_code: 'SEMESTER1'
           })
@@ -1188,7 +987,7 @@ describe('Policies - API v0 - Integration', async () => {
           .rejects(new PolicyNotUpdatableError(command.policyId, Policy.Status.Signed))
 
         response = await httpServer.api()
-          .post(`/v0/policies/${command.policyId}/apply-spec-ops-code`)
+          .post(`/v1/policies/${command.policyId}/apply-spec-ops-code`)
           .send({
             spec_ops_code: 'SEMESTER1'
           })
@@ -1209,7 +1008,7 @@ describe('Policies - API v0 - Integration', async () => {
           .rejects(new PartnerNotFoundError('Partner'))
 
         response = await httpServer.api()
-          .post('/v0/policies/APP854732081/apply-spec-ops-code')
+          .post('/v1/policies/APP854732081/apply-spec-ops-code')
           .send({
             spec_ops_code: 'SEMESTER1'
           })
@@ -1230,7 +1029,7 @@ describe('Policies - API v0 - Integration', async () => {
           .rejects(new OperationCodeNotApplicableError('SEMESTER1', 'Partner'))
 
         response = await httpServer.api()
-          .post('/v0/policies/APP854732081/apply-spec-ops-code')
+          .post('/v1/policies/APP854732081/apply-spec-ops-code')
           .send({
             spec_ops_code: 'SEMESTER1'
           })
@@ -1251,7 +1050,7 @@ describe('Policies - API v0 - Integration', async () => {
           .rejects(new Error())
 
         response = await httpServer.api()
-          .post('/v0/policies/APP854732081/apply-spec-ops-code')
+          .post('/v1/policies/APP854732081/apply-spec-ops-code')
           .send({
             spec_ops_code: 'SEMESTER1'
           })
@@ -1263,7 +1062,7 @@ describe('Policies - API v0 - Integration', async () => {
     describe('when there is a validation error', () => {
       it('should reply with status 400 when wrong spec ops code format', async () => {
         response = await httpServer.api()
-          .post('/v0/policies/APP854732081/apply-spec-ops-code')
+          .post('/v1/policies/APP854732081/apply-spec-ops-code')
           .send({
             spec_ops_code: 'SEMESTER1SEMESTER1SEMESTER1SEMESTER1SEMESTER1SEMESTER1S' +
                   'SEMESTER1SEMESTER1SEMESTER1SEMESTER1SEMESTER1EMESTER1SEMESTER1SEMESTER1'
@@ -1276,7 +1075,7 @@ describe('Policies - API v0 - Integration', async () => {
     describe('when there is a missing key', () => {
       it('should return status 400', async () => {
         response = await httpServer.api()
-          .post('/v0/policies/APP854732081/apply-spec-ops-code')
+          .post('/v1/policies/APP854732081/apply-spec-ops-code')
           .send({
             wrong_key: 'key'
           })
@@ -1286,7 +1085,7 @@ describe('Policies - API v0 - Integration', async () => {
     })
   })
 
-  describe('POST /v0/policies/id/change-start-date', async () => {
+  describe('POST /v1/policies/id/change-start-date', async () => {
     let response: supertest.Response
     const startDate = new Date('2020-04-26')
 
@@ -1305,7 +1104,7 @@ describe('Policies - API v0 - Integration', async () => {
         insurance: {
           monthly_price: 5.82,
           default_deductible: 150,
-          default_ceiling: 7000,
+          default_cap: 7000,
           currency: 'EUR',
           simplified_covers: ['ACDDE', 'ACVOL'],
           product_code: 'APP999',
@@ -1320,32 +1119,30 @@ describe('Policies - API v0 - Integration', async () => {
             postal_code: 91100,
             city: 'Corbeil-Essonnes'
           },
-          people: {
-            policy_holder: {
-              firstname: 'Jean',
-              lastname: 'Dupont'
-            },
-            other_insured: [{ firstname: 'John', lastname: 'Doe' }]
-          }
+          person: {
+            firstname: 'Jean',
+            lastname: 'Dupont'
+          },
+          other_people: [{ firstname: 'John', lastname: 'Doe' }]
         },
-        contact: {
+        policy_holder: {
           lastname: 'Dupont',
           firstname: 'Jean',
           address: '13 rue du loup garou',
           postal_code: 91100,
           city: 'Corbeil-Essonnes',
           email: 'jeandupont@email.com',
-          phone_number: '+33684205510'
+          phone_number: '+33684205510',
+          email_validated_at: '2020-01-05T00:00:00.000Z'
         },
         nb_months_due: 12,
         premium: 69.84,
         start_date: '2020-01-05',
         term_start_date: '2020-01-05',
         term_end_date: '2020-01-05',
-        subscription_date: '2020-01-05T00:00:00.000Z',
-        signature_date: '2020-01-05T00:00:00.000Z',
-        payment_date: '2020-01-05T00:00:00.000Z',
-        email_validated: true,
+        subscribed_at: '2020-01-05T00:00:00.000Z',
+        signed_at: '2020-01-05T00:00:00.000Z',
+        paid_at: '2020-01-05T00:00:00.000Z',
         special_operations_code: null,
         special_operations_code_applied_at: null,
         status: 'INITIATED'
@@ -1357,7 +1154,7 @@ describe('Policies - API v0 - Integration', async () => {
           .resolves(policy)
 
         response = await httpServer.api()
-          .post(`/v0/policies/${policyId}/change-start-date`)
+          .post(`/v1/policies/${policyId}/change-start-date`)
           .send({
             start_date: '2020-04-26'
           })
@@ -1383,7 +1180,7 @@ describe('Policies - API v0 - Integration', async () => {
           .rejects(new PolicyNotFoundError(command.policyId))
 
         response = await httpServer.api()
-          .post(`/v0/policies/${command.policyId}/change-start-date`)
+          .post(`/v1/policies/${command.policyId}/change-start-date`)
           .send({
             start_date: '2020-04-26'
           })
@@ -1404,7 +1201,7 @@ describe('Policies - API v0 - Integration', async () => {
           .rejects(new PolicyCanceledError(command.policyId))
 
         response = await httpServer.api()
-          .post(`/v0/policies/${command.policyId}/change-start-date`)
+          .post(`/v1/policies/${command.policyId}/change-start-date`)
           .send({
             start_date: '2020-04-26'
           })
@@ -1425,7 +1222,7 @@ describe('Policies - API v0 - Integration', async () => {
           .rejects(new PolicyNotUpdatableError(command.policyId, Policy.Status.Signed))
 
         response = await httpServer.api()
-          .post(`/v0/policies/${command.policyId}/change-start-date`)
+          .post(`/v1/policies/${command.policyId}/change-start-date`)
           .send({
             start_date: '2020-04-26'
           })
@@ -1446,7 +1243,7 @@ describe('Policies - API v0 - Integration', async () => {
           .rejects(new PolicyStartDateConsistencyError())
 
         response = await httpServer.api()
-          .post('/v0/policies/APP854732081/change-start-date')
+          .post('/v1/policies/APP854732081/change-start-date')
           .send({
             start_date: '2020-04-26'
           })
@@ -1467,7 +1264,7 @@ describe('Policies - API v0 - Integration', async () => {
           .rejects(new Error())
 
         response = await httpServer.api()
-          .post('/v0/policies/APP854732081/change-start-date')
+          .post('/v1/policies/APP854732081/change-start-date')
           .send({
             start_date: '2020-04-26'
           })
@@ -1479,7 +1276,7 @@ describe('Policies - API v0 - Integration', async () => {
     describe('when there is a validation error', () => {
       it('should reply with status 400 when wrong spec ops code format', async () => {
         response = await httpServer.api()
-          .post('/v0/policies/APP854732081/change-start-date')
+          .post('/v1/policies/APP854732081/change-start-date')
           .send({
             start_date: 'wrong_date_format'
           })
@@ -1491,7 +1288,7 @@ describe('Policies - API v0 - Integration', async () => {
     describe('when there is a missing key', () => {
       it('should return status 400', async () => {
         response = await httpServer.api()
-          .post('/v0/policies/APP854732081/change-start-date')
+          .post('/v1/policies/APP854732081/change-start-date')
           .send({
             wrong_key: 'key'
           })

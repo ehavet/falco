@@ -5,7 +5,7 @@ export function quoteToResource (quote: Quote) {
     id: quote.id,
     code: quote.partnerCode,
     special_operations_code: quote.specialOperationsCode,
-    special_operations_code_applied_at: quote.specialOperationsCodeAppliedAt ? new Date(quote.specialOperationsCodeAppliedAt) : undefined,
+    special_operations_code_applied_at: quote.specialOperationsCodeAppliedAt ? new Date(quote.specialOperationsCodeAppliedAt) : null,
     risk: _toRisk(quote.risk),
     insurance: _toInsurance(quote.insurance)
   }

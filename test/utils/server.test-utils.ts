@@ -17,7 +17,7 @@ export const newProdLikeServer = async (): Promise<HttpServerForTesting> => {
   return new HapiHttpServerForTesting(hapiServer)
 }
 
-// Creates a simple server with no configuration excepts the given routes to test
+// Creates a simple server with no configuration excepts the given PoliciesRoutesV0 to test
 // Useful for specific api tests with mocked dependencies
 export const newMinimalServer = (routesToTest: ServerRoute[]): HttpServerForTesting => {
   const hapiServer = new Server()

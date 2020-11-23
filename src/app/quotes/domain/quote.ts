@@ -1,5 +1,10 @@
 import { Partner } from '../../partners/domain/partner'
-import { QuoteRiskPropertyRoomCountNotInsurableError, QuoteRiskNumberOfRoommatesError, QuoteRiskRoommatesNotAllowedError, QuoteStartDateConsistencyError } from './quote.errors'
+import {
+  QuoteRiskNumberOfRoommatesError,
+  QuoteRiskPropertyRoomCountNotInsurableError,
+  QuoteRiskRoommatesNotAllowedError,
+  QuoteStartDateConsistencyError
+} from './quote.errors'
 import { generate } from 'randomstring'
 import { UpdateQuoteCommand } from './update-quote-command'
 import dayjs from '../../../libs/dayjs'
@@ -14,8 +19,8 @@ const DEFAULT_NUMBER_MONTHS_DUE = 12
 export interface Quote {
     id: string,
     partnerCode: string,
-    specialOperationsCode?: string,
-    specialOperationsCodeAppliedAt?: Date
+    specialOperationsCode?: OperationCode | null,
+    specialOperationsCodeAppliedAt?: Date | null
     risk: Quote.Risk,
     insurance: Quote.Insurance
     policyHolder?: Quote.PolicyHolder,
@@ -145,6 +150,12 @@ export namespace Quote {
       }
     }
 
+    export function setSpecialOperationCode (quote: Quote, newOperationsCode: OperationCode | null = null): void {
+      const hasPreviouslyAppliedOperationCode: boolean = !!quote.specialOperationsCode
+      quote.specialOperationsCodeAppliedAt = hasPreviouslyAppliedOperationCode || newOperationsCode ? new Date() : null
+      quote.specialOperationsCode = newOperationsCode
+    }
+
     export function _isUpdatedPolicyHolderEmail (quote: Quote, updateQuoteCommand: UpdateQuoteCommand): boolean {
       return !(quote.policyHolder!.email === updateQuoteCommand.policyHolder!.email)
     }
@@ -198,6 +209,26 @@ export namespace Quote {
       return generate({ length: 7, charset: 'alphanumeric', readable: true, capitalization: 'uppercase' })
     }
 
+    export interface PolicyHolder {
+        firstname?: string,
+        lastname?: string,
+        address?: string,
+        postalCode?: string,
+        city?: string,
+        email?: string,
+        phoneNumber?: string,
+        emailValidatedAt?: Date
+    }
+
+    export function isEmptyRiskPerson (quote: Quote): boolean { return !quote.risk.person }
+    export function isEmptyPolicyHolder (quote: Quote): boolean { return !quote.policyHolder }
+    export function isPolicyHolderEmailMissing (quote: Quote): boolean { return !(quote.policyHolder?.email) }
+    export function isPolicyHolderPhoneNumberMissing (quote: Quote): boolean { return !(quote.policyHolder?.phoneNumber) }
+    export function isPolicyRiskPropertyAddressMissing (quote: Quote): boolean { return !quote.risk.property.address }
+    export function isPolicyRiskPropertyPostalCodeMissing (quote: Quote): boolean { return !quote.risk.property.postalCode }
+    export function isPolicyRiskPropertyCityMissing (quote: Quote): boolean { return !quote.risk.property.city }
+    export function isPolicyHolderEmailNotValidated (quote: Quote): boolean { return !(quote.policyHolder?.emailValidatedAt) }
+
     function _applyOperationCode (quote: Quote, partnerApplicableCodes: Array<OperationCode>, codeToApply?: string): Quote {
       const operationCode: OperationCode = SpecialOperation.inferOperationCode(codeToApply)
       if (partnerApplicableCodes.concat(OperationCode.BLANK).includes(operationCode)) {
@@ -205,18 +236,15 @@ export namespace Quote {
           case OperationCode.SEMESTER1:
           case OperationCode.SEMESTER2:
             Quote.applyNbMonthsDue(quote, 5)
-            quote.specialOperationsCode = operationCode
-            quote.specialOperationsCodeAppliedAt = new Date()
+            setSpecialOperationCode(quote, operationCode)
             break
           case OperationCode.FULLYEAR:
             Quote.applyNbMonthsDue(quote, 10)
-            quote.specialOperationsCode = operationCode
-            quote.specialOperationsCodeAppliedAt = new Date()
+            setSpecialOperationCode(quote, operationCode)
             break
           case OperationCode.BLANK:
             Quote.applyNbMonthsDue(quote, 12)
-            quote.specialOperationsCode = undefined
-            quote.specialOperationsCodeAppliedAt = undefined
+            setSpecialOperationCode(quote, null)
         }
       } else {
         throw new OperationCodeNotApplicableError(codeToApply!, quote.partnerCode)
@@ -232,10 +260,13 @@ export namespace Quote {
       return quote.policyHolder?.emailValidatedAt === undefined || quote.policyHolder?.emailValidatedAt === null
     }
 
-    export function isPolicyRiskPropertyAddressMissing (quote: Quote): boolean { return !quote.risk.property.address }
-    export function isPolicyRiskPropertyPostalCodeMissing (quote: Quote): boolean { return !quote.risk.property.postalCode }
-    export function isPolicyRiskPropertyCityMissing (quote: Quote): boolean { return !quote.risk.property.city }
+    export function getProductCode (quote: Quote): string {
+      return quote.insurance.productCode
+    }
 
+    export function isNotIssuedForPartner (quote: Quote, partnerCode: string): boolean {
+      return !(quote.partnerCode === partnerCode)
+    }
 }
 
 export namespace Quote.Risk {

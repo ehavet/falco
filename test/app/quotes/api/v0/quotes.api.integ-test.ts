@@ -1,17 +1,25 @@
 import * as supertest from 'supertest'
-import { expect, sinon, HttpServerForTesting, newMinimalServer } from '../../../../test-utils'
+import { expect, HttpServerForTesting, newMinimalServer, sinon } from '../../../../test-utils'
 import { Quote } from '../../../../../src/app/quotes/domain/quote'
 import { container, quoteRoutes } from '../../../../../src/app/quotes/quote.container'
 import { PartnerNotFoundError } from '../../../../../src/app/partners/domain/partner.errors'
 import {
   NoPartnerInsuranceForRiskError,
-  QuoteRiskPropertyRoomCountNotInsurableError,
   QuoteNotFoundError,
+  QuotePolicyHolderEmailNotFoundError,
   QuoteRiskNumberOfRoommatesError,
+  QuoteRiskPropertyRoomCountNotInsurableError,
   QuoteRiskRoommatesNotAllowedError,
-  QuoteStartDateConsistencyError, QuotePolicyHolderEmailNotFoundError
+  QuoteStartDateConsistencyError
 } from '../../../../../src/app/quotes/domain/quote.errors'
-import { createQuoteFixture, createQuoteInsuranceFixture, createQuoteRiskFixture, createUpdateQuoteCommandFixture, createUpdateQuoteCommandRiskFixture, createUpdateQuotePayloadFixture } from '../../fixtures/quote.fixture'
+import {
+  createQuoteFixture,
+  createQuoteInsuranceFixture,
+  createQuoteRiskFixture,
+  createUpdateQuoteCommandFixture,
+  createUpdateQuoteCommandRiskFixture,
+  createUpdateQuotePayloadFixture
+} from '../../fixtures/quote.fixture'
 import { UpdateQuoteCommand } from '../../../../../src/app/quotes/domain/update-quote-command'
 import { OperationCodeNotApplicableError } from '../../../../../src/app/policies/domain/operation-code.errors'
 
@@ -52,7 +60,9 @@ describe('Http API - Quotes - Integ', async () => {
         },
         policyHolder: {},
         nbMonthsDue: 12,
-        premium: 69.84
+        premium: 69.84,
+        specialOperationsCode: null,
+        specialOperationsCodeAppliedAt: null
       }
 
       const expectedResourceQuote = {
@@ -76,7 +86,9 @@ describe('Http API - Quotes - Integ', async () => {
           contractual_terms: '/path/to/contractual/terms',
           ipid: '/path/to/ipid'
         },
-        code: 'myPartner'
+        code: 'myPartner',
+        special_operations_code: null,
+        special_operations_code_applied_at: null
       }
 
       beforeEach(async () => {

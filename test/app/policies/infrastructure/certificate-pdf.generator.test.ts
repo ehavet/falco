@@ -27,7 +27,7 @@ describe('Policies - Infra - Certificate PDF Generator', async () => {
       expect(certificate.name).to.equal('Appenin_Attestation_assurance_habitation_APP753210859.pdf')
       expect(certificateUncompressed.includes('Jean Dupont')).to.be.true
       expect(certificateUncompressed.includes('13 rue du loup garou')).to.be.true
-      expect(certificateUncompressed.includes('91100 Corbeil\\055Essones')).to.be.true
+      expect(certificateUncompressed.includes('91100 Corbeil\\055Essonnes')).to.be.true
       expect(certificateUncompressed.includes('est assur\\351(e) par le contrat Assurance Habitation APPENIN n\\260 APP 753 210 859')).to.be.true
       expect(certificateUncompressed.includes('depuis le 05\\05701\\0572020 \\(prochaine \\351ch\\351ance le 05\\05701\\0572020\\)')).to.be.true
     })
@@ -77,7 +77,7 @@ describe('Policies - Infra - Certificate PDF Generator', async () => {
       expect(certificate.name).to.equal('Appenin_Attestation_assurance_habitation_APP753210859.pdf')
       expect(certificateUncompressed.includes('Jean Dupont')).to.be.true
       expect(certificateUncompressed.includes('13 rue du loup garou')).to.be.true
-      expect(certificateUncompressed.includes('91100 Corbeil\\055Essones')).to.be.true
+      expect(certificateUncompressed.includes('91100 Corbeil\\055Essonnes')).to.be.true
       expect(certificateUncompressed.includes('est assur\\351(e) par le contrat Assurance Habitation APPENIN n\\260 APP 753 210 859')).to.be.true
       expect(certificateUncompressed.includes('depuis le 05\\05701\\0572020 \\(prochaine \\351ch\\351ance le 05\\05701\\0572020\\)')).to.be.true
     })

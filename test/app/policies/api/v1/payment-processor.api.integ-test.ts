@@ -7,10 +7,10 @@ import { UnauthenticatedEventError } from '../../../../../src/app/policies/domai
 import { Stripe } from 'stripe'
 import { createConfirmPaymentIntentCommandFixture } from '../../fixtures/payment/confirmPaymentIntentCommand.fixture'
 
-describe('Payment Intent Event Handler - API v0 - Integration', async () => {
+describe('Payment Intent Event Handler - API v1 - Integration', async () => {
   let httpServer: HttpServerForTesting
 
-  describe('POST /internal/v0/payment-processor/event-handler/', async () => {
+  describe('POST /internal/v1/payment-processor/event-handler/', async () => {
     let response: supertest.Response
 
     before(async () => {
@@ -31,7 +31,7 @@ describe('Payment Intent Event Handler - API v0 - Integration', async () => {
           .withArgs(policyId).resolves(undefined)
 
         response = await httpServer.api()
-          .post('/internal/v0/payment-processor/event-handler/')
+          .post('/internal/v1/payment-processor/event-handler/')
           .set('stripe-signature', stripeHeaderSignature)
           .send(event)
 
@@ -62,7 +62,7 @@ describe('Payment Intent Event Handler - API v0 - Integration', async () => {
           .rejects(new PolicyNotFoundError(policyId))
 
         response = await httpServer.api()
-          .post('/internal/v0/payment-processor/event-handler/')
+          .post('/internal/v1/payment-processor/event-handler/')
           .set('stripe-signature', stripeHeaderSignature)
           .send(event)
 
@@ -81,7 +81,7 @@ describe('Payment Intent Event Handler - API v0 - Integration', async () => {
           .withArgs(JSON.stringify(unauthorizedEvent), stripeHeaderSignature).resolves(unauthorizedEvent)
 
         response = await httpServer.api()
-          .post('/internal/v0/payment-processor/event-handler/')
+          .post('/internal/v1/payment-processor/event-handler/')
           .set('stripe-signature', stripeHeaderSignature)
           .send(unauthorizedEvent)
 
@@ -96,7 +96,7 @@ describe('Payment Intent Event Handler - API v0 - Integration', async () => {
           .withArgs(JSON.stringify(corruptedEvent), stripeHeaderSignature).rejects(new UnauthenticatedEventError('UnauthenticatedEvent'))
 
         response = await httpServer.api()
-          .post('/internal/v0/payment-processor/event-handler/')
+          .post('/internal/v1/payment-processor/event-handler/')
           .set('stripe-signature', stripeHeaderSignature)
           .send(corruptedEvent)
 
@@ -126,7 +126,7 @@ describe('Payment Intent Event Handler - API v0 - Integration', async () => {
           .rejects(new Error())
 
         response = await httpServer.api()
-          .post('/internal/v0/payment-processor/event-handler/')
+          .post('/internal/v1/payment-processor/event-handler/')
           .set('stripe-signature', stripeHeaderSignature)
           .send(event)
 

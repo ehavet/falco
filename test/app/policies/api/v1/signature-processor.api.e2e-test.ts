@@ -5,10 +5,10 @@ import { Policy } from '../../../../../src/app/policies/domain/policy'
 import { PolicySqlModel } from '../../../../../src/app/policies/infrastructure/policy-sql.model'
 import { signatureRequestEventJSONFixture } from '../../fixtures/signatureRequestEventJSON.fixture'
 
-describe('Signature Event Handler - API v0 - E2E', async () => {
+describe('Signature Event Handler - API v1 - E2E', async () => {
   let httpServer: HttpServerForTesting
 
-  describe('POST /internal/v0/signature-processor/event-handler/', async () => {
+  describe('POST /internal/v1/signature-processor/event-handler/', async () => {
     before(async () => {
       httpServer = await newProdLikeServer()
     })
@@ -30,7 +30,7 @@ describe('Signature Event Handler - API v0 - E2E', async () => {
 
       // When
       await httpServer.api()
-        .post('/internal/v0/signature-processor/event-handler/')
+        .post('/internal/v1/signature-processor/event-handler/')
         .type('multipart/form-data')
         .field('json', JSON.stringify(signatureRequestSignedEvent))
 

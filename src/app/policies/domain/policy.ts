@@ -5,8 +5,17 @@ import { PolicyRepository } from './policy.repository'
 import dayjs from '../../../libs/dayjs'
 import { Partner } from '../../partners/domain/partner'
 import * as PartnerFunc from '../../partners/domain/partner.func'
-import { PolicyStartDateConsistencyError, PolicyRiskRoommatesNotAllowedError, PolicyRiskNumberOfRoommatesError, PolicyRiskPropertyMissingFieldError } from './policies.errors'
 import { OperationCode } from '../../common-api/domain/operation-code'
+import {
+  PolicyStartDateConsistencyError,
+  PolicyRiskRoommatesNotAllowedError,
+  PolicyRiskNumberOfRoommatesError,
+  PolicyHolderMissingError,
+  PolicyRiskPersonMissingError,
+  PolicyHolderMissingPropertyError,
+  PolicyHolderEmailValidationError,
+  PolicyRiskPropertyMissingFieldError
+} from './policies.errors'
 
 const DEFAULT_NUMBER_OF_MONTHS_DUE = 12
 
@@ -105,11 +114,10 @@ export namespace Policy {
       return policy.partnerCode
     }
 
-    export async function
-    create (createPolicyCommand: CreatePolicyCommand, quote: Quote, policyRepository: PolicyRepository, partner: Partner): Promise<Policy> {
+    export async function create (createPolicyCommand: CreatePolicyCommand, quote: Quote, policyRepository: PolicyRepository, partner: Partner): Promise<Policy> {
       const partnerCode: string = createPolicyCommand.partnerCode
       const productCode: string = PartnerFunc.getProductCode(partner)
-      const generatedId: string = _generateId(partnerCode, productCode)
+      const generatedId: string = generateId(partnerCode, productCode)
       if (await policyRepository.isIdAvailable(generatedId)) {
         if (_addressIsMissingFromQuoteAndCommand(quote, createPolicyCommand)) throw new PolicyRiskPropertyMissingFieldError(quote.id, 'address')
         if (_postalCodeIsMissingFromQuoteAndCommand(quote, createPolicyCommand)) throw new PolicyRiskPropertyMissingFieldError(quote.id, 'postalCode')
@@ -142,54 +150,103 @@ export namespace Policy {
       return create(createPolicyCommand, quote, policyRepository, partner)
     }
 
-    function _generateId (partnerCode: string, productCode: string): string {
+    export async function createFromQuote (policyId: string, quote: Quote): Promise<Policy> {
+      _checkQuoteConsistencyToCreatePolicy(quote)
+
+      return {
+        id: policyId,
+        partnerCode: quote.partnerCode,
+        insurance: quote.insurance,
+        // eslint-disable-next-line no-use-before-define
+        risk: Risk.createFromQuoteRisk(quote.risk),
+        contact: _createHolderFromQuotePolicyHolder(quote.policyHolder!),
+        nbMonthsDue: quote.nbMonthsDue,
+        premium: quote.premium,
+        startDate: quote.startDate!,
+        termStartDate: quote.termStartDate!,
+        termEndDate: quote.termEndDate!,
+        signatureDate: undefined,
+        paymentDate: undefined,
+        subscriptionDate: undefined,
+        emailValidationDate: quote.policyHolder!.emailValidatedAt,
+        status: Policy.Status.Initiated,
+        specialOperationsCode: quote.specialOperationsCode!,
+        specialOperationsCodeAppliedAt: quote.specialOperationsCodeAppliedAt!
+      }
+    }
+
+    export function generateId (partnerCode: string, productCode: string): string {
       const partner: string = partnerCode.substr(0, 3).toUpperCase()
       const product: string = productCode.replace(/[^0-9]/g, '')
       const random: string = generate({ length: 6, charset: 'numeric', readable: true })
       return `${partner}${product}${random}`
     }
+}
 
-    function _getStartDate (createPolicyCommand: CreatePolicyCommand): Date {
-      return createPolicyCommand.startDate || new Date()
-    }
+function _checkQuoteConsistencyToCreatePolicy (quote: Quote): void {
+  if (Quote.isEmptyPolicyHolder(quote)) { throw new PolicyHolderMissingError(quote.id) }
+  if (Quote.isEmptyRiskPerson(quote)) { throw new PolicyRiskPersonMissingError(quote.id) }
+  if (Quote.isPolicyHolderEmailMissing(quote)) { throw new PolicyHolderMissingPropertyError(quote.id, 'email') }
+  if (Quote.isPolicyHolderPhoneNumberMissing(quote)) { throw new PolicyHolderMissingPropertyError(quote.id, 'phoneNumber') }
+  if (Quote.isPolicyHolderEmailNotValidated(quote)) { throw new PolicyHolderEmailValidationError(quote.id) }
+  if (Quote.isPolicyRiskPropertyAddressMissing(quote)) { throw new PolicyRiskPropertyMissingFieldError(quote.id, 'address') }
+  if (Quote.isPolicyRiskPropertyPostalCodeMissing(quote)) { throw new PolicyRiskPropertyMissingFieldError(quote.id, 'postalCode') }
+  if (Quote.isPolicyRiskPropertyCityMissing(quote)) { throw new PolicyRiskPropertyMissingFieldError(quote.id, 'city') }
+}
 
-    function _createContact (queryContact: CreatePolicyCommand.Contact, queryRisk: CreatePolicyCommand.Risk, quoteRisk: Quote.Risk): Policy.Holder {
-      return {
-        lastname: queryRisk.people.policyHolder.lastname,
-        firstname: queryRisk.people.policyHolder.firstname,
-        address: quoteRisk.property.address || queryRisk.property.address!,
-        postalCode: quoteRisk.property.postalCode ? parseInt(quoteRisk.property.postalCode) : queryRisk.property.postalCode!,
-        city: quoteRisk.property.city || queryRisk.property.city!,
-        email: queryContact.email,
-        phoneNumber: queryContact.phoneNumber
-      }
-    }
+function _getStartDate (createPolicyCommand: CreatePolicyCommand): Date {
+  return createPolicyCommand.startDate || new Date()
+}
 
-    function _computeTermEndDate (termStartDate: Date, durationInMonths: number): Date {
-      return dayjs(termStartDate).add(durationInMonths, 'month').subtract(1, 'day').toDate()
-    }
+function _createContact (queryContact: CreatePolicyCommand.Contact, queryRisk: CreatePolicyCommand.Risk, quoteRisk: Quote.Risk): Policy.Holder {
+  return {
+    lastname: queryRisk.people.policyHolder.lastname,
+    firstname: queryRisk.people.policyHolder.firstname,
+    address: quoteRisk.property.address || queryRisk.property.address!,
+    postalCode: quoteRisk.property.postalCode ? parseInt(quoteRisk.property.postalCode) : queryRisk.property.postalCode!,
+    city: quoteRisk.property.city || queryRisk.property.city!,
+    email: queryContact.email,
+    phoneNumber: queryContact.phoneNumber
+  }
+}
 
-    function _applyNbMonthsDue (policy: Policy, nbMonthsDue: number): void {
-      policy.premium = nbMonthsDue * policy.insurance.estimate.monthlyPrice
-      policy.nbMonthsDue = nbMonthsDue
-      policy.termEndDate = _computeTermEndDate(policy.startDate, nbMonthsDue)
-    }
+function _computeTermEndDate (termStartDate: Date, durationInMonths: number): Date {
+  return dayjs(termStartDate).add(durationInMonths, 'month').subtract(1, 'day').toDate()
+}
 
-    function _setSpecialOperationsCodeAndApplicationDate (policy: Policy, specialOperationsCode: OperationCode | null = null): void {
-      policy.specialOperationsCode = specialOperationsCode
-      policy.specialOperationsCodeAppliedAt = specialOperationsCode ? new Date() : null
-    }
+function _applyNbMonthsDue (policy: Policy, nbMonthsDue: number): void {
+  policy.premium = nbMonthsDue * policy.insurance.estimate.monthlyPrice
+  policy.nbMonthsDue = nbMonthsDue
+  policy.termEndDate = _computeTermEndDate(policy.startDate, nbMonthsDue)
+}
 
-    function _addressIsMissingFromQuoteAndCommand (quote: Quote, createPolicyCommand: CreatePolicyCommand): boolean {
-      return (Quote.isPolicyRiskPropertyAddressMissing(quote) && CreatePolicyCommand.isRiskPropertyAddressMissing(createPolicyCommand))
-    }
-    function _postalCodeIsMissingFromQuoteAndCommand (quote: Quote, createPolicyCommand: CreatePolicyCommand): boolean {
-      return (Quote.isPolicyRiskPropertyPostalCodeMissing(quote) && CreatePolicyCommand.isRiskPropertyPostalCodeMissing(createPolicyCommand))
-    }
-    function _cityIsMissingFromQuoteAndCommand (quote: Quote, createPolicyCommand: CreatePolicyCommand): boolean {
-      return (Quote.isPolicyRiskPropertyCityMissing(quote) && CreatePolicyCommand.isRiskPropertyCityMissing(createPolicyCommand))
-    }
+function _createHolderFromQuotePolicyHolder (quotePolicyHolder: Quote.PolicyHolder): Policy.Holder {
+  return {
+    lastname: quotePolicyHolder.lastname!,
+    firstname: quotePolicyHolder.firstname!,
+    address: quotePolicyHolder.address!,
+    postalCode: parseInt(quotePolicyHolder.postalCode!),
+    city: quotePolicyHolder.city!,
+    email: quotePolicyHolder.email!,
+    phoneNumber: quotePolicyHolder.phoneNumber!
+  }
+}
 
+function _setSpecialOperationsCodeAndApplicationDate (policy: Policy, specialOperationsCode: OperationCode | null = null): void {
+  policy.specialOperationsCode = specialOperationsCode
+  policy.specialOperationsCodeAppliedAt = specialOperationsCode ? new Date() : null
+}
+
+function _addressIsMissingFromQuoteAndCommand (quote: Quote, createPolicyCommand: CreatePolicyCommand): boolean {
+  return (Quote.isPolicyRiskPropertyAddressMissing(quote) && CreatePolicyCommand.isRiskPropertyAddressMissing(createPolicyCommand))
+}
+
+function _postalCodeIsMissingFromQuoteAndCommand (quote: Quote, createPolicyCommand: CreatePolicyCommand): boolean {
+  return (Quote.isPolicyRiskPropertyPostalCodeMissing(quote) && CreatePolicyCommand.isRiskPropertyPostalCodeMissing(createPolicyCommand))
+}
+
+function _cityIsMissingFromQuoteAndCommand (quote: Quote, createPolicyCommand: CreatePolicyCommand): boolean {
+  return (Quote.isPolicyRiskPropertyCityMissing(quote) && CreatePolicyCommand.isRiskPropertyCityMissing(createPolicyCommand))
 }
 
 export namespace Policy.Risk {
@@ -235,8 +292,23 @@ export namespace Policy.Risk {
       }
     }
 
-    function _hasRoommates (commandRisk: CreatePolicyCommand.Risk) {
+    function _hasRoommates (commandRisk: CreatePolicyCommand.Risk): boolean {
       return commandRisk.people.otherInsured?.length > 0
+    }
+
+    export function createFromQuoteRisk (quoteRisk: Quote.Risk): Policy.Risk {
+      return {
+        property: {
+          roomCount: quoteRisk.property.roomCount,
+          address: quoteRisk.property.address!,
+          postalCode: parseInt(quoteRisk.property.postalCode!),
+          city: quoteRisk.property.city!
+        },
+        people: {
+          person: quoteRisk.person!,
+          otherPeople: quoteRisk.otherPeople!
+        }
+      }
     }
 }
 

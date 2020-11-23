@@ -58,7 +58,9 @@ describe('Http API quotes e2e', async () => {
           contractual_terms: '/docs/Appenin_Conditions_Generales_assurance_habitation_APP658.pdf',
           ipid: '/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf'
         },
-        code: 'studyo'
+        code: 'studyo',
+        special_operations_code: null,
+        special_operations_code_applied_at: null
       })
     })
 

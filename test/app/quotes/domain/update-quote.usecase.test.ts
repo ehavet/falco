@@ -10,7 +10,13 @@ import {
   createUpdateQuoteCommandRiskFixture
 } from '../fixtures/quote.fixture'
 import { SinonStubbedInstance } from 'sinon'
-import { QuoteRiskPropertyRoomCountNotInsurableError, QuoteNotFoundError, QuoteRiskNumberOfRoommatesError, QuoteRiskRoommatesNotAllowedError, QuoteStartDateConsistencyError } from '../../../../src/app/quotes/domain/quote.errors'
+import {
+  QuoteNotFoundError,
+  QuoteRiskNumberOfRoommatesError,
+  QuoteRiskPropertyRoomCountNotInsurableError,
+  QuoteRiskRoommatesNotAllowedError,
+  QuoteStartDateConsistencyError
+} from '../../../../src/app/quotes/domain/quote.errors'
 import { PartnerRepository } from '../../../../src/app/partners/domain/partner.repository'
 import { createPartnerFixture } from '../../partners/fixtures/partner.fixture'
 import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
@@ -175,7 +181,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
         phoneNumber: '+66666666666',
         emailValidatedAt: undefined
       },
-      specialOperationsCode: 'FULLYEAR',
+      specialOperationsCode: OperationCode.FULLYEAR,
       specialOperationsCodeAppliedAt: new Date('2020-01-05T00:00:00.000Z'),
       startDate: new Date('2020-01-05T00:00:00.000Z'),
       termStartDate: new Date('2020-01-05T00:00:00.000Z'),
@@ -280,7 +286,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
         partnerCode: 'myPartner',
         premium: 29.1,
         nbMonthsDue: 5,
-        specialOperationsCode: 'SEMESTER1',
+        specialOperationsCode: OperationCode.SEMESTER1,
         specialOperationsCodeAppliedAt: new Date('2020-01-05T00:00:00.000Z'),
         startDate: new Date('2020-01-05T00:00:00.000Z'),
         termStartDate: new Date('2020-01-05T00:00:00.000Z'),
@@ -307,7 +313,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
         partnerCode: 'myPartner',
         premium: 29.1,
         nbMonthsDue: 5,
-        specialOperationsCode: 'SEMESTER2',
+        specialOperationsCode: OperationCode.SEMESTER2,
         specialOperationsCodeAppliedAt: new Date('2020-01-05T00:00:00.000Z'),
         startDate: new Date('2020-01-05T00:00:00.000Z'),
         termStartDate: new Date('2020-01-05T00:00:00.000Z'),
@@ -334,7 +340,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
         partnerCode: 'myPartner',
         premium: 58.2,
         nbMonthsDue: 10,
-        specialOperationsCode: 'FULLYEAR',
+        specialOperationsCode: OperationCode.FULLYEAR,
         specialOperationsCodeAppliedAt: new Date('2020-01-05T00:00:00.000Z'),
         startDate: new Date('2020-01-05T00:00:00.000Z'),
         termStartDate: new Date('2020-01-05T00:00:00.000Z'),
@@ -350,58 +356,118 @@ describe('Quotes - Usecase - Update Quote', async () => {
     sinon.assert.calledWithExactly(quoteRepository.update, updatedQuote)
   })
 
-  it('should update premium on 12 months if provided operation code is empty', async () => {
-    // Given
-    quoteRepository.get.withArgs(quoteId).resolves(quote)
-    const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId, specOpsCode: '' })
-    const updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
-    const updatedQuote = createQuoteFixture(
-      {
-        id: 'UDQUOT3',
-        partnerCode: 'myPartner',
-        premium: 69.84,
-        nbMonthsDue: 12,
-        specialOperationsCode: undefined,
-        specialOperationsCodeAppliedAt: undefined,
-        startDate: new Date('2020-01-05T00:00:00.000Z'),
-        termStartDate: new Date('2020-01-05T00:00:00.000Z'),
-        termEndDate: new Date('2021-01-04T00:00:00.000Z')
-      }
-    )
-    quoteRepository.update.withArgs(updatedQuote).resolves()
+  describe('when empty operation code is provided', async () => {
+    it('should update premium on 12 months with specialOperationsCode and specialOperationsCodeAppliedAt not filled up when no spec ops code applied previously', async () => {
+      // Given
+      quoteRepository.get.withArgs(quoteId).resolves(quote)
+      const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId, specOpsCode: '' })
+      const updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+      const updatedQuote = createQuoteFixture(
+        {
+          id: 'UDQUOT3',
+          partnerCode: 'myPartner',
+          premium: 69.84,
+          nbMonthsDue: 12,
+          specialOperationsCode: null,
+          specialOperationsCodeAppliedAt: null,
+          startDate: new Date('2020-01-05T00:00:00.000Z'),
+          termStartDate: new Date('2020-01-05T00:00:00.000Z'),
+          termEndDate: new Date('2021-01-04T00:00:00.000Z')
+        }
+      )
+      quoteRepository.update.withArgs(updatedQuote).resolves()
 
-    // When
-    await updateQuote(updateQuoteCommand)
+      // When
+      await updateQuote(updateQuoteCommand)
 
-    // Then
-    sinon.assert.calledWithExactly(quoteRepository.update, updatedQuote)
+      // Then
+      return expect(quoteRepository.update).to.have.been.calledWithExactly(updatedQuote)
+    })
+
+    it('should update premium on 12 months with specialOperationsCode null and specialOperationsCodeAppliedAt filled up when a spec ops code has been applied previously', async () => {
+      // Given
+      const quote = createQuoteFixture({ id: quoteId, partnerCode: partnerCode, specialOperationsCode: OperationCode.SEMESTER1, specialOperationsCodeAppliedAt: new Date() })
+      quoteRepository.get.withArgs(quoteId).resolves(quote)
+      const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quote.id, specOpsCode: '' })
+      const updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+      const updatedQuote = createQuoteFixture(
+        {
+          id: 'UDQUOT3',
+          partnerCode: 'myPartner',
+          premium: 69.84,
+          nbMonthsDue: 12,
+          specialOperationsCode: null,
+          specialOperationsCodeAppliedAt: new Date('2020-01-05T00:00:00.000Z'),
+          startDate: new Date('2020-01-05T00:00:00.000Z'),
+          termStartDate: new Date('2020-01-05T00:00:00.000Z'),
+          termEndDate: new Date('2021-01-04T00:00:00.000Z')
+        }
+      )
+      quoteRepository.update.withArgs(updatedQuote).resolves()
+
+      // When
+      await updateQuote(updateQuoteCommand)
+
+      // Then
+      return expect(quoteRepository.update).to.have.been.calledWithExactly(updatedQuote)
+    })
   })
 
-  it('should update premium on 12 months if provided operation code is undefined', async () => {
-    // Given
-    quoteRepository.get.withArgs(quoteId).resolves(quote)
-    const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId, specOpsCode: undefined })
-    const updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
-    const updatedQuote = createQuoteFixture(
-      {
-        id: 'UDQUOT3',
-        partnerCode: 'myPartner',
-        premium: 69.84,
-        nbMonthsDue: 12,
-        specialOperationsCode: undefined,
-        specialOperationsCodeAppliedAt: undefined,
-        startDate: new Date('2020-01-05T00:00:00.000Z'),
-        termStartDate: new Date('2020-01-05T00:00:00.000Z'),
-        termEndDate: new Date('2021-01-04T00:00:00.000Z')
-      }
-    )
-    quoteRepository.update.withArgs(updatedQuote).resolves()
+  describe('when undefined operation code is provided', async () => {
+    it('should update premium on 12 months with specialOperationsCode and specialOperationsCodeAppliedAt not filled up when no spec ops code applied previously', async () => {
+      // Given
+      quoteRepository.get.withArgs(quoteId).resolves(quote)
+      const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId, specOpsCode: undefined })
+      const updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+      const updatedQuote = createQuoteFixture(
+        {
+          id: 'UDQUOT3',
+          partnerCode: 'myPartner',
+          premium: 69.84,
+          nbMonthsDue: 12,
+          specialOperationsCode: null,
+          specialOperationsCodeAppliedAt: null,
+          startDate: new Date('2020-01-05T00:00:00.000Z'),
+          termStartDate: new Date('2020-01-05T00:00:00.000Z'),
+          termEndDate: new Date('2021-01-04T00:00:00.000Z')
+        }
+      )
+      quoteRepository.update.withArgs(updatedQuote).resolves()
 
-    // When
-    await updateQuote(updateQuoteCommand)
+      // When
+      await updateQuote(updateQuoteCommand)
 
-    // Then
-    sinon.assert.calledWithExactly(quoteRepository.update, updatedQuote)
+      // Then
+      return expect(quoteRepository.update).to.have.been.calledWithExactly(updatedQuote)
+    })
+
+    it('should update premium on 12 months with specialOperationsCode null and specialOperationsCodeAppliedAt filled up when a spec ops code has been applied previously', async () => {
+      // Given
+      const quote = createQuoteFixture({ id: quoteId, partnerCode: partnerCode, specialOperationsCode: OperationCode.SEMESTER1, specialOperationsCodeAppliedAt: new Date() })
+      quoteRepository.get.withArgs(quoteId).resolves(quote)
+      const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quote.id, specOpsCode: undefined })
+      const updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+      const updatedQuote = createQuoteFixture(
+        {
+          id: 'UDQUOT3',
+          partnerCode: 'myPartner',
+          premium: 69.84,
+          nbMonthsDue: 12,
+          specialOperationsCode: null,
+          specialOperationsCodeAppliedAt: new Date('2020-01-05T00:00:00.000Z'),
+          startDate: new Date('2020-01-05T00:00:00.000Z'),
+          termStartDate: new Date('2020-01-05T00:00:00.000Z'),
+          termEndDate: new Date('2021-01-04T00:00:00.000Z')
+        }
+      )
+      quoteRepository.update.withArgs(updatedQuote).resolves()
+
+      // When
+      await updateQuote(updateQuoteCommand)
+
+      // Then
+      return expect(quoteRepository.update).to.have.been.calledWithExactly(updatedQuote)
+    })
   })
 
   describe('should apply operation code when valid code contains spaces or non alphanumeric characters', async () => {
@@ -411,7 +477,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
         id: 'UDQUOT3',
         partnerCode: 'myPartner',
         nbMonthsDue: 10,
-        specialOperationsCode: 'FULLYEAR',
+        specialOperationsCode: OperationCode.FULLYEAR,
         specialOperationsCodeAppliedAt: new Date('2020-01-05T00:00:00.000Z'),
         startDate: new Date('2020-01-05T00:00:00.000Z'),
         termStartDate: new Date('2020-01-05T00:00:00.000Z'),
@@ -420,7 +486,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
       }
     )
 
-    codesList.forEach(async (code) => {
+    for (const code of codesList) {
       it(`when ${code} is passed as special operations code`, async () => {
         // Given
         quoteRepository.get.withArgs(quoteId).resolves(quote)
@@ -432,7 +498,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
         // Then
         quoteRepository.update.verify()
       })
-    })
+    }
   })
 
   it('should throw an QuoteStartDateConsistencyError when start date is earlier than today', async () => {
@@ -459,8 +525,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
         termEndDate: new Date('2021-06-30T00:00:00.000Z'),
         premium: 69.84,
         nbMonthsDue: 12,
-        specialOperationsCode: undefined,
-        specialOperationsCodeAppliedAt: undefined
+        specialOperationsCode: null,
+        specialOperationsCodeAppliedAt: null
       }
     )
     quoteRepository.get.withArgs(quoteId).resolves(quote)
@@ -491,6 +557,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
       {
         id: 'UDQUOT3',
         partnerCode: 'myPartner',
+        specialOperationsCode: null,
+        specialOperationsCodeAppliedAt: null,
         termEndDate: new Date('2021-01-04T00:00:00.000Z'),
         policyHolder: createQuotePolicyHolderFixture({
           email: 'updated@email.com',

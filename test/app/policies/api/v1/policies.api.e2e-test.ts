@@ -3,18 +3,21 @@ import { createPolicyFixture } from '../../fixtures/policy.fixture'
 import { Policy } from '../../../../../src/app/policies/domain/policy'
 import { config, dateFaker, expect, HttpServerForTesting, newProdLikeServer } from '../../../../test-utils'
 import { PolicySqlModel } from '../../../../../src/app/policies/infrastructure/policy-sql.model'
-import { createPolicyApiRequestFixture } from '../../fixtures/createPolicyApiRequest.fixture'
 import { PolicySqlRepository } from '../../../../../src/app/policies/infrastructure/policy-sql.repository'
 import { PolicyRepository } from '../../../../../src/app/policies/domain/policy.repository'
 import fsx from 'fs-extra'
 import { QuoteSqlModel } from '../../../../../src/app/quotes/infrastructure/sql-models/quote-sql-model'
+import { createPolicyApiRequestFixtureV1 } from '../../fixtures/createPolicyApiRequest.fixture'
+import { QuoteSqlRepository } from '../../../../../src/app/quotes/infrastructure/quote-sql.repository'
+import { createQuoteFixture, createQuotePolicyHolderFixture } from '../../../quotes/fixtures/quote.fixture'
+import { Quote } from '../../../../../src/app/quotes/domain/quote'
 
 async function resetDb () {
   await PolicySqlModel.destroy({ truncate: true, cascade: true })
   await QuoteSqlModel.destroy({ truncate: true })
 }
 
-describe('Policies - API v0 - E2E', async () => {
+describe('Policies - API v1 - E2E', async () => {
   let httpServer: HttpServerForTesting
 
   before(async () => {
@@ -25,7 +28,7 @@ describe('Policies - API v0 - E2E', async () => {
     await resetDb()
   })
 
-  describe('POST /v0/policies/:id/payment-intents', async () => {
+  describe('POST /v1/policies/:id/payment-intents', async () => {
     let response: supertest.Response
     let policyRepository: PolicySqlRepository
 
@@ -42,7 +45,7 @@ describe('Policies - API v0 - E2E', async () => {
 
     it('should return a payment intent id', async () => {
       response = await httpServer.api()
-        .post('/v0/policies/APP463109486/payment-intents')
+        .post('/v1/policies/APP463109486/payment-intents')
 
       // THEN
       expect(response.body)
@@ -54,53 +57,49 @@ describe('Policies - API v0 - E2E', async () => {
     }).timeout(10000)
   })
 
-  describe('POST /v0/policies', async () => {
+  describe('POST /v1/policies', async () => {
     let response: supertest.Response
+    let quoteRepository: QuoteSqlRepository
     const now = new Date('2020-04-18T00:00:00Z')
-    const requestParams: any = createPolicyApiRequestFixture({ code: 'studyo' })
+    const requestParams: any = createPolicyApiRequestFixtureV1()
 
     beforeEach(async () => {
       // Given
       dateFaker.setCurrentDate(now)
-      response = await httpServer.api()
-        .post('/v0/quotes')
-        .send({
-          code: 'studyo',
-          risk: {
-            property: {
-              room_count: 2,
-              address: '88 rue des prairies',
-              postal_code: 91100,
-              city: 'Kyukamura'
-            }
-          }
-        })
-        .set('X-Consumer-Username', 'studyo')
-
-      requestParams.quote_id = response.body.id
+      quoteRepository = new QuoteSqlRepository()
+      await quoteRepository.save(createQuoteFixture())
+      const quote: Quote = await quoteRepository.update(createQuoteFixture({
+        partnerCode: 'studyo',
+        policyHolder: createQuotePolicyHolderFixture({ emailValidatedAt: now })
+      }))
+      requestParams.quote_id = quote.id
 
       // When
       response = await httpServer.api()
-        .post('/v0/policies')
+        .post('/v1/policies')
         .send(requestParams)
-        .set('X-Consumer-Username', 'myPartner')
+        .set('X-Consumer-Username', quote.partnerCode)
+    })
+
+    afterEach(async () => {
+      await resetDb()
     })
 
     it('should return the policy', async () => {
       // Given
       const expectedPolicy = {
-        id: 'MYP936794823',
+        id: 'UD65X3A',
         code: 'studyo',
         insurance: {
-          monthly_price: 7.5,
-          default_deductible: 120,
-          default_ceiling: 5000,
+          monthly_price: 5.82,
+          default_deductible: 150,
+          default_cap: 7000,
           currency: 'EUR',
-          simplified_covers: ['ACDDE', 'ACINCEX', 'ACVOL', 'ACASSHE', 'ACDEFJU', 'ACRC'],
-          product_code: 'APP658',
-          product_version: '2020-07-15',
-          contractual_terms: '/docs/Appenin_Conditions_Generales_assurance_habitation_APP658.pdf',
-          ipid: '/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf'
+          simplified_covers: ['ACDDE', 'ACVOL'],
+          product_code: 'APP999',
+          product_version: 'v2020-02-01',
+          contractual_terms: '/path/to/contractual/terms',
+          ipid: '/path/to/ipid'
         },
         risk: {
           property: {
@@ -109,39 +108,37 @@ describe('Policies - API v0 - E2E', async () => {
             postal_code: 91100,
             city: 'Kyukamura'
           },
-          people: {
-            other_insured: [
-              {
-                firstname: 'John',
-                lastname: 'Doe'
-              }
-            ],
-            policy_holder: {
-              firstname: 'Jean',
-              lastname: 'Dupont'
+          other_people: [
+            {
+              firstname: 'John',
+              lastname: 'Doe'
             }
+          ],
+          person: {
+            firstname: 'Jean-Jean',
+            lastname: 'Lapin'
           }
         },
-        contact: {
-          lastname: 'Dupont',
-          firstname: 'Jean',
+        policy_holder: {
+          firstname: 'Jean-Jean',
+          lastname: 'Lapin',
           address: '88 rue des prairies',
           postal_code: 91100,
           city: 'Kyukamura',
-          email: 'jeandupont@email.com',
-          phone_number: '+33684205510'
+          email: 'jeanjean@email.com',
+          phone_number: '+33684205510',
+          email_validated_at: '2020-04-18T00:00:00.000Z'
         },
         nb_months_due: 12,
-        premium: 90,
-        start_date: '2020-04-05',
-        term_start_date: '2020-04-05',
-        term_end_date: '2021-04-04',
-        subscription_date: null,
-        signature_date: null,
+        premium: 69.84,
+        start_date: '2020-01-05',
+        term_start_date: '2020-01-05',
+        term_end_date: '2020-01-05',
+        subscribed_at: null,
+        signed_at: null,
         special_operations_code: null,
         special_operations_code_applied_at: null,
-        payment_date: null,
-        email_validated: false,
+        paid_at: null,
         status: 'INITIATED'
       }
 
@@ -157,7 +154,7 @@ describe('Policies - API v0 - E2E', async () => {
     })
   })
 
-  describe('GET /v0/policies/:id', async () => {
+  describe('GET /v1/policies/:id', async () => {
     it('should return the found policy', async () => {
       // Given
       const policyId: string = 'APP105944294'
@@ -166,7 +163,7 @@ describe('Policies - API v0 - E2E', async () => {
       await policyRepository.save(expectedPolicy)
 
       // When
-      const response = await httpServer.api().get(`/v0/policies/${policyId}`).set('X-Consumer-Username', 'myPartner')
+      const response = await httpServer.api().get(`/v1/policies/${policyId}`).set('X-Consumer-Username', 'myPartner')
 
       // Then
       const expectedResourcePolicy = {
@@ -175,7 +172,7 @@ describe('Policies - API v0 - E2E', async () => {
         insurance: {
           monthly_price: 5.82,
           default_deductible: 150,
-          default_ceiling: 7000,
+          default_cap: 7000,
           currency: 'EUR',
           simplified_covers: ['ACDDE', 'ACVOL'],
           product_code: 'APP999',
@@ -190,41 +187,39 @@ describe('Policies - API v0 - E2E', async () => {
             postal_code: 91100,
             city: 'Corbeil-Essonnes'
           },
-          people: {
-            policy_holder: {
-              firstname: 'Jean',
-              lastname: 'Dupont'
-            },
-            other_insured: [{ firstname: 'John', lastname: 'Doe' }]
-          }
+          person: {
+            firstname: 'Jean',
+            lastname: 'Dupont'
+          },
+          other_people: [{ firstname: 'John', lastname: 'Doe' }]
         },
-        contact: {
+        policy_holder: {
           lastname: 'Dupont',
           firstname: 'Jean',
           address: '13 rue du loup garou',
           postal_code: 91100,
           city: 'Corbeil-Essonnes',
           email: 'jeandupont@email.com',
-          phone_number: '+33684205510'
+          phone_number: '+33684205510',
+          email_validated_at: '2020-01-05T00:00:00.000Z'
         },
         nb_months_due: 12,
         premium: 69.84,
         start_date: '2020-01-05',
         term_start_date: '2020-01-05',
         term_end_date: '2020-01-05',
-        subscription_date: '2020-01-05T00:00:00.000Z',
-        signature_date: '2020-01-05T00:00:00.000Z',
-        payment_date: '2020-01-05T00:00:00.000Z',
+        subscribed_at: '2020-01-05T00:00:00.000Z',
+        signed_at: '2020-01-05T00:00:00.000Z',
+        paid_at: '2020-01-05T00:00:00.000Z',
         special_operations_code: null,
         special_operations_code_applied_at: null,
-        email_validated: true,
         status: 'INITIATED'
       }
       expect(response.body).to.deep.equal(expectedResourcePolicy)
     })
   })
 
-  describe('POST /v0/policies/:id/certificates', async () => {
+  describe('POST /v1/policies/:id/certificates', async () => {
     // Given
     let response: supertest.Response
     const now = new Date('2020-04-18T00:00:00Z')
@@ -239,7 +234,7 @@ describe('Policies - API v0 - E2E', async () => {
     it('should return certificate', async () => {
       // When
       response = await httpServer.api()
-        .post(`/v0/policies/${policy.id}/certificates`)
+        .post(`/v1/policies/${policy.id}/certificates`)
         .send()
         .set('X-Consumer-Username', 'myPartner')
 
@@ -250,7 +245,7 @@ describe('Policies - API v0 - E2E', async () => {
     })
   })
 
-  describe('POST /v0/policies/:id/signature-request', async () => {
+  describe('POST /v1/policies/:id/signature-request', async () => {
     let response: supertest.Response
     const policy: Policy = createPolicyFixture({ status: Policy.Status.Initiated, partnerCode: 'studyo' })
     const policyRepository: PolicyRepository = new PolicySqlRepository()
@@ -266,7 +261,7 @@ describe('Policies - API v0 - E2E', async () => {
     it('should return signature request url', async () => {
       // When
       response = await httpServer.api()
-        .post(`/v0/policies/${policy.id}/signature-request`)
+        .post(`/v1/policies/${policy.id}/signature-request`)
         .send()
         .set('X-Consumer-Username', 'studyo')
       // Then
@@ -274,7 +269,7 @@ describe('Policies - API v0 - E2E', async () => {
     }).timeout(15000)
   })
 
-  describe('POST /v0/policies/:id/apply-spec-ops-code', async () => {
+  describe('POST /v1/policies/:id/apply-spec-ops-code', async () => {
     it('should apply special operation code on policies', async () => {
       // Given
       const policyRepository = new PolicySqlRepository()
@@ -304,7 +299,7 @@ describe('Policies - API v0 - E2E', async () => {
       await policyRepository.save(initialPolicy)
       // When
       const response = await httpServer.api()
-        .post(`/v0/policies/${policyId}/apply-spec-ops-code`)
+        .post(`/v1/policies/${policyId}/apply-spec-ops-code`)
         .send({
           spec_ops_code: 'SEMESTER1'
         })
@@ -315,7 +310,7 @@ describe('Policies - API v0 - E2E', async () => {
         insurance: {
           monthly_price: 10,
           default_deductible: 150,
-          default_ceiling: 7000,
+          default_cap: 7000,
           currency: 'EUR',
           simplified_covers: ['ACDDE', 'ACVOL'],
           product_code: 'APP999',
@@ -330,32 +325,30 @@ describe('Policies - API v0 - E2E', async () => {
             postal_code: 91100,
             city: 'Corbeil-Essonnes'
           },
-          people: {
-            policy_holder: {
-              firstname: 'Jean',
-              lastname: 'Dupont'
-            },
-            other_insured: [{ firstname: 'John', lastname: 'Doe' }]
-          }
+          person: {
+            firstname: 'Jean',
+            lastname: 'Dupont'
+          },
+          other_people: [{ firstname: 'John', lastname: 'Doe' }]
         },
-        contact: {
+        policy_holder: {
           lastname: 'Dupont',
           firstname: 'Jean',
           address: '13 rue du loup garou',
           postal_code: 91100,
           city: 'Corbeil-Essonnes',
           email: 'jeandupont@email.com',
-          phone_number: '+33684205510'
+          phone_number: '+33684205510',
+          email_validated_at: '2020-01-05T00:00:00.000Z'
         },
         nb_months_due: 5,
         premium: 50,
         start_date: '2020-01-05',
         term_end_date: '2020-06-04',
         term_start_date: '2020-01-05',
-        subscription_date: '2020-01-05T00:00:00.000Z',
-        signature_date: '2020-01-05T00:00:00.000Z',
-        payment_date: '2020-01-05T00:00:00.000Z',
-        email_validated: true,
+        subscribed_at: '2020-01-05T00:00:00.000Z',
+        signed_at: '2020-01-05T00:00:00.000Z',
+        paid_at: '2020-01-05T00:00:00.000Z',
         status: 'INITIATED',
         special_operations_code: 'SEMESTER1',
         special_operations_code_applied_at: '2020-01-05T00:00:00.000Z'
@@ -364,7 +357,7 @@ describe('Policies - API v0 - E2E', async () => {
     })
   })
 
-  describe('POST /v0/policies/:id/change-start-date', async () => {
+  describe('POST /v1/policies/:id/change-start-date', async () => {
     const now = new Date('2020-07-13T00:00:00Z')
 
     beforeEach(async () => {
@@ -379,7 +372,7 @@ describe('Policies - API v0 - E2E', async () => {
       await policyRepository.save(initialPolicy)
       // When
       const response = await httpServer.api()
-        .post(`/v0/policies/${policyId}/change-start-date`)
+        .post(`/v1/policies/${policyId}/change-start-date`)
         .send({
           start_date: '2020-07-13'
         })
@@ -390,7 +383,7 @@ describe('Policies - API v0 - E2E', async () => {
         insurance: {
           monthly_price: 5.82,
           default_deductible: 150,
-          default_ceiling: 7000,
+          default_cap: 7000,
           currency: 'EUR',
           simplified_covers: ['ACDDE', 'ACVOL'],
           product_code: 'APP999',
@@ -405,32 +398,30 @@ describe('Policies - API v0 - E2E', async () => {
             postal_code: 91100,
             city: 'Corbeil-Essonnes'
           },
-          people: {
-            policy_holder: {
-              firstname: 'Jean',
-              lastname: 'Dupont'
-            },
-            other_insured: [{ firstname: 'John', lastname: 'Doe' }]
-          }
+          person: {
+            firstname: 'Jean',
+            lastname: 'Dupont'
+          },
+          other_people: [{ firstname: 'John', lastname: 'Doe' }]
         },
-        contact: {
+        policy_holder: {
           lastname: 'Dupont',
           firstname: 'Jean',
           address: '13 rue du loup garou',
           postal_code: 91100,
           city: 'Corbeil-Essonnes',
           email: 'jeandupont@email.com',
-          phone_number: '+33684205510'
+          phone_number: '+33684205510',
+          email_validated_at: '2020-01-05T00:00:00.000Z'
         },
         nb_months_due: 12,
         premium: 69.84,
         start_date: '2020-07-13',
         term_end_date: '2021-07-12',
         term_start_date: '2020-07-13',
-        subscription_date: '2020-01-05T00:00:00.000Z',
-        signature_date: '2020-01-05T00:00:00.000Z',
-        payment_date: '2020-01-05T00:00:00.000Z',
-        email_validated: true,
+        subscribed_at: '2020-01-05T00:00:00.000Z',
+        signed_at: '2020-01-05T00:00:00.000Z',
+        paid_at: '2020-01-05T00:00:00.000Z',
         special_operations_code: null,
         special_operations_code_applied_at: null,
         status: 'INITIATED'

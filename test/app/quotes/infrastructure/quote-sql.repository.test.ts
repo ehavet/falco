@@ -6,6 +6,7 @@ import { QuoteNotFoundError } from '../../../../src/app/quotes/domain/quote.erro
 import { QuoteRiskSqlModel } from '../../../../src/app/quotes/infrastructure/sql-models/quote-risk-sql.model'
 import { QuoteSqlModel } from '../../../../src/app/quotes/infrastructure/sql-models/quote-sql-model'
 import { QuotePersonSqlModel } from '../../../../src/app/quotes/infrastructure/sql-models/quote-person-sql.model'
+import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
 
 async function resetDb () {
   await QuoteSqlModel.destroy({ truncate: true, cascade: true })
@@ -176,7 +177,7 @@ describe('Repository - Quote', async () => {
           phoneNumber: '+UPD4T3DPHON3',
           emailValidatedAt: validationDate
         },
-        specialOperationsCode: 'SEMESTER1',
+        specialOperationsCode: OperationCode.SEMESTER1,
         specialOperationsCodeAppliedAt: new Date('2020-01-05T00:00:00Z')
       })
       await quoteRepository.save(initialQuote)

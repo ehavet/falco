@@ -64,10 +64,50 @@ export class PolicyRiskNumberOfRoommatesError extends Error {
   }
 }
 
+export class PolicyHolderEmailValidationError extends Error {
+  constructor (quoteId: string) {
+    const message: string = `Quote ${quoteId} policy holder email should have been validated`
+    super(message)
+    this.name = 'PolicyHolderEmailValidationError'
+  }
+}
+
+export class PolicyHolderMissingError extends Error {
+  constructor (quoteId: string) {
+    const message: string = `Quote ${quoteId} policy holder should be completed`
+    super(message)
+    this.name = 'PolicyHolderMissingError'
+  }
+}
+
+export class PolicyHolderMissingPropertyError extends Error {
+  constructor (quoteId: string, propertyName: string) {
+    const message: string = `Quote ${quoteId} policy holder ${propertyName} should be completed`
+    super(message)
+    this.name = 'PolicyHolderMissingPropertyError'
+  }
+}
+
+export class PolicyRiskPersonMissingError extends Error {
+  constructor (quoteId: string) {
+    const message: string = `Quote ${quoteId} risk person should be completed`
+    super(message)
+    this.name = 'PolicyRiskPersonMissingError'
+  }
+}
+
 export class PolicyRiskPropertyMissingFieldError extends Error {
   constructor (quoteId: string, fieldName: string) {
     const message: string = `Quote ${quoteId} risk property ${fieldName} should be completed`
     super(message)
     this.name = 'PolicyRiskPropertyMissingFieldError'
+  }
+}
+
+export class CreatePolicyQuotePartnerOwnershipError extends Error {
+  constructor (quoteId: string, partnerCode: string) {
+    const message: string = `Could not create policy with quote ${quoteId} that does not belong to ${partnerCode}`
+    super(message)
+    this.name = 'CreatePolicyQuotePartnerOwnershipError'
   }
 }

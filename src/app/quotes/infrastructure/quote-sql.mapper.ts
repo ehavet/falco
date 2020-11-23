@@ -1,6 +1,7 @@
 import { Quote } from '../domain/quote'
 import { QuoteSqlModel } from './sql-models/quote-sql-model'
 import { QuotePersonSqlModel } from './sql-models/quote-person-sql.model'
+import { OperationCode } from '../../common-api/domain/operation-code'
 
 export function sqlToDomain (quoteSql: QuoteSqlModel): Quote {
   return {
@@ -11,7 +12,7 @@ export function sqlToDomain (quoteSql: QuoteSqlModel): Quote {
     startDate: new Date(quoteSql.startDate),
     termStartDate: new Date(quoteSql.termStartDate),
     termEndDate: new Date(quoteSql.termEndDate),
-    specialOperationsCode: quoteSql.specialOperationsCode || undefined,
+    specialOperationsCode: quoteSql.specialOperationsCode ? OperationCode[quoteSql.specialOperationsCode!] : undefined,
     specialOperationsCodeAppliedAt: quoteSql.specialOperationsCodeAppliedAt ? new Date(quoteSql.specialOperationsCodeAppliedAt) : undefined,
     risk: _sqlToRiskMapper(quoteSql),
     insurance: _sqlToInsuranceMapper(quoteSql),

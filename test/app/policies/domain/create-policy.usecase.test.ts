@@ -22,7 +22,7 @@ import { quoteRepositoryStub } from '../../quotes/fixtures/quote-repository.test
 import Question = Partner.Question
 
 describe('Policies - Usecase - Create policy', async () => {
-  const now = new Date('2020-01-05T10:09:08Z')
+  const now = new Date('2020-01-05T00:00:00Z')
   const quote: Quote = createQuoteFixture()
   const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({ quoteId: quote.id, startDate: null })
   const policyRepository: SinonStubbedInstance<PolicyRepository> = policyRepositoryStub()

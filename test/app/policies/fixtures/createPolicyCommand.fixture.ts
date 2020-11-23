@@ -8,7 +8,7 @@ export function createCreatePolicyCommand (attr: Partial<CreatePolicyCommand> = 
       property: {
         address: '13 rue du loup garou',
         postalCode: 91100,
-        city: 'Corbeil-Essones'
+        city: 'Corbeil-Essonnes'
       },
       people: {
         policyHolder: {

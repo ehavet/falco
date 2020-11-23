@@ -257,7 +257,7 @@ describe('Quotes - API - E2E', async () => {
     it('should return the quote matching the given quoteId', async () => {
       // Given
       const quoteRepository = new QuoteSqlRepository()
-      const quote: Quote = createQuoteFixture()
+      const quote: Quote = createQuoteFixture({ partnerCode: 'studyo' })
       await quoteRepository.save(quote)
 
       const expectedResourceQuote = {
@@ -312,7 +312,7 @@ describe('Quotes - API - E2E', async () => {
       // When
       const response: supertest.Response = await httpServer.api()
         .get(`/v0/quotes/${quote.id}`)
-        .set('X-Consumer-Username', 'studyo')
+        .set('X-Consumer-Username', quote.partnerCode)
 
       // Then
       expect(response.body).to.deep.equal(expectedResourceQuote)

@@ -7,7 +7,7 @@ import { Container } from '../../quote.container'
 import { PartnerNotFoundError } from '../../../partners/domain/partner.errors'
 import {
   NoPartnerInsuranceForRiskError,
-  QuoteNotFoundError,
+  QuoteNotFoundError, QuotePartnerOwnershipError,
   QuotePolicyHolderEmailNotFoundError,
   QuoteRiskNumberOfRoommatesError,
   QuoteRiskPropertyRoomCountNotInsurableError,
@@ -208,6 +208,7 @@ export default function (container: Container): Array<ServerRoute> {
         } catch (error) {
           switch (true) {
             case error instanceof QuoteNotFoundError:
+            case error instanceof QuotePartnerOwnershipError:
               throw Boom.notFound(error.message)
             default:
               throw Boom.internal(error)

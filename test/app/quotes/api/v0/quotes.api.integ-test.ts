@@ -5,7 +5,7 @@ import { container, quoteRoutes } from '../../../../../src/app/quotes/quote.cont
 import { PartnerNotFoundError } from '../../../../../src/app/partners/domain/partner.errors'
 import {
   NoPartnerInsuranceForRiskError,
-  QuoteNotFoundError,
+  QuoteNotFoundError, QuotePartnerOwnershipError,
   QuotePolicyHolderEmailNotFoundError,
   QuoteRiskNumberOfRoommatesError,
   QuoteRiskPropertyRoomCountNotInsurableError,
@@ -675,6 +675,23 @@ describe('Http API - Quotes - Integ', async () => {
         // Then
         expect(response).to.have.property('statusCode', 404)
         expect(response.body).to.have.property('message', `Could not find quote with id : ${quoteId}`)
+      })
+    })
+
+    describe('when the header partner code soed not match the quote partner code', () => {
+      it('should reply with status 404', async () => {
+        // Given
+        const quoteId: string = '3UR7D6A2'
+        sinon.stub(container, 'GetQuoteById').withArgs({ quoteId, partnerCode: 'myPartner' }).rejects(new QuotePartnerOwnershipError(quoteId, 'myPartner'))
+
+        // When
+        const response = await httpServer.api()
+          .get(`/v0/quotes/${quoteId}`)
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 404)
+        expect(response.body).to.have.property('message', 'Could not find the quote 3UR7D6A2 for partner myPartner')
       })
     })
 

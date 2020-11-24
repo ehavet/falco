@@ -55,3 +55,11 @@ export class QuoteRiskNumberOfRoommatesError extends Error {
     this.name = 'QuoteRiskNumberOfRoommatesError'
   }
 }
+
+export class QuotePartnerOwnershipError extends Error {
+  constructor (quoteId: string, partnerCode: string) {
+    const message: string = `Could not find the quote ${quoteId} for partner ${partnerCode}`
+    super(message)
+    this.name = 'QuotePartnerOwnershipError'
+  }
+}

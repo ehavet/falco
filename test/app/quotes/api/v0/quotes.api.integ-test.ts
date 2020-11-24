@@ -5,7 +5,7 @@ import { container, quoteRoutes } from '../../../../../src/app/quotes/quote.cont
 import { PartnerNotFoundError } from '../../../../../src/app/partners/domain/partner.errors'
 import {
   NoPartnerInsuranceForRiskError,
-  QuoteNotFoundError,
+  QuoteNotFoundError, QuotePartnerOwnershipError,
   QuotePolicyHolderEmailNotFoundError,
   QuoteRiskNumberOfRoommatesError,
   QuoteRiskPropertyRoomCountNotInsurableError,
@@ -585,6 +585,124 @@ describe('Http API - Quotes - Integ', async () => {
         // Then
         expect(response).to.have.property('statusCode', 422)
         expect(response.body).to.have.property('message', '3 room(s) property allows a maximum of 10 roommate(s)')
+      })
+    })
+  })
+
+  describe('GET /v0/quotes/{id}', () => {
+    describe('when the quote is found', () => {
+      let response: supertest.Response
+      const quote = createQuoteFixture()
+      const expectedResourceQuote = {
+        id: 'UD65X3A',
+        code: 'myPartner',
+        risk: {
+          property: {
+            room_count: 2,
+            address: '88 rue des prairies',
+            postal_code: '91100',
+            city: 'Kyukamura'
+          },
+          person: {
+            firstname: 'Jean-Jean',
+            lastname: 'Lapin'
+          },
+          other_people: [
+            {
+              firstname: 'John',
+              lastname: 'Doe'
+            }
+          ]
+        },
+        insurance: {
+          monthly_price: 5.82,
+          default_deductible: 150,
+          default_cap: 7000,
+          currency: 'EUR',
+          simplified_covers: ['ACDDE', 'ACVOL'],
+          product_code: 'APP999',
+          product_version: 'v2020-02-01',
+          contractual_terms: '/path/to/contractual/terms',
+          ipid: '/path/to/ipid'
+        },
+        policy_holder: {
+          firstname: 'Jean-Jean',
+          lastname: 'Lapin',
+          address: '88 rue des prairies',
+          postal_code: '91100',
+          city: 'Kyukamura',
+          email: 'jeanjean@email.com',
+          phone_number: '+33684205510',
+          email_validated_at: null
+        },
+        premium: 69.84,
+        nb_months_due: 12,
+        start_date: '2020-01-05',
+        term_end_date: '2020-01-05',
+        term_start_date: '2020-01-05'
+      }
+
+      beforeEach(async () => {
+        // Given
+        sinon.stub(container, 'GetQuoteById').withArgs({ quoteId: expectedResourceQuote.id, partnerCode: 'myPartner' }).resolves(quote)
+
+        // When
+        response = await httpServer.api()
+          .get(`/v0/quotes/${expectedResourceQuote.id}`)
+          .set('X-Consumer-Username', 'myPartner')
+      })
+
+      it('should reply with status 200', async () => {
+        expect(response).to.have.property('statusCode', 200)
+      })
+
+      it('should return the found quote', async () => {
+        expect(response.body).to.deep.equal(expectedResourceQuote)
+      })
+    })
+
+    describe('when the quote is not found', () => {
+      it('should reply with status 404', async () => {
+        // Given
+        const quoteId: string = 'UNKNOWN'
+        sinon.stub(container, 'GetQuoteById').withArgs({ quoteId, partnerCode: 'myPartner' }).rejects(new QuoteNotFoundError(quoteId))
+
+        // When
+        const response = await httpServer.api()
+          .get(`/v0/quotes/${quoteId}`)
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 404)
+        expect(response.body).to.have.property('message', `Could not find quote with id : ${quoteId}`)
+      })
+    })
+
+    describe('when the header partner code soed not match the quote partner code', () => {
+      it('should reply with status 404', async () => {
+        // Given
+        const quoteId: string = '3UR7D6A2'
+        sinon.stub(container, 'GetQuoteById').withArgs({ quoteId, partnerCode: 'myPartner' }).rejects(new QuotePartnerOwnershipError(quoteId, 'myPartner'))
+
+        // When
+        const response = await httpServer.api()
+          .get(`/v0/quotes/${quoteId}`)
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 404)
+        expect(response.body).to.have.property('message', 'Could not find the quote 3UR7D6A2 for partner myPartner')
+      })
+    })
+
+    describe('when there is a validation error', () => {
+      it('should reply with status 400 when quoteId has a wrong format', async () => {
+        // When
+        const response = await httpServer.api()
+          .get('/v0/quotes/small')
+          .set('X-Consumer-Username', 'myPartner')
+
+        expect(response).to.have.property('statusCode', 400)
       })
     })
   })

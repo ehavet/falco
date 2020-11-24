@@ -13,11 +13,11 @@ export const quoteResponseBodySchema: Joi.ObjectSchema = Joi.object({
     person: Joi.object({
       firstname: Joi.string().max(100).description('Person firstname').example('John'),
       lastname: Joi.string().max(100).description('Person lastname').example('Doe')
-    }).description('Risks regarding the person'),
-    other_person: Joi.array().items(
+    }).allow(null).description('Risks regarding the person'),
+    other_people: Joi.array().items(
       Joi.object({
-        firstname: Joi.string().max(100).description('Other person firstname').example('Jane'),
-        lastname: Joi.string().max(100).description('Other person lastname').example('Dose')
+        firstname: Joi.string().allow(null).max(100).description('Other person firstname').example('Jane'),
+        lastname: Joi.string().allow(null).max(100).description('Other person lastname').example('Dose')
       }).description('Risks regarding other people')
     ).description('Risks regarding other people').example([{ firstname: 'Jane', lastname: 'Dose' }])
   }).description('Risks').label('Risk'),
@@ -40,8 +40,8 @@ export const quoteResponseBodySchema: Joi.ObjectSchema = Joi.object({
     city: Joi.string().max(50).description('Property city').example('Corbeil-Essonnes'),
     email: Joi.string().email().description('Policy holder email').example('john.doe@email.com'),
     phone_number: Joi.string().max(15).description('Policy holder phone number').example('+33684205510'),
-    email_validated_at: Joi.date().description('Email validation date').example('2020-04-25T10:09:09.000')
-  }).optional().description('Policy holder contact'),
+    email_validated_at: Joi.date().allow(null).description('Email validation date').example('2020-04-25T10:09:09.000')
+  }).optional().allow(null).description('Policy holder contact'),
   start_date: Joi.date().description('Start date').example('2020-04-26'),
   term_start_date: Joi.date().description('Term start date').example('2020-04-26'),
   term_end_date: Joi.date().description('Term end date').example('2021-04-25'),

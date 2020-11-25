@@ -28,7 +28,7 @@ describe('Payment - Infra - Stripe Payment Processor', async () => {
           policy_id: 'APP463109486'
         }
       }).resolves(mockedStripeResponse)
-      const response = await paymentProcessor.createIntent('APP463109486', 5000, 'eur')
+      const response = await paymentProcessor.createIntent('APP463109486', 5000, 'eur', 'essca')
       expect(response).to.deep.equal({
         id: 'pi_1nt3Nt1d',
         amount: 5000,

@@ -1,4 +1,4 @@
-import { PaymentProcessor } from '../domain/payment-processor'
+import { Intent, PaymentProcessor } from '../domain/payment-processor'
 import { Logger } from '../../../libs/logger'
 import { Stripe } from 'stripe'
 const config = require('../../../config')
@@ -12,16 +12,23 @@ export class StripePaymentProcessor implements PaymentProcessor {
       this.#logger = logger
     }
 
-    async createIntent (policyId, amount, currency, stripe = this.#stripe) {
+    async createIntent (policyId: string, amount: number, currency: string, partnerCode: string): Promise<Intent> {
       let paymentIntent
+      const paymentIntentCreateParams: Stripe.PaymentIntentCreateParams = {
+        amount,
+        currency,
+        metadata: {
+          policy_id: policyId
+        }
+      }
       try {
-        paymentIntent = await stripe.paymentIntents.create({
-          amount: amount,
-          currency: currency,
-          metadata: {
-            policy_id: policyId
-          }
-        })
+        if (partnerCode === 'demo-student') {
+          const stripeDemoPartner = new Stripe(config.get('FALCO_API_STRIPE_API_KEY_TEST'), { apiVersion: config.get('FALCO_API_STRIPE_API_VERSION') })
+
+          paymentIntent = await stripeDemoPartner.paymentIntents.create(paymentIntentCreateParams)
+        } else {
+          paymentIntent = await this.#stripe.paymentIntents.create(paymentIntentCreateParams)
+        }
       } catch (error) {
         this.#logger.error(error)
         throw new PaymentIntentFailureError()
@@ -57,12 +64,6 @@ export class StripePaymentProcessor implements PaymentProcessor {
         this.#logger.error('An error occurred while calling Stripe to retrieve the balance transaction', { error, stripePaymentIntent })
         return null
       }
-    }
-
-    async createIntentForDemoPartner (policyId, amount, currency) {
-      const stripeDemoPartner = new Stripe(config.get('FALCO_API_STRIPE_API_KEY_TEST'), { apiVersion: config.get('FALCO_API_STRIPE_API_VERSION') })
-
-      return this.createIntent(policyId, amount, currency, stripeDemoPartner)
     }
 }
 

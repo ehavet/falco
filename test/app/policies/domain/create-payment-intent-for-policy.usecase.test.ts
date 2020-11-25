@@ -22,14 +22,15 @@ describe('Usecase - Create payment intent for policy', async () => {
     const paymentIntent = {
       id: 'pi_P4yM3nt1nT3nT1d',
       amount: 2450,
-      currency: 'eur'
+      currency: 'eur',
+      partnerCode: 'myPartner'
     }
 
     const policyRepository = policyRepositoryStub()
     const paymentProcessor = paymentProcessorMock()
 
     policyRepository.get.withArgs('APP463109486').resolves(policy)
-    paymentProcessor.createIntent.withArgs('APP463109486', 2450, 'EUR').resolves(paymentIntent)
+    paymentProcessor.createIntent.withArgs('APP463109486', 2450, 'EUR', 'myPartner').resolves(paymentIntent)
 
     const createPaymentIntentForPolicy: CreatePaymentIntentForPolicy =
             CreatePaymentIntentForPolicy.factory(paymentProcessor, policyRepository)

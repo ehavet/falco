@@ -5,8 +5,14 @@ import { Stripe } from 'stripe'
 
 describe('Payment - Infra - Stripe Payment Processor', async () => {
   const stripeMock = {
-    paymentIntents: { create: sinon.mock() },
-    balanceTransactions: { retrieve: sinon.mock() }
+    demoPartner: {
+      paymentIntents: { create: sinon.mock() },
+      balanceTransactions: { retrieve: sinon.mock() }
+    },
+    partner: {
+      paymentIntents: { create: sinon.mock() },
+      balanceTransactions: { retrieve: sinon.mock() }
+    }
   }
   const loggerMock = { error: sinon.stub() }
 
@@ -21,7 +27,7 @@ describe('Payment - Infra - Stripe Payment Processor', async () => {
         amount: 5000,
         currency: 'eur'
       }
-      stripeMock.paymentIntents.create.withExactArgs({
+      stripeMock.partner.paymentIntents.create.withExactArgs({
         amount: 5000,
         currency: 'eur',
         metadata: {
@@ -31,6 +37,29 @@ describe('Payment - Infra - Stripe Payment Processor', async () => {
       const response = await paymentProcessor.createIntent('APP463109486', 5000, 'eur', 'essca')
       expect(response).to.deep.equal({
         id: 'pi_1nt3Nt1d',
+        amount: 5000,
+        currency: 'eur'
+      })
+    })
+
+    it('should create a testing payment intent with a demo-student and return a client secret', async () => {
+      const mockedStripeResponse = {
+        client_secret: 'pi_T3st!Ng1nt3Nt1d',
+        anotherkey: null,
+        otherKey: 'fake',
+        amount: 5000,
+        currency: 'eur'
+      }
+      stripeMock.demoPartner.paymentIntents.create.withExactArgs({
+        amount: 5000,
+        currency: 'eur',
+        metadata: {
+          policy_id: 'APP463109486'
+        }
+      }).resolves(mockedStripeResponse)
+      const response = await paymentProcessor.createIntent('APP463109486', 5000, 'eur', 'demo-student')
+      expect(response).to.deep.equal({
+        id: 'pi_T3st!Ng1nt3Nt1d',
         amount: 5000,
         currency: 'eur'
       })
@@ -60,7 +89,7 @@ describe('Payment - Infra - Stripe Payment Processor', async () => {
         status: '',
         type: 'payment'
       }
-      stripeMock.balanceTransactions.retrieve.withArgs(balanceTransactionId).resolves(balanceTransaction)
+      stripeMock.partner.balanceTransactions.retrieve.withArgs(balanceTransactionId).resolves(balanceTransaction)
 
       // When
       const pspFee = await paymentProcessor.getTransactionFee(rawPaymentIntent)
@@ -104,7 +133,7 @@ describe('Payment - Infra - Stripe Payment Processor', async () => {
       const rawPaymentIntent = getStripePaymentIntentSucceededEvent().data.object as Stripe.PaymentIntent
       const balanceTransactionId = rawPaymentIntent.charges.data[0].balance_transaction
 
-      stripeMock.balanceTransactions.retrieve.withArgs(balanceTransactionId).rejects(Error)
+      stripeMock.partner.balanceTransactions.retrieve.withArgs(balanceTransactionId).rejects(Error)
 
       // When
       const pspFee = await paymentProcessor.getTransactionFee(rawPaymentIntent)

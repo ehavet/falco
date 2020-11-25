@@ -1,10 +1,10 @@
 import { Intent, PaymentProcessor } from '../domain/payment-processor'
 import { Logger } from '../../../libs/logger'
 import { Stripe } from 'stripe'
-const config = require('../../../config')
+import { StripePartner } from '../../../libs/stripe'
 
 export class StripePaymentProcessor implements PaymentProcessor {
-    #stripe: Stripe
+    #stripe: StripePartner
     #logger: Logger
 
     constructor (stripe, logger) {
@@ -23,11 +23,9 @@ export class StripePaymentProcessor implements PaymentProcessor {
       }
       try {
         if (partnerCode === 'demo-student') {
-          const stripeDemoPartner = new Stripe(config.get('FALCO_API_STRIPE_API_KEY_TEST'), { apiVersion: config.get('FALCO_API_STRIPE_API_VERSION') })
-
-          paymentIntent = await stripeDemoPartner.paymentIntents.create(paymentIntentCreateParams)
+          paymentIntent = await this.#stripe.demoPartner.paymentIntents.create(paymentIntentCreateParams)
         } else {
-          paymentIntent = await this.#stripe.paymentIntents.create(paymentIntentCreateParams)
+          paymentIntent = await this.#stripe.partner.paymentIntents.create(paymentIntentCreateParams)
         }
       } catch (error) {
         this.#logger.error(error)
@@ -58,7 +56,7 @@ export class StripePaymentProcessor implements PaymentProcessor {
       const balanceTransactionId = stripePaymentIntent.charges.data[0].balance_transaction as string
 
       try {
-        const balanceTransaction = await this.#stripe.balanceTransactions.retrieve(balanceTransactionId)
+        const balanceTransaction = await this.#stripe.partner.balanceTransactions.retrieve(balanceTransactionId)
         return balanceTransaction.fee
       } catch (error) {
         this.#logger.error('An error occurred while calling Stripe to retrieve the balance transaction', { error, stripePaymentIntent })

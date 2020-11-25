@@ -71,7 +71,7 @@ describe('Http API - Quotes - Integ', async () => {
           property: {
             room_count: 2,
             address: '52 Rue Beaubourg',
-            postal_code: 75003,
+            postal_code: '75003',
             city: 'Paris'
           }
         },
@@ -145,7 +145,7 @@ describe('Http API - Quotes - Integ', async () => {
               property: {
                 room_count: 2,
                 address: '52 Rue Beaubourg',
-                postal_code: 75003,
+                postal_code: '75003',
                 city: 'Paris'
               }
             }
@@ -214,6 +214,25 @@ describe('Http API - Quotes - Integ', async () => {
         response = await httpServer.api()
           .post('/v0/quotes')
           .send({ code: 'myPartner', risk: { property: {} } })
+          .set('X-Consumer-Username', 'myPartner')
+
+        expect(response).to.have.property('statusCode', 400)
+      })
+
+      it('Should reply with status 400 when the code postal is invalid', async () => {
+        response = await httpServer.api()
+          .post('/v0/quotes')
+          .send({
+            code: 'myPartner',
+            risk: {
+              property: {
+                room_count: 2,
+                address: '52 Rue Beaubourg',
+                postal_code: 'F4k30',
+                city: 'Paris'
+              }
+            }
+          })
           .set('X-Consumer-Username', 'myPartner')
 
         expect(response).to.have.property('statusCode', 400)

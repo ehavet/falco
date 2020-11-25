@@ -33,7 +33,7 @@ describe('Quotes - API - E2E', async () => {
       // When
       response = await httpServer.api()
         .post('/v0/quotes')
-        .send({ code: 'studyo', risk: { property: { room_count: 2, address: '15 Rue Des Amandiers', postal_code: 91110, city: 'Les Ulysses' } } })
+        .send({ code: 'studyo', risk: { property: { room_count: 2, address: '15 Rue Des Amandiers', postal_code: '91110', city: 'Les Ulysses' } } })
         .set('X-Consumer-Username', 'studyo')
 
       // Then
@@ -43,7 +43,7 @@ describe('Quotes - API - E2E', async () => {
           property: {
             room_count: 2,
             address: '15 Rue Des Amandiers',
-            postal_code: 91110,
+            postal_code: '91110',
             city: 'Les Ulysses'
           }
         },

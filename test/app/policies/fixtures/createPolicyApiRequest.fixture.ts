@@ -5,7 +5,7 @@ export function createPolicyApiRequestFixture (attr = {}) {
     risk: {
       property: {
         address: '13 rue du loup garou',
-        postal_code: 91100,
+        postal_code: '91100',
         city: 'Corbeil-Essonnes'
       },
       people: {

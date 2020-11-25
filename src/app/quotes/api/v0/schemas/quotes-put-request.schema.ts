@@ -1,4 +1,5 @@
 import Joi from '@hapi/joi'
+import { POSTALCODE_REGEX } from '../../../../common-api/domain/regexp'
 
 export const quotePutRequestBodySchema: Joi.ObjectSchema = Joi.object({
   start_date: Joi.date().required().allow(null).description('Start date').example('2020-04-26'),
@@ -8,7 +9,7 @@ export const quotePutRequestBodySchema: Joi.ObjectSchema = Joi.object({
     property: Joi.object({
       room_count: Joi.number().integer().max(5).required().description('Property number of rooms').example(3),
       address: Joi.string().required().allow(null).max(100).description('Property address').example('112 rue du chêne rouge'),
-      postal_code: Joi.string().required().allow(null).description('Property postal code').example('95470'),
+      postal_code: Joi.string().required().regex(POSTALCODE_REGEX).allow(null).description('Property postal code').example('95470'),
       city: Joi.string().required().allow(null).max(50).description('Property city').example('Corbeil-Essonnes')
     }).required().allow(null).description('Risks regarding the property'),
     person: Joi.object({

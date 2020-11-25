@@ -22,7 +22,7 @@ export function createPolicyFixture (attr: Partial<Policy> = {}): Policy {
       property: {
         roomCount: 2,
         address: '13 rue du loup garou',
-        postalCode: 91100,
+        postalCode: '91100',
         city: 'Corbeil-Essonnes'
       },
       people: {
@@ -42,7 +42,7 @@ export function createPolicyFixture (attr: Partial<Policy> = {}): Policy {
       firstname: 'Jean',
       lastname: 'Dupont',
       address: '13 rue du loup garou',
-      postalCode: 91100,
+      postalCode: '91100',
       city: 'Corbeil-Essonnes',
       email: 'jeandupont@email.com',
       phoneNumber: '+33684205510'

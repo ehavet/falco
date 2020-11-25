@@ -7,7 +7,7 @@ export function createCreatePolicyCommand (attr: Partial<CreatePolicyCommand> = 
     risk: {
       property: {
         address: '13 rue du loup garou',
-        postalCode: 91100,
+        postalCode: '91100',
         city: 'Corbeil-Essonnes'
       },
       people: {

@@ -16,7 +16,7 @@ function _toRisk (risk: Quote.Risk) {
     property: {
       room_count: risk.property.roomCount,
       address: risk.property.address,
-      postal_code: risk.property.postalCode ? parseInt(risk.property.postalCode) : undefined,
+      postal_code: risk.property.postalCode,
       city: risk.property.city
     }
   }

@@ -22,7 +22,7 @@ export class PolicyPropertySqlModel extends Model<PolicyPropertySqlModel> {
     address!: string
 
     @Column
-    postalCode!: number
+    postalCode!: string
 
     @Column
     city!: string

@@ -24,6 +24,7 @@ import { quotePostRequestBodySchema } from './schemas/quotes-post-request.schema
 import { requestToUpdateQuoteCommand } from './mappers/request-to-update-quote-command.mapper'
 import { requestToCreateQuoteCommand } from './mappers/request-to-create-quote-command.mapper'
 import { GetQuoteById } from '../../domain/get-quote-by-id.usecase'
+import { POSTALCODE_REGEX } from '../../../common-api/domain/regexp'
 import GetQuoteByIdQuery = GetQuoteById.GetQuoteByIdQuery
 
 const TAGS = ['api', 'quotes']
@@ -49,8 +50,8 @@ export default function (container: Container): Array<ServerRoute> {
               risk: Joi.object({
                 property: Joi.object({
                   room_count: Joi.number().integer().description('Property number of rooms').example(3),
-                  address: Joi.string().optional().max(100).description('Property address').example('112 rue du chêne rouge'),
-                  postal_code: Joi.number().integer().positive().optional().min(0o1000).max(97680).description('Property postal code').example(95470),
+                  address: Joi.string().optional().description('Property address').example('112 rue du chêne rouge'),
+                  postal_code: Joi.string().optional().regex(POSTALCODE_REGEX).description('Property postal code').example('95470'),
                   city: Joi.string().optional().max(50).description('Property city').example('Corbeil-Essonnes')
                 }).description('Risks regarding the property').label('Risk.Property')
               }).description('Risks').label('Risk'),
@@ -75,7 +76,6 @@ export default function (container: Container): Array<ServerRoute> {
       },
       handler: async (request, h) => {
         const createQuoteCommand: CreateQuoteCommand = requestToCreateQuoteCommand(request)
-
         try {
           const quote = await container.CreateQuote(createQuoteCommand)
           const quoteAsResource = quoteToResource(quote)

@@ -1,4 +1,5 @@
 import Joi from '@hapi/joi'
+import { POSTALCODE_REGEX } from '../../../../common-api/domain/regexp'
 
 export const quotePostRequestBodySchema: Joi.ObjectSchema = Joi.object({
   code: Joi.string().required().description('Partner code').example('myCode'),
@@ -9,7 +10,7 @@ export const quotePostRequestBodySchema: Joi.ObjectSchema = Joi.object({
     property: Joi.object({
       room_count: Joi.number().integer().max(5).required().description('Property number of rooms').example(3),
       address: Joi.string().optional().max(100).description('Property address').example('112 rue du chêne rouge'),
-      postal_code: Joi.number().integer().positive().optional().min(0o1000).max(97680).description('Property postal code').example(95470),
+      postal_code: Joi.string().optional().regex(POSTALCODE_REGEX).description('Property postal code').example('95470'),
       city: Joi.string().optional().max(50).description('Property city').example('Corbeil-Essonnes')
     }).required().description('Risks regarding the property'),
     person: Joi.object({

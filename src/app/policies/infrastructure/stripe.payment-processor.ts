@@ -1,6 +1,7 @@
 import { PaymentProcessor } from '../domain/payment-processor'
 import { Logger } from '../../../libs/logger'
 import { Stripe } from 'stripe'
+const config = require('../../../config')
 
 export class StripePaymentProcessor implements PaymentProcessor {
     #stripe: Stripe
@@ -11,10 +12,10 @@ export class StripePaymentProcessor implements PaymentProcessor {
       this.#logger = logger
     }
 
-    async createIntent (policyId, amount, currency) {
+    async createIntent (policyId, amount, currency, stripe = this.#stripe) {
       let paymentIntent
       try {
-        paymentIntent = await this.#stripe.paymentIntents.create({
+        paymentIntent = await stripe.paymentIntents.create({
           amount: amount,
           currency: currency,
           metadata: {
@@ -56,6 +57,12 @@ export class StripePaymentProcessor implements PaymentProcessor {
         this.#logger.error('An error occurred while calling Stripe to retrieve the balance transaction', { error, stripePaymentIntent })
         return null
       }
+    }
+
+    async createIntentForDemoPartner (policyId, amount, currency) {
+      const stripeDemoPartner = new Stripe(config.get('FALCO_API_STRIPE_API_KEY_TEST'), { apiVersion: config.get('FALCO_API_STRIPE_API_VERSION') })
+
+      return this.createIntent(policyId, amount, currency, stripeDemoPartner)
     }
 }
 

@@ -4,6 +4,7 @@ export function paymentProcessorMock (attr = {}) {
   return {
     createIntent: sinon.mock(),
     getTransactionFee: sinon.mock(),
+    createIntentForDemoPartner: sinon.mock(),
     ...attr
   }
 }
@@ -12,6 +13,7 @@ export function paymentProcessorStub (attr = {}) {
   return {
     createIntent: sinon.stub(),
     getTransactionFee: sinon.stub(),
+    createIntentForDemoPartner: sinon.stub(),
     ...attr
   }
 }

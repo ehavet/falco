@@ -20,7 +20,12 @@ export namespace CreatePaymentIntentForPolicy {
         if (Policy.isCancelled(policy)) { throw new PolicyCanceledError(policy.id) }
         if (policy.status === Policy.Status.Applicable) { throw new PolicyAlreadyPaidError(policy.id) }
 
-        const intent = await paymentProcessor.createIntent(policy.id, _toZeroDecimal(policy.premium), policy.insurance.currency)
+        let intent
+        if (policy.partnerCode === 'demo-student') {
+          intent = await paymentProcessor.createIntentForDemoPartner(policy.id, _toZeroDecimal(policy.premium), policy.insurance.currency)
+        } else {
+          intent = await paymentProcessor.createIntent(policy.id, _toZeroDecimal(policy.premium), policy.insurance.currency)
+        }
 
         return {
           id: intent.id,

@@ -31,6 +31,8 @@ module.exports = Envie({
 
   FALCO_API_STRIPE_API_KEY: Joi.string(),
 
+  FALCO_API_STRIPE_API_KEY_TEST: Joi.string(),
+
   FALCO_API_STRIPE_API_VERSION: Joi.string(),
 
   FALCO_API_STRIPE_WEBHOOK_SECRET: Joi.string(),

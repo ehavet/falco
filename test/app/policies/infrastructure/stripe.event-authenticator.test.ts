@@ -12,7 +12,7 @@ describe('StripeEventAuthenticator', async () => {
 
   const eventAuthenticator: StripeEventAuthenticator = new StripeEventAuthenticator(stripeConfig)
 
-  describe('createIntent', async () => {
+  describe('createPaymentIntent', async () => {
     it('should return event when event is authenticated', async () => {
       const eventPayload = 'rawPayloadToString'
       const headerSignature = 'rawHeaderSignature'

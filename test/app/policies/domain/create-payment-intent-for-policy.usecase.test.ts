@@ -30,7 +30,7 @@ describe('Usecase - Create payment intent for policy', async () => {
     const paymentProcessor = paymentProcessorMock()
 
     policyRepository.get.withArgs('APP463109486').resolves(policy)
-    paymentProcessor.createIntent.withArgs('APP463109486', 2450, 'EUR', 'myPartner').resolves(paymentIntent)
+    paymentProcessor.createPaymentIntent.withArgs('APP463109486', 2450, 'EUR', 'myPartner').resolves(paymentIntent)
 
     const createPaymentIntentForPolicy: CreatePaymentIntentForPolicy =
             CreatePaymentIntentForPolicy.factory(paymentProcessor, policyRepository)

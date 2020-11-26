@@ -84,7 +84,7 @@ export default function (container: Container): Array<ServerRoute> {
           if (error instanceof PartnerNotFoundError) {
             throw Boom.notFound(error.message)
           }
-          if (error instanceof NoPartnerInsuranceForRiskError) {
+          if (error instanceof NoPartnerInsuranceForRiskError || error instanceof OperationCodeNotApplicableError) {
             throw Boom.badData(error.message)
           }
 

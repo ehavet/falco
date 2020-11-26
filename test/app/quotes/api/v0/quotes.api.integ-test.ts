@@ -237,6 +237,29 @@ describe('Http API - Quotes - Integ', async () => {
 
         expect(response).to.have.property('statusCode', 400)
       })
+
+      it('Should reply with status 422 when special operations code is not applicable for selected partner', async () => {
+        const invalidSpecOpsCode = '!Nv4l!D'
+        const partnerCode = 'demo-student'
+        response = await httpServer.api()
+          .post('/v0/quotes')
+          .send({
+            code: partnerCode,
+            spec_ops_code: invalidSpecOpsCode,
+            risk: {
+              property: {
+                room_count: 2,
+                address: '52 Rue Beaubourg',
+                postal_code: '75019',
+                city: 'Paris'
+              }
+            }
+          })
+          .set('X-Consumer-Username', partnerCode)
+
+        expect(response).to.have.property('statusCode', 422)
+        expect(response.body.message).to.equal(`The operation code ${invalidSpecOpsCode} is not applicable for partner : ${partnerCode}`)
+      })
     })
   })
 

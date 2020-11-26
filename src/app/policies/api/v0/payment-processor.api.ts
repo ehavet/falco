@@ -1,3 +1,4 @@
+import Joi from 'joi'
 import * as HttpErrorSchema from '../../../common-api/HttpErrorSchema'
 import * as Boom from '@hapi/boom'
 import { Container } from '../../policies.container'
@@ -20,7 +21,7 @@ export default function (container: Container): Array<ServerRoute> {
         description: 'Listen for payment processor notifications',
         response: {
           status: {
-            204: false,
+            204: Joi.any().forbidden(),
             400: HttpErrorSchema.badRequestSchema,
             403: HttpErrorSchema.forbiddenSchema,
             500: HttpErrorSchema.internalServerErrorSchema
@@ -47,7 +48,7 @@ export default function (container: Container): Array<ServerRoute> {
           try {
             const command = requestToConfirmPaymentIntentCommand(paymentIntent)
             await container.ConfirmPaymentIntentForPolicy(command)
-            return h.response({}).code(204)
+            return h.continue
           } catch (error) {
             if (error instanceof PolicyNotFoundError) {
               throw Boom.notFound(error.message)

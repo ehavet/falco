@@ -1,5 +1,5 @@
 import * as Boom from '@hapi/boom'
-import Joi from '@hapi/joi'
+import Joi from 'joi'
 import { ServerRoute } from '@hapi/hapi'
 import { Container } from '../../partner.container'
 import { GetPartnerByCodeQuery } from '../../domain/get-partner-by-code-query'

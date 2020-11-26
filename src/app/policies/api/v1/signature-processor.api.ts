@@ -1,6 +1,6 @@
 import { Container } from '../../policies.container'
 import { ServerRoute } from '@hapi/hapi'
-import Joi from '@hapi/joi'
+import Joi from 'joi'
 import SignatureRequestEvent from '../../domain/signature/signature-request-event'
 import { resourceToDomain } from './mappers/signature-request-event-resource-to-domain.mapper'
 import * as Boom from '@hapi/boom'

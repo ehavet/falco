@@ -1,4 +1,5 @@
 import { Request, ResponseToolkit, Server } from '@hapi/hapi'
+import Joi from 'joi'
 import { Boom } from '@hapi/boom'
 import { happiSwaggerPlugin } from './plugins/swagger'
 import { initSequelize } from '../libs/sequelize'
@@ -31,7 +32,7 @@ export default async (config: Map<string, any>, logger: Logger): Promise<Server>
   })
 
   server.ext('onPreResponse', setBoomErrorDataToResponse)
-  server.validator(require('@hapi/joi'))
+  server.validator(Joi)
   server.route(partnerRoutes())
   server.route(emailValidationsRoutes())
   server.route(quoteRoutes())

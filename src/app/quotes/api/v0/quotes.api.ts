@@ -14,7 +14,7 @@ import {
   QuoteRiskRoommatesNotAllowedError,
   QuoteStartDateConsistencyError
 } from '../../domain/quote.errors'
-import Joi from '@hapi/joi'
+import Joi from 'joi'
 import { UpdateQuoteCommand } from '../../domain/update-quote-command'
 import { updatedQuoteToResource } from './mappers/updated-quote-to-resource.mapper'
 import { OperationCodeNotApplicableError } from '../../../policies/domain/operation-code.errors'

@@ -1,4 +1,5 @@
 import * as Boom from '@hapi/boom'
+import Joi from 'joi'
 import * as HttpErrorSchema from '../../../common-api/HttpErrorSchema'
 import { ServerRoute } from '@hapi/hapi'
 import { CreateQuoteCommand } from '../../domain/create-quote-command'
@@ -14,7 +15,6 @@ import {
   QuoteRiskRoommatesNotAllowedError,
   QuoteStartDateConsistencyError
 } from '../../domain/quote.errors'
-import Joi from 'joi'
 import { UpdateQuoteCommand } from '../../domain/update-quote-command'
 import { updatedQuoteToResource } from './mappers/updated-quote-to-resource.mapper'
 import { OperationCodeNotApplicableError } from '../../../policies/domain/operation-code.errors'
@@ -25,6 +25,7 @@ import { requestToUpdateQuoteCommand } from './mappers/request-to-update-quote-c
 import { requestToCreateQuoteCommand } from './mappers/request-to-create-quote-command.mapper'
 import { GetQuoteById } from '../../domain/get-quote-by-id.usecase'
 import { POSTALCODE_REGEX } from '../../../common-api/domain/regexp'
+import { commonHeadersSchema } from '../../../common-api/api/common-headers.schema'
 import GetQuoteByIdQuery = GetQuoteById.GetQuoteByIdQuery
 
 const TAGS = ['api', 'quotes']
@@ -185,7 +186,8 @@ export default function (container: Container): Array<ServerRoute> {
         validate: {
           params: Joi.object({
             id: Joi.string().min(6).max(12).required().description('Quote id').example('DU6C73X')
-          })
+          }),
+          headers: commonHeadersSchema
         },
         response: {
           status: {

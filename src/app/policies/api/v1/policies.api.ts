@@ -34,6 +34,7 @@ import { OperationCodeNotApplicableError } from '../../domain/operation-code.err
 import { ApplySpecialOperationCodeCommand } from '../../domain/apply-special-operation-code-command'
 import { PartnerNotFoundError } from '../../../partners/domain/partner.errors'
 import { ApplyStartDateOnPolicyCommand } from '../../domain/apply-start-date-on-policy.usecase'
+import { commonHeadersSchema } from '../../../common-api/api/common-headers.schema'
 
 const TAGS = ['api', 'policies']
 
@@ -100,7 +101,8 @@ export default function (container: Container): Array<ServerRoute> {
         tags: TAGS,
         description: 'Creates a policy',
         validate: {
-          payload: createPolicyRequestSchema
+          payload: createPolicyRequestSchema,
+          headers: commonHeadersSchema
         },
         response: {
           status: {

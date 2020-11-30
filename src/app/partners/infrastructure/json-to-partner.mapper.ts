@@ -8,6 +8,7 @@ export function toPartner (partnerJson: any) : Partner {
 
   return {
     code: partnerJson.code,
+    trigram: partnerJson.trigram,
     translationKey: partnerJson.translationKey,
     callbackUrl: partnerJson.callbackUrl,
     customerSupportEmail: partnerJson.customerSupportEmail,

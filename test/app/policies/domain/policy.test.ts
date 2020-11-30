@@ -52,7 +52,7 @@ describe('Policies - Domain', async () => {
 
         // Then
         const idPrefix: string = createdPolicy.id.substring(0, 3)
-        expect(idPrefix).to.equal('MYP')
+        expect(idPrefix).to.equal('TRI')
       })
 
       it('with 3 next characters are from partners product code', async () => {

@@ -11,6 +11,7 @@ const partnerJson = {
   partnerOne: {
     code: 'partnerOne',
     translationKey: 'translationKey',
+    trigram: 'TRI',
     callbackUrl: 'http://partner1-callback.com',
     customerSupportEmail: 'customer@support.fr',
     questions: [

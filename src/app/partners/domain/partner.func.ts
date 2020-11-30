@@ -34,6 +34,10 @@ export function getProductCode (partner: Partner): string {
   return partner.offer.productCode
 }
 
+export function getTrigram (partner: Partner): string {
+  return partner.trigram
+}
+
 function _getQuestionOnRoommates (partner: Partner) {
   const roommateQuestion: Partner.Question | undefined = partner.questions
     .find(question => question.code === Partner.Question.QuestionCode.Roommate)

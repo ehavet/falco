@@ -115,7 +115,7 @@ const createSignatureRequestForPolicy: CreateSignatureRequestForPolicy = CreateS
 const manageSignatureRequestEvent: ManageSignatureRequestEvent = ManageSignatureRequestEvent.factory(signatureRequestEventValidator, signatureRequestProvider, policyRepository, contractRepository, logger)
 const applySpecialOperationCodeOnPolicy: ApplySpecialOperationCodeOnPolicy = ApplySpecialOperationCodeOnPolicy.factory(policyRepository, partnerRepository)
 const applyStartDateOnPolicy: ApplyStartDateOnPolicy = ApplyStartDateOnPolicy.factory(policyRepository)
-const createPolicyForQuote: CreatePolicyForQuote = CreatePolicyForQuote.factory(policyRepository, quoteRepository)
+const createPolicyForQuote: CreatePolicyForQuote = CreatePolicyForQuote.factory(policyRepository, quoteRepository, partnerRepository)
 
 export const container: Container = {
   CreatePaymentIntentForPolicy: createPaymentIntentForPolicy,

@@ -1,6 +1,7 @@
 {
   "studyo": {
     "code": "studyo",
+    "trigram": "STU",
     "translationKey": "studyo",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
@@ -35,6 +36,7 @@
   },
   "e-mobilia-alternant": {
     "code": "e-mobilia-alternant",
+    "trigram": "EMA",
     "translationKey": "e-mobilia-alternant",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
@@ -76,6 +78,7 @@
   },
   "essca": {
     "code": "essca",
+    "trigram": "ESS",
     "translationKey": "essca",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
@@ -109,6 +112,7 @@
   },
   "demo-student": {
     "code": "demo-student",
+    "trigram": "DST",
     "translationKey": "demo-student",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",

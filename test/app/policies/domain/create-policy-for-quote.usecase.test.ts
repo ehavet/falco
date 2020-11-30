@@ -66,7 +66,7 @@ describe('Policies - Usecase - Create policy for quote', async () => {
   const policyRepository = policyRepositoryStub({ save: sinon.mock() })
   const quoteRepository: SinonStubbedInstance<QuoteRepository> = quoteRepositoryStub()
   const partnerRepository: SinonStubbedInstance<PartnerRepository> = partnerRepositoryStub()
-  const createPolicyForQuote: CreatePolicyForQuote = CreatePolicyForQuote.factory(policyRepository, quoteRepository)
+  const createPolicyForQuote: CreatePolicyForQuote = CreatePolicyForQuote.factory(policyRepository, quoteRepository, partnerRepository)
 
   beforeEach(() => {
     policyRepository.isIdAvailable.resolves(true)

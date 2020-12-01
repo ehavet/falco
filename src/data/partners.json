@@ -110,6 +110,40 @@
       "ipid": "/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf"
     }
   },
+  "estudent": {
+    "code": "estudent",
+    "trigram": "EST",
+    "translationKey": "estudent",
+    "callbackUrl": "",
+    "customerSupportEmail": "help@appenin.fr",
+    "questions": [
+      {
+        "code": "RoomCount",
+        "options": {
+          "list": [1, 2]
+        },
+        "manageOtherCases": true
+      },
+      {
+        "code": "Roommate",
+        "applicable": true,
+        "_comment":  "The rule for the maximum number of roommates for estudent is the following : roomcount - 1",
+        "maximumNumbers": [{ "roomCount": 1, "value": 0 }, { "roomCount": 2, "value": 1 }]
+      }
+    ],
+    "offer": {
+      "simplifiedCovers": ["ACDDE", "ACINCEX", "ACVOL", "ACASSHE", "ACDEFJU", "ACRC"],
+      "pricingMatrix": [
+        [1, { "monthlyPrice": 6.00, "defaultDeductible": 120, "defaultCeiling": 3000 }],
+        [2, { "monthlyPrice": 8.00, "defaultDeductible": 120, "defaultCeiling": 5000 }]
+      ],
+      "operationCodes": [],
+      "productCode": "APP658",
+      "productVersion": "2020-12-01",
+      "contractualTerms": "/docs/Appenin_Conditions_Generales_assurance_habitation_APP658.pdf",
+      "ipid": "/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf"
+    }
+  },
   "demo-student": {
     "code": "demo-student",
     "trigram": "DST",

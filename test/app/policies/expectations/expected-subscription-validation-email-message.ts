@@ -1,11 +1,5 @@
-import { Email } from '../../../../src/app/common-api/domain/mailer'
-
-export const expectedSubscriptionValidationEmail: Email = {
-  sender: '"Appenin Assurance" <moncontrat@appenin.fr>',
-  recipient: 'test@email.com',
-  subject: 'Appenin - vos documents contractuels / your contractual documents',
-  cc: 'notif-souscription@appenin.fr',
-  messageHtml: '<!DOCTYPE html>\n' +
+export const expectedSubscriptionValidationEmailMessage: string =
+    '<!DOCTYPE html>\n' +
         '<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">\n' +
         '<head>\n' +
         '    <meta charset="utf-8"> <!-- utf-8 works for most cases -->\n' +
@@ -364,9 +358,4 @@ export const expectedSubscriptionValidationEmail: Email = {
         '    <![endif]-->\n' +
         '    </center>\n' +
         '</body>\n' +
-        '</html>\n',
-  attachments: [
-    { filename: 'filename', content: Buffer.alloc(1) },
-    { filename: 'signedContract.pdf', content: Buffer.from('signedContract') }
-  ]
-}
+        '</html>\n'

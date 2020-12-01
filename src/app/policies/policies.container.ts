@@ -44,8 +44,6 @@ import { SignatureRequestEventValidator } from './domain/signature/signature-req
 import { HelloSignRequestEventValidator } from './infrastructure/signature/hello-sign-request-event.validator'
 import { logger } from '../../libs/logger'
 import { Mailer } from '../common-api/domain/mailer'
-import { Nodemailer } from '../common-api/infrastructure/nodemailer.mailer'
-import { nodemailerTransporter } from '../../libs/nodemailer'
 import { ApplySpecialOperationCodeOnPolicy } from './domain/apply-special-operation-code-on-policy.usecase'
 import { ApplyStartDateOnPolicy } from './domain/apply-start-date-on-policy.usecase'
 import { PolicyInsuranceSqlModel } from '../quotes/infrastructure/policy-insurance-sql.model'
@@ -60,6 +58,8 @@ import { PaymentSqlRepository } from './infrastructure/payment/payment-sql.repos
 import { PaymentSqlModel } from './infrastructure/payment/payment-sql.model'
 import { PaymentPolicySqlModel } from './infrastructure/payment/payment-policy-sql.model'
 import { CreatePolicyForQuote } from './domain/create-policy-for-quote.usecase'
+import { container as commonApiContainer } from '../common-api/common-api.container'
+import { HtmlTemplateEngine } from '../common-api/domain/html-template-engine'
 const config = require('../../config')
 
 export interface Container {
@@ -90,15 +90,16 @@ const specificTermsGenerator: SpecificTermsGenerator = new SpecificTermsPdfGener
 const contractRepository: ContractRepository = new ContractFsRepository(config)
 const contractGenerator: ContractGenerator = new ContractPdfGenerator(pdftkPDFProcessor)
 const signatureRequestEventValidator: SignatureRequestEventValidator = new HelloSignRequestEventValidator(helloSignConfig)
-const mailer: Mailer = new Nodemailer(nodemailerTransporter)
+const mailer: Mailer = commonApiContainer.mailer
 const paymentRepository: PaymentRepository = new PaymentSqlRepository()
 const createPaymentIntentForPolicy: CreatePaymentIntentForPolicy =
     CreatePaymentIntentForPolicy.factory(paymentProcessor, policyRepository)
+const htmlTemplateEngine: HtmlTemplateEngine = commonApiContainer.htmlTemplateEngine
 
 const sendValidationLinkToEmailAddress: SendValidationLinkToEmailAddress = emailValidationContainer.SendValidationLinkToEmailAddress
 const createPolicy: CreatePolicy = CreatePolicy.factory(policyRepository, quoteRepository, partnerRepository, sendValidationLinkToEmailAddress)
 const confirmPaymentIntentForPolicy: ConfirmPaymentIntentForPolicy =
-    ConfirmPaymentIntentForPolicy.factory(policyRepository, certificateGenerator, contractGenerator, contractRepository, paymentRepository, paymentProcessor, mailer)
+    ConfirmPaymentIntentForPolicy.factory(policyRepository, certificateGenerator, contractGenerator, contractRepository, paymentRepository, paymentProcessor, mailer, htmlTemplateEngine)
 const getPolicy: GetPolicy = GetPolicy.factory(policyRepository)
 const generatePolicyCertificate: GeneratePolicyCertificate = GeneratePolicyCertificate.factory(policyRepository, certificateGenerator)
 const getPolicySpecificTerms: GetPolicySpecificTerms = GetPolicySpecificTerms.factory(specificTermsRepository, specificTermsGenerator, policyRepository)

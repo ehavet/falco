@@ -6,6 +6,7 @@ import { HttpServerForTesting, newProdLikeServer } from '../../../../utils/serve
 import { getStripePaymentIntentSucceededEvent } from '../../fixtures/payment/stripeEvent.fixture'
 import { config, dateFaker, expect, sinon } from '../../../../test-utils'
 import { container } from '../../../../../src/app/policies/policies.container'
+import { container as commonApiContainer } from '../../../../../src/app/common-api/common-api.container'
 import { ContractFsRepository } from '../../../../../src/app/policies/infrastructure/contract/contract-fs.repository'
 import { SpecificTerms } from '../../../../../src/app/policies/domain/specific-terms/specific-terms'
 import { ContractGenerator } from '../../../../../src/app/policies/domain/contract/contract.generator'
@@ -19,8 +20,8 @@ import { PDFProcessor } from '../../../../../src/app/policies/infrastructure/pdf
 import { PDFtkPDFProcessor } from '../../../../../src/app/policies/infrastructure/pdf/pdftk.pdf-processor'
 
 async function resetDb () {
-  await PaymentSqlModel.destroy({ truncate: true, cascade: true })
   await PolicySqlModel.destroy({ truncate: true, cascade: true })
+  await PaymentSqlModel.destroy({ truncate: true, cascade: true })
 }
 
 const now = new Date('2034-06-05T00:00:00Z')
@@ -42,6 +43,7 @@ describe('PaymentProcessor - API v0 - E2E', async () => {
   describe('POST /internal/v0/payment-processor/event-handler/', async () => {
     let policyRepository: PolicyRepository
     let policyId: string
+    let spy
 
     before(async function () {
       // Given
@@ -81,8 +83,7 @@ describe('PaymentProcessor - API v0 - E2E', async () => {
       sinon.stub(container.PaymentEventAuthenticator, 'parse')
         .withArgs(JSON.stringify(event), stripeHeaderSignature).resolves(event)
 
-      const paymentsInDb: PaymentSqlModel[] = await PaymentSqlModel.findAll()
-      expect(paymentsInDb).to.have.lengthOf(0)
+      spy = sinon.spy(commonApiContainer.mailer, 'send')
 
       // When
       await httpServer.api()
@@ -104,6 +105,10 @@ describe('PaymentProcessor - API v0 - E2E', async () => {
       const paymentsInDb: PaymentSqlModel[] = await PaymentSqlModel.findAll()
       expect(paymentsInDb).to.have.lengthOf(1)
       expect(paymentsInDb[0].pspFee).to.equal(373)
+    })
+
+    it('should send congratulation email', async () => {
+      expect(spy).to.have.been.called
     })
   })
 })

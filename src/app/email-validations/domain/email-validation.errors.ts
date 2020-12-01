@@ -21,3 +21,11 @@ export class EmailValidationQueryConsistencyError extends Error {
     this.name = 'EmailValidationQueryConsistencyError'
   }
 }
+
+export class EmailValidationTemplateNotFoundError extends Error {
+  constructor (templateName: string) {
+    const message: string = `Could not find email validation template : ${templateName}.ejs`
+    super(message)
+    this.name = 'EmailValidationTemplateNotFoundError'
+  }
+}

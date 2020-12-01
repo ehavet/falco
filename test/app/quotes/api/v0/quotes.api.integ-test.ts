@@ -23,7 +23,7 @@ import {
 import { UpdateQuoteCommand } from '../../../../../src/app/quotes/domain/update-quote-command'
 import { OperationCodeNotApplicableError } from '../../../../../src/app/policies/domain/operation-code.errors'
 
-describe('Http API - Quotes - Integ', async () => {
+describe('Quotes - API - Integration', async () => {
   let httpServer: HttpServerForTesting
 
   before(async () => {

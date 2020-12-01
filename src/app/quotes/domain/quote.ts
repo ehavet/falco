@@ -84,7 +84,7 @@ export namespace Quote {
     export function update (quote: Quote, partner: Partner, command: UpdateQuoteCommand, partnerAvailableCodes: Array<OperationCode>): Quote {
       quote.risk = _buildQuoteRisk(command.risk, partner)
       quote.insurance = getInsurance(quote.risk, partner.offer)
-      quote.policyHolder = _buildQuotePolicyHolder(quote, command)
+      quote.policyHolder = Quote.PolicyHolder.build(quote.risk, command.policyHolder, quote.policyHolder)
       _applyStartDate(quote, command.startDate)
       _applyOperationCode(quote, partnerAvailableCodes, command.specOpsCode)
       return quote
@@ -93,19 +93,6 @@ export namespace Quote {
     export function setPolicyHolderEmailValidatedAt (quote: Quote, date: Date): Quote {
         quote.policyHolder!.emailValidatedAt = date
         return quote
-    }
-
-    function _buildQuotePolicyHolder (quote: Quote, command: UpdateQuoteCommand): Quote.PolicyHolder {
-      return {
-        firstname: command.risk.person?.firstname,
-        lastname: command.risk.person?.lastname,
-        address: command.risk.property.address,
-        postalCode: command.risk.property.postalCode,
-        city: command.risk.property.city,
-        email: command.policyHolder?.email,
-        phoneNumber: command.policyHolder?.phoneNumber,
-        emailValidatedAt: _isUpdatedPolicyHolderEmail(quote, command) ? undefined : quote.policyHolder!.emailValidatedAt
-      }
     }
 
     function _buildQuoteRisk (risk: UpdateQuoteCommand.Risk, partner: Partner) {
@@ -154,10 +141,6 @@ export namespace Quote {
       const hasPreviouslyAppliedOperationCode: boolean = !!quote.specialOperationsCode
       quote.specialOperationsCodeAppliedAt = hasPreviouslyAppliedOperationCode || newOperationsCode ? new Date() : null
       quote.specialOperationsCode = newOperationsCode
-    }
-
-    export function _isUpdatedPolicyHolderEmail (quote: Quote, updateQuoteCommand: UpdateQuoteCommand): boolean {
-      return !(quote.policyHolder!.email === updateQuoteCommand.policyHolder!.email)
     }
 
     function _computeTermEndDate (termStartDate: Date, durationInMonths: number): Date {
@@ -280,4 +263,23 @@ export namespace Quote.Insurance {
     }
 
     export type SimplifiedCover = string
+}
+
+export namespace Quote.PolicyHolder {
+    export function build (quoteRisk: Quote.Risk, newPolicyHolderFields?: UpdateQuoteCommand.PolicyHolder, oldPolicyHolder?: Quote.PolicyHolder): Quote.PolicyHolder {
+      return {
+        firstname: quoteRisk.person?.firstname,
+        lastname: quoteRisk.person?.lastname,
+        address: quoteRisk.property.address,
+        postalCode: quoteRisk.property.postalCode,
+        city: quoteRisk.property.city,
+        email: newPolicyHolderFields?.email,
+        phoneNumber: newPolicyHolderFields?.phoneNumber,
+        emailValidatedAt: _isEmailUpdated(oldPolicyHolder, newPolicyHolderFields) ? undefined : oldPolicyHolder!.emailValidatedAt
+      }
+    }
+
+    function _isEmailUpdated (oldPolicyHolder?: Quote.PolicyHolder, newPolicyHolderFields?: UpdateQuoteCommand.PolicyHolder): boolean {
+      return !(oldPolicyHolder!.email === newPolicyHolderFields!.email)
+    }
 }

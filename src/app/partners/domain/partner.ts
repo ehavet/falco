@@ -3,6 +3,7 @@ import { OperationCode } from '../../common-api/domain/operation-code'
 
 export interface Partner {
     code: string,
+    trigram: string
     translationKey: string
     callbackUrl: string
     customerSupportEmail: string

@@ -4,6 +4,7 @@ import { OperationCode } from '../../../../src/app/common-api/domain/operation-c
 export function createPartnerFixture (attr: Partial<Partner> = {}): Partner {
   return {
     code: 'partnerOne',
+    trigram: 'TRI',
     translationKey: 'translationKey',
     callbackUrl: 'http://partner1-callback.com',
     customerSupportEmail: 'customer@support.fr',

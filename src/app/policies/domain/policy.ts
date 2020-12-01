@@ -115,9 +115,9 @@ export namespace Policy {
     }
 
     export async function create (createPolicyCommand: CreatePolicyCommand, quote: Quote, policyRepository: PolicyRepository, partner: Partner): Promise<Policy> {
-      const partnerCode: string = createPolicyCommand.partnerCode
+      const partnerTrigram: string = PartnerFunc.getTrigram(partner)
       const productCode: string = PartnerFunc.getProductCode(partner)
-      const generatedId: string = generateId(partnerCode, productCode)
+      const generatedId: string = generateId(partnerTrigram, productCode)
       if (await policyRepository.isIdAvailable(generatedId)) {
         if (_addressIsMissingFromQuoteAndCommand(quote, createPolicyCommand)) throw new PolicyRiskPropertyMissingFieldError(quote.id, 'address')
         if (_postalCodeIsMissingFromQuoteAndCommand(quote, createPolicyCommand)) throw new PolicyRiskPropertyMissingFieldError(quote.id, 'postalCode')
@@ -175,8 +175,8 @@ export namespace Policy {
       }
     }
 
-    export function generateId (partnerCode: string, productCode: string): string {
-      const partner: string = partnerCode.substr(0, 3).toUpperCase()
+    export function generateId (partnerTrigram: string, productCode: string): string {
+      const partner: string = partnerTrigram.toUpperCase()
       const product: string = productCode.replace(/[^0-9]/g, '')
       const random: string = generate({ length: 6, charset: 'numeric', readable: true })
       return `${partner}${product}${random}`

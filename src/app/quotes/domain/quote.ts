@@ -209,17 +209,6 @@ export namespace Quote {
       return generate({ length: 7, charset: 'alphanumeric', readable: true, capitalization: 'uppercase' })
     }
 
-    export interface PolicyHolder {
-        firstname?: string,
-        lastname?: string,
-        address?: string,
-        postalCode?: string,
-        city?: string,
-        email?: string,
-        phoneNumber?: string,
-        emailValidatedAt?: Date
-    }
-
     export function isEmptyRiskPerson (quote: Quote): boolean { return !quote.risk.person }
     export function isEmptyPolicyHolder (quote: Quote): boolean { return !quote.policyHolder }
     export function isPolicyHolderEmailMissing (quote: Quote): boolean { return !(quote.policyHolder?.email) }

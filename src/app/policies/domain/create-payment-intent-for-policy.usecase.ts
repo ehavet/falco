@@ -20,12 +20,12 @@ export namespace CreatePaymentIntentForPolicy {
         if (Policy.isCancelled(policy)) { throw new PolicyCanceledError(policy.id) }
         if (policy.status === Policy.Status.Applicable) { throw new PolicyAlreadyPaidError(policy.id) }
 
-        const intent = await paymentProcessor.createPaymentIntent(policy.id, _toZeroDecimal(policy.premium), policy.insurance.currency, policy.partnerCode)
+        const paymentIntent = await paymentProcessor.createPaymentIntent(policy.id, _toZeroDecimal(policy.premium), policy.insurance.currency, policy.partnerCode)
 
         return {
-          id: intent.id,
-          amount: _toTwoDecimal(intent.amount),
-          currency: intent.currency
+          id: paymentIntent.id,
+          amount: _toTwoDecimal(paymentIntent.amount),
+          currency: paymentIntent.currency
         }
       }
     }

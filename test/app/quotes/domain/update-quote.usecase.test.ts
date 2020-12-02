@@ -3,8 +3,8 @@ import { UpdateQuoteCommand } from '../../../../src/app/quotes/domain/update-quo
 import { UpdateQuote } from '../../../../src/app/quotes/domain/update-quote.usecase'
 import { Quote } from '../../../../src/app/quotes/domain/quote'
 import {
-  createQuoteFixture,
-  createQuotePolicyHolderFixture,
+  createQuoteFixture, createQuoteInsuranceFixture,
+  createQuotePolicyHolderFixture, createQuoteRiskFixture,
   createUpdateQuoteCommandFixture,
   createUpdateQuoteCommandPolicyHolderFixture,
   createUpdateQuoteCommandRiskFixture
@@ -31,6 +31,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
   let quoteRepository
   let partnerRepository: SinonStubbedInstance<PartnerRepository>
   let quote: Quote
+  let partner: Partner
   const quoteId: string = 'UDQUOT3'
   const partnerCode: string = 'myPartner'
 
@@ -39,7 +40,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
     quote = createQuoteFixture({ id: quoteId })
     quoteRepository = quoteRepositoryStub({ update: sinon.mock() })
     partnerRepository = partnerRepositoryStub()
-    partnerRepository.getByCode.withArgs(partnerCode).resolves(createPartnerFixture(
+    partner = createPartnerFixture(
       {
         code: partnerCode,
         questions: [
@@ -56,16 +57,16 @@ describe('Quotes - Usecase - Update Quote', async () => {
             maximumNumbers: [
               { roomCount: 1, value: 0 },
               { roomCount: 2, value: 1 },
-              { roomCount: 3, value: 0 }
+              { roomCount: 3, value: 2 }
             ]
           }
         ],
         offer: {
           simplifiedCovers: ['ACDDE', 'ACVOL'],
           pricingMatrix: new Map([
-            [1, { monthlyPrice: 5.82, defaultDeductible: 150, defaultCeiling: 7000 }],
+            [1, { monthlyPrice: 4.82, defaultDeductible: 140, defaultCeiling: 6000 }],
             [2, { monthlyPrice: 5.82, defaultDeductible: 150, defaultCeiling: 7000 }],
-            [3, { monthlyPrice: 5.82, defaultDeductible: 150, defaultCeiling: 7000 }]
+            [3, { monthlyPrice: 7.82, defaultDeductible: 160, defaultCeiling: 8000 }]
           ]),
           productCode: 'APP999',
           productVersion: 'v2020-02-01',
@@ -74,7 +75,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
           operationCodes: [OperationCode.SEMESTER1, OperationCode.FULLYEAR]
         }
       }
-    ))
+    )
+    partnerRepository.getByCode.withArgs(partnerCode).resolves(partner)
     partnerRepository.getOperationCodes.withArgs(partnerCode).resolves(
       [OperationCode.FULLYEAR, OperationCode.SEMESTER1, OperationCode.SEMESTER2, OperationCode.BLANK]
     )
@@ -441,6 +443,228 @@ describe('Quotes - Usecase - Update Quote', async () => {
     })
   })
 
+  describe('when the risk is changed', async () => {
+    it('should update the insurance estimate and premium if the room count is changed', async () => {
+      // Given
+      const updatedQuote = createQuoteFixture(
+        {
+          id: 'UDQUOT3',
+          specialOperationsCode: null,
+          specialOperationsCodeAppliedAt: null,
+          termEndDate: new Date('2021-01-04T00:00:00.000Z'),
+          insurance: createQuoteInsuranceFixture({ estimate: partner.offer.pricingMatrix.get(3) }),
+          risk: createQuoteRiskFixture({
+            property: {
+              address: '88 rue des prairies',
+              city: 'Kyukamura',
+              postalCode: '91100',
+              roomCount: 3
+            }
+          }),
+          premium: 93.84
+        }
+      )
+      quoteRepository.get.withArgs(quoteId).resolves(quote)
+      quoteRepository.update.resolves(updatedQuote)
+      updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+
+      const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId })
+      updateQuoteCommand.risk.property.roomCount = 3
+
+      // When
+      await updateQuote(updateQuoteCommand)
+
+      // Then
+      sinon.assert.calledWithExactly(quoteRepository.update, updatedQuote)
+    })
+
+    it('should update the risk and policy holder if risk address, postal code and city are changed', async () => {
+      // Given
+      const updatedQuote = createQuoteFixture(
+        {
+          id: 'UDQUOT3',
+          specialOperationsCode: null,
+          specialOperationsCodeAppliedAt: null,
+          termEndDate: new Date('2021-01-04T00:00:00.000Z'),
+          risk: createQuoteRiskFixture({
+            property: {
+              roomCount: 2,
+              address: '5 avenue du bitume',
+              postalCode: '13840',
+              city: 'Nakamura'
+            }
+          }),
+          policyHolder: createQuotePolicyHolderFixture({
+            address: '5 avenue du bitume',
+            postalCode: '13840',
+            city: 'Nakamura'
+          })
+        }
+      )
+      quoteRepository.get.withArgs(quoteId).resolves(quote)
+      quoteRepository.update.resolves(updatedQuote)
+      updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+
+      const updateQuoteCommand = createUpdateQuoteCommandFixture({
+        id: quoteId,
+        risk: createQuoteRiskFixture({
+          property: {
+            roomCount: 2,
+            address: '5 avenue du bitume',
+            postalCode: '13840',
+            city: 'Nakamura'
+          }
+        })
+      })
+
+      // When
+      await updateQuote(updateQuoteCommand)
+
+      // Then
+      sinon.assert.calledWithExactly(quoteRepository.update, updatedQuote)
+    })
+
+    it('should update risk on the person firstname/lastname and policy holder firstname/lastname if the risk on the person is changed', async () => {
+      // Given
+      const updatedQuote = createQuoteFixture(
+        {
+          id: 'UDQUOT3',
+          specialOperationsCode: null,
+          specialOperationsCodeAppliedAt: null,
+          termEndDate: new Date('2021-01-04T00:00:00.000Z'),
+          risk: createQuoteRiskFixture({
+            person: {
+              firstname: 'Harry',
+              lastname: 'Cover'
+            }
+          }),
+          policyHolder: createQuotePolicyHolderFixture({ firstname: 'Harry', lastname: 'Cover' })
+        }
+      )
+      quoteRepository.get.withArgs(quoteId).resolves(quote)
+      quoteRepository.update.resolves(updatedQuote)
+      updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+
+      const updateQuoteCommand = createUpdateQuoteCommandFixture({
+        id: quoteId,
+        risk: createQuoteRiskFixture({
+          person: {
+            firstname: 'Harry',
+            lastname: 'Cover'
+          }
+        })
+      })
+
+      // When
+      await updateQuote(updateQuoteCommand)
+
+      // Then
+      sinon.assert.calledWithExactly(quoteRepository.update, updatedQuote)
+    })
+
+    it('should remove the the person policy holder firstname/lastname if the risk on the person is deleted', async () => {
+      // Given
+      const updatedQuote = createQuoteFixture(
+        {
+          id: 'UDQUOT3',
+          specialOperationsCode: null,
+          specialOperationsCodeAppliedAt: null,
+          termEndDate: new Date('2021-01-04T00:00:00.000Z'),
+          risk: createQuoteRiskFixture({
+            person: undefined
+          }),
+          policyHolder: createQuotePolicyHolderFixture({ firstname: undefined, lastname: undefined })
+        }
+      )
+      quoteRepository.get.withArgs(quoteId).resolves(quote)
+      quoteRepository.update.resolves(updatedQuote)
+      updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+
+      const updateQuoteCommand = createUpdateQuoteCommandFixture({
+        id: quoteId,
+        risk: createQuoteRiskFixture({
+          person: undefined
+        })
+      })
+
+      // When
+      await updateQuote(updateQuoteCommand)
+
+      // Then
+      sinon.assert.calledWithExactly(quoteRepository.update, updatedQuote)
+    })
+
+    it('should update risk on the other people if the risk on the other people is changed', async () => {
+      // Given
+      const updatedQuote = createQuoteFixture(
+        {
+          id: 'UDQUOT3',
+          specialOperationsCode: null,
+          specialOperationsCodeAppliedAt: null,
+          termEndDate: new Date('2021-01-04T00:00:00.000Z'),
+          risk: createQuoteRiskFixture({
+            otherPeople: [
+              { firstname: 'Jean', lastname: 'Bono' }
+            ]
+          })
+        }
+      )
+
+      quote.risk.otherPeople = []
+      quoteRepository.get.withArgs(quoteId).resolves(quote)
+      quoteRepository.update.resolves(updatedQuote)
+      updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+
+      const updateQuoteCommand = createUpdateQuoteCommandFixture({
+        id: quoteId,
+        risk: createQuoteRiskFixture({
+          otherPeople: [
+            { firstname: 'Jean', lastname: 'Bono' }
+          ]
+        })
+      })
+
+      // When
+      await updateQuote(updateQuoteCommand)
+
+      // Then
+      sinon.assert.calledWithExactly(quoteRepository.update, updatedQuote)
+    })
+
+    it('should remove the risk on the other people if the risk on the other people is deleted', async () => {
+      // Given
+      const updatedQuote = createQuoteFixture(
+        {
+          id: 'UDQUOT3',
+          specialOperationsCode: null,
+          specialOperationsCodeAppliedAt: null,
+          termEndDate: new Date('2021-01-04T00:00:00.000Z'),
+          risk: createQuoteRiskFixture({
+            otherPeople: []
+          })
+        }
+      )
+
+      quote.risk.otherPeople = []
+      quoteRepository.get.withArgs(quoteId).resolves(quote)
+      quoteRepository.update.resolves(updatedQuote)
+      updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+
+      const updateQuoteCommand = createUpdateQuoteCommandFixture({
+        id: quoteId,
+        risk: createQuoteRiskFixture({
+          otherPeople: []
+        })
+      })
+
+      // When
+      await updateQuote(updateQuoteCommand)
+
+      // Then
+      sinon.assert.calledWithExactly(quoteRepository.update, updatedQuote)
+    })
+  })
+
   it('should save and return the updated quote', async () => {
     // Given
     quoteRepository.get.withArgs(quoteId).resolves(quote)
@@ -449,7 +673,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
       id: quoteId,
       partnerCode: partnerCode,
       nbMonthsDue: 10,
-      premium: 58.2,
+      premium: 48.2,
       risk: {
         property: {
           roomCount: 1,
@@ -473,6 +697,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
         phoneNumber: '+66666666666',
         emailValidatedAt: undefined
       },
+      insurance: createQuoteInsuranceFixture({ estimate: { defaultCeiling: 6000, defaultDeductible: 140, monthlyPrice: 4.82 } }),
       specialOperationsCode: OperationCode.FULLYEAR,
       specialOperationsCodeAppliedAt: new Date('2020-01-05T00:00:00.000Z'),
       startDate: new Date('2020-01-05T00:00:00.000Z'),
@@ -502,7 +727,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
       specOpsCode: 'FULLYEAR'
     }
 
-    quoteRepository.update.withArgs(expectedQuote).resolves(expectedQuote)
+    quoteRepository.update.resolves(expectedQuote)
 
     // When
     const result = await updateQuote(updateQuoteCommand)

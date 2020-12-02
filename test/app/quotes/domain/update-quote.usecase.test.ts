@@ -320,7 +320,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
     })
   })
 
-  describe('when the email is changed', async () => {
+  describe('when the policy holder email is changed', async () => {
     it('should update the email and reset the email validation date', async () => {
       // Given
       const quote = createQuoteFixture(
@@ -364,7 +364,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
     })
   })
 
-  describe('when the email is not changed', async () => {
+  describe('when the policy holder email is not changed', async () => {
     it('should not reset email validation date', async () => {
       // Given
       const quote = createQuoteFixture(
@@ -397,6 +397,39 @@ describe('Quotes - Usecase - Update Quote', async () => {
         id: quoteId,
         policyHolder: createUpdateQuoteCommandPolicyHolderFixture({
           email: 'former@email.com'
+        })
+      })
+
+      // When
+      await updateQuote(updateQuoteCommand)
+
+      // Then
+      sinon.assert.calledWithExactly(quoteRepository.update, updatedQuote)
+    })
+  })
+
+  describe('when the policy holder phone number is changed', async () => {
+    it('should update the policy holder phone', async () => {
+      // Given
+      const updatedQuote = createQuoteFixture(
+        {
+          id: 'UDQUOT3',
+          specialOperationsCode: null,
+          specialOperationsCodeAppliedAt: null,
+          termEndDate: new Date('2021-01-04T00:00:00.000Z'),
+          policyHolder: createQuotePolicyHolderFixture({
+            phoneNumber: '+33666666666'
+          })
+        }
+      )
+      quoteRepository.get.withArgs(quoteId).resolves(quote)
+      quoteRepository.update.resolves(updatedQuote)
+      updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+
+      const updateQuoteCommand = createUpdateQuoteCommandFixture({
+        id: quoteId,
+        policyHolder: createUpdateQuoteCommandPolicyHolderFixture({
+          phoneNumber: '+33666666666'
         })
       })
 

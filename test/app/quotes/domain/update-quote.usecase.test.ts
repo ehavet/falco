@@ -89,8 +89,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
     quoteRepository.update.reset()
   })
 
-  describe('when start date is changed', async () => {
-    it('should update start date, term start date and term end date', async () => {
+  describe('updating the start date', async () => {
+    it('should update start date, term start date and term end date when start date is changed', async () => {
       // Given
       const updatedStartDate: Date = new Date('2020-07-01')
       const updatedQuote = createQuoteFixture(
@@ -116,7 +116,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
     })
   })
 
-  describe('when special operations code is changed', async () => {
+  describe('updating the special operations code', async () => {
     it('should update premium on 5 months if new special operations code is SEMESTER1', async () => {
       // Given
       quoteRepository.get.withArgs(quoteId).resolves(quote)
@@ -189,7 +189,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
       sinon.assert.calledWithExactly(quoteRepository.update, updatedQuote)
     })
 
-    describe('and an empty operation code is provided', async () => {
+    describe('when an empty operation code is provided', async () => {
       it('should update premium on 12 months with specialOperationsCode and specialOperationsCodeAppliedAt not filled up when no spec ops code applied previously', async () => {
         // Given
         quoteRepository.get.withArgs(quoteId).resolves(quote)
@@ -240,7 +240,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
       })
     })
 
-    describe('and an undefined operation code is provided', async () => {
+    describe('when an undefined operation code is provided', async () => {
       it('should update premium on 12 months with specialOperationsCode and specialOperationsCodeAppliedAt not filled up when no spec ops code applied previously', async () => {
         // Given
         quoteRepository.get.withArgs(quoteId).resolves(quote)
@@ -322,8 +322,34 @@ describe('Quotes - Usecase - Update Quote', async () => {
     })
   })
 
-  describe('when the policy holder email is changed', async () => {
-    it('should update the email and reset the email validation date', async () => {
+  describe('updating the policy holder', async () => {
+    it('should add a policy holder with no email validation date if the quote did not have one before', async () => {
+      // Given
+      quote.policyHolder = undefined
+      const updatedQuote = createQuoteFixture(
+        {
+          id: 'UDQUOT3',
+          specialOperationsCode: null,
+          specialOperationsCodeAppliedAt: null,
+          termEndDate: new Date('2021-01-04T00:00:00.000Z')
+        }
+      )
+      quoteRepository.get.withArgs(quoteId).resolves(quote)
+      quoteRepository.update.resolves(updatedQuote)
+      updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+
+      const updateQuoteCommand = createUpdateQuoteCommandFixture({
+        id: quoteId
+      })
+
+      // When
+      await updateQuote(updateQuoteCommand)
+
+      // Then
+      sinon.assert.calledWithExactly(quoteRepository.update, updatedQuote)
+    })
+
+    it('should update the email and reset the email validation date when email is changed', async () => {
       // Given
       const quote = createQuoteFixture(
         {
@@ -364,10 +390,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
       // Then
       sinon.assert.calledWithExactly(quoteRepository.update, updatedQuote)
     })
-  })
 
-  describe('when the policy holder email is not changed', async () => {
-    it('should not reset email validation date', async () => {
+    it('should not reset the email validation date when email is not changed', async () => {
       // Given
       const quote = createQuoteFixture(
         {
@@ -408,10 +432,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
       // Then
       sinon.assert.calledWithExactly(quoteRepository.update, updatedQuote)
     })
-  })
 
-  describe('when the policy holder phone number is changed', async () => {
-    it('should update the policy holder phone', async () => {
+    it('should update the policy holder phone when the phone is changed', async () => {
       // Given
       const updatedQuote = createQuoteFixture(
         {
@@ -443,7 +465,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
     })
   })
 
-  describe('when the risk is changed', async () => {
+  describe('updating the risk', async () => {
     it('should update the insurance estimate and premium if the room count is changed', async () => {
       // Given
       const updatedQuote = createQuoteFixture(

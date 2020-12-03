@@ -275,11 +275,18 @@ export namespace Quote.PolicyHolder {
         city: quoteRisk.property.city,
         email: newPolicyHolderFields?.email,
         phoneNumber: newPolicyHolderFields?.phoneNumber,
-        emailValidatedAt: _isEmailUpdated(oldPolicyHolder, newPolicyHolderFields) ? undefined : oldPolicyHolder!.emailValidatedAt
+        emailValidatedAt: _computeEmailValidationDate(oldPolicyHolder, newPolicyHolderFields)
       }
     }
 
+    function _computeEmailValidationDate (oldPolicyHolder?: Quote.PolicyHolder, newPolicyHolderFields?: UpdateQuoteCommand.PolicyHolder): Date | undefined {
+      return _isEmailUpdated(oldPolicyHolder, newPolicyHolderFields) ? undefined : oldPolicyHolder?.emailValidatedAt
+    }
+
     function _isEmailUpdated (oldPolicyHolder?: Quote.PolicyHolder, newPolicyHolderFields?: UpdateQuoteCommand.PolicyHolder): boolean {
-      return !(oldPolicyHolder!.email === newPolicyHolderFields!.email)
+      if (oldPolicyHolder && newPolicyHolderFields) {
+        return oldPolicyHolder.email !== newPolicyHolderFields.email
+      }
+      return false
     }
 }

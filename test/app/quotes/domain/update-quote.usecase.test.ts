@@ -546,6 +546,43 @@ describe('Quotes - Usecase - Update Quote', async () => {
       sinon.assert.calledWithExactly(quoteRepository.update, updatedQuote)
     })
 
+    it('should add risk on the person if there was no risk on person before', async () => {
+      // Given
+      quote.risk.person = undefined
+      const newRiskPerson: Quote.Risk.Person = {
+        firstname: 'Jean-Jean',
+        lastname: 'Lapin'
+      }
+      const updatedQuote = createQuoteFixture(
+        {
+          id: 'UDQUOT3',
+          specialOperationsCode: null,
+          specialOperationsCodeAppliedAt: null,
+          termEndDate: new Date('2021-01-04T00:00:00.000Z'),
+          risk: createQuoteRiskFixture({
+            person: newRiskPerson
+          })
+        }
+      )
+
+      quoteRepository.get.withArgs(quoteId).resolves(quote)
+      quoteRepository.update.resolves(updatedQuote)
+      updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+
+      const updateQuoteCommand = createUpdateQuoteCommandFixture({
+        id: quoteId,
+        risk: createQuoteRiskFixture({
+          person: newRiskPerson
+        })
+      })
+
+      // When
+      await updateQuote(updateQuoteCommand)
+
+      // Then
+      sinon.assert.calledWithExactly(quoteRepository.update, updatedQuote)
+    })
+
     it('should update risk on the person firstname/lastname and policy holder firstname/lastname if the risk on the person is changed', async () => {
       // Given
       const updatedQuote = createQuoteFixture(
@@ -584,7 +621,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
       sinon.assert.calledWithExactly(quoteRepository.update, updatedQuote)
     })
 
-    it('should remove the the person policy holder firstname/lastname if the risk on the person is deleted', async () => {
+    it('should remove the person and policy holder firstname/lastname if the risk on the person is deleted', async () => {
       // Given
       const updatedQuote = createQuoteFixture(
         {

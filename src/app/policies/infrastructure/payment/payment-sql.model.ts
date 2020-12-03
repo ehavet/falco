@@ -1,6 +1,7 @@
 import { Column, DataType, Default, Model, PrimaryKey, Table } from 'sequelize-typescript'
 import { Payment } from '../../domain/payment/payment'
 import { v4 as uuidv4 } from 'uuid'
+import { DECIMAL } from 'sequelize'
 
 @Table({ timestamps: true, tableName: 'payment', underscored: true })
 export class PaymentSqlModel extends Model {
@@ -24,7 +25,7 @@ export class PaymentSqlModel extends Model {
     @Column
     externalId!: string
 
-    @Column
+    @Column(DECIMAL)
     pspFee!: number
 
     @Column

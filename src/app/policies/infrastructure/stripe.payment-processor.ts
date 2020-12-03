@@ -1,9 +1,10 @@
-import { PaymentProcessor } from '../domain/payment-processor'
+import { PaymentIntent, PaymentProcessor } from '../domain/payment-processor'
 import { Logger } from '../../../libs/logger'
 import { Stripe } from 'stripe'
+import { StripeClients } from '../../../libs/stripe'
 
 export class StripePaymentProcessor implements PaymentProcessor {
-    #stripe: Stripe
+    #stripe: StripeClients
     #logger: Logger
 
     constructor (stripe, logger) {
@@ -11,16 +12,21 @@ export class StripePaymentProcessor implements PaymentProcessor {
       this.#logger = logger
     }
 
-    async createIntent (policyId, amount, currency) {
+    async createPaymentIntent (policyId: string, amount: number, currency: string, partnerCode: string): Promise<PaymentIntent> {
       let paymentIntent
+      const paymentIntentCreateParams: Stripe.PaymentIntentCreateParams = {
+        amount,
+        currency,
+        metadata: {
+          policy_id: policyId
+        }
+      }
       try {
-        paymentIntent = await this.#stripe.paymentIntents.create({
-          amount: amount,
-          currency: currency,
-          metadata: {
-            policy_id: policyId
-          }
-        })
+        if (partnerCode === 'demo-student') {
+          paymentIntent = await this.#stripe.TestClient.paymentIntents.create(paymentIntentCreateParams)
+        } else {
+          paymentIntent = await this.#stripe.LiveClient.paymentIntents.create(paymentIntentCreateParams)
+        }
       } catch (error) {
         this.#logger.error(error)
         throw new PaymentIntentFailureError()
@@ -50,7 +56,7 @@ export class StripePaymentProcessor implements PaymentProcessor {
       const balanceTransactionId = stripePaymentIntent.charges.data[0].balance_transaction as string
 
       try {
-        const balanceTransaction = await this.#stripe.balanceTransactions.retrieve(balanceTransactionId)
+        const balanceTransaction = await this.#stripe.LiveClient.balanceTransactions.retrieve(balanceTransactionId)
         return balanceTransaction.fee
       } catch (error) {
         this.#logger.error('An error occurred while calling Stripe to retrieve the balance transaction', { error, stripePaymentIntent })

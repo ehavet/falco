@@ -2,7 +2,7 @@ import { sinon } from '../../../../test-utils'
 
 export function paymentProcessorMock (attr = {}) {
   return {
-    createIntent: sinon.mock(),
+    createPaymentIntent: sinon.mock(),
     getTransactionFee: sinon.mock(),
     ...attr
   }
@@ -10,7 +10,7 @@ export function paymentProcessorMock (attr = {}) {
 
 export function paymentProcessorStub (attr = {}) {
   return {
-    createIntent: sinon.stub(),
+    createPaymentIntent: sinon.stub(),
     getTransactionFee: sinon.stub(),
     ...attr
   }

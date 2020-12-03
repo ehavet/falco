@@ -24,7 +24,8 @@ describe('Repository - Quote', async () => {
     await dbTestUtils.closeDB()
   })
 
-  afterEach(async () => {
+  afterEach(async function () {
+    this.timeout(10000)
     await resetDb()
   })
 

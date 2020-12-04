@@ -7,7 +7,7 @@ export class StripePaymentProcessor implements PaymentProcessor {
     #stripe: StripeClients
     #logger: Logger
 
-    constructor (stripe, logger) {
+    constructor (stripe: StripeClients, logger) {
       this.#stripe = stripe
       this.#logger = logger
     }
@@ -18,7 +18,8 @@ export class StripePaymentProcessor implements PaymentProcessor {
         amount,
         currency,
         metadata: {
-          policy_id: policyId
+          policy_id: policyId,
+          partner_code: partnerCode
         }
       }
       try {

@@ -13,7 +13,7 @@ describe('Payment - Infra - Stripe Payment Processor', async () => {
       paymentIntents: { create: sinon.stub() },
       balanceTransactions: { retrieve: sinon.stub() }
     }
-  }
+  } as any
   const loggerMock = { error: sinon.stub() }
 
   const paymentProcessor: StripePaymentProcessor = new StripePaymentProcessor(stripeMock, loggerMock)
@@ -31,7 +31,8 @@ describe('Payment - Infra - Stripe Payment Processor', async () => {
         amount: 5000,
         currency: 'eur',
         metadata: {
-          policy_id: 'APP463109486'
+          policy_id: 'APP463109486',
+          partner_code: 'essca'
         }
       }).resolves(stubbedStripeResponse)
       const response = await paymentProcessor.createPaymentIntent('APP463109486', 5000, 'eur', 'essca')
@@ -54,7 +55,8 @@ describe('Payment - Infra - Stripe Payment Processor', async () => {
         amount: 5000,
         currency: 'eur',
         metadata: {
-          policy_id: 'APP463109486'
+          policy_id: 'APP463109486',
+          partner_code: 'demo-student'
         }
       }).resolves(stubbedStripeResponse)
       const response = await paymentProcessor.createPaymentIntent('APP463109486', 5000, 'eur', 'demo-student')

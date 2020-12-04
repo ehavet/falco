@@ -12,12 +12,24 @@ export class StripeEventAuthenticator implements PaymentEventAuthenticator {
 
     async parse (rawPayload, signature) {
       try {
-        return await this.#config.stripe.webhooks
-          .constructEvent(
-            rawPayload,
-            signature,
-            this.#config.eventHandlerSecret
-          )
+        const parsedPayload = JSON.parse(rawPayload)
+        // eslint-disable-next-line camelcase
+        const isDemoStudent = parsedPayload.data?.object?.metadata?.partner_code === 'demo-student'
+        if (isDemoStudent) {
+          return await this.#config.stripe.TestClient.webhooks
+            .constructEvent(
+              rawPayload,
+              signature,
+              this.#config.eventHandlerSecret
+            )
+        } else {
+          return await this.#config.stripe.LiveClient.webhooks
+            .constructEvent(
+              rawPayload,
+              signature,
+              this.#config.eventHandlerSecret
+            )
+        }
       } catch (error) {
         logger.error(error)
         throw new UnauthenticatedEventError(error.message)

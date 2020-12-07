@@ -2,6 +2,7 @@ import { logger } from '../../../libs/logger'
 import { PaymentEventAuthenticator } from '../domain/payment-event-authenticator'
 import { StripeConfig } from '../../../configs/stripe.config'
 import { UnauthenticatedEventError } from '../domain/payment-processor.errors'
+import { isRelatedToADemoPartner } from '../../partners/domain/partner.func'
 
 export class StripeEventAuthenticator implements PaymentEventAuthenticator {
     #config: StripeConfig
@@ -14,7 +15,7 @@ export class StripeEventAuthenticator implements PaymentEventAuthenticator {
       try {
         const parsedPayload = JSON.parse(rawPayload)
         // eslint-disable-next-line camelcase
-        const isDemoStudent = parsedPayload.data?.object?.metadata?.partner_code === 'demo-student'
+        const isDemoStudent = isRelatedToADemoPartner(parsedPayload.data?.object?.metadata?.partner_code)
         if (isDemoStudent) {
           return await this.#config.stripe.TestClient.webhooks
             .constructEvent(

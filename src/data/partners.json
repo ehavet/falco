@@ -144,6 +144,41 @@
       "ipid": "/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf"
     }
   },
+  "greystar": {
+    "code": "greystar",
+    "trigram": "GRE",
+    "translationKey": "greystar",
+    "callbackUrl": "",
+    "customerSupportEmail": "help@appenin.fr",
+    "questions": [
+      {
+        "code": "RoomCount",
+        "options": {
+          "list": [1, 2, 3, 4]
+        },
+        "manageOtherCases": false
+      },
+      {
+        "code": "Roommate",
+        "applicable": false,
+        "_comment":  "There is no maximum number of roommates here because Greystar does not allow roommates"
+      }
+    ],
+    "offer": {
+      "simplifiedCovers": ["ACDDE", "ACINCEX", "ACVOL", "ACASSHE", "ACDEFJU", "ACRC"],
+      "pricingMatrix": [
+        [1, { "monthlyPrice": 6.00, "defaultDeductible": 120, "defaultCeiling": 3000 }],
+        [2, { "monthlyPrice": 6.00, "defaultDeductible": 120, "defaultCeiling": 3000 }],
+        [3, { "monthlyPrice": 6.00, "defaultDeductible": 120, "defaultCeiling": 3000 }],
+        [4, { "monthlyPrice": 6.00, "defaultDeductible": 120, "defaultCeiling": 3000 }]
+      ],
+      "operationCodes": [],
+      "productCode": "APP658",
+      "productVersion": "2020-12-02",
+      "contractualTerms": "/docs/Appenin_Conditions_Generales_assurance_habitation_APP658.pdf",
+      "ipid": "/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf"
+    }
+  },
   "demo-student": {
     "code": "demo-student",
     "trigram": "DST",

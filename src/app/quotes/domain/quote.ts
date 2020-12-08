@@ -284,9 +284,6 @@ export namespace Quote.PolicyHolder {
     }
 
     function _isEmailUpdated (oldPolicyHolder?: Quote.PolicyHolder, newPolicyHolderFields?: UpdateQuoteCommand.PolicyHolder): boolean {
-      if (oldPolicyHolder && newPolicyHolderFields) {
-        return oldPolicyHolder.email !== newPolicyHolderFields.email
-      }
-      return false
+      return oldPolicyHolder?.email !== newPolicyHolderFields?.email
     }
 }

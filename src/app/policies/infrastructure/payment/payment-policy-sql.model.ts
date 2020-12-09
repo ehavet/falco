@@ -6,7 +6,7 @@ import Sequelize from 'sequelize'
 
 // This model is used to keep track of the link between a payment and a policy.
 @Table({ timestamps: false, tableName: 'payment_policy', underscored: true })
-export class PaymentPolicySqlModel extends Model<PaymentPolicySqlModel> {
+export class PaymentPolicySqlModel extends Model {
     @PrimaryKey
     @Default(uuidv4)
     @Column(Sequelize.UUIDV4)

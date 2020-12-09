@@ -5,7 +5,7 @@ import { PolicyRiskSqlModel } from '../../quotes/infrastructure/policy-risk-sql.
 import { PolicyPersonSqlModel } from './policy-person-sql.model'
 
 @Table({ timestamps: true, tableName: 'policy_risk_other_people', underscored: true })
-export class PolicyRiskOtherPeopleSqlModel extends Model<PolicyRiskOtherPeopleSqlModel> {
+export class PolicyRiskOtherPeopleSqlModel extends Model {
     @PrimaryKey
     @Default(uuidv4)
     @Column(Sequelize.UUIDV4)

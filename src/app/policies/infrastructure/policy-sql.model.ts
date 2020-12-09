@@ -6,7 +6,7 @@ import { PolicyPersonSqlModel } from './policy-person-sql.model'
 import { OperationCode } from '../../common-api/domain/operation-code'
 
 @Table({ timestamps: true, tableName: 'policy', underscored: true })
-export class PolicySqlModel extends Model<PolicySqlModel> {
+export class PolicySqlModel extends Model {
     @PrimaryKey
     @Column
     id!: string

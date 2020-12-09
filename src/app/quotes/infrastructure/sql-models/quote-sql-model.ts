@@ -4,7 +4,7 @@ import { QuoteRiskSqlModel } from './quote-risk-sql.model'
 import { QuotePersonSqlModel } from './quote-person-sql.model'
 
 @Table({ timestamps: true, tableName: 'quote', underscored: true })
-export class QuoteSqlModel extends Model<QuoteSqlModel> {
+export class QuoteSqlModel extends Model {
     @PrimaryKey
     @Column
     id!: string

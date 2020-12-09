@@ -12,13 +12,13 @@ import { QuoteRiskOtherPeopleSqlModel } from './sql-models/quote-risk-other-peop
 export class QuoteSqlRepository implements QuoteRepository {
   async save (quote: Quote): Promise<Quote> {
     const personSql = await QuotePersonSqlModel.create({
-      firstname: quote.policyHolder ? quote.policyHolder.firstname : null,
-      lastname: quote.policyHolder ? quote.policyHolder.lastname : null,
-      address: quote.policyHolder ? quote.policyHolder.address : null,
-      postalCode: quote.policyHolder ? quote.policyHolder.postalCode : null,
-      city: quote.policyHolder ? quote.policyHolder.city : null,
-      email: quote.policyHolder ? quote.policyHolder.email : null,
-      phoneNumber: quote.policyHolder ? quote.policyHolder.phoneNumber : null
+      firstname: quote.policyHolder ? quote.policyHolder.firstname : undefined,
+      lastname: quote.policyHolder ? quote.policyHolder.lastname : undefined,
+      address: quote.policyHolder ? quote.policyHolder.address : undefined,
+      postalCode: quote.policyHolder ? quote.policyHolder.postalCode : undefined,
+      city: quote.policyHolder ? quote.policyHolder.city : undefined,
+      email: quote.policyHolder ? quote.policyHolder.email : undefined,
+      phoneNumber: quote.policyHolder ? quote.policyHolder.phoneNumber : undefined
     })
 
     const quoteSql = await QuoteSqlModel.create({

@@ -12,7 +12,7 @@ import { QuotePersonSqlModel } from './quote-person-sql.model'
 import { QuoteRiskSqlModel } from './quote-risk-sql.model'
 
 @Table({ timestamps: true, tableName: 'quote_risk_other_people', underscored: true })
-export class QuoteRiskOtherPeopleSqlModel extends Model<QuoteRiskOtherPeopleSqlModel> {
+export class QuoteRiskOtherPeopleSqlModel extends Model {
     @PrimaryKey
     @Default(uuidv4)
     @Column(Sequelize.UUIDV4)

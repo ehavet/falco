@@ -180,7 +180,7 @@ describe('Quotes - API - E2E', async () => {
 
       // Then
       const updatedQuote = await QuoteSqlModel.findByPk(response.body.id)
-      expect(updatedQuote.updatedAt.toUTCString())
+      expect(updatedQuote!.updatedAt.toUTCString())
         .is.equal(new Date('2020-01-13 10:09:08.000Z').toUTCString())
     })
 

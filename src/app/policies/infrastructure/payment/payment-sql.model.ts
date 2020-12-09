@@ -3,7 +3,7 @@ import { Payment } from '../../domain/payment/payment'
 import { v4 as uuidv4 } from 'uuid'
 
 @Table({ timestamps: true, tableName: 'payment', underscored: true })
-export class PaymentSqlModel extends Model<PaymentSqlModel> {
+export class PaymentSqlModel extends Model {
     @PrimaryKey
     @Default(uuidv4)
     @Column

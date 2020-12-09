@@ -16,8 +16,9 @@ module.exports = {
         .renameTable('contact', 'policy_person', { transaction: transaction })
 
       const addPolicyPersonPrimaryKeyConstraint = await queryInterface
-        .addConstraint('policy_person', ['id'], {
+        .addConstraint('policy_person', {
           type: 'primary key',
+          fields: ['id'],
           name: 'policy_person_pkey',
           transaction: transaction
         })
@@ -45,15 +46,17 @@ module.exports = {
           .renameTable('policy_person', 'contact', { transaction: renamePolicyPersonToContactTable })
 
         const addContactPrimaryKeyConstraint = await queryInterface
-          .addConstraint('contact', ['id'], {
+          .addConstraint('contact', {
             type: 'primary key',
+            fields: ['id'],
             name: 'contact_pkey',
             transaction: renamePolicyPersonToContactTable
           })
 
         const addPolicyIdForeignKeyConstraintOnContactTable = await queryInterface
-          .addConstraint('contact', ['policy_id'], {
+          .addConstraint('contact', {
             type: 'foreign key',
+            fields: ['policy_id'],
             name: 'contact_policy_id_fkey',
             references: {
               table: 'policy',

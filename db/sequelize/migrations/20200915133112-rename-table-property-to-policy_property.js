@@ -13,8 +13,9 @@ module.exports = {
         .renameTable('property', 'policy_property', { transaction: transaction })
 
       const addPolicyPropertyPrimaryKeyConstraintOnPolicyPropertyTable = await queryInterface
-        .addConstraint('policy_property', ['id'], {
+        .addConstraint('policy_property', {
           type: 'primary key',
+          fields: ['id'],
           name: 'policy_property_pkey',
           transaction: transaction
         })
@@ -40,15 +41,17 @@ module.exports = {
         .renameTable('policy_property', 'property', { transaction: transaction })
 
       const addPropertyPrimaryKeyConstraintOnPropertyTable = await queryInterface
-        .addConstraint('property', ['id'], {
+        .addConstraint('property', {
           type: 'primary key',
+          fields: ['id'],
           name: 'property_pkey',
           transaction: transaction
         })
 
       const addRiskIdForeignKeyConstraintOnPropertyTable = await queryInterface
-        .addConstraint('property', ['risk_id'], {
+        .addConstraint('property', {
           type: 'foreign key',
+          fields: ['risk_id'],
           name: 'property_risk_id_fkey',
           references: {
             table: 'risk',

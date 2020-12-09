@@ -19,15 +19,17 @@ module.exports = {
         .renameTable('insurance', 'policy_insurance', { transaction: transaction })
 
       const addPolicyInsuranceIdPrimaryKeyConstraintOnPolicyInsuranceTable = await queryInterface
-        .addConstraint('policy_insurance', ['id'], {
+        .addConstraint('policy_insurance', {
           type: 'primary key',
+          fields: ['id'],
           name: 'policy_insurance_pkey',
           transaction: transaction
         })
 
       const addPolicyInsuranceIdForeignkeyConstraintOnPolicyTable = await queryInterface
-        .addConstraint('policy', ['policy_insurance_id'], {
+        .addConstraint('policy', {
           type: 'foreign key',
+          fields: ['policy_insurance_id'],
           name: 'policy_policy_insurance_id_fkey',
           references: {
             table: 'policy_insurance',
@@ -69,15 +71,17 @@ module.exports = {
         .renameTable('policy_insurance', 'insurance', { transaction: transaction })
 
       const addInsuranceIdPrimaryKeyConstraintOnInsuranceTable = await queryInterface
-        .addConstraint('insurance', ['id'], {
+        .addConstraint('insurance', {
           type: 'primary key',
+          fields: ['id'],
           name: 'insurance_pkey',
           transaction: transaction
         })
 
       const addInsuranceIdForeignKeyConstraintOnPolicyTable = await queryInterface
-        .addConstraint('policy', ['insurance_id'], {
+        .addConstraint('policy', {
           type: 'foreign key',
+          fields: ['insurance_id'],
           name: 'policy_insurance_id_fkey',
           references: {
             table: 'insurance',

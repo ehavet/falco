@@ -2,12 +2,13 @@ import { Quote } from '../domain/quote'
 import { QuoteSqlModel } from './sql-models/quote-sql-model'
 import { QuotePersonSqlModel } from './sql-models/quote-person-sql.model'
 import { OperationCode } from '../../common-api/domain/operation-code'
+import { toAmount } from '../../common-api/domain/amount/amount'
 
 export function sqlToDomain (quoteSql: QuoteSqlModel): Quote {
   return {
     id: quoteSql.id,
     partnerCode: quoteSql.partnerCode,
-    premium: quoteSql.premium,
+    premium: toAmount(quoteSql.premium),
     nbMonthsDue: quoteSql.nbMonthsDue,
     startDate: new Date(quoteSql.startDate),
     termStartDate: new Date(quoteSql.termStartDate),
@@ -41,9 +42,9 @@ function _sqlToRiskMapper (quoteSql: QuoteSqlModel) {
 function _sqlToInsuranceMapper (quoteSql: QuoteSqlModel) {
   return {
     estimate: {
-      monthlyPrice: quoteSql.insurance.monthlyPrice,
-      defaultDeductible: quoteSql.insurance.defaultDeductible,
-      defaultCeiling: quoteSql.insurance.defaultCeiling
+      monthlyPrice: toAmount(quoteSql.insurance.monthlyPrice),
+      defaultDeductible: toAmount(quoteSql.insurance.defaultDeductible),
+      defaultCeiling: toAmount(quoteSql.insurance.defaultCeiling)
     },
     currency: quoteSql.insurance.currency,
     simplifiedCovers: quoteSql.insurance.simplifiedCovers,

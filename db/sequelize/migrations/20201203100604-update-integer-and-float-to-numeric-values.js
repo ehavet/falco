@@ -1,7 +1,7 @@
 'use strict'
 const Sequelize = require('sequelize')
 
-const DEFAULT_PRECISION = 12
+const DEFAULT_PRECISION = 14
 const DEFAULT_SCALE = 6
 const tablesToUpdate = [
   {
@@ -54,6 +54,26 @@ const tablesToUpdate = [
       },
       {
         name: 'default_ceiling',
+        previousType: Sequelize.FLOAT,
+        nextType: Sequelize.DECIMAL(DEFAULT_PRECISION, DEFAULT_SCALE)
+      }
+    ]
+  },
+  {
+    tableName: 'policy',
+    attributes: [
+      {
+        name: 'premium',
+        previousType: Sequelize.FLOAT,
+        nextType: Sequelize.DECIMAL(DEFAULT_PRECISION, DEFAULT_SCALE)
+      }
+    ]
+  },
+  {
+    tableName: 'quote',
+    attributes: [
+      {
+        name: 'premium',
         previousType: Sequelize.FLOAT,
         nextType: Sequelize.DECIMAL(DEFAULT_PRECISION, DEFAULT_SCALE)
       }

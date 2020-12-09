@@ -1,7 +1,7 @@
 import { Column, DataType, Default, Model, PrimaryKey, Table } from 'sequelize-typescript'
 import { Payment } from '../../domain/payment/payment'
 import { v4 as uuidv4 } from 'uuid'
-import { DECIMAL } from 'sequelize'
+import { SQL_DEFAULT_PRECISION, SQL_DEFAULT_SCALE } from '../../../common-api/domain/amount/amount'
 
 @Table({ timestamps: true, tableName: 'payment', underscored: true })
 export class PaymentSqlModel extends Model {
@@ -10,8 +10,8 @@ export class PaymentSqlModel extends Model {
     @Column
     id!: string
 
-    @Column
-    amount!: number
+    @Column(DataType.DECIMAL(SQL_DEFAULT_PRECISION, SQL_DEFAULT_SCALE))
+    amount!: string
 
     @Column
     currency!: Payment.Currency
@@ -25,8 +25,8 @@ export class PaymentSqlModel extends Model {
     @Column
     externalId!: string
 
-    @Column(DECIMAL)
-    pspFee!: number
+    @Column(DataType.DECIMAL(SQL_DEFAULT_PRECISION, SQL_DEFAULT_SCALE))
+    pspFee!: string
 
     @Column
     status!: Payment.Status

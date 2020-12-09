@@ -104,7 +104,7 @@ describe('PaymentProcessor - API v0 - E2E', async () => {
       // Then
       const paymentsInDb: PaymentSqlModel[] = await PaymentSqlModel.findAll()
       expect(paymentsInDb).to.have.lengthOf(1)
-      expect(paymentsInDb[0].pspFee).to.equal(373)
+      expect(paymentsInDb[0].pspFee).to.equal('373.000000')
     })
 
     it('should send congratulation email', async () => {

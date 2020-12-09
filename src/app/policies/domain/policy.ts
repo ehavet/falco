@@ -1,3 +1,4 @@
+import currency from 'currency.js'
 import { Quote } from '../../quotes/domain/quote'
 import { CreatePolicyCommand } from './create-policy-command'
 import { generate } from 'randomstring'
@@ -133,7 +134,7 @@ export namespace Policy {
           risk,
           contact: _createContact(createPolicyCommand.contact, createPolicyCommand.risk, quote.risk),
           nbMonthsDue: DEFAULT_NUMBER_OF_MONTHS_DUE,
-          premium: DEFAULT_NUMBER_OF_MONTHS_DUE * quote.insurance.estimate.monthlyPrice,
+          premium: currency(quote.insurance.estimate.monthlyPrice).multiply(DEFAULT_NUMBER_OF_MONTHS_DUE).value,
           startDate,
           termStartDate: startDate,
           termEndDate: _computeTermEndDate(startDate, DEFAULT_NUMBER_OF_MONTHS_DUE),
@@ -215,7 +216,7 @@ function _computeTermEndDate (termStartDate: Date, durationInMonths: number): Da
 }
 
 function _applyNbMonthsDue (policy: Policy, nbMonthsDue: number): void {
-  policy.premium = nbMonthsDue * policy.insurance.estimate.monthlyPrice
+  policy.premium = currency(nbMonthsDue).multiply(policy.insurance.estimate.monthlyPrice).value
   policy.nbMonthsDue = nbMonthsDue
   policy.termEndDate = _computeTermEndDate(policy.startDate, nbMonthsDue)
 }

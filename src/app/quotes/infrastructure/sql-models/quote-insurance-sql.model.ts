@@ -8,6 +8,7 @@ import {
 } from 'sequelize-typescript'
 import Sequelize from 'sequelize'
 import { v4 as uuidv4 } from 'uuid'
+import { SQL_DEFAULT_SCALE, SQL_DEFAULT_PRECISION } from '../../../common-api/domain/amount/amount'
 
 @Table({ timestamps: true, tableName: 'quote_insurance', underscored: true })
 export class QuoteInsuranceSqlModel extends Model {
@@ -16,14 +17,14 @@ export class QuoteInsuranceSqlModel extends Model {
     @Column(Sequelize.UUIDV4)
     id!: string
 
-    @Column(DataType.FLOAT)
-    monthlyPrice!: number
+    @Column(DataType.DECIMAL(SQL_DEFAULT_PRECISION, SQL_DEFAULT_SCALE))
+    monthlyPrice!: string
 
-    @Column
-    defaultDeductible!: number
+    @Column(DataType.DECIMAL(SQL_DEFAULT_PRECISION, SQL_DEFAULT_SCALE))
+    defaultDeductible!: string
 
-    @Column
-    defaultCeiling!: number
+    @Column(DataType.DECIMAL(SQL_DEFAULT_PRECISION, SQL_DEFAULT_SCALE))
+    defaultCeiling!: string
 
     @Column
     currency!: string

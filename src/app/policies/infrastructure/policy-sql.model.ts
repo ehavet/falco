@@ -4,6 +4,7 @@ import { PolicyRiskSqlModel } from '../../quotes/infrastructure/policy-risk-sql.
 import { Policy } from '../domain/policy'
 import { PolicyPersonSqlModel } from './policy-person-sql.model'
 import { OperationCode } from '../../common-api/domain/operation-code'
+import { SQL_DEFAULT_PRECISION, SQL_DEFAULT_SCALE } from '../../common-api/domain/amount/amount'
 
 @Table({ timestamps: true, tableName: 'policy', underscored: true })
 export class PolicySqlModel extends Model {
@@ -14,8 +15,8 @@ export class PolicySqlModel extends Model {
     @Column
     partnerCode!: string
 
-    @Column
-    premium!: number
+    @Column(DataType.DECIMAL(SQL_DEFAULT_PRECISION, SQL_DEFAULT_SCALE))
+    premium!: string
 
     @Column
     nbMonthsDue!: number

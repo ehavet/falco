@@ -1,3 +1,4 @@
+import currency from 'currency.js'
 import { Partner } from '../../partners/domain/partner'
 import {
   QuoteRiskNumberOfRoommatesError,
@@ -73,7 +74,7 @@ export namespace Quote {
         specialOperationsCode: undefined,
         specialOperationsCodeAppliedAt: undefined,
         nbMonthsDue: nbMonthsDue,
-        premium: nbMonthsDue * insurance.estimate.monthlyPrice
+        premium: currency(nbMonthsDue).multiply(insurance.estimate.monthlyPrice).value
       }
 
       _applyOperationCode(quote, partnerOffer.operationCodes, command.specOpsCode)
@@ -129,7 +130,7 @@ export namespace Quote {
     }
 
     export function applyNbMonthsDue (quote: Quote, nbMonthsDue: number): void {
-      quote.premium = nbMonthsDue * quote.insurance.estimate.monthlyPrice
+      quote.premium = currency(nbMonthsDue).multiply(quote.insurance.estimate.monthlyPrice).value
       quote.nbMonthsDue = nbMonthsDue
 
       if (quote.startDate) {

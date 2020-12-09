@@ -2,6 +2,7 @@ import { BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } fro
 import { QuoteInsuranceSqlModel } from './quote-insurance-sql.model'
 import { QuoteRiskSqlModel } from './quote-risk-sql.model'
 import { QuotePersonSqlModel } from './quote-person-sql.model'
+import { SQL_DEFAULT_PRECISION, SQL_DEFAULT_SCALE } from '../../../common-api/domain/amount/amount'
 
 @Table({ timestamps: true, tableName: 'quote', underscored: true })
 export class QuoteSqlModel extends Model {
@@ -12,7 +13,7 @@ export class QuoteSqlModel extends Model {
     @Column
     partnerCode!: string
 
-    @Column
+    @Column(DataType.DECIMAL(SQL_DEFAULT_PRECISION, SQL_DEFAULT_SCALE))
     premium!: number
 
     @Column

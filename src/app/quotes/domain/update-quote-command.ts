@@ -14,6 +14,11 @@ export namespace UpdateQuoteCommand {
     }
 
     export interface PolicyHolder {
+        firstname?: string,
+        lastname?: string,
+        address?: string,
+        postalCode?: string,
+        city?: string,
         email?: string,
         phoneNumber?: string
     }

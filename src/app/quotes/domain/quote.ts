@@ -85,7 +85,7 @@ export namespace Quote {
     export function update (quote: Quote, partner: Partner, command: UpdateQuoteCommand, partnerAvailableCodes: Array<OperationCode>): Quote {
       quote.risk = _buildQuoteRisk(command.risk, partner)
       quote.insurance = getInsurance(quote.risk, partner.offer)
-      quote.policyHolder = Quote.PolicyHolder.build(quote.risk, command.policyHolder, quote.policyHolder)
+      quote.policyHolder = Quote.PolicyHolder.build(command.policyHolder, quote.policyHolder)
       _applyStartDate(quote, command.startDate)
       _applyOperationCode(quote, partnerAvailableCodes, command.specOpsCode)
       return quote
@@ -267,16 +267,16 @@ export namespace Quote.Insurance {
 }
 
 export namespace Quote.PolicyHolder {
-    export function build (quoteRisk: Quote.Risk, newPolicyHolderFields?: UpdateQuoteCommand.PolicyHolder, oldPolicyHolder?: Quote.PolicyHolder): Quote.PolicyHolder {
+    export function build (updatedPolicyHolder?: UpdateQuoteCommand.PolicyHolder, formerPolicyHolder?: Quote.PolicyHolder): Quote.PolicyHolder {
       return {
-        firstname: quoteRisk.person?.firstname,
-        lastname: quoteRisk.person?.lastname,
-        address: quoteRisk.property.address,
-        postalCode: quoteRisk.property.postalCode,
-        city: quoteRisk.property.city,
-        email: newPolicyHolderFields?.email,
-        phoneNumber: newPolicyHolderFields?.phoneNumber,
-        emailValidatedAt: _computeEmailValidationDate(oldPolicyHolder, newPolicyHolderFields)
+        firstname: updatedPolicyHolder?.firstname,
+        lastname: updatedPolicyHolder?.lastname,
+        address: updatedPolicyHolder?.address,
+        postalCode: updatedPolicyHolder?.postalCode,
+        city: updatedPolicyHolder?.city,
+        email: updatedPolicyHolder?.email,
+        phoneNumber: updatedPolicyHolder?.phoneNumber,
+        emailValidatedAt: _computeEmailValidationDate(formerPolicyHolder, updatedPolicyHolder)
       }
     }
 

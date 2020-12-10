@@ -141,8 +141,8 @@ describe('Repository - Quote', async () => {
             city: 'updated city'
           },
           person: {
-            firstname: 'updated-policy-holder-firstname',
-            lastname: 'updated-policy-holder-lastname'
+            firstname: 'updated-person-firstname',
+            lastname: 'updated-person-lastname'
           },
           otherPeople: [
             {
@@ -206,8 +206,8 @@ describe('Repository - Quote', async () => {
       expect(savedRisk.property.address).to.equal('updated address')
       expect(savedRisk.property.postalCode).to.equal('99999')
       expect(savedRisk.property.city).to.equal('updated city')
-      expect(savedRisk.person!.firstname).to.equal('updated-policy-holder-firstname')
-      expect(savedRisk.person!.lastname).to.equal('updated-policy-holder-lastname')
+      expect(savedRisk.person!.firstname).to.equal('updated-person-firstname')
+      expect(savedRisk.person!.lastname).to.equal('updated-person-lastname')
       expect(savedRisk.otherPeople!.map(person => { return { firstname: person.firstname, lastname: person.lastname } }))
         .to.deep.include(
           { firstname: 'updated-first-otherPeople-firstname', lastname: 'updated-first-otherPeople-lastname' },

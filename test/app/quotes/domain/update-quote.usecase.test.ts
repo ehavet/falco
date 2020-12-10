@@ -323,7 +323,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
   })
 
   describe('updating the policy holder', async () => {
-    it('should add a policy holder with no email validation date if the quote did not have one before', async () => {
+    it('should add a policy holder with no email validation date when former quote policy holder is undefined', async () => {
       // Given
       quote.policyHolder = undefined
       const updatedQuote = createQuoteFixture(
@@ -433,7 +433,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
       sinon.assert.calledWithExactly(quoteRepository.update, updatedQuote)
     })
 
-    it('should update the policy holder phone when the phone is changed', async () => {
+    it('should update policy holder properties when they have changed', async () => {
       // Given
       const updatedQuote = createQuoteFixture(
         {
@@ -442,7 +442,13 @@ describe('Quotes - Usecase - Update Quote', async () => {
           specialOperationsCodeAppliedAt: null,
           termEndDate: new Date('2021-01-04T00:00:00.000Z'),
           policyHolder: createQuotePolicyHolderFixture({
-            phoneNumber: '+33666666666'
+            firstname: 'Eupe',
+            lastname: 'Daitide',
+            address: '999 rue des prairies',
+            postalCode: '91100',
+            city: undefined,
+            email: 'jeanjean@email.com',
+            phoneNumber: '+33684205510'
           })
         }
       )
@@ -453,7 +459,13 @@ describe('Quotes - Usecase - Update Quote', async () => {
       const updateQuoteCommand = createUpdateQuoteCommandFixture({
         id: quoteId,
         policyHolder: createUpdateQuoteCommandPolicyHolderFixture({
-          phoneNumber: '+33666666666'
+          firstname: 'Eupe',
+          lastname: 'Daitide',
+          address: '999 rue des prairies',
+          postalCode: '91100',
+          city: undefined,
+          email: 'jeanjean@email.com',
+          phoneNumber: '+33684205510'
         })
       })
 
@@ -500,7 +512,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
       sinon.assert.calledWithExactly(quoteRepository.update, updatedQuote)
     })
 
-    it('should update the risk and policy holder if risk address, postal code and city are changed', async () => {
+    it('should update risk if risk address, postal code and city are changed', async () => {
       // Given
       const updatedQuote = createQuoteFixture(
         {
@@ -515,11 +527,6 @@ describe('Quotes - Usecase - Update Quote', async () => {
               postalCode: '13840',
               city: 'Nakamura'
             }
-          }),
-          policyHolder: createQuotePolicyHolderFixture({
-            address: '5 avenue du bitume',
-            postalCode: '13840',
-            city: 'Nakamura'
           })
         }
       )
@@ -583,7 +590,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
       sinon.assert.calledWithExactly(quoteRepository.update, updatedQuote)
     })
 
-    it('should update risk on the person firstname/lastname and policy holder firstname/lastname if the risk on the person is changed', async () => {
+    it('should update the risk person if firstname and lastname have changed', async () => {
       // Given
       const updatedQuote = createQuoteFixture(
         {
@@ -596,8 +603,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
               firstname: 'Harry',
               lastname: 'Cover'
             }
-          }),
-          policyHolder: createQuotePolicyHolderFixture({ firstname: 'Harry', lastname: 'Cover' })
+          })
         }
       )
       quoteRepository.get.withArgs(quoteId).resolves(quote)
@@ -621,7 +627,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
       sinon.assert.calledWithExactly(quoteRepository.update, updatedQuote)
     })
 
-    it('should remove the person and policy holder firstname/lastname if the risk on the person is deleted', async () => {
+    it('should remove the person if the risk on the person is deleted', async () => {
       // Given
       const updatedQuote = createQuoteFixture(
         {
@@ -631,8 +637,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
           termEndDate: new Date('2021-01-04T00:00:00.000Z'),
           risk: createQuoteRiskFixture({
             person: undefined
-          }),
-          policyHolder: createQuotePolicyHolderFixture({ firstname: undefined, lastname: undefined })
+          })
         }
       )
       quoteRepository.get.withArgs(quoteId).resolves(quote)
@@ -779,6 +784,11 @@ describe('Quotes - Usecase - Update Quote', async () => {
         }
       },
       policyHolder: {
+        firstname: 'Lucie',
+        lastname: 'Fer',
+        address: '666 rue de la mer morte',
+        postalCode: '66666',
+        city: 'Babylone',
         email: 'henoch@book.com',
         phoneNumber: '+66666666666'
       },

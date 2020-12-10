@@ -134,8 +134,13 @@ export function createUpdateQuoteCommandFixture (attr:Partial<UpdateQuoteCommand
       ]
     },
     policyHolder: {
+      firstname: 'Jean-Jean',
+      lastname: 'Lapin',
       email: 'jeanjean@email.com',
-      phoneNumber: '+33684205510'
+      phoneNumber: '+33684205510',
+      address: '88 rue des prairies',
+      postalCode: '91100',
+      city: 'Kyukamura'
     },
     startDate: now,
     ...attr
@@ -144,6 +149,11 @@ export function createUpdateQuoteCommandFixture (attr:Partial<UpdateQuoteCommand
 
 export function createUpdateQuoteCommandPolicyHolderFixture (attr:Partial<UpdateQuoteCommand.PolicyHolder> = {}): UpdateQuoteCommand.PolicyHolder {
   return {
+    firstname: 'Jean-Jean',
+    lastname: 'Lapin',
+    address: '88 rue des prairies',
+    postalCode: '91100',
+    city: 'Kyukamura',
     email: 'jeanjean@email.com',
     phoneNumber: '+33684205510',
     ...attr
@@ -203,6 +213,11 @@ export function createUpdateQuotePayloadFixture (attr:Partial<object> = {}) {
       ]
     },
     policy_holder: {
+      firstname: 'Jean-Jean',
+      lastname: 'Lapin',
+      address: '88 rue des prairies',
+      postal_code: '91100',
+      city: 'Kyukamura',
       email: 'jeanjean@email.com',
       phone_number: '+33684205510'
     },

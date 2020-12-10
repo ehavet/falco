@@ -11,22 +11,15 @@ import { QuoteRiskOtherPeopleSqlModel } from './sql-models/quote-risk-other-peop
 
 export class QuoteSqlRepository implements QuoteRepository {
   async save (quote: Quote): Promise<Quote> {
-    const personSql = await QuotePersonSqlModel.create({
-      firstname: quote.policyHolder ? quote.policyHolder.firstname : undefined,
-      lastname: quote.policyHolder ? quote.policyHolder.lastname : undefined,
-      address: quote.policyHolder ? quote.policyHolder.address : undefined,
-      postalCode: quote.policyHolder ? quote.policyHolder.postalCode : undefined,
-      city: quote.policyHolder ? quote.policyHolder.city : undefined,
-      email: quote.policyHolder ? quote.policyHolder.email : undefined,
-      phoneNumber: quote.policyHolder ? quote.policyHolder.phoneNumber : undefined
-    })
-
     const quoteSql = await QuoteSqlModel.create({
       id: quote.id,
       partnerCode: quote.partnerCode,
       risk: {
         property: quote.risk.property,
-        quotePersonId: personSql.id,
+        person: {
+          firstname: quote.risk.person ? quote.risk.person.firstname : undefined,
+          lastname: quote.risk.person ? quote.risk.person.lastname : undefined
+        },
         otherPeople: quote.risk.otherPeople
       },
       insurance: {
@@ -40,7 +33,15 @@ export class QuoteSqlRepository implements QuoteRepository {
         contractualTerms: quote.insurance.contractualTerms,
         ipid: quote.insurance.ipid
       },
-      policyHolderId: personSql.id,
+      policyHolder: {
+        firstname: quote.policyHolder ? quote.policyHolder.firstname : null,
+        lastname: quote.policyHolder ? quote.policyHolder.lastname : null,
+        address: quote.policyHolder ? quote.policyHolder.address : null,
+        postalCode: quote.policyHolder ? quote.policyHolder.postalCode : null,
+        city: quote.policyHolder ? quote.policyHolder.city : null,
+        email: quote.policyHolder ? quote.policyHolder.email : null,
+        phoneNumber: quote.policyHolder ? quote.policyHolder.phoneNumber : null
+      },
       premium: quote.premium,
       nbMonthsDue: quote.nbMonthsDue,
       startDate: quote.startDate,
@@ -55,9 +56,6 @@ export class QuoteSqlRepository implements QuoteRepository {
         }
       ]
     })
-
-    quoteSql.policyHolder = personSql
-    quoteSql.risk.person = personSql
 
     return sqlToDomain(quoteSql)
   }
@@ -113,17 +111,6 @@ export class QuoteSqlRepository implements QuoteRepository {
       }
     )
 
-    const updatedPeopleResult = await QuotePersonSqlModel.update(
-      {
-        firstname: (quote.risk.person && quote.risk.person.firstname) ? quote.risk.person.firstname : null,
-        lastname: (quote.risk.person && quote.risk.person.lastname) ? quote.risk.person.lastname : null
-      },
-      {
-        where: { id: risk.quotePersonId },
-        returning: true
-      }
-    )
-
     const riskPeopleAssociationsResult = await QuoteRiskOtherPeopleSqlModel.findAll(
       {
         where: { quoteRiskId: risk.id }
@@ -165,28 +152,63 @@ export class QuoteSqlRepository implements QuoteRepository {
       }
     )
 
-    const updatedPolicyHoldersResult = await QuotePersonSqlModel.update(
-      {
-        address: (quote.policyHolder && quote.policyHolder.address) ? quote.policyHolder.address : null,
-        postalCode: (quote.policyHolder && quote.policyHolder.postalCode) ? quote.policyHolder.postalCode : null,
-        city: (quote.policyHolder && quote.policyHolder.city) ? quote.policyHolder.city : null,
-        email: (quote.policyHolder && quote.policyHolder.email) ? quote.policyHolder.email : null,
-        phoneNumber: (quote.policyHolder && quote.policyHolder.phoneNumber) ? quote.policyHolder.phoneNumber : null,
-        emailValidatedAt: (quote.policyHolder && quote.policyHolder.emailValidatedAt) ? quote.policyHolder.emailValidatedAt : null
-      },
-      {
-        where: { id: updatedQuoteSql.policyHolderId },
-        returning: true
-      }
-    )
-
     updatedQuoteSql.insurance = updatedInsurancesResult[1][0]
     updatedQuoteSql.risk = risk
     updatedQuoteSql.risk.property = updatedQuotePropertiesResult[1][0]
-    updatedQuoteSql.risk.person = updatedPeopleResult[1][0]
+    updatedQuoteSql.risk.person = await _updatePerson(risk.quotePersonId!, quote.risk.person)
     updatedQuoteSql.risk.otherPeople = otherPeopleResult
-    updatedQuoteSql.policyHolder = updatedPolicyHoldersResult[1][0]
+    updatedQuoteSql.policyHolder = await _updatePolicyHolder(updatedQuoteSql.policyHolderId!, quote.policyHolder)
 
     return sqlToDomain(updatedQuoteSql)
   }
+}
+
+async function _updatePerson (id: string, person?: Quote.Risk.Person): Promise<QuotePersonSqlModel> {
+  const updatedPeople: [number, QuotePersonSqlModel[]] =
+      await _updatePeople(id, person?.firstname, person?.lastname)
+  return updatedPeople[1][0]
+}
+
+async function _updatePolicyHolder (id: string, policyHolder?: Quote.PolicyHolder): Promise<QuotePersonSqlModel> {
+  const updatedPeople: [number, QuotePersonSqlModel[]] = await _updatePeople(
+    id,
+    policyHolder?.firstname,
+    policyHolder?.lastname,
+    policyHolder?.address,
+    policyHolder?.postalCode,
+    policyHolder?.city,
+    policyHolder?.email,
+    policyHolder?.phoneNumber,
+    policyHolder?.emailValidatedAt
+  )
+  return updatedPeople[1][0]
+}
+
+async function _updatePeople (
+  id: string,
+  firstname?: string,
+  lastname?: string,
+  address?: string,
+  postalCode?: string,
+  city?: string,
+  email?: string,
+  phoneNumber?: string,
+  emailValidatedAt?: Date
+): Promise<[number, QuotePersonSqlModel[]]> {
+  return QuotePersonSqlModel.update(
+    {
+      firstname: firstname || null,
+      lastname: lastname || null,
+      address: address || null,
+      postalCode: postalCode || null,
+      city: city || null,
+      email: email || null,
+      phoneNumber: phoneNumber || null,
+      emailValidatedAt: emailValidatedAt || null
+    },
+    {
+      where: { id: id },
+      returning: true
+    }
+  )
 }

@@ -48,7 +48,9 @@ export namespace Partner.Question {
 
     export enum QuestionCode {
         RoomCount = 'RoomCount',
-        Roommate = 'Roommate'
+        Roommate = 'Roommate',
+        PropertyType = 'PropertyType',
+        Occupancy = 'Occupancy'
     }
 
     export interface ListOptions<T> {

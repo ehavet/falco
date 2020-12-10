@@ -2,7 +2,7 @@ import pdftk from 'node-pdftk'
 import path from 'path'
 import { PDFProcessor } from './pdf-processor'
 import { PDFGenerationConfig } from '../../../../configs/pdf-generation.config'
-import { isRelatedToADemoPartner } from '../../../partners/domain/partner.func'
+import * as Partner from '../../../partners/domain/partner.func'
 
 const SPECIMEN_STAMP_FILENAME: string = 'specimen-stamp.pdf'
 
@@ -14,7 +14,7 @@ export class PDFtkPDFProcessor implements PDFProcessor {
   }
 
   public async readPdfFile (filePath: string, partnerCode: string): Promise<Buffer> {
-    if (isRelatedToADemoPartner(partnerCode) || this.isNotInProductionMode()) {
+    if (Partner.isRelatedToADemoPartner(partnerCode) || this.isNotInProductionMode()) {
       return this.readPdfFileAndAddSpecimenStamp(filePath)
     }
     return pdftk.input(filePath).uncompress().output()

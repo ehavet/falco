@@ -2,7 +2,7 @@ import { PaymentIntent, PaymentProcessor } from '../domain/payment-processor'
 import { Logger } from '../../../libs/logger'
 import { Stripe } from 'stripe'
 import { StripeClients } from '../../../libs/stripe'
-import { isRelatedToADemoPartner } from '../../partners/domain/partner.func'
+import * as Partner from '../../partners/domain/partner.func'
 
 export class StripePaymentProcessor implements PaymentProcessor {
     #stripe: StripeClients
@@ -24,7 +24,7 @@ export class StripePaymentProcessor implements PaymentProcessor {
         }
       }
       try {
-        if (isRelatedToADemoPartner(partnerCode)) {
+        if (Partner.isRelatedToADemoPartner(partnerCode)) {
           paymentIntent = await this.#stripe.TestClient.paymentIntents.create(paymentIntentCreateParams)
         } else {
           paymentIntent = await this.#stripe.LiveClient.paymentIntents.create(paymentIntentCreateParams)

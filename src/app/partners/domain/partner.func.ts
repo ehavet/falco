@@ -3,6 +3,7 @@ import { PartnerQuestionNotFoundError } from './partner.errors'
 import { Quote } from '../../quotes/domain/quote'
 
 const NUMBER_FOR_NO_ROOMMATES = 0
+const DEMO_PARTNER_CODE_PREFIX: string = 'demo'
 
 export function doesPartnerAllowRoommates (partner: Partner): boolean {
   const roommateQuestion = _getQuestionOnRoommates(partner)
@@ -51,4 +52,9 @@ export function isPropertyRoomCountCovered (partner: Partner, propertyRoomCount)
 export function isPropertyAllowNumberOfRoommates (partner: Partner, numberOfRoommates: number, risk: Quote.Risk): boolean {
   const maxNumberOfRoommates = getMaxNumberOfRoommatesForProperty(partner, risk)
   return numberOfRoommates <= maxNumberOfRoommates
+}
+
+export function isRelatedToADemoPartner (partnerCode?: string): boolean {
+  if (!partnerCode) return false
+  return partnerCode.startsWith(DEMO_PARTNER_CODE_PREFIX)
 }

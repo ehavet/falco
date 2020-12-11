@@ -47,17 +47,19 @@ function _toRoomCountQuestion (jsonQuestion: any) {
 }
 
 function _toPropertyTypeQuestion (jsonQuestion: any) {
-  return {
+  const question: Partner.Question.PropertyTypeQuestion = {
     code: Partner.Question.QuestionCode.PropertyType,
     options: jsonQuestion.options
   }
+  return question
 }
 
 function _toOccupancyQuestion (jsonQuestion: any) {
-  return {
+  const question: Partner.Question.OccupancyQuestion = {
     code: Partner.Question.QuestionCode.Occupancy,
     options: jsonQuestion.options
   }
+  return question
 }
 
 function _toRoommateQuestion (jsonQuestion: any) {

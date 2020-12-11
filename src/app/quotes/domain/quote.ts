@@ -1,4 +1,3 @@
-import currency from 'currency.js'
 import { Partner } from '../../partners/domain/partner'
 import {
   QuoteRiskNumberOfRoommatesError,
@@ -14,6 +13,7 @@ import { OperationCode } from '../../common-api/domain/operation-code'
 import { OperationCodeNotApplicableError } from '../../policies/domain/operation-code.errors'
 import { SpecialOperation } from '../../common-api/domain/special-operation.func'
 import { CreateQuoteCommand } from './create-quote-command'
+import { Amount } from '../../common-api/domain/amount/amount'
 
 const DEFAULT_NUMBER_MONTHS_DUE = 12
 
@@ -74,7 +74,7 @@ export namespace Quote {
         specialOperationsCode: undefined,
         specialOperationsCodeAppliedAt: undefined,
         nbMonthsDue: nbMonthsDue,
-        premium: currency(nbMonthsDue).multiply(insurance.estimate.monthlyPrice).value
+        premium: Amount.multiply(nbMonthsDue, insurance.estimate.monthlyPrice)
       }
 
       _applyOperationCode(quote, partnerOffer.operationCodes, command.specOpsCode)
@@ -130,7 +130,7 @@ export namespace Quote {
     }
 
     export function applyNbMonthsDue (quote: Quote, nbMonthsDue: number): void {
-      quote.premium = currency(nbMonthsDue).multiply(quote.insurance.estimate.monthlyPrice).value
+      quote.premium = Amount.multiply(nbMonthsDue, quote.insurance.estimate.monthlyPrice)
       quote.nbMonthsDue = nbMonthsDue
 
       if (quote.startDate) {

@@ -1,4 +1,3 @@
-import currency from 'currency.js'
 import { Quote } from '../../quotes/domain/quote'
 import { CreatePolicyCommand } from './create-policy-command'
 import { generate } from 'randomstring'
@@ -17,6 +16,7 @@ import {
   PolicyHolderEmailValidationError,
   PolicyRiskPropertyMissingFieldError
 } from './policies.errors'
+import { Amount } from '../../common-api/domain/amount/amount'
 
 const DEFAULT_NUMBER_OF_MONTHS_DUE = 12
 
@@ -26,7 +26,7 @@ export interface Policy {
     insurance: Quote.Insurance,
     risk: Policy.Risk,
     contact: Policy.Holder,
-    premium: number,
+    premium: Amount,
     nbMonthsDue: number,
     startDate: Date,
     termStartDate: Date,
@@ -134,7 +134,7 @@ export namespace Policy {
           risk,
           contact: _createContact(createPolicyCommand.contact, createPolicyCommand.risk, quote.risk),
           nbMonthsDue: DEFAULT_NUMBER_OF_MONTHS_DUE,
-          premium: currency(quote.insurance.estimate.monthlyPrice).multiply(DEFAULT_NUMBER_OF_MONTHS_DUE).value,
+          premium: Amount.multiply(quote.insurance.estimate.monthlyPrice, DEFAULT_NUMBER_OF_MONTHS_DUE),
           startDate,
           termStartDate: startDate,
           termEndDate: _computeTermEndDate(startDate, DEFAULT_NUMBER_OF_MONTHS_DUE),
@@ -216,7 +216,7 @@ function _computeTermEndDate (termStartDate: Date, durationInMonths: number): Da
 }
 
 function _applyNbMonthsDue (policy: Policy, nbMonthsDue: number): void {
-  policy.premium = currency(nbMonthsDue).multiply(policy.insurance.estimate.monthlyPrice).value
+  policy.premium = Amount.multiply(nbMonthsDue, policy.insurance.estimate.monthlyPrice)
   policy.nbMonthsDue = nbMonthsDue
   policy.termEndDate = _computeTermEndDate(policy.startDate, nbMonthsDue)
 }

@@ -5,7 +5,7 @@ import { sqlToDomain } from './policy-sql.mapper'
 import { PolicyNotFoundError } from '../domain/policies.errors'
 import { PolicyPersonSqlModel } from './policy-person-sql.model'
 import { PolicyRiskSqlModel } from '../../quotes/infrastructure/policy-risk-sql.model'
-import { toAmount } from '../../common-api/domain/amount/amount'
+import { Amount } from '../../common-api/domain/amount/amount'
 
 export class PolicySqlRepository implements PolicyRepository {
   async save (policy: Policy): Promise<Policy> {
@@ -119,7 +119,7 @@ export class PolicySqlRepository implements PolicyRepository {
           { model: PolicyRiskSqlModel, include: [{ all: true }] }]
       })
     if (persitedPolicy) {
-      persitedPolicy.premium = toAmount(policy.premium).toString()
+      persitedPolicy.premium = Amount.toAmount(policy.premium).toString()
       persitedPolicy.nbMonthsDue = policy.nbMonthsDue
       persitedPolicy.startDate = policy.startDate
       persitedPolicy.termStartDate = policy.termStartDate

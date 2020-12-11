@@ -83,17 +83,21 @@ const tablesToUpdate = [
 
 module.exports = {
   up: async (queryInterface) => {
-    const isUpMigration = true
-    await Promise.all(updateTable(tablesToUpdate, queryInterface, isUpMigration))
+    return upMigrationColumns(tablesToUpdate, queryInterface)
   },
 
   down: async (queryInterface) => {
-    const isUpMigration = false
-    await Promise.all(updateTable(tablesToUpdate, queryInterface, isUpMigration))
+    return downMigrationColumns(tablesToUpdate, queryInterface)
   }
 }
 
-function updateTable (tablesToUpdate, queryInterface, isUpMigration) {
+function upMigrationColumns (columnsToUpdate, queryInterface) {
+  return _updateTables(columnsToUpdate, queryInterface, true)
+}
+function downMigrationColumns (columnsToUpdate, queryInterface) {
+  return _updateTables(columnsToUpdate, queryInterface, false)
+}
+function _updateTables (tablesToUpdate, queryInterface, isUpMigration) {
   return tablesToUpdate.map((tableToUpdate) => {
     return tableToUpdate.attributes.map((attribute) => {
       return queryInterface.changeColumn(tableToUpdate.tableName, attribute.name, {

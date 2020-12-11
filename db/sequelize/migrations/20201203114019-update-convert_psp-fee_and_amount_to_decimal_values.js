@@ -2,19 +2,22 @@
 
 module.exports = {
   up: async (queryInterface) => {
-    const isUpMigration = true
-
-    await convertAmountAndPspFee(queryInterface, isUpMigration)
+    await upConvertAmountAndPspFee(queryInterface)
   },
 
   down: async (queryInterface) => {
-    const isUpMigration = false
-
-    await convertAmountAndPspFee(queryInterface, isUpMigration)
+    await downConvertAmountAndPspFee(queryInterface)
   }
 }
 
-async function convertAmountAndPspFee (queryInterface, isUpMigration) {
+async function upConvertAmountAndPspFee (queryInterface) {
+  await _convertAmountAndPspFee(queryInterface, true)
+}
+async function downConvertAmountAndPspFee (queryInterface) {
+  await _convertAmountAndPspFee(queryInterface, false)
+}
+
+async function _convertAmountAndPspFee (queryInterface, isUpMigration) {
   const payments = await queryInterface.sequelize.query('SELECT id, amount, psp_fee FROM payment')
 
   return payments[0].map(payment => {

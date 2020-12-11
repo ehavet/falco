@@ -33,7 +33,7 @@ function _sqlToRiskMapper (quoteSql: QuoteSqlModel) {
       lastname: quoteSql.risk.person.lastname
     } : undefined,
     otherPeople: quoteSql.risk.otherPeople ? quoteSql.risk.otherPeople.map(person => {
-      return { firstname: person.firstname, lastname: person.lastname }
+      return { firstname: person.firstname!, lastname: person.lastname! }
     }) : undefined
   }
 }

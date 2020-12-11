@@ -10,7 +10,7 @@ import Sequelize from 'sequelize'
 import { v4 as uuidv4 } from 'uuid'
 
 @Table({ timestamps: true, tableName: 'quote_insurance', underscored: true })
-export class QuoteInsuranceSqlModel extends Model<QuoteInsuranceSqlModel> {
+export class QuoteInsuranceSqlModel extends Model {
     @PrimaryKey
     @Default(uuidv4)
     @Column(Sequelize.UUIDV4)

@@ -30,15 +30,17 @@ module.exports = {
             )
 
           const addPolicyRiskIdPrimaryKeyConstraintOnPolicyRiskTable = await queryInterface
-            .addConstraint('policy_risk', ['id'], {
+            .addConstraint('policy_risk', {
               type: 'primary key',
+              fields: ['id'],
               name: 'policy_risk_pkey',
               transaction: renameTableRiskToPolicyRiskUpdate
             })
 
           const addPolicyRiskIdForeignkeyConstraintOnPolicyTable = await queryInterface
-            .addConstraint('policy', ['policy_risk_id'], {
+            .addConstraint('policy', {
               type: 'foreign key',
+              fields: ['policy_risk_id'],
               name: 'policy_policy_risk_id_fkey',
               references: {
                 table: 'policy_risk',
@@ -51,8 +53,9 @@ module.exports = {
             })
 
           const addPolicyRiskIdForeignkeyConstraintOnOtherInsuredTable = await queryInterface
-            .addConstraint('other_insured', ['risk_id'], {
+            .addConstraint('other_insured', {
               type: 'foreign key',
+              fields: ['risk_id'],
               name: 'other_insured_policy_risk_id_fkey',
               references: {
                 table: 'policy_risk',
@@ -143,15 +146,17 @@ module.exports = {
           )
 
         const addRiskIdPrimaryKeyConstraintOnRiskTable = await queryInterface
-          .addConstraint('risk', ['id'], {
+          .addConstraint('risk', {
             type: 'primary key',
+            fields: ['id'],
             name: 'risk_pkey',
             transaction: renameTablePolicyRiskToRiskUpdate
           })
 
         const addRiskIdForeignkeyConstraintOnPolicyTable = await queryInterface
-          .addConstraint('policy', ['risk_id'], {
+          .addConstraint('policy', {
             type: 'foreign key',
+            fields: ['risk_id'],
             name: 'policy_risk_id_fkey',
             references: {
               table: 'risk',
@@ -164,8 +169,9 @@ module.exports = {
           })
 
         const addRiskIdForeignkeyConstraintOnOtherInsuredTable = await queryInterface
-          .addConstraint('other_insured', ['risk_id'], {
+          .addConstraint('other_insured', {
             type: 'foreign key',
+            fields: ['risk_id'],
             name: 'other_insured_risk_id_fkey',
             references: {
               table: 'risk',

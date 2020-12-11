@@ -3,33 +3,33 @@ import { v4 as uuidv4 } from 'uuid'
 import Sequelize from 'sequelize'
 
 @Table({ timestamps: true, tableName: 'quote_person', underscored: true })
-export class QuotePersonSqlModel extends Model<QuotePersonSqlModel> {
+export class QuotePersonSqlModel extends Model {
     @PrimaryKey
     @Default(uuidv4)
     @Column(Sequelize.UUIDV4)
     id!: string
 
     @Column
-    firstname!: string
+    firstname?: string
 
     @Column
-    lastname!: string
+    lastname?: string
 
     @Column
-    address!: string
+    address?: string
 
     @Column
-    postalCode!: string
+    postalCode?: string
 
     @Column
-    city!: string
+    city?: string
 
     @Column
-    email!: string
+    email?: string
 
     @Column
     emailValidatedAt?: Date
 
     @Column
-    phoneNumber!: string
+    phoneNumber?: string
 }

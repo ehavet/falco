@@ -88,8 +88,9 @@ module.exports = {
         )
 
         const addPolicyRiskOtherPeopleForeignKeyConstraint = await queryInterface
-          .addConstraint('policy_risk_other_people', ['policy_person_id'], {
+          .addConstraint('policy_risk_other_people', {
             type: 'foreign key',
+            fields: ['policy_person_id'],
             name: 'policy_risk_other_people_policy_person_id_fkey',
             references: {
               table: 'policy_person',

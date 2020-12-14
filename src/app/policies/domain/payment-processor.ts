@@ -1,10 +1,12 @@
+import { Amount } from '../../common-api/domain/amount/amount'
+
 export interface PaymentProcessor {
-    createPaymentIntent(policyId: string, amount: number, currency: string, partnerCode: string): Promise<PaymentIntent>
-    getTransactionFee(rawPaymentIntent: any): Promise<number | null>
+    createPaymentIntent(policyId: string, amount: Amount, currency: string, partnerCode: string): Promise<PaymentIntent>
+    getTransactionFee(rawPaymentIntent: any): Promise<Amount | null>
 }
 
 export type PaymentIntent = {
     id: string
-    amount: number
+    amount: Amount
     currency: string
 }

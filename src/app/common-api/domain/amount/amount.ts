@@ -13,4 +13,8 @@ export namespace Amount {
   export function multiply (firstNumber: number, secondNumber: number): Amount {
     return currentLibrary(firstNumber).multiply(secondNumber).value
   }
+
+  export function divide (numerator: number, denominator: number): Amount {
+    return currentLibrary(numerator).divide(denominator).value
+  }
 }

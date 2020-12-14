@@ -1,11 +1,13 @@
+import { Amount } from '../../../common-api/domain/amount/amount'
+
 export interface Payment {
     id?: Payment.PaymentId,
-    amount: Payment.AmountInCents,
+    amount: Amount,
     currency: Payment.Currency,
     processor: Payment.Processor,
     method: Payment.Method,
     externalId: string,
-    pspFee: Payment.AmountInCents | null, // can be null if the value cannot be retrieved
+    pspFee: Amount | null, // can be null if the value cannot be retrieved
     status: Payment.Status,
     payedAt: Date,
     cancelledAt: Date | null,
@@ -15,8 +17,6 @@ export interface Payment {
 export namespace Payment {
 
     export type PaymentId = string
-
-    export type AmountInCents = number
 
     export enum Processor {
         STRIPE = 'STRIPE'

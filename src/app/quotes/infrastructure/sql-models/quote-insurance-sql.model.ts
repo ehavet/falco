@@ -8,6 +8,7 @@ import {
 } from 'sequelize-typescript'
 import Sequelize from 'sequelize'
 import { v4 as uuidv4 } from 'uuid'
+import { AmountSQLDataType } from '../../../common-api/infrastructure/amount/amount-sql'
 
 @Table({ timestamps: true, tableName: 'quote_insurance', underscored: true })
 export class QuoteInsuranceSqlModel extends Model {
@@ -16,14 +17,14 @@ export class QuoteInsuranceSqlModel extends Model {
     @Column(Sequelize.UUIDV4)
     id!: string
 
-    @Column(DataType.FLOAT)
-    monthlyPrice!: number
+    @Column(AmountSQLDataType)
+    monthlyPrice!: string
 
-    @Column
-    defaultDeductible!: number
+    @Column(AmountSQLDataType)
+    defaultDeductible!: string
 
-    @Column
-    defaultCeiling!: number
+    @Column(AmountSQLDataType)
+    defaultCeiling!: string
 
     @Column
     currency!: string

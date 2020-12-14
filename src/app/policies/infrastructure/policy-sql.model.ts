@@ -4,6 +4,7 @@ import { PolicyRiskSqlModel } from '../../quotes/infrastructure/policy-risk-sql.
 import { Policy } from '../domain/policy'
 import { PolicyPersonSqlModel } from './policy-person-sql.model'
 import { OperationCode } from '../../common-api/domain/operation-code'
+import { AmountSQLDataType } from '../../common-api/infrastructure/amount/amount-sql'
 
 @Table({ timestamps: true, tableName: 'policy', underscored: true })
 export class PolicySqlModel extends Model {
@@ -14,8 +15,8 @@ export class PolicySqlModel extends Model {
     @Column
     partnerCode!: string
 
-    @Column
-    premium!: number
+    @Column(AmountSQLDataType)
+    premium!: string
 
     @Column
     nbMonthsDue!: number

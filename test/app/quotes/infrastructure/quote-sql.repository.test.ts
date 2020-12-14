@@ -51,7 +51,7 @@ describe('Repository - Quote', async () => {
       const savedQuote = result[0]
       expect(savedQuote.id).to.equal('RF85D4S')
       expect(savedQuote.partnerCode).to.equal('myPartner')
-      expect(savedQuote.premium).to.equal(69.84)
+      expect(savedQuote.premium).to.equal('69.840000')
       expect(savedQuote.nbMonthsDue).to.equal(12)
       expect(savedQuote.startDate).to.equal('2020-01-05')
       expect(savedQuote.createdAt).to.be.an.instanceof(Date)
@@ -72,9 +72,9 @@ describe('Repository - Quote', async () => {
 
       const savedInsurance = savedQuote.insurance
       expect(savedInsurance.id).to.be.a('string')
-      expect(savedInsurance.monthlyPrice).to.equal(5.82)
-      expect(savedInsurance.defaultDeductible).to.equal(150)
-      expect(savedInsurance.defaultCeiling).to.equal(7000)
+      expect(savedInsurance.monthlyPrice).to.equal('5.820000')
+      expect(savedInsurance.defaultDeductible).to.equal('150.000000')
+      expect(savedInsurance.defaultCeiling).to.equal('7000.000000')
       expect(savedInsurance.currency).to.equal('EUR')
       expect(savedInsurance.simplifiedCovers).to.include('ACDDE', 'ACVOL')
       expect(savedInsurance.productCode).to.equal('APP999')
@@ -131,7 +131,7 @@ describe('Repository - Quote', async () => {
       })
       const updatedQuote: Quote = createQuoteFixture({
         id: 'RF85D4S',
-        premium: 101,
+        premium: 101.65,
         nbMonthsDue: 12,
         risk: {
           property: {
@@ -198,7 +198,7 @@ describe('Repository - Quote', async () => {
       const savedQuote = result[0]
       expect(savedQuote.id).to.equal('RF85D4S')
       expect(savedQuote.partnerCode).to.equal('myPartner')
-      expect(savedQuote.premium).to.equal(101)
+      expect(savedQuote.premium).to.equal('101.650000')
       expect(savedQuote.nbMonthsDue).to.equal(12)
 
       const savedRisk = savedQuote.risk
@@ -214,9 +214,9 @@ describe('Repository - Quote', async () => {
           { firstname: 'updated-second-otherPeople-firstname', lastname: 'updated-second-otherPeople-lastname' }
         )
       const savedInsurance = savedQuote.insurance
-      expect(savedInsurance.monthlyPrice).to.equal(99.99)
-      expect(savedInsurance.defaultDeductible).to.equal(99)
-      expect(savedInsurance.defaultCeiling).to.equal(99)
+      expect(savedInsurance.monthlyPrice).to.equal('99.990000')
+      expect(savedInsurance.defaultDeductible).to.equal('99.000000')
+      expect(savedInsurance.defaultCeiling).to.equal('99.000000')
       expect(savedInsurance.currency).to.equal('UPD')
       expect(savedInsurance.simplifiedCovers).to.include('UPD4T3D', 'C0V3R')
       expect(savedInsurance.productCode).to.equal('APPUPD4T3D')

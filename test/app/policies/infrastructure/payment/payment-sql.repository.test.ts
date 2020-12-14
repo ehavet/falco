@@ -43,7 +43,7 @@ describe('Payments - Infra - Payment SQL Repository', async () => {
       const policy = createPolicyFixture()
       savedPolicy = await policyRepository.save(policy)
 
-      paymentToSave = createPaymentFixture({ policyId: policy.id })
+      paymentToSave = createPaymentFixture({ amount: 100.12, policyId: policy.id })
 
       // When
       savedPayment = await paymentRepository.save(paymentToSave)
@@ -55,12 +55,12 @@ describe('Payments - Infra - Payment SQL Repository', async () => {
       expect(paymentsInDb).to.have.lengthOf(1)
       const paymentFromDb = paymentsInDb[0]
       expect(paymentFromDb.id).to.exist
-      expect(paymentFromDb.amount).to.equal(paymentToSave.amount)
+      expect(paymentFromDb.amount).to.equal('100.120000')
       expect(paymentFromDb.currency).to.equal(paymentToSave.currency)
       expect(paymentFromDb.processor).to.equal(paymentToSave.processor)
       expect(paymentFromDb.method).to.equal(paymentToSave.method)
       expect(paymentFromDb.externalId).to.equal(paymentToSave.externalId)
-      expect(paymentFromDb.pspFee).to.equal(paymentToSave.pspFee)
+      expect(paymentFromDb.pspFee).to.equal('150.000000')
       expect(paymentFromDb.status).to.equal(paymentToSave.status)
       expect(paymentFromDb.payedAt).to.deep.equal(paymentToSave.payedAt)
       expect(paymentFromDb.cancelledAt).to.deep.equal(paymentToSave.cancelledAt)
@@ -76,12 +76,12 @@ describe('Payments - Infra - Payment SQL Repository', async () => {
     it('should return the saved payment', async () => {
       // Then
       expect(savedPayment.id).to.exist
-      expect(savedPayment.amount).to.equal(paymentToSave.amount)
+      expect(savedPayment.amount).to.equal(100.12)
       expect(savedPayment.currency).to.equal(paymentToSave.currency)
       expect(savedPayment.processor).to.equal(paymentToSave.processor)
       expect(savedPayment.method).to.equal(paymentToSave.method)
       expect(savedPayment.externalId).to.equal(paymentToSave.externalId)
-      expect(savedPayment.pspFee).to.equal(paymentToSave.pspFee)
+      expect(savedPayment.pspFee).to.equal(150)
       expect(savedPayment.status).to.equal(paymentToSave.status)
       expect(savedPayment.payedAt).to.deep.equal(paymentToSave.payedAt)
       expect(savedPayment.policyId).to.equal(paymentToSave.policyId)

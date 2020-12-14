@@ -1,6 +1,7 @@
 import { Column, DataType, Default, Model, PrimaryKey, Table } from 'sequelize-typescript'
 import { Payment } from '../../domain/payment/payment'
 import { v4 as uuidv4 } from 'uuid'
+import { AmountSQLDataType } from '../../../common-api/infrastructure/amount/amount-sql'
 
 @Table({ timestamps: true, tableName: 'payment', underscored: true })
 export class PaymentSqlModel extends Model {
@@ -9,8 +10,8 @@ export class PaymentSqlModel extends Model {
     @Column
     id!: string
 
-    @Column
-    amount!: number
+    @Column(AmountSQLDataType)
+    amount!: string
 
     @Column
     currency!: Payment.Currency
@@ -24,8 +25,8 @@ export class PaymentSqlModel extends Model {
     @Column
     externalId!: string
 
-    @Column
-    pspFee!: number
+    @Column(AmountSQLDataType)
+    pspFee!: string
 
     @Column
     status!: Payment.Status

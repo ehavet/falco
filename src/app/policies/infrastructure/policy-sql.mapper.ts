@@ -2,6 +2,7 @@ import { Policy } from '../domain/policy'
 import { PolicySqlModel } from './policy-sql.model'
 import { PolicyInsuranceSqlModel } from '../../quotes/infrastructure/policy-insurance-sql.model'
 import { PolicyRiskSqlModel } from '../../quotes/infrastructure/policy-risk-sql.model'
+import { Amount } from '../../common-api/domain/amount/amount'
 
 export function sqlToDomain (policySql: PolicySqlModel): Policy {
   return {
@@ -18,7 +19,7 @@ export function sqlToDomain (policySql: PolicySqlModel): Policy {
       email: policySql.policyHolder.email,
       phoneNumber: policySql.policyHolder.phoneNumber
     },
-    premium: policySql.premium,
+    premium: Amount.toAmount(policySql.premium),
     nbMonthsDue: policySql.nbMonthsDue,
     startDate: new Date(policySql.startDate),
     termStartDate: new Date(policySql.termStartDate),
@@ -56,9 +57,9 @@ function _sqlToRiskMapper (riskSql: PolicyRiskSqlModel) {
 function _sqlToInsuranceMapper (insuranceSql: PolicyInsuranceSqlModel) {
   return {
     estimate: {
-      monthlyPrice: insuranceSql.monthlyPrice,
-      defaultDeductible: insuranceSql.defaultDeductible,
-      defaultCeiling: insuranceSql.defaultCeiling
+      monthlyPrice: Amount.toAmount(insuranceSql.monthlyPrice),
+      defaultDeductible: Amount.toAmount(insuranceSql.defaultDeductible),
+      defaultCeiling: Amount.toAmount(insuranceSql.defaultCeiling)
     },
     currency: insuranceSql.currency,
     simplifiedCovers: insuranceSql.simplifiedCovers,

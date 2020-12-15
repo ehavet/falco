@@ -12,6 +12,7 @@
   "scripts": {
     "prebuild": "rm -rf dist",
     "build": "tsc && copyfiles -u 1 ./src/app/**/*.pdf ./dist/",
+    "build:dev": "tsc --sourceMap && copyfiles -u 1 ./src/app/**/*.pdf ./dist/",
     "lint": "eslint '{src,test}/**/*.ts'",
     "lint:fix": "yarn lint --fix",
     "db:migrate": "sequelize db:migrate",
@@ -24,7 +25,7 @@
     "migrate-and-start": "yarn db:migrate && yarn start",
     "test": "NODE_ENV=test nyc mocha 'test/**/*.{js,ts}' --require ts-node/register",
     "test:ci": "NODE_ENV=test nyc --reporter text --reporter html mocha 'test/**/*.{js,ts}' --require ts-node/register",
-    "dev:start": "yarn build && yarn start",
+    "dev:start": "yarn build:dev && yarn start",
     "dev": "nodemon --watch src -e ts --exec yarn dev:start",
     "postversion": "git push https://${APPENIN_CI_USER}:${APPENIN_CI_TOKEN}@gitlab.com/appenin/falco-api.git  && git push https://${APPENIN_CI_USER}:${APPENIN_CI_TOKEN}@gitlab.com/appenin/falco-api.git --tags"
   },

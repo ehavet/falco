@@ -11,7 +11,8 @@ import { PDFtkPDFProcessor } from '../../../../src/app/policies/infrastructure/p
 describe('Policies - Infra - Contract PDF Generator', async () => {
   const specificTermsFolderPath: string = config.get('FALCO_API_DOCUMENTS_STORAGE_FOLDER')
 
-  afterEach(async () => {
+  afterEach(async function () {
+    this.timeout(10000)
     await fsx.emptyDir(specificTermsFolderPath)
   })
 

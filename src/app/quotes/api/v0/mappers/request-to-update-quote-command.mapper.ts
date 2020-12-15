@@ -28,7 +28,12 @@ function _toRisk (risk): UpdateQuoteCommand.Risk {
 
 function _toPolicyHolder (policyHolder): UpdateQuoteCommand.PolicyHolder {
   return {
-    email: policyHolder.email ? policyHolder.email : undefined,
-    phoneNumber: policyHolder.phone_number ? policyHolder.phone_number : undefined
+    firstname: policyHolder.firstname ?? undefined,
+    lastname: policyHolder.lastname ?? undefined,
+    address: policyHolder.address ?? undefined,
+    postalCode: policyHolder.postal_code ?? undefined,
+    city: policyHolder.city ?? undefined,
+    email: policyHolder.email ?? undefined,
+    phoneNumber: policyHolder.phone_number ?? undefined
   }
 }

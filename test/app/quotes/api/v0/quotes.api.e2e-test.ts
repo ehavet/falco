@@ -136,6 +136,11 @@ describe('Quotes - API - E2E', async () => {
         ]
       },
       policy_holder: {
+        firstname: 'Jeannot',
+        lastname: 'Lapin',
+        address: '90 rue de la nouvelle prairie',
+        postal_code: '91100',
+        city: 'Neo Kyukamura',
         email: 'jean.lapin@email.com',
         phone_number: '+33684205510'
       }

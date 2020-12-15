@@ -476,6 +476,11 @@ describe('Quotes - API - Integration', async () => {
               ]
             },
             policy_holder: {
+              firstname: 'Jean-Jean',
+              lastname: 'Lapin',
+              address: '88 rue des prairies',
+              postal_code: '91100',
+              city: 'Kyukamura',
               email: 'jeanjean@email.com',
               phone_number: '+33684205510'
             }

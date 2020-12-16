@@ -24,10 +24,6 @@ function _toQuestions (questions: any) {
         return _toRoomCountQuestion(jsonQuestion)
       case Partner.Question.QuestionCode.Roommate:
         return _toRoommateQuestion(jsonQuestion)
-      case Partner.Question.QuestionCode.PropertyType:
-        return _toPropertyTypeQuestion(jsonQuestion)
-      case Partner.Question.QuestionCode.Occupancy:
-        return _toOccupancyQuestion(jsonQuestion)
       default:
         return undefined
     }
@@ -43,22 +39,6 @@ function _toRoomCountQuestion (jsonQuestion: any) {
     manageOtherCases: jsonQuestion.manageOtherCases
   }
 
-  return question
-}
-
-function _toPropertyTypeQuestion (jsonQuestion: any) {
-  const question: Partner.Question.PropertyTypeQuestion = {
-    code: Partner.Question.QuestionCode.PropertyType,
-    options: jsonQuestion.options
-  }
-  return question
-}
-
-function _toOccupancyQuestion (jsonQuestion: any) {
-  const question: Partner.Question.OccupancyQuestion = {
-    code: Partner.Question.QuestionCode.Occupancy,
-    options: jsonQuestion.options
-  }
   return question
 }
 

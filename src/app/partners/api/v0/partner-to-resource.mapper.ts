@@ -18,10 +18,6 @@ function _toQuestions (jsonQuestions: any) {
         return Object.assign(questions, _toRoomCountQuestion(jsonQuestion))
       case Partner.Question.QuestionCode.Roommate:
         return Object.assign(questions, _toRoommateQuestion(jsonQuestion))
-      case Partner.Question.QuestionCode.PropertyType:
-        return Object.assign(questions, _toPropertyTypeQuestion(jsonQuestion))
-      case Partner.Question.QuestionCode.Occupancy:
-        return Object.assign(questions, _toOccupancyQuestion(jsonQuestion))
       default:
         return questions
     }
@@ -33,22 +29,6 @@ function _toRoomCountQuestion (jsonQuestion: any) {
     room_count: {
       options: jsonQuestion.options.list,
       manage_other_cases: jsonQuestion.manageOtherCases
-    }
-  }
-}
-
-function _toPropertyTypeQuestion (jsonQuestion: any) {
-  return {
-    property_type: {
-      options: jsonQuestion.options.list
-    }
-  }
-}
-
-function _toOccupancyQuestion (jsonQuestion: any) {
-  return {
-    occupancy: {
-      options: jsonQuestion.options.list
     }
   }
 }

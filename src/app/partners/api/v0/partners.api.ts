@@ -31,12 +31,6 @@ export default function (container: Container): Array<ServerRoute> {
                   options: Joi.array().description('Possible values').example([1, 2, 3]),
                   manage_other_cases: Joi.boolean().description('Manage other cases for not proposed rooms').example(true)
                 }).description('Question about the number of rooms of the property'),
-                property_type: Joi.object({
-                  options: Joi.array().description('Property type').example(['FLAT', 'HOUSE'])
-                }).optional(),
-                occupancy: Joi.object({
-                  options: Joi.array().description('Occupancy').example(['LANDLORD', 'TENANT'])
-                }).optional(),
                 roommate: Joi.object({
                   applicable: Joi.boolean().description('Define if the question is applicable for the partner. If not, do not ask the question to the subscriber otherwise an error could be thrown when creating a policy').example(false),
                   maximum_numbers: Joi.array().optional().items(

@@ -14,7 +14,6 @@ export interface Partner {
 export namespace Partner {
 
     export type Question = Question.RoomCountQuestion | Question.RoommateQuestion
-        | Question.PropertyTypeQuestion | Question.OccupancyQuestion
 
     export interface Offer {
         pricingMatrix: Map<RoomCount, Quote.Insurance.Estimate>
@@ -27,14 +26,6 @@ export namespace Partner {
     }
 
     export type RoomCount = number
-    export enum Occupancy {
-      LANDLORD = 'LANDLORD',
-        TENANT = 'TENANT'
-    }
-    export enum PropertyType {
-        HOUSE = 'HOUSE',
-        FLAT = 'FLAT'
-    }
 }
 
 export namespace Partner.Question {
@@ -42,16 +33,6 @@ export namespace Partner.Question {
         code: QuestionCode,
         options: ListOptions<RoomCount>,
         manageOtherCases: boolean
-    }
-
-    export interface PropertyTypeQuestion {
-        code: QuestionCode,
-        options: ListOptions<PropertyType>,
-    }
-
-    export interface OccupancyQuestion {
-        code: QuestionCode,
-        options: ListOptions<OccupancyQuestion>,
     }
 
     export interface RoommateQuestion {
@@ -67,9 +48,7 @@ export namespace Partner.Question {
 
     export enum QuestionCode {
         RoomCount = 'RoomCount',
-        Roommate = 'Roommate',
-        PropertyType = 'PropertyType',
-        Occupancy = 'Occupancy'
+        Roommate = 'Roommate'
     }
 
     export interface ListOptions<T> {

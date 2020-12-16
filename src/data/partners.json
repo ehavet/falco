@@ -229,18 +229,6 @@
         "manageOtherCases": true
       },
       {
-        "code": "PropertyType",
-        "options": {
-          "list": ["FLAT", "HOUSE"]
-        }
-      },
-      {
-        "code": "Occupancy",
-        "options": {
-          "list": ["LANDLORD", "TENANT"]
-        }
-      },
-      {
         "code": "Roommate",
         "applicable": true,
         "_comment":  "The rule for the maximum number of roommates for demo is the following : roomcount - 1",
@@ -257,7 +245,7 @@
         [4, { "monthlyPrice": 16.90, "defaultDeductible": 150, "defaultCeiling": 12000 }],
         [5, { "monthlyPrice": 19.80, "defaultDeductible": 150, "defaultCeiling": 15000 }]
       ],
-      "operationCodes": ["SUPERCODE"],
+      "operationCodes": [],
       "productCode": "APP978",
       "productVersion": "2020-12-10",
       "contractualTerms": "/docs/Appenin_Conditions_Generales_assurance_habitation_APP978.pdf",

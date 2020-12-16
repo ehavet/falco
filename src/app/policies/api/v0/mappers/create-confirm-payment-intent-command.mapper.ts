@@ -5,7 +5,7 @@ import { Amount } from '../../../../common-api/domain/amount/amount'
 export function requestToConfirmPaymentIntentCommand (paymentIntent: Stripe.PaymentIntent): ConfirmPaymentIntentCommand {
   return {
     policyId: paymentIntent.metadata.policy_id,
-    amount: Amount.toAmount(paymentIntent.amount),
+    amount: Amount.convertCentsToEuro(paymentIntent.amount),
     externalId: paymentIntent.id,
     processor: Payment.Processor.STRIPE,
     method: Payment.Method.CREDITCARD,

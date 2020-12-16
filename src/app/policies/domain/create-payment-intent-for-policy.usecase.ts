@@ -11,6 +11,7 @@ export interface CreatePaymentIntentForPolicy {
 }
 
 export namespace CreatePaymentIntentForPolicy {
+
     export function factory (
       paymentProcessor: PaymentProcessor,
       policyRepository: PolicyRepository
@@ -21,11 +22,11 @@ export namespace CreatePaymentIntentForPolicy {
         if (Policy.isCancelled(policy)) { throw new PolicyCanceledError(policy.id) }
         if (policy.status === Policy.Status.Applicable) { throw new PolicyAlreadyPaidError(policy.id) }
 
-        const paymentIntent = await paymentProcessor.createPaymentIntent(policy.id, Amount.multiply(policy.premium, 100), policy.insurance.currency, policy.partnerCode)
+        const paymentIntent = await paymentProcessor.createPaymentIntent(policy.id, Amount.convertEuroToCents(policy.premium), policy.insurance.currency, policy.partnerCode)
 
         return {
           id: paymentIntent.id,
-          amount: Amount.divide(paymentIntent.amount, 100),
+          amount: Amount.convertCentsToEuro(paymentIntent.amount),
           currency: paymentIntent.currency
         }
       }

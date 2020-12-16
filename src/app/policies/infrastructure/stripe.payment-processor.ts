@@ -60,7 +60,7 @@ export class StripePaymentProcessor implements PaymentProcessor {
 
       try {
         const balanceTransaction = await this.#stripe.LiveClient.balanceTransactions.retrieve(balanceTransactionId)
-        return Amount.toAmount(balanceTransaction.fee)
+        return Amount.convertCentsToEuro(balanceTransaction.fee)
       } catch (error) {
         this.#logger.error('An error occurred while calling Stripe to retrieve the balance transaction', { error, stripePaymentIntent })
         return null

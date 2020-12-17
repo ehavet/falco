@@ -1,7 +1,7 @@
 import { Amount } from '../../../../src/app/common-api/domain/amount/amount'
 import { expect } from '../../../test-utils'
 
-describe('#Amount', () => {
+describe('Common-api - Domain - Amount', () => {
   describe('#convertCentsToEuro', () => {
     it('Should convert cents to euro', () => {
       const numberToConvert = 7200
@@ -40,12 +40,12 @@ describe('#Amount', () => {
 
   describe('#multiply', () => {
     it('Should multiply a non-decimal number', () => {
-      const firstOperand = 9
-      const secondOperand = 9
+      const firstOperand = 6
+      const secondOperand = 7
 
       const convertedResult = Amount.multiply(firstOperand, secondOperand)
 
-      expect(convertedResult).to.be.equal(81)
+      expect(convertedResult).to.be.equal(42)
     })
 
     it('Should multiply a decimal number', () => {

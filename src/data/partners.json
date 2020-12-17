@@ -233,7 +233,7 @@
         "applicable": true,
         "_comment":  "The rule for the maximum number of roommates for demo is the following : roomcount - 1",
         "maximumNumbers": [{ "roomCount": 1, "value": 0 }, { "roomCount": 2, "value": 1 }, { "roomCount": 3, "value": 2 },
-          { "roomCount": 4, "value": 5 }, { "roomCount": 5, "value": 4 }]
+          { "roomCount": 4, "value": 3 }, { "roomCount": 5, "value": 4 }]
       }
     ],
     "offer": {

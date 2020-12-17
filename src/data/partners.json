@@ -213,5 +213,43 @@
       "contractualTerms": "/docs/Appenin_Conditions_Generales_assurance_habitation_APP999.pdf",
       "ipid": "/docs/Appenin_Document_Information_assurance_habitation_APP999.pdf"
     }
+  },
+  "demo": {
+    "code": "demo",
+    "trigram": "DEM",
+    "translationKey": "demo",
+    "callbackUrl": "",
+    "customerSupportEmail": "help@appenin.fr",
+    "questions": [
+      {
+        "code": "RoomCount",
+        "options": {
+          "list": [1, 2, 3, 4, 5]
+        },
+        "manageOtherCases": true
+      },
+      {
+        "code": "Roommate",
+        "applicable": true,
+        "_comment":  "The rule for the maximum number of roommates for demo is the following : roomcount - 1",
+        "maximumNumbers": [{ "roomCount": 1, "value": 0 }, { "roomCount": 2, "value": 1 }, { "roomCount": 3, "value": 2 },
+          { "roomCount": 4, "value": 3 }, { "roomCount": 5, "value": 4 }]
+      }
+    ],
+    "offer": {
+      "simplifiedCovers": ["ACDDE", "ACINCEX", "ACVOL", "ACASSHE", "ACDEFJU", "ACRC"],
+      "pricingMatrix": [
+        [1, { "monthlyPrice": 8.50, "defaultDeductible": 120, "defaultCeiling": 5000 }],
+        [2, { "monthlyPrice": 10.50, "defaultDeductible": 120, "defaultCeiling": 7000 }],
+        [3, { "monthlyPrice": 13.60, "defaultDeductible": 150, "defaultCeiling": 9000 }],
+        [4, { "monthlyPrice": 16.90, "defaultDeductible": 150, "defaultCeiling": 12000 }],
+        [5, { "monthlyPrice": 19.80, "defaultDeductible": 150, "defaultCeiling": 15000 }]
+      ],
+      "operationCodes": [],
+      "productCode": "APP978",
+      "productVersion": "2020-12-10",
+      "contractualTerms": "/docs/Appenin_Conditions_Generales_assurance_habitation_APP978.pdf",
+      "ipid": "/docs/Appenin_Document_Information_assurance_habitation_APP978.pdf"
+    }
   }
 }

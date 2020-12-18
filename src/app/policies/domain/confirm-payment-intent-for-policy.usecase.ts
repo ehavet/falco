@@ -13,6 +13,7 @@ import { Certificate } from './certificate/certificate'
 import { PaymentProcessor } from './payment-processor'
 import { HtmlTemplateEngine } from '../../common-api/domain/html-template-engine'
 import { buildSubscriptionValidationEmail, SubscriptionValidationEmail } from '../../email-validations/domain/subscription-validation.email'
+import { Amount } from '../../common-api/domain/amount/amount'
 
 export interface ConfirmPaymentIntentForPolicy {
     (confirmPaymentIntentCommand: ConfirmPaymentIntentCommand): Promise<void>
@@ -20,7 +21,7 @@ export interface ConfirmPaymentIntentForPolicy {
 
 export interface ConfirmPaymentIntentCommand {
     policyId: string,
-    amount: Payment.AmountInCents,
+    amount: Amount,
     externalId: string,
     processor: Payment.Processor,
     method: Payment.Method,

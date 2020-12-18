@@ -52,7 +52,7 @@ describe('Payment Intent Event Handler - API v0 - Integration', async () => {
         const stripePaymentIntent = event.data.object as Stripe.PaymentIntent
         const expectedCommand = createConfirmPaymentIntentCommandFixture({
           policyId,
-          amount: stripePaymentIntent.amount,
+          amount: 20,
           externalId: stripePaymentIntent.id,
           rawPaymentIntent: stripePaymentIntent
         })
@@ -116,7 +116,7 @@ describe('Payment Intent Event Handler - API v0 - Integration', async () => {
 
         const expectedCommand = createConfirmPaymentIntentCommandFixture({
           policyId: 'APP463109486',
-          amount: stripePaymentIntent.amount,
+          amount: 20,
           externalId: stripePaymentIntent.id,
           rawPaymentIntent: stripePaymentIntent
         })

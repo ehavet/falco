@@ -4,12 +4,14 @@ import { PaymentProcessor } from './payment-processor'
 import { PolicyRepository } from './policy.repository'
 import { Policy } from './policy'
 import { PolicyAlreadyPaidError, PolicyCanceledError } from './policies.errors'
+import { Amount } from '../../common-api/domain/amount/amount'
 
 export interface CreatePaymentIntentForPolicy {
     (paymentIntentQuery: PaymentIntentQuery): Promise<PaymentIntent>
 }
 
 export namespace CreatePaymentIntentForPolicy {
+
     export function factory (
       paymentProcessor: PaymentProcessor,
       policyRepository: PolicyRepository
@@ -20,21 +22,13 @@ export namespace CreatePaymentIntentForPolicy {
         if (Policy.isCancelled(policy)) { throw new PolicyCanceledError(policy.id) }
         if (policy.status === Policy.Status.Applicable) { throw new PolicyAlreadyPaidError(policy.id) }
 
-        const paymentIntent = await paymentProcessor.createPaymentIntent(policy.id, _toZeroDecimal(policy.premium), policy.insurance.currency, policy.partnerCode)
+        const paymentIntent = await paymentProcessor.createPaymentIntent(policy.id, Amount.convertEuroToCents(policy.premium), policy.insurance.currency, policy.partnerCode)
 
         return {
           id: paymentIntent.id,
-          amount: _toTwoDecimal(paymentIntent.amount),
+          amount: Amount.convertCentsToEuro(paymentIntent.amount),
           currency: paymentIntent.currency
         }
       }
     }
-}
-
-function _toZeroDecimal (amount: number): number {
-  return amount * 100
-}
-
-function _toTwoDecimal (amount: number): number {
-  return parseFloat((amount / 100).toFixed(2))
 }

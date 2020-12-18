@@ -97,7 +97,7 @@ describe('Payment - Infra - Stripe Payment Processor', async () => {
       const pspFee = await paymentProcessor.getTransactionFee(rawPaymentIntent)
 
       // Then
-      expect(pspFee).to.equal(balanceTransaction.fee)
+      expect(pspFee).to.equal(2.3)
     })
 
     it('should return null if there is no charge related to the given payment intent', async () => {

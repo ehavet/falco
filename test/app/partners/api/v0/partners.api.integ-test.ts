@@ -22,10 +22,21 @@ describe('Partners - API - Integ', async () => {
         code: 'partnerOne',
         translation_key: 'translationKey',
         customer_support_email: 'customer@support.fr',
+        first_question: 'RoomCount',
         questions: {
           room_count: {
-            options: [1, 2, 3],
-            manage_other_cases: false
+            to_ask: true,
+            options: [
+              { option: 1 },
+              { option: 2 },
+              { option: 3, next_step: 'SUBMIT' }
+            ],
+            default_next_step: 'Address',
+            default_option: 1
+          },
+          address: {
+            to_ask: true,
+            default_next_step: 'SUBMIT'
           },
           roommate: {
             applicable: true,

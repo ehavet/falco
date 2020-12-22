@@ -20,10 +20,22 @@ describe('Partners - API - E2E', async () => {
         code: 'studyo',
         translation_key: 'studyo',
         customer_support_email: 'help@appenin.fr',
+        first_question: 'RoomCount',
         questions: {
+          address: {
+            default_next_step: 'SUBMIT',
+            to_ask: true
+          },
           room_count: {
-            options: [1, 2, 3],
-            manage_other_cases: false
+            default_next_step: 'Address',
+            default_option: 1,
+            options: [
+              { option: 1 },
+              { option: 2 },
+              { option: 3 },
+              { option: 4, next_step: 'REJECT' }
+            ],
+            to_ask: true
           },
           roommate: {
             applicable: true,

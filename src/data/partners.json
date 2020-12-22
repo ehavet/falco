@@ -5,13 +5,24 @@
     "translationKey": "studyo",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
+    "firstQuestion": "RoomCount",
     "questions": [
       {
         "code": "RoomCount",
-        "options": {
-          "list": [1, 2, 3]
-        },
-        "manageOtherCases": false
+        "toAsk": true,
+        "options": [
+          { "option": 1 },
+          { "option": 2 },
+          { "option": 3 },
+          { "option": 4, "nextStep": "REJECT" }
+        ],
+        "defaultNextStep": "Address",
+        "defaultOption": 1
+      },
+      {
+        "code": "Address",
+        "toAsk": true,
+        "defaultNextStep": "SUBMIT"
       },
       {
         "code": "Roommate",
@@ -40,13 +51,24 @@
     "translationKey": "e-mobilia-alternant",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
+    "firstQuestion": "RoomCount",
     "questions": [
       {
         "code": "RoomCount",
-        "options": {
-          "list": [1, 2, 3]
-        },
-        "manageOtherCases": true
+        "toAsk": true,
+        "options": [
+          { "option": 1 },
+          { "option": 2 },
+          { "option": 3 },
+          { "option": 4, "nextStep": "REJECT" }
+        ],
+        "defaultNextStep": "Address",
+        "defaultOption": 1
+      },
+      {
+        "code": "Address",
+        "toAsk": true,
+        "defaultNextStep": "SUBMIT"
       },
       {
         "code": "Roommate",
@@ -82,13 +104,24 @@
     "translationKey": "essca",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
+    "firstQuestion": "RoomCount",
     "questions": [
       {
         "code": "RoomCount",
-        "options": {
-          "list": [1, 2, 3]
-        },
-        "manageOtherCases": true
+        "toAsk": true,
+        "options": [
+          { "option": 1 },
+          { "option": 2 },
+          { "option": 3 },
+          { "option": 4, "nextStep": "REJECT" }
+        ],
+        "defaultNextStep": "Address",
+        "defaultOption": 1
+      },
+      {
+        "code": "Address",
+        "toAsk": true,
+        "defaultNextStep": "SUBMIT"
       },
       {
         "code": "Roommate",
@@ -116,13 +149,23 @@
     "translationKey": "estudent",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
+    "firstQuestion": "RoomCount",
     "questions": [
       {
         "code": "RoomCount",
-        "options": {
-          "list": [1, 2]
-        },
-        "manageOtherCases": true
+        "toAsk": true,
+        "options": [
+          { "option": 1 },
+          { "option": 2 },
+          { "option": 3, "nextStep": "REJECT" }
+        ],
+        "defaultNextStep": "Address",
+        "defaultOption": 1
+      },
+      {
+        "code": "Address",
+        "toAsk": true,
+        "defaultNextStep": "SUBMIT"
       },
       {
         "code": "Roommate",
@@ -150,13 +193,24 @@
     "translationKey": "greystar",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
+    "firstQuestion": "RoomCount",
     "questions": [
       {
         "code": "RoomCount",
-        "options": {
-          "list": [1, 2, 3, 4]
-        },
-        "manageOtherCases": false
+        "toAsk": true,
+        "options": [
+          { "option": 1 },
+          { "option": 2 },
+          { "option": 3 },
+          { "option": 4 }
+        ],
+        "defaultNextStep": "Address",
+        "defaultOption": 1
+      },
+      {
+        "code": "Address",
+        "toAsk": true,
+        "defaultNextStep": "SUBMIT"
       },
       {
         "code": "Roommate",
@@ -185,13 +239,23 @@
     "translationKey": "demo-student",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
+    "firstQuestion": "RoomCount",
     "questions": [
       {
         "code": "RoomCount",
-        "options": {
-          "list": [1, 2, 3]
-        },
-        "manageOtherCases": false
+        "toAsk": true,
+        "options": [
+          { "option": 1 },
+          { "option": 2 },
+          { "option": 3 }
+        ],
+        "defaultNextStep": "Address",
+        "defaultOption": 1
+      },
+      {
+        "code": "Address",
+        "toAsk": true,
+        "defaultNextStep": "SUBMIT"
       },
       {
         "code": "Roommate",
@@ -220,13 +284,26 @@
     "translationKey": "demo",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
+    "firstQuestion": "RoomCount",
     "questions": [
       {
         "code": "RoomCount",
-        "options": {
-          "list": [1, 2, 3, 4, 5]
-        },
-        "manageOtherCases": true
+        "toAsk": true,
+        "options": [
+          { "option": 1 },
+          { "option": 2 },
+          { "option": 3 },
+          { "option": 4 },
+          { "option": 5 },
+          { "option": 6, "nextStep": "REJECT" }
+        ],
+        "defaultNextStep": "Address",
+        "defaultOption": 1
+      },
+      {
+        "code": "Address",
+        "toAsk": true,
+        "defaultNextStep": "SUBMIT"
       },
       {
         "code": "Roommate",

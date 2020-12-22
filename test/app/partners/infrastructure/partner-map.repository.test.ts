@@ -14,13 +14,23 @@ const partnerJson = {
     trigram: 'TRI',
     callbackUrl: 'http://partner1-callback.com',
     customerSupportEmail: 'customer@support.fr',
+    firstQuestion: 'RoomCount',
     questions: [
       {
         code: Partner.Question.QuestionCode.RoomCount,
-        options: {
-          list: [1, 2, 3]
-        },
-        manageOtherCases: false
+        toAsk: true,
+        options: [
+          { option: 1 },
+          { option: 2 },
+          { option: 3 }
+        ],
+        defaultNextStep: 'Address',
+        defaultOption: 1
+      },
+      {
+        code: Partner.Question.QuestionCode.Address,
+        toAsk: true,
+        defaultNextStep: 'SUBMIT'
       },
       {
         code: Partner.Question.QuestionCode.Roommate,
@@ -48,9 +58,18 @@ const partnerJson = {
     questions: [
       {
         code: Partner.Question.QuestionCode.RoomCount,
-        options: {
-          list: [1]
-        }
+        toAsk: true,
+        options: [
+          { option: 1 },
+          { option: 2 }
+        ],
+        defaultNextStep: 'Address',
+        defaultOption: 1
+      },
+      {
+        code: Partner.Question.QuestionCode.Address,
+        toAsk: true,
+        defaultNextStep: 'SUBMIT'
       },
       {
         code: Partner.Question.QuestionCode.Roommate,

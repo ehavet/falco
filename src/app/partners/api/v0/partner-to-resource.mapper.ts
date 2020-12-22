@@ -1,13 +1,12 @@
 import { Partner } from '../../domain/partner'
 
 export function partnerToResource (partner: Partner) {
-  const questions = _toQuestions(partner.questions)
-
   return {
     code: partner.code,
     translation_key: partner.translationKey,
     customer_support_email: partner.customerSupportEmail,
-    questions: questions
+    first_question: partner.firstQuestion,
+    questions: _toQuestions(partner.questions)
   }
 }
 
@@ -18,6 +17,8 @@ function _toQuestions (jsonQuestions: any) {
         return Object.assign(questions, _toRoomCountQuestion(jsonQuestion))
       case Partner.Question.QuestionCode.Roommate:
         return Object.assign(questions, _toRoommateQuestion(jsonQuestion))
+      case Partner.Question.QuestionCode.Address:
+        return Object.assign(questions, _toAddressQuestion(jsonQuestion))
       default:
         return questions
     }
@@ -27,8 +28,13 @@ function _toQuestions (jsonQuestions: any) {
 function _toRoomCountQuestion (jsonQuestion: any) {
   return {
     room_count: {
-      options: jsonQuestion.options.list,
-      manage_other_cases: jsonQuestion.manageOtherCases
+      options: jsonQuestion.options.map(option => ({
+        option: option.option,
+        next_step: option.nextStep
+      })),
+      to_ask: jsonQuestion.toAsk,
+      default_next_step: jsonQuestion.defaultNextStep,
+      default_option: jsonQuestion.defaultOption
     }
   }
 }
@@ -47,6 +53,15 @@ function _toRoommateQuestion (jsonQuestion: any) {
     roommate: {
       applicable: jsonQuestion.applicable,
       maximum_numbers: jsonQuestion.applicable ? _toRoomateMaximumNumbers(jsonQuestion.maximumNumbers) : undefined
+    }
+  }
+}
+
+function _toAddressQuestion (jsonQuestion: any) {
+  return {
+    address: {
+      to_ask: jsonQuestion.toAsk,
+      default_next_step: jsonQuestion.defaultNextStep
     }
   }
 }

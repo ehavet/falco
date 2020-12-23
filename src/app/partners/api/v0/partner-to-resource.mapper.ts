@@ -11,31 +11,30 @@ export function partnerToResource (partner: Partner) {
 }
 
 function _toQuestions (jsonQuestions: any) {
-  return jsonQuestions.reduce((questions, jsonQuestion) => {
+  return jsonQuestions.map((jsonQuestion) => {
     switch (jsonQuestion.code) {
       case Partner.Question.QuestionCode.RoomCount:
-        return Object.assign(questions, _toRoomCountQuestion(jsonQuestion))
+        return _toRoomCountQuestion(jsonQuestion)
       case Partner.Question.QuestionCode.Roommate:
-        return Object.assign(questions, _toRoommateQuestion(jsonQuestion))
+        return _toRoommateQuestion(jsonQuestion)
       case Partner.Question.QuestionCode.Address:
-        return Object.assign(questions, _toAddressQuestion(jsonQuestion))
+        return _toAddressQuestion(jsonQuestion)
       default:
-        return questions
+        return undefined
     }
   }, {})
 }
 
 function _toRoomCountQuestion (jsonQuestion: any) {
   return {
-    room_count: {
-      options: jsonQuestion.options.map(option => ({
-        option: option.option,
-        next_step: option.nextStep
-      })),
-      to_ask: jsonQuestion.toAsk,
-      default_next_step: jsonQuestion.defaultNextStep,
-      default_option: jsonQuestion.defaultOption
-    }
+    code: jsonQuestion.code,
+    options: jsonQuestion.options.map(option => ({
+      option: option.option,
+      next_step: option.nextStep
+    })),
+    to_ask: jsonQuestion.toAsk,
+    default_next_step: jsonQuestion.defaultNextStep,
+    default_option: jsonQuestion.defaultOption
   }
 }
 
@@ -50,18 +49,16 @@ function _toRoommateQuestion (jsonQuestion: any) {
   }
 
   return {
-    roommate: {
-      applicable: jsonQuestion.applicable,
-      maximum_numbers: jsonQuestion.applicable ? _toRoomateMaximumNumbers(jsonQuestion.maximumNumbers) : undefined
-    }
+    code: jsonQuestion.code,
+    applicable: jsonQuestion.applicable,
+    maximum_numbers: jsonQuestion.applicable ? _toRoomateMaximumNumbers(jsonQuestion.maximumNumbers) : undefined
   }
 }
 
 function _toAddressQuestion (jsonQuestion: any) {
   return {
-    address: {
-      to_ask: jsonQuestion.toAsk,
-      default_next_step: jsonQuestion.defaultNextStep
-    }
+    code: jsonQuestion.code,
+    to_ask: jsonQuestion.toAsk,
+    default_next_step: jsonQuestion.defaultNextStep
   }
 }

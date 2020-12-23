@@ -26,7 +26,7 @@ function _toQuestions (questions: any) {
       case Partner.Question.QuestionCode.Roommate:
         return _toRoommateQuestion(jsonQuestion)
       case Partner.Question.QuestionCode.Address:
-        return _toAdressQuestion(jsonQuestion)
+        return _toAddressQuestion(jsonQuestion)
       default:
         return undefined
     }
@@ -55,7 +55,7 @@ function _toRoommateQuestion (jsonQuestion: any) {
   return question
 }
 
-function _toAdressQuestion (jsonQuestion: any) {
+function _toAddressQuestion (jsonQuestion: any) {
   const question: Partner.Question.AddressQuestion = {
     code: Partner.Question.QuestionCode.Address,
     toAsk: jsonQuestion.toAsk,

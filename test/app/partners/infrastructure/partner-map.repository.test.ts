@@ -22,7 +22,7 @@ const partnerJson = {
         options: [
           { option: 1 },
           { option: 2 },
-          { option: 3 }
+          { option: 3, nextStep: 'REJECT' }
         ],
         defaultNextStep: 'Address',
         defaultOption: 1
@@ -60,8 +60,7 @@ const partnerJson = {
         code: Partner.Question.QuestionCode.RoomCount,
         toAsk: true,
         options: [
-          { option: 1 },
-          { option: 2 }
+          { option: 1 }
         ],
         defaultNextStep: 'Address',
         defaultOption: 1

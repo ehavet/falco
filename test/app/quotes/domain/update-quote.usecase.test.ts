@@ -46,10 +46,20 @@ describe('Quotes - Usecase - Update Quote', async () => {
         questions: [
           {
             code: Partner.Question.QuestionCode.RoomCount,
-            options: {
-              list: [1, 2, 3]
-            },
-            manageOtherCases: false
+            toAsk: true,
+            options: [
+              { option: 1 },
+              { option: 2 },
+              { option: 3 },
+              { option: 4, nextStep: 'REJECT' }
+            ],
+            defaultNextStep: 'Address',
+            defaultOption: 1
+          },
+          {
+            code: Partner.Question.QuestionCode.Address,
+            toAsk: true,
+            defaultNextStep: 'SUBMIT'
           },
           {
             code: Partner.Question.QuestionCode.Roommate,

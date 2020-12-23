@@ -16,7 +16,7 @@ export function createPartnerFixture (attr: Partial<Partner> = {}): Partner {
         options: [
           { option: 1 },
           { option: 2 },
-          { option: 3, nextStep: 'SUBMIT' }
+          { option: 3, nextStep: 'REJECT' }
         ],
         defaultNextStep: 'Address',
         defaultOption: 1

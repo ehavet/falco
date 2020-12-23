@@ -1,11 +1,15 @@
+import { HelloSignRequestEventValidator } from '../../../../src/app/policies/infrastructure/signature/hello-sign-request-event.validator'
+import { helloSignConfigTest } from '../../../configs/hellosign.test.config'
+
 export function signatureRequestEventJSONFixture (attr = {}) {
+  const fakeEventFixture = generateFakeEventFixture()
   return {
     account_guid: '63522885f9261e2b04eea043933ee7313eb674fd',
     client_id: null,
     event: {
-      event_time: '1348177752',
-      event_type: 'signature_request_signed',
-      event_hash: '43b6813a08bed6c3723fac94ec7870ee4f3409b89972896a031e35dca64079ce',
+      event_time: fakeEventFixture.time,
+      event_type: fakeEventFixture.eventType,
+      event_hash: fakeEventFixture.hash,
       event_metadata: {
         related_signature_id: 'ad4d8a769b555fa5ef38691465d426682bf2c992',
         reported_for_account_id: '63522885f9261e2b04eea043933ee7313eb674fd',
@@ -26,4 +30,17 @@ export function signatureRequestEventJSONFixture (attr = {}) {
     },
     ...attr
   }
+}
+
+/**
+ * Use to generate an 'Event' object based on your own HelloSign key
+ */
+// eslint-disable-next-line camelcase
+function generateFakeEventFixture (): { hash: string, time: string, eventType: string } {
+  const helloSignRequestEventValidator = new HelloSignRequestEventValidator(helloSignConfigTest)
+
+  const fakeTimestamp = '1348177752'
+  const signatureRequestEventType = 'signature_request_signed'
+  const generatedHash = helloSignRequestEventValidator.generateHash(fakeTimestamp, signatureRequestEventType)
+  return { hash: generatedHash, time: fakeTimestamp, eventType: signatureRequestEventType }
 }

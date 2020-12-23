@@ -12,9 +12,13 @@ export class HelloSignRequestEventValidator implements SignatureRequestEventVali
     }
 
     isValid (signatureRequestEvent: SignatureRequestEvent): boolean {
-      const hash = crypto.createHmac('sha256', this.config.key)
-        .update(signatureRequestEvent.validation.time + signatureRequestEvent.validation.rawEventType)
-        .digest('hex').toString()
+      const hash = this.generateHash(signatureRequestEvent.validation.time, signatureRequestEvent.validation.rawEventType)
       return hash === signatureRequestEvent.validation.hash
+    }
+
+    generateHash (time: string, eventType: string): string {
+      return crypto.createHmac('sha256', this.config.key)
+        .update(time + eventType)
+        .digest('hex').toString()
     }
 }

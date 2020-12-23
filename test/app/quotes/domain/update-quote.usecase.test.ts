@@ -496,7 +496,13 @@ describe('Quotes - Usecase - Update Quote', async () => {
           specialOperationsCode: null,
           specialOperationsCodeAppliedAt: null,
           termEndDate: new Date('2021-01-04T00:00:00.000Z'),
-          insurance: createQuoteInsuranceFixture({ estimate: partner.offer.pricingMatrix.get(3) }),
+          insurance: createQuoteInsuranceFixture({
+            estimate: {
+              monthlyPrice: 7.82,
+              defaultDeductible: 160,
+              defaultCeiling: 8000
+            }
+          }),
           risk: createQuoteRiskFixture({
             property: {
               address: '88 rue des prairies',

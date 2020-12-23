@@ -14,6 +14,7 @@ import { OperationCodeNotApplicableError } from '../../policies/domain/operation
 import { SpecialOperation } from '../../common-api/domain/special-operation.func'
 import { CreateQuoteCommand } from './create-quote-command'
 import { Amount } from '../../common-api/domain/amount/amount'
+import { DefaultCapAdvice } from './default-cap-advice/default-cap-advice'
 
 const DEFAULT_NUMBER_MONTHS_DUE = 12
 
@@ -61,8 +62,8 @@ export namespace Quote {
         emailValidatedAt?: Date
     }
 
-    export function create (command: CreateQuoteCommand, partnerOffer: Partner.Offer): Quote {
-      const insurance: Insurance = getInsurance(command.risk, partnerOffer)
+    export function create (command: CreateQuoteCommand, partnerOffer: Partner.Offer, defaultCapAdvice: DefaultCapAdvice): Quote {
+      const insurance: Insurance = getInsurance(command.risk, partnerOffer, defaultCapAdvice)
 
       const nbMonthsDue = DEFAULT_NUMBER_MONTHS_DUE
 
@@ -171,15 +172,19 @@ export namespace Quote {
       return dayjs(date).utc()
     }
 
-    export function getInsurance (risk: Risk, partnerOffer: Partner.Offer): Insurance {
-      const estimate: Insurance.Estimate | undefined = partnerOffer.pricingMatrix.get(risk.property.roomCount)
+    export function getInsurance (risk: Risk, partnerOffer: Partner.Offer, defaultCapAdvice?: DefaultCapAdvice): Insurance {
+      const estimate: Partner.Estimate | undefined = partnerOffer.pricingMatrix.get(risk.property.roomCount)
 
       if (estimate === undefined) {
         throw new QuoteRiskPropertyRoomCountNotInsurableError(risk.property.roomCount)
       }
 
       return <Insurance>{
-        estimate,
+        estimate: {
+          monthlyPrice: estimate.monthlyPrice,
+          defaultDeductible: estimate.defaultDeductible,
+          defaultCeiling: defaultCapAdvice ? defaultCapAdvice.value : estimate.defaultCeiling
+        },
         simplifiedCovers: partnerOffer.simplifiedCovers,
         currency: 'EUR',
         productCode: partnerOffer.productCode,

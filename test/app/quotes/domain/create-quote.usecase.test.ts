@@ -6,15 +6,18 @@ import { QuoteRiskPropertyRoomCountNotInsurableError } from '../../../../src/app
 import { CreateQuote } from '../../../../src/app/quotes/domain/create-quote.usecase'
 import { quoteRepositoryMock } from '../fixtures/quote-repository.test-doubles'
 import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
+import { defaultCapAdviceRepositoryStub } from '../fixtures/default-cap-advice-repository.test-doubles'
+import { MultipleDefaultCapAdviceFoundError } from '../../../../src/app/quotes/domain/default-cap-advice/default-cap-advice.errors'
 
 describe('Quotes - Usecase - Create Quote', async () => {
   let createQuote: CreateQuote
   const quoteRepository = quoteRepositoryMock()
   const partnerRepository = { getByCode: sinon.stub(), getOffer: sinon.stub(), getCallbackUrl: sinon.stub(), getOperationCodes: sinon.stub() }
+  const defaultCapAdviceRepository = defaultCapAdviceRepositoryStub()
   const partnerOffer : Partner.Offer = {
     pricingMatrix: new Map([
-      [1, { monthlyPrice: 4.39, defaultDeductible: 120, defaultCeiling: 5000 }],
-      [2, { monthlyPrice: 5.82, defaultDeductible: 150, defaultCeiling: 7000 }]
+      [1, { monthlyPrice: 4.39, defaultDeductible: 120 }],
+      [2, { monthlyPrice: 5.82, defaultDeductible: 150 }]
     ]),
     simplifiedCovers: ['ACDDE', 'ACVOL'],
     productCode: 'MRH_Etudiant',
@@ -42,7 +45,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
       estimate: {
         monthlyPrice: 5.82,
         defaultDeductible: 150,
-        defaultCeiling: 7000
+        defaultCeiling: 6000
       },
       currency: 'EUR',
       simplifiedCovers: ['ACDDE', 'ACVOL'],
@@ -61,7 +64,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
   beforeEach(() => {
     dateFaker.setCurrentDate(now)
     partnerRepository.getOffer.withArgs('myPartner').returns(partnerOffer)
-    createQuote = CreateQuote.factory(quoteRepository, partnerRepository)
+    createQuote = CreateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository)
   })
 
   afterEach(() => {
@@ -72,6 +75,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
     it('with the partner code and the risk', async () => {
       // Given
       quoteRepository.save.resolves()
+      defaultCapAdviceRepository.get.withArgs('myPartner', 2).resolves({ value: 6000 })
 
       // When
       const quote: Quote = await createQuote({ partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses' } } })
@@ -85,6 +89,8 @@ describe('Quotes - Usecase - Create Quote', async () => {
       // Given
       const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2 } } }
       const expectedInsurance: Quote.Insurance = expectedQuote.insurance
+
+      defaultCapAdviceRepository.get.withArgs('myPartner', 2).resolves({ value: 6000 })
 
       quoteRepository.save.resolves()
 
@@ -218,6 +224,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
     // Given
     const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses' } } }
     quoteRepository.save.resolves()
+    defaultCapAdviceRepository.get.withArgs('myPartner', 2).resolves({ value: 6000 })
 
     // When
     const quote = await createQuote(createQuoteCommand)
@@ -241,5 +248,17 @@ describe('Quotes - Usecase - Create Quote', async () => {
         QuoteRiskPropertyRoomCountNotInsurableError,
         '3 room(s) property is not insurable'
       )
+  })
+
+  it('should throw an error if there are multiple default cap advices for a given partner and room count', async () => {
+    // GIVEN
+    const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses' } } }
+    defaultCapAdviceRepository.get.withArgs('myPartner', 2).rejects(new MultipleDefaultCapAdviceFoundError('myPartner', 2))
+
+    // WHEN
+    const quotePromise = createQuote(createQuoteCommand)
+
+    // THEN
+    return expect(quotePromise).to.be.rejectedWith(MultipleDefaultCapAdviceFoundError)
   })
 })

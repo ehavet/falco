@@ -1,3 +1,3 @@
-interface DefaultCapAdvice {
+export interface DefaultCapAdvice {
     value: number
 }

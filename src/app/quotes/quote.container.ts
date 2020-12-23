@@ -14,6 +14,7 @@ import { QuoteSqlModel } from './infrastructure/sql-models/quote-sql-model'
 import { UpdateQuote } from './domain/update-quote.usecase'
 import { SendValidationLinkEmailToQuotePolicyHolder } from './domain/send-validation-link-email-to-quote-policy-holder.usecase'
 import { GetQuoteById } from './domain/get-quote-by-id.usecase'
+import { DefaultCapAdviceSqlModel } from './infrastructure/default-cap-advice/default-cap-advice-sql.model'
 
 export interface Container {
   CreateQuote: CreateQuote
@@ -45,7 +46,8 @@ export const container: Container = {
 
 export const quoteSqlModels: Array<any> = [
   QuoteSqlModel, QuoteInsuranceSqlModel, QuoteRiskSqlModel,
-  QuotePropertySqlModel, QuoteRiskOtherPeopleSqlModel, QuotePersonSqlModel
+  QuotePropertySqlModel, QuoteRiskOtherPeopleSqlModel, QuotePersonSqlModel,
+  DefaultCapAdviceSqlModel
 ]
 
 export function quoteRoutes () {

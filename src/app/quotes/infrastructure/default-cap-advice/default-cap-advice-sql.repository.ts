@@ -1,8 +1,12 @@
 import { DefaultCapAdviceRepository } from '../../domain/default-cap-advice/default-cap-advice.repository'
+import { DefaultCapAdviceSqlModel } from './default-cap-advice-sql.model'
+import { DefaultCapAdvice } from '../../domain/default-cap-advice/default-cap-advice'
+import { DefaultCapAdviceNotFoundError } from '../../domain/default-cap-advice/default-cap-advice.errors'
 
 export class DefaultCapAdviceSqlRepository implements DefaultCapAdviceRepository {
-  // @ts-ignore
   async get (partnerCode: string, roomCount: number): Promise<DefaultCapAdvice> {
-    throw new Error('Not implemented yet')
+    const result = await DefaultCapAdviceSqlModel.findOne({ where: { partnerCode: partnerCode, roomCount: roomCount } })
+    if (result) return { value: result.defaultCapAdvice }
+    throw new DefaultCapAdviceNotFoundError(partnerCode, roomCount)
   }
 }

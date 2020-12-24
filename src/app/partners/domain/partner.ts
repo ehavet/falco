@@ -30,17 +30,21 @@ export namespace Partner {
 }
 
 export namespace Partner.Question {
+    export type OptionType = string | number
+
+    export type NextStepType = QuestionCode | NextStepAction
+
     export type Option = {
-        option: string | number,
-        nextStep?: string
+        option: OptionType,
+        nextStep?: NextStepType
     }
 
     export interface RoomCountQuestion {
         code: QuestionCode,
         options: Array<Option>,
         toAsk: boolean,
-        defaultOption: string | number,
-        defaultNextStep: string
+        defaultOption: OptionType,
+        defaultNextStep: NextStepType
     }
 
     export interface RoommateQuestion {
@@ -52,7 +56,7 @@ export namespace Partner.Question {
     export interface AddressQuestion {
         code: QuestionCode,
         toAsk: boolean,
-        defaultNextStep: string
+        defaultNextStep: NextStepType
     }
 
     export interface MaximumNumberOfRoommates {
@@ -64,6 +68,11 @@ export namespace Partner.Question {
         Address = 'Address',
         RoomCount = 'RoomCount',
         Roommate = 'Roommate'
+    }
+
+    export enum NextStepAction {
+        SUBMIT='SUBMIT',
+        REJECT='REJECT'
     }
 
     export interface ListOptions<T> {

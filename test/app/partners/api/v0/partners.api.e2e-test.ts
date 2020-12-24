@@ -29,8 +29,7 @@ describe('Partners - API - E2E', async () => {
             options: [
               { option: 1 },
               { option: 2 },
-              { option: 3 },
-              { option: 4, next_step: 'REJECT' }
+              { option: 3 }
             ],
             to_ask: true
           },

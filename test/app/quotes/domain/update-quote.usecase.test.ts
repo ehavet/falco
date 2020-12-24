@@ -51,15 +51,15 @@ describe('Quotes - Usecase - Update Quote', async () => {
               { option: 1 },
               { option: 2 },
               { option: 3 },
-              { option: 4, nextStep: 'REJECT' }
+              { option: 4, nextStep: Partner.Question.NextStepAction.REJECT }
             ],
-            defaultNextStep: 'Address',
+            defaultNextStep: Partner.Question.QuestionCode.Address,
             defaultOption: 1
           },
           {
             code: Partner.Question.QuestionCode.Address,
             toAsk: true,
-            defaultNextStep: 'SUBMIT'
+            defaultNextStep: Partner.Question.NextStepAction.SUBMIT
           },
           {
             code: Partner.Question.QuestionCode.Roommate,

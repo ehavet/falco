@@ -42,7 +42,10 @@ export default function (container: Container): Array<ServerRoute> {
                   to_ask: Joi.boolean().optional().description('Question to be asked or not').example(true),
                   applicable: Joi.boolean().optional().description('Question to be asked or not').example(true),
                   default_next_step: Joi.string().optional().description('Default next step name').example('Address'),
-                  default_option: Joi.number().optional().description('Default value of room count').example(1),
+                  default_option: Joi.alternatives().try(
+                    Joi.number(),
+                    Joi.string()
+                  ).optional().description('Default value of room count').example(1),
                   maximum_numbers: Joi.array().optional().items(
                     Joi.object({
                       room_count: Joi.number().description('Room count targeted by the limitation of roommates').example(3),
@@ -50,7 +53,7 @@ export default function (container: Container): Array<ServerRoute> {
                     }).optional().description('Number Maximum of roommates for one room count')
                   ).description('Number maxixmum of roommates regarding the different partner room counts. Only present if the question is applicable.')
                 })
-              ).description('List of questions to as for the quote')
+              ).description('List of questions to ask for the quote')
             }).label('Partner'),
             400: HttpErrorSchema.badRequestSchema,
             404: HttpErrorSchema.notFoundSchema,

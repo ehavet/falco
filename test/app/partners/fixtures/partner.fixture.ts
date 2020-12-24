@@ -16,15 +16,15 @@ export function createPartnerFixture (attr: Partial<Partner> = {}): Partner {
         options: [
           { option: 1 },
           { option: 2 },
-          { option: 3, nextStep: 'REJECT' }
+          { option: 3, nextStep: Partner.Question.NextStepAction.REJECT }
         ],
-        defaultNextStep: 'Address',
+        defaultNextStep: Partner.Question.QuestionCode.Address,
         defaultOption: 1
       },
       {
         code: Partner.Question.QuestionCode.Address,
         toAsk: true,
-        defaultNextStep: 'SUBMIT'
+        defaultNextStep: Partner.Question.NextStepAction.SUBMIT
       },
       {
         code: Partner.Question.QuestionCode.Roommate,

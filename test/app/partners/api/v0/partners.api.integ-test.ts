@@ -57,6 +57,16 @@ describe('Partners - API - Integ', async () => {
               { room_count: 1, value: 0 },
               { room_count: 2, value: 1 },
               { room_count: 3, value: 2 }]
+          },
+          {
+            code: 'occupancy',
+            to_ask: true,
+            options: [
+              { value: 'TENANT' },
+              { value: 'LANDLORD', next_step: 'REJECT' }
+            ],
+            default_next_step: 'roommate',
+            default_value: 'TENANT'
           }
         ]
       }

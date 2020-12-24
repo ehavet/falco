@@ -109,7 +109,7 @@ describe('Policies - Usecase - Create policy', async () => {
   it('should throw an error if there are roommates but the partner does not allow it', async () => {
     // Given
     partnerRepository.getByCode.reset()
-    const questions: Array<Question> = [{ code: Partner.Question.QuestionCode.Roommate, applicable: false }]
+    const questions: Array<Question> = [{ code: Partner.Question.QuestionCode.ROOMMATE, applicable: false }]
     const partner = createPartnerFixture({ questions })
     partnerRepository.getByCode.resolves(partner)
     quoteRepository.get.withArgs(createPolicyCommand.quoteId).resolves(quote)

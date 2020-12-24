@@ -11,12 +11,12 @@
         "code": "RoomCount",
         "toAsk": true,
         "options": [
-          { "option": 1 },
-          { "option": 2 },
-          { "option": 3 }
+          { "value": 1 },
+          { "value": 2 },
+          { "value": 3 }
         ],
         "defaultNextStep": "Address",
-        "defaultOption": 1
+        "defaultValue": 1
       },
       {
         "code": "Address",
@@ -56,13 +56,13 @@
         "code": "RoomCount",
         "toAsk": true,
         "options": [
-          { "option": 1 },
-          { "option": 2 },
-          { "option": 3 },
-          { "option": 4, "nextStep": "REJECT" }
+          { "value": 1 },
+          { "value": 2 },
+          { "value": 3 },
+          { "value": 4, "nextStep": "REJECT" }
         ],
         "defaultNextStep": "Address",
-        "defaultOption": 1
+        "defaultValue": 1
       },
       {
         "code": "Address",
@@ -109,13 +109,13 @@
         "code": "RoomCount",
         "toAsk": true,
         "options": [
-          { "option": 1 },
-          { "option": 2 },
-          { "option": 3 },
-          { "option": 4, "nextStep": "REJECT" }
+          { "value": 1 },
+          { "value": 2 },
+          { "value": 3 },
+          { "value": 4, "nextStep": "REJECT" }
         ],
         "defaultNextStep": "Address",
-        "defaultOption": 1
+        "defaultValue": 1
       },
       {
         "code": "Address",
@@ -154,12 +154,12 @@
         "code": "RoomCount",
         "toAsk": true,
         "options": [
-          { "option": 1 },
-          { "option": 2 },
-          { "option": 3, "nextStep": "REJECT" }
+          { "value": 1 },
+          { "value": 2 },
+          { "value": 3, "nextStep": "REJECT" }
         ],
         "defaultNextStep": "Address",
-        "defaultOption": 1
+        "defaultValue": 1
       },
       {
         "code": "Address",
@@ -198,13 +198,13 @@
         "code": "RoomCount",
         "toAsk": true,
         "options": [
-          { "option": 1 },
-          { "option": 2 },
-          { "option": 3 },
-          { "option": 4 }
+          { "value": 1 },
+          { "value": 2 },
+          { "value": 3 },
+          { "value": 4 }
         ],
         "defaultNextStep": "Address",
-        "defaultOption": 1
+        "defaultValue": 1
       },
       {
         "code": "Address",
@@ -244,12 +244,12 @@
         "code": "RoomCount",
         "toAsk": true,
         "options": [
-          { "option": 1 },
-          { "option": 2 },
-          { "option": 3 }
+          { "value": 1 },
+          { "value": 2 },
+          { "value": 3 }
         ],
         "defaultNextStep": "Address",
-        "defaultOption": 1
+        "defaultValue": 1
       },
       {
         "code": "Address",
@@ -289,15 +289,15 @@
         "code": "RoomCount",
         "toAsk": true,
         "options": [
-          { "option": 1 },
-          { "option": 2 },
-          { "option": 3 },
-          { "option": 4 },
-          { "option": 5 },
-          { "option": 6, "nextStep": "REJECT" }
+          { "value": 1 },
+          { "value": 2 },
+          { "value": 3 },
+          { "value": 4 },
+          { "value": 5 },
+          { "value": 6, "nextStep": "REJECT" }
         ],
         "defaultNextStep": "Address",
-        "defaultOption": 1
+        "defaultValue": 1
       },
       {
         "code": "Address",

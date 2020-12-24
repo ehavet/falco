@@ -32,7 +32,7 @@ export default function (container: Container): Array<ServerRoute> {
                   code: Joi.string().description('Code of the question').example('RoomCount'),
                   options: Joi.array().optional().items(
                     Joi.object({
-                      option:
+                      value:
                           Joi.alternatives().try(
                             Joi.number(),
                             Joi.string()
@@ -42,10 +42,10 @@ export default function (container: Container): Array<ServerRoute> {
                   to_ask: Joi.boolean().optional().description('Question to be asked or not').example(true),
                   applicable: Joi.boolean().optional().description('Question to be asked or not').example(true),
                   default_next_step: Joi.string().optional().description('Default next step name').example('Address'),
-                  default_option: Joi.alternatives().try(
+                  default_value: Joi.alternatives().try(
                     Joi.number(),
                     Joi.string()
-                  ).optional().description('Default value of room count').example(1),
+                  ).optional().description('Default value of options').example(1),
                   maximum_numbers: Joi.array().optional().items(
                     Joi.object({
                       room_count: Joi.number().description('Room count targeted by the limitation of roommates').example(3),

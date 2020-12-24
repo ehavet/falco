@@ -39,7 +39,7 @@ function _toRoomCountQuestion (jsonQuestion: any) {
     options: jsonQuestion.options,
     toAsk: jsonQuestion.toAsk,
     defaultNextStep: jsonQuestion.defaultNextStep,
-    defaultOption: jsonQuestion.defaultOption
+    defaultValue: jsonQuestion.defaultValue
   }
 
   return question

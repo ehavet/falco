@@ -29,12 +29,12 @@ function _toRoomCountQuestion (jsonQuestion: any) {
   return {
     code: jsonQuestion.code,
     options: jsonQuestion.options.map(option => ({
-      option: option.option,
+      value: option.value,
       next_step: option.nextStep
     })),
     to_ask: jsonQuestion.toAsk,
     default_next_step: jsonQuestion.defaultNextStep,
-    default_option: jsonQuestion.defaultOption
+    default_value: jsonQuestion.defaultValue
   }
 }
 

@@ -25,11 +25,11 @@ describe('Partners - API - E2E', async () => {
           {
             code: 'RoomCount',
             default_next_step: 'Address',
-            default_option: 1,
+            default_value: 1,
             options: [
-              { option: 1 },
-              { option: 2 },
-              { option: 3 }
+              { value: 1 },
+              { value: 2 },
+              { value: 3 }
             ],
             to_ask: true
           },

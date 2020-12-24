@@ -28,12 +28,12 @@ describe('Partners - API - Integ', async () => {
             code: 'RoomCount',
             to_ask: true,
             options: [
-              { option: 1 },
-              { option: 2 },
-              { option: 3, next_step: 'REJECT' }
+              { value: 1 },
+              { value: 2 },
+              { value: 3, next_step: 'REJECT' }
             ],
             default_next_step: 'Address',
-            default_option: 1
+            default_value: 1
           },
           {
             code: 'Address',

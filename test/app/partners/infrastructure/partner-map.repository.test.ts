@@ -20,12 +20,12 @@ const partnerJson = {
         code: Partner.Question.QuestionCode.RoomCount,
         toAsk: true,
         options: [
-          { option: 1 },
-          { option: 2 },
-          { option: 3, nextStep: 'REJECT' }
+          { value: 1 },
+          { value: 2 },
+          { value: 3, nextStep: 'REJECT' }
         ],
         defaultNextStep: 'Address',
-        defaultOption: 1
+        defaultValue: 1
       },
       {
         code: Partner.Question.QuestionCode.Address,
@@ -60,10 +60,10 @@ const partnerJson = {
         code: Partner.Question.QuestionCode.RoomCount,
         toAsk: true,
         options: [
-          { option: 1 }
+          { value: 1 }
         ],
         defaultNextStep: 'Address',
-        defaultOption: 1
+        defaultValue: 1
       },
       {
         code: Partner.Question.QuestionCode.Address,

@@ -15,6 +15,7 @@ export interface Partner {
 export namespace Partner {
 
     export type Question = Question.RoomCountQuestion | Question.RoommateQuestion | Question.AddressQuestion
+        | Question.PropertyTypeQuestion
 
     export interface Offer {
         pricingMatrix: Map<RoomCount, Quote.Insurance.Estimate>
@@ -30,32 +31,44 @@ export namespace Partner {
 }
 
 export namespace Partner.Question {
-    export type ValueType = string | number
 
     export type NextStepType = QuestionCode | NextStepAction
 
-    export type Option = {
-        value: ValueType,
+    export type Option<T> = {
+        value: T,
         nextStep?: NextStepType
     }
 
+    export enum PropertyTypeValue {
+        FLAT = 'FLAT',
+        HOUSE = 'HOUSE'
+    }
+
     export interface RoomCountQuestion {
-        code: QuestionCode,
-        options: Array<Option>,
+        code: QuestionCode.RoomCount,
+        options: Array<Option<number>>,
         toAsk: boolean,
-        defaultValue: ValueType,
+        defaultValue: number,
         defaultNextStep: NextStepType
     }
 
     export interface RoommateQuestion {
-        code: QuestionCode,
+        code: QuestionCode.Roommate,
         applicable: boolean,
         maximumNumbers?: Array<MaximumNumberOfRoommates>
     }
 
     export interface AddressQuestion {
-        code: QuestionCode,
+        code: QuestionCode.Address,
         toAsk: boolean,
+        defaultNextStep: NextStepType
+    }
+
+    export interface PropertyTypeQuestion {
+        code: QuestionCode.PropertyType,
+        toAsk: boolean,
+        options: Array<Option<PropertyTypeValue>>,
+        defaultValue: PropertyTypeValue,
         defaultNextStep: NextStepType
     }
 
@@ -67,7 +80,8 @@ export namespace Partner.Question {
     export enum QuestionCode {
         Address = 'address',
         RoomCount = 'room_count',
-        Roommate = 'roommate'
+        Roommate = 'roommate',
+        PropertyType = 'property_type'
     }
 
     export enum NextStepAction {

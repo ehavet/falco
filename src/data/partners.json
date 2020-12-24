@@ -5,8 +5,14 @@
     "translationKey": "studyo",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
-    "firstQuestion": "room_count",
+    "firstQuestion": "property_type",
     "questions": [
+      {
+        "code": "property_type",
+        "toAsk": false,
+        "defaultValue": "FLAT",
+        "defaultNextStep": "occupancy"
+      },
       {
         "code": "room_count",
         "toAsk": true,
@@ -50,8 +56,14 @@
     "translationKey": "e-mobilia-alternant",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
-    "firstQuestion": "room_count",
+    "firstQuestion": "property_type",
     "questions": [
+      {
+        "code": "property_type",
+        "toAsk": false,
+        "defaultValue": "FLAT",
+        "defaultNextStep": "occupancy"
+      },
       {
         "code": "room_count",
         "toAsk": true,
@@ -103,8 +115,14 @@
     "translationKey": "essca",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
-    "firstQuestion": "room_count",
+    "firstQuestion": "property_type",
     "questions": [
+      {
+        "code": "property_type",
+        "toAsk": false,
+        "defaultValue": "FLAT",
+        "defaultNextStep": "occupancy"
+      },
       {
         "code": "room_count",
         "toAsk": true,
@@ -148,8 +166,14 @@
     "translationKey": "estudent",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
-    "firstQuestion": "room_count",
+    "firstQuestion": "property_type",
     "questions": [
+      {
+        "code": "property_type",
+        "toAsk": false,
+        "defaultValue": "FLAT",
+        "defaultNextStep": "occupancy"
+      },
       {
         "code": "room_count",
         "toAsk": true,
@@ -192,8 +216,14 @@
     "translationKey": "greystar",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
-    "firstQuestion": "room_count",
+    "firstQuestion": "property_type",
     "questions": [
+      {
+        "code": "property_type",
+        "toAsk": false,
+        "defaultValue": "FLAT",
+        "defaultNextStep": "occupancy"
+      },
       {
         "code": "room_count",
         "toAsk": true,
@@ -238,8 +268,14 @@
     "translationKey": "demo-student",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
-    "firstQuestion": "room_count",
+    "firstQuestion": "property_type",
     "questions": [
+      {
+        "code": "property_type",
+        "toAsk": false,
+        "defaultValue": "FLAT",
+        "defaultNextStep": "occupancy"
+      },
       {
         "code": "room_count",
         "toAsk": true,
@@ -283,8 +319,18 @@
     "translationKey": "demo",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
-    "firstQuestion": "room_count",
+    "firstQuestion": "property_type",
     "questions": [
+      {
+        "code": "property_type",
+        "toAsk": true,
+        "options": [
+          {"value": "FLAT"},
+          {"value": "HOUSE", "nextStep": "REJECT"}
+        ],
+        "defaultValue": "FLAT",
+        "defaultNextStep": "occupancy"
+      },
       {
         "code": "room_count",
         "toAsk": true,

@@ -22,8 +22,18 @@ describe('Partners - API - Integ', async () => {
         code: 'partnerOne',
         translation_key: 'translationKey',
         customer_support_email: 'customer@support.fr',
-        first_question: 'room_count',
+        first_question: 'property_type',
         questions: [
+          {
+            code: 'property_type',
+            to_ask: true,
+            options: [
+              { value: 'FLAT' },
+              { value: 'HOUSE', next_step: 'REJECT' }
+            ],
+            default_value: 'FLAT',
+            default_next_step: 'address'
+          },
           {
             code: 'room_count',
             to_ask: true,

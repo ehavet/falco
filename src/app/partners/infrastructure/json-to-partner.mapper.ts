@@ -27,6 +27,8 @@ function _toQuestions (questions: any) {
         return _toRoommateQuestion(jsonQuestion)
       case Partner.Question.QuestionCode.Address:
         return _toAddressQuestion(jsonQuestion)
+      case Partner.Question.QuestionCode.PropertyType:
+        return _toPropertyTypeQuestion(jsonQuestion)
       default:
         return undefined
     }
@@ -59,6 +61,17 @@ function _toAddressQuestion (jsonQuestion: any) {
   const question: Partner.Question.AddressQuestion = {
     code: Partner.Question.QuestionCode.Address,
     toAsk: jsonQuestion.toAsk,
+    defaultNextStep: jsonQuestion.defaultNextStep
+  }
+  return question
+}
+
+function _toPropertyTypeQuestion (jsonQuestion: any) {
+  const question: Partner.Question.PropertyTypeQuestion = {
+    code: Partner.Question.QuestionCode.PropertyType,
+    toAsk: jsonQuestion.toAsk,
+    options: jsonQuestion.options,
+    defaultValue: jsonQuestion.defaultValue,
     defaultNextStep: jsonQuestion.defaultNextStep
   }
   return question

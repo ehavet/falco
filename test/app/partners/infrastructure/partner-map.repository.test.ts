@@ -5,7 +5,6 @@ import { Partner } from '../../../../src/app/partners/domain/partner'
 import { Quote } from '../../../../src/app/quotes/domain/quote'
 import { PartnerRepository } from '../../../../src/app/partners/domain/partner.repository'
 import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
-import { createPartnerFixture } from '../fixtures/partner.fixture'
 
 const partnerJson: {partnerOne: Partner, partnerTwo: Partner} = {
   partnerOne: {
@@ -125,7 +124,7 @@ describe('Partners - Infra - Partner Map Repository', async () => {
       const partner: Partner = await partnerMapRepository.getByCode('partnerOne')
 
       // THEN
-      expect(partner).to.deep.equal(createPartnerFixture())
+      expect(partner).to.deep.equal(partnerJson.partnerOne)
     })
 
     it('should thrown not found error when partner is not found', async () => {

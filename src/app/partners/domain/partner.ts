@@ -65,9 +65,9 @@ export namespace Partner.Question {
     }
 
     export enum QuestionCode {
-        Address = 'Address',
-        RoomCount = 'RoomCount',
-        Roommate = 'Roommate'
+        Address = 'address',
+        RoomCount = 'room_count',
+        Roommate = 'roommate'
     }
 
     export enum NextStepAction {

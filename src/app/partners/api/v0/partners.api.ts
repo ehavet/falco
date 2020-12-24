@@ -26,10 +26,10 @@ export default function (container: Container): Array<ServerRoute> {
               code: Joi.string().description('Partner code').example('myPartner'),
               translation_key: Joi.string().description('Partner translation key').example('myPartnerTranslationKey'),
               customer_support_email: Joi.string().description('Partner customer support email').example('customersupport@mypartner.com'),
-              first_question: Joi.string().description('The first question to be asked, should reference ').example('RoomCount'),
+              first_question: Joi.string().description('The first question to be asked, should reference ').example('room_count'),
               questions: Joi.array().items(
                 Joi.object({
-                  code: Joi.string().description('Code of the question').example('RoomCount'),
+                  code: Joi.string().description('Code of the question').example('room_count'),
                   options: Joi.array().optional().items(
                     Joi.object({
                       value:

@@ -20,11 +20,11 @@ describe('Partners - API - E2E', async () => {
         code: 'studyo',
         translation_key: 'studyo',
         customer_support_email: 'help@appenin.fr',
-        first_question: 'RoomCount',
+        first_question: 'room_count',
         questions: [
           {
-            code: 'RoomCount',
-            default_next_step: 'Address',
+            code: 'room_count',
+            default_next_step: 'address',
             default_value: 1,
             options: [
               { value: 1 },
@@ -34,12 +34,12 @@ describe('Partners - API - E2E', async () => {
             to_ask: true
           },
           {
-            code: 'Address',
+            code: 'address',
             default_next_step: 'SUBMIT',
             to_ask: true
           },
           {
-            code: 'Roommate',
+            code: 'roommate',
             applicable: true,
             maximum_numbers: [
               { room_count: 1, value: 0 },

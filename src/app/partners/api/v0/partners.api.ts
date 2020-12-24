@@ -26,21 +26,34 @@ export default function (container: Container): Array<ServerRoute> {
               code: Joi.string().description('Partner code').example('myPartner'),
               translation_key: Joi.string().description('Partner translation key').example('myPartnerTranslationKey'),
               customer_support_email: Joi.string().description('Partner customer support email').example('customersupport@mypartner.com'),
-              questions: Joi.object({
-                room_count: Joi.object({
-                  options: Joi.array().description('Possible values').example([1, 2, 3]),
-                  manage_other_cases: Joi.boolean().description('Manage other cases for not proposed rooms').example(true)
-                }).description('Question about the number of rooms of the property'),
-                roommate: Joi.object({
-                  applicable: Joi.boolean().description('Define if the question is applicable for the partner. If not, do not ask the question to the subscriber otherwise an error could be thrown when creating a policy').example(false),
+              first_question: Joi.string().description('The first question to be asked, should reference ').example('room_count'),
+              questions: Joi.array().items(
+                Joi.object({
+                  code: Joi.string().description('Code of the question').example('room_count'),
+                  options: Joi.array().optional().items(
+                    Joi.object({
+                      value:
+                          Joi.alternatives().try(
+                            Joi.number(),
+                            Joi.string()
+                          ).description('Value of possible option').example(1),
+                      next_step: Joi.string().optional().description('Next step name').example('Address')
+                    })).description('Possible options'),
+                  to_ask: Joi.boolean().optional().description('Question to be asked or not').example(true),
+                  applicable: Joi.boolean().optional().description('Question to be asked or not').example(true),
+                  default_next_step: Joi.string().optional().description('Default next step name').example('Address'),
+                  default_value: Joi.alternatives().try(
+                    Joi.number(),
+                    Joi.string()
+                  ).optional().description('Default value of options').example(1),
                   maximum_numbers: Joi.array().optional().items(
                     Joi.object({
                       room_count: Joi.number().description('Room count targeted by the limitation of roommates').example(3),
                       value: Joi.number().description('Number maximum of roommates').example(2)
                     }).optional().description('Number Maximum of roommates for one room count')
                   ).description('Number maxixmum of roommates regarding the different partner room counts. Only present if the question is applicable.')
-                }).description('Question about the possibility of roommates for the insured property')
-              }).description('List of questions to ask for the quote')
+                })
+              ).description('List of questions to ask for the quote')
             }).label('Partner'),
             400: HttpErrorSchema.badRequestSchema,
             404: HttpErrorSchema.notFoundSchema,

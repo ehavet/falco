@@ -22,19 +22,33 @@ describe('Partners - API - Integ', async () => {
         code: 'partnerOne',
         translation_key: 'translationKey',
         customer_support_email: 'customer@support.fr',
-        questions: {
-          room_count: {
-            options: [1, 2, 3],
-            manage_other_cases: false
+        first_question: 'room_count',
+        questions: [
+          {
+            code: 'room_count',
+            to_ask: true,
+            options: [
+              { value: 1 },
+              { value: 2 },
+              { value: 3, next_step: 'REJECT' }
+            ],
+            default_next_step: 'address',
+            default_value: 1
           },
-          roommate: {
+          {
+            code: 'address',
+            to_ask: true,
+            default_next_step: 'SUBMIT'
+          },
+          {
+            code: 'roommate',
             applicable: true,
             maximum_numbers: [
               { room_count: 1, value: 0 },
               { room_count: 2, value: 1 },
               { room_count: 3, value: 2 }]
           }
-        }
+        ]
       }
 
       beforeEach(async () => {

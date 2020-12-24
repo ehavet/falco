@@ -7,20 +7,30 @@ import { PartnerRepository } from '../../../../src/app/partners/domain/partner.r
 import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
 import { createPartnerFixture } from '../fixtures/partner.fixture'
 
-const partnerJson = {
+const partnerJson: {partnerOne: Partner, partnerTwo: Partner} = {
   partnerOne: {
     code: 'partnerOne',
     translationKey: 'translationKey',
     trigram: 'TRI',
     callbackUrl: 'http://partner1-callback.com',
     customerSupportEmail: 'customer@support.fr',
+    firstQuestion: Partner.Question.QuestionCode.RoomCount,
     questions: [
       {
         code: Partner.Question.QuestionCode.RoomCount,
-        options: {
-          list: [1, 2, 3]
-        },
-        manageOtherCases: false
+        toAsk: true,
+        options: [
+          { value: 1 },
+          { value: 2 },
+          { value: 3, nextStep: Partner.Question.NextStepAction.REJECT }
+        ],
+        defaultNextStep: Partner.Question.QuestionCode.Address,
+        defaultValue: 1
+      },
+      {
+        code: Partner.Question.QuestionCode.Address,
+        toAsk: true,
+        defaultNextStep: Partner.Question.NextStepAction.SUBMIT
       },
       {
         code: Partner.Question.QuestionCode.Roommate,
@@ -30,10 +40,10 @@ const partnerJson = {
     ],
     offer: {
       simplifiedCovers: ['ACDDE'],
-      pricingMatrix: [
+      pricingMatrix: new Map([
         [1, { monthlyPrice: 3.30, defaultDeductible: 120, defaultCeiling: 5000 }]
-      ],
-      operationCodes: ['SEMESTER1', 'FULLYEAR'],
+      ]),
+      operationCodes: [OperationCode.SEMESTER1, OperationCode.FULLYEAR],
       productCode: 'APP666',
       productVersion: '1.0',
       contractualTerms: '/path/to/contractual/terms',
@@ -42,15 +52,25 @@ const partnerJson = {
   },
   partnerTwo: {
     code: 'partnerTwo',
+    trigram: 'PAR',
     translationKey: 'translationKey',
     callbackUrl: 'http://partner2-callback.com',
     customerSupportEmail: 'customer@support.fr',
+    firstQuestion: Partner.Question.QuestionCode.RoomCount,
     questions: [
       {
         code: Partner.Question.QuestionCode.RoomCount,
-        options: {
-          list: [1]
-        }
+        toAsk: true,
+        options: [
+          { value: 1 }
+        ],
+        defaultNextStep: Partner.Question.QuestionCode.Address,
+        defaultValue: 1
+      },
+      {
+        code: Partner.Question.QuestionCode.Address,
+        toAsk: true,
+        defaultNextStep: Partner.Question.NextStepAction.SUBMIT
       },
       {
         code: Partner.Question.QuestionCode.Roommate,
@@ -59,11 +79,11 @@ const partnerJson = {
     ],
     offer: {
       simplifiedCovers: ['ACDDE', 'ACVOL'],
-      pricingMatrix: [
+      pricingMatrix: new Map([
         [1, { monthlyPrice: 4.52, defaultDeductible: 120, defaultCeiling: 5000 }],
         [2, { monthlyPrice: 6.95, defaultDeductible: 150, defaultCeiling: 7000 }]
-      ],
-      operationCodes: ['SEMESTER2', 'FULLYEAR'],
+      ]),
+      operationCodes: [OperationCode.SEMESTER2, OperationCode.FULLYEAR],
       productCode: 'MRH_Etudiant',
       productVersion: '1.0',
       contractualTerms: '/path/to/contractual/terms',

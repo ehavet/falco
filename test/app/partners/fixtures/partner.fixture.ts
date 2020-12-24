@@ -8,13 +8,23 @@ export function createPartnerFixture (attr: Partial<Partner> = {}): Partner {
     translationKey: 'translationKey',
     callbackUrl: 'http://partner1-callback.com',
     customerSupportEmail: 'customer@support.fr',
+    firstQuestion: Partner.Question.QuestionCode.RoomCount,
     questions: [
       {
         code: Partner.Question.QuestionCode.RoomCount,
-        options: {
-          list: [1, 2, 3]
-        },
-        manageOtherCases: false
+        toAsk: true,
+        options: [
+          { value: 1 },
+          { value: 2 },
+          { value: 3, nextStep: Partner.Question.NextStepAction.REJECT }
+        ],
+        defaultNextStep: Partner.Question.QuestionCode.Address,
+        defaultValue: 1
+      },
+      {
+        code: Partner.Question.QuestionCode.Address,
+        toAsk: true,
+        defaultNextStep: Partner.Question.NextStepAction.SUBMIT
       },
       {
         code: Partner.Question.QuestionCode.Roommate,

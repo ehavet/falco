@@ -12,6 +12,7 @@ export function toPartner (partnerJson: any) : Partner {
     translationKey: partnerJson.translationKey,
     callbackUrl: partnerJson.callbackUrl,
     customerSupportEmail: partnerJson.customerSupportEmail,
+    firstQuestion: partnerJson.firstQuestion,
     questions: questions,
     offer: offer
   }
@@ -24,6 +25,8 @@ function _toQuestions (questions: any) {
         return _toRoomCountQuestion(jsonQuestion)
       case Partner.Question.QuestionCode.Roommate:
         return _toRoommateQuestion(jsonQuestion)
+      case Partner.Question.QuestionCode.Address:
+        return _toAddressQuestion(jsonQuestion)
       default:
         return undefined
     }
@@ -33,10 +36,10 @@ function _toQuestions (questions: any) {
 function _toRoomCountQuestion (jsonQuestion: any) {
   const question: Partner.Question.RoomCountQuestion = {
     code: Partner.Question.QuestionCode.RoomCount,
-    options: {
-      list: jsonQuestion.options.list
-    },
-    manageOtherCases: jsonQuestion.manageOtherCases
+    options: jsonQuestion.options,
+    toAsk: jsonQuestion.toAsk,
+    defaultNextStep: jsonQuestion.defaultNextStep,
+    defaultValue: jsonQuestion.defaultValue
   }
 
   return question
@@ -49,6 +52,15 @@ function _toRoommateQuestion (jsonQuestion: any) {
     maximumNumbers: jsonQuestion.maximumNumbers
   }
 
+  return question
+}
+
+function _toAddressQuestion (jsonQuestion: any) {
+  const question: Partner.Question.AddressQuestion = {
+    code: Partner.Question.QuestionCode.Address,
+    toAsk: jsonQuestion.toAsk,
+    defaultNextStep: jsonQuestion.defaultNextStep
+  }
   return question
 }
 

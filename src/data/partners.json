@@ -5,16 +5,26 @@
     "translationKey": "studyo",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
+    "firstQuestion": "room_count",
     "questions": [
       {
-        "code": "RoomCount",
-        "options": {
-          "list": [1, 2, 3]
-        },
-        "manageOtherCases": false
+        "code": "room_count",
+        "toAsk": true,
+        "options": [
+          { "value": 1 },
+          { "value": 2 },
+          { "value": 3 }
+        ],
+        "defaultNextStep": "address",
+        "defaultValue": 1
       },
       {
-        "code": "Roommate",
+        "code": "address",
+        "toAsk": true,
+        "defaultNextStep": "SUBMIT"
+      },
+      {
+        "code": "roommate",
         "applicable": true,
         "_comment":  "The rule for the maximum number of roommates for studyo is the following : roomcount - 1",
         "maximumNumbers": [{ "roomCount": 1, "value": 0 }, { "roomCount": 2, "value": 1 }, { "roomCount": 3, "value": 2 }]
@@ -40,16 +50,27 @@
     "translationKey": "e-mobilia-alternant",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
+    "firstQuestion": "room_count",
     "questions": [
       {
-        "code": "RoomCount",
-        "options": {
-          "list": [1, 2, 3]
-        },
-        "manageOtherCases": true
+        "code": "room_count",
+        "toAsk": true,
+        "options": [
+          { "value": 1 },
+          { "value": 2 },
+          { "value": 3 },
+          { "value": 4, "nextStep": "REJECT" }
+        ],
+        "defaultNextStep": "address",
+        "defaultValue": 1
       },
       {
-        "code": "Roommate",
+        "code": "address",
+        "toAsk": true,
+        "defaultNextStep": "SUBMIT"
+      },
+      {
+        "code": "roommate",
         "applicable": true,
         "_comment":  "The rule for the maximum number of roommates for e-mobilia is the following : roomcount - 1",
         "maximumNumbers": [{ "roomCount": 1, "value": 0 }, { "roomCount": 2, "value": 1 }, { "roomCount": 3, "value": 2 }]
@@ -82,16 +103,27 @@
     "translationKey": "essca",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
+    "firstQuestion": "room_count",
     "questions": [
       {
-        "code": "RoomCount",
-        "options": {
-          "list": [1, 2, 3]
-        },
-        "manageOtherCases": true
+        "code": "room_count",
+        "toAsk": true,
+        "options": [
+          { "value": 1 },
+          { "value": 2 },
+          { "value": 3 },
+          { "value": 4, "nextStep": "REJECT" }
+        ],
+        "defaultNextStep": "address",
+        "defaultValue": 1
       },
       {
-        "code": "Roommate",
+        "code": "address",
+        "toAsk": true,
+        "defaultNextStep": "SUBMIT"
+      },
+      {
+        "code": "roommate",
         "applicable": false,
         "_comment":  "There is no maximum number of roommates here because Essca does not allow roommates"
       }
@@ -116,16 +148,26 @@
     "translationKey": "estudent",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
+    "firstQuestion": "room_count",
     "questions": [
       {
-        "code": "RoomCount",
-        "options": {
-          "list": [1, 2]
-        },
-        "manageOtherCases": true
+        "code": "room_count",
+        "toAsk": true,
+        "options": [
+          { "value": 1 },
+          { "value": 2 },
+          { "value": 3, "nextStep": "REJECT" }
+        ],
+        "defaultNextStep": "address",
+        "defaultValue": 1
       },
       {
-        "code": "Roommate",
+        "code": "address",
+        "toAsk": true,
+        "defaultNextStep": "SUBMIT"
+      },
+      {
+        "code": "roommate",
         "applicable": true,
         "_comment":  "The rule for the maximum number of roommates for estudent is the following : roomcount - 1",
         "maximumNumbers": [{ "roomCount": 1, "value": 0 }, { "roomCount": 2, "value": 1 }]
@@ -150,16 +192,27 @@
     "translationKey": "greystar",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
+    "firstQuestion": "room_count",
     "questions": [
       {
-        "code": "RoomCount",
-        "options": {
-          "list": [1, 2, 3, 4]
-        },
-        "manageOtherCases": false
+        "code": "room_count",
+        "toAsk": true,
+        "options": [
+          { "value": 1 },
+          { "value": 2 },
+          { "value": 3 },
+          { "value": 4 }
+        ],
+        "defaultNextStep": "address",
+        "defaultValue": 1
       },
       {
-        "code": "Roommate",
+        "code": "address",
+        "toAsk": true,
+        "defaultNextStep": "SUBMIT"
+      },
+      {
+        "code": "roommate",
         "applicable": false,
         "_comment":  "There is no maximum number of roommates here because Greystar does not allow roommates"
       }
@@ -185,16 +238,26 @@
     "translationKey": "demo-student",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
+    "firstQuestion": "room_count",
     "questions": [
       {
-        "code": "RoomCount",
-        "options": {
-          "list": [1, 2, 3]
-        },
-        "manageOtherCases": false
+        "code": "room_count",
+        "toAsk": true,
+        "options": [
+          { "value": 1 },
+          { "value": 2 },
+          { "value": 3 }
+        ],
+        "defaultNextStep": "address",
+        "defaultValue": 1
       },
       {
-        "code": "Roommate",
+        "code": "address",
+        "toAsk": true,
+        "defaultNextStep": "SUBMIT"
+      },
+      {
+        "code": "roommate",
         "applicable": true,
         "_comment":  "The rule for the maximum number of roommates for demo-student is the following : roomcount - 1",
         "maximumNumbers": [{ "roomCount": 1, "value": 0 }, { "roomCount": 2, "value": 1 }, { "roomCount": 3, "value": 2 }]
@@ -220,16 +283,29 @@
     "translationKey": "demo",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
+    "firstQuestion": "room_count",
     "questions": [
       {
-        "code": "RoomCount",
-        "options": {
-          "list": [1, 2, 3, 4, 5]
-        },
-        "manageOtherCases": true
+        "code": "room_count",
+        "toAsk": true,
+        "options": [
+          { "value": 1 },
+          { "value": 2 },
+          { "value": 3 },
+          { "value": 4 },
+          { "value": 5 },
+          { "value": 6, "nextStep": "REJECT" }
+        ],
+        "defaultNextStep": "address",
+        "defaultValue": 1
       },
       {
-        "code": "Roommate",
+        "code": "address",
+        "toAsk": true,
+        "defaultNextStep": "SUBMIT"
+      },
+      {
+        "code": "roommate",
         "applicable": true,
         "_comment":  "The rule for the maximum number of roommates for demo is the following : roomcount - 1",
         "maximumNumbers": [{ "roomCount": 1, "value": 0 }, { "roomCount": 2, "value": 1 }, { "roomCount": 3, "value": 2 },

@@ -7,13 +7,14 @@ export interface Partner {
     translationKey: string
     callbackUrl: string
     customerSupportEmail: string
+    firstQuestion: Partner.Question.QuestionCode
     questions: Array<Partner.Question>
     offer: Partner.Offer
 }
 
 export namespace Partner {
 
-    export type Question = Question.RoomCountQuestion | Question.RoommateQuestion
+    export type Question = Question.RoomCountQuestion | Question.RoommateQuestion | Question.AddressQuestion
 
     export interface Offer {
         pricingMatrix: Map<RoomCount, Quote.Insurance.Estimate>
@@ -29,10 +30,21 @@ export namespace Partner {
 }
 
 export namespace Partner.Question {
+    export type ValueType = string | number
+
+    export type NextStepType = QuestionCode | NextStepAction
+
+    export type Option = {
+        value: ValueType,
+        nextStep?: NextStepType
+    }
+
     export interface RoomCountQuestion {
         code: QuestionCode,
-        options: ListOptions<RoomCount>,
-        manageOtherCases: boolean
+        options: Array<Option>,
+        toAsk: boolean,
+        defaultValue: ValueType,
+        defaultNextStep: NextStepType
     }
 
     export interface RoommateQuestion {
@@ -41,18 +53,25 @@ export namespace Partner.Question {
         maximumNumbers?: Array<MaximumNumberOfRoommates>
     }
 
+    export interface AddressQuestion {
+        code: QuestionCode,
+        toAsk: boolean,
+        defaultNextStep: NextStepType
+    }
+
     export interface MaximumNumberOfRoommates {
-        roomCount: number,
+        roomCount: number
         value: number
     }
 
     export enum QuestionCode {
-        RoomCount = 'RoomCount',
-        Roommate = 'Roommate'
+        Address = 'address',
+        RoomCount = 'room_count',
+        Roommate = 'roommate'
     }
 
-    export interface ListOptions<T> {
-        list: Array<T>,
+    export enum NextStepAction {
+        SUBMIT='SUBMIT',
+        REJECT='REJECT'
     }
-
 }

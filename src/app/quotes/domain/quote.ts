@@ -265,7 +265,7 @@ export namespace Quote.Insurance {
     export interface Estimate {
         monthlyPrice: number,
         defaultDeductible: number,
-        defaultCeiling: number,
+        defaultCeiling: Amount,
     }
 
     export type SimplifiedCover = string

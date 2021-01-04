@@ -23,15 +23,15 @@ describe('Quotes - Infra - Default Cap Advice Repository', async () => {
   })
 
   describe('#get', async () => {
-    it('should return the found default cap advice for the given partner and room count', async () => {
+    it('should return the found default cap advice as an amount for the given partner and room count', async () => {
       // Given
-      await DefaultCapAdviceSqlModel.create({ partnerCode: partnerCode, roomCount: 2, defaultCapAdvice: 5000 })
+      await DefaultCapAdviceSqlModel.create({ partnerCode: partnerCode, roomCount: 2, defaultCapAdvice: 5000.12 })
 
       // When
       const defaultCapAdvice = await defaultCapAdviceRepository.get(partnerCode, 2)
 
       // Then
-      expect(defaultCapAdvice.value).to.deep.equal('5000.000000')
+      expect(defaultCapAdvice.value).to.deep.equal(5000.12)
     })
 
     it('should throw an error if there is no default cap advice for the given partner', async () => {

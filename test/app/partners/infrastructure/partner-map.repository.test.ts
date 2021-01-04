@@ -5,8 +5,9 @@ import { Partner } from '../../../../src/app/partners/domain/partner'
 import { Quote } from '../../../../src/app/quotes/domain/quote'
 import { PartnerRepository } from '../../../../src/app/partners/domain/partner.repository'
 import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
+import partnerJson from './partner.json'
 
-const partnerJson: {partnerOne: Partner, partnerTwo: Partner} = {
+const expectedPartner: {partnerOne: Partner, partnerTwo: Partner} = {
   partnerOne: {
     code: 'partnerOne',
     translationKey: 'translationKey',
@@ -124,7 +125,7 @@ describe('Partners - Infra - Partner Map Repository', async () => {
       const partner: Partner = await partnerMapRepository.getByCode('partnerOne')
 
       // THEN
-      expect(partner).to.deep.equal(partnerJson.partnerOne)
+      expect(partner).to.deep.equal(expectedPartner.partnerOne)
     })
 
     it('should thrown not found error when partner is not found', async () => {
@@ -147,7 +148,7 @@ describe('Partners - Infra - Partner Map Repository', async () => {
 
       const propertyRoomCount2Estimate: Quote.Insurance.Estimate = {
         monthlyPrice: 6.95,
-        defaultDeductible: 150,
+        defaultDeductible: 120,
         defaultCeiling: 7000
       }
 

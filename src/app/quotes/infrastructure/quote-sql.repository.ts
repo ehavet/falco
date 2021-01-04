@@ -103,7 +103,8 @@ export class QuoteSqlRepository implements QuoteRepository {
         roomCount: (quote.risk.property && quote.risk.property.roomCount) ? quote.risk.property.roomCount : null,
         address: (quote.risk.property && quote.risk.property.address) ? quote.risk.property.address : null,
         postalCode: (quote.risk.property && quote.risk.property.postalCode) ? quote.risk.property.postalCode : null,
-        city: (quote.risk.property && quote.risk.property.city) ? quote.risk.property.city : null
+        city: (quote.risk.property && quote.risk.property.city) ? quote.risk.property.city : null,
+        type: (quote.risk.property && quote.risk.property.type) ? quote.risk.property.type : null
       },
       {
         where: { id: risk.quotePropertyId },

@@ -12,7 +12,8 @@ export function createQuoteFixture (attr:Partial<Quote> = {}): Quote {
         roomCount: 2,
         address: '88 rue des prairies',
         postalCode: '91100',
-        city: 'Kyukamura'
+        city: 'Kyukamura',
+        type: 'FLAT'
       },
       person: {
         firstname: 'Jean-Jean',
@@ -96,7 +97,8 @@ export function createQuoteRiskFixture (attr:Partial<Quote.Risk> = {}): Quote.Ri
       roomCount: 2,
       address: '88 rue des prairies',
       postalCode: '91100',
-      city: 'Kyukamura'
+      city: 'Kyukamura',
+      type: 'FLAT'
     },
     person: {
       firstname: 'Jean-Jean',
@@ -120,7 +122,8 @@ export function createUpdateQuoteCommandFixture (attr:Partial<UpdateQuoteCommand
         roomCount: 2,
         address: '88 rue des prairies',
         postalCode: '91100',
-        city: 'Kyukamura'
+        city: 'Kyukamura',
+        type: 'FLAT'
       },
       person: {
         firstname: 'Jean-Jean',
@@ -195,7 +198,8 @@ export function createUpdateQuotePayloadFixture (attr:Partial<object> = {}) {
         room_count: 2,
         address: '88 rue des prairies',
         postal_code: '91100',
-        city: 'Kyukamura'
+        city: 'Kyukamura',
+        type: 'FLAT'
       },
       person: {
         firstname: 'Jean-Jean',

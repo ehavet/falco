@@ -38,7 +38,8 @@ describe('Quotes - Usecase - Create Quote', async () => {
         roomCount: 2,
         address: '15 Rue Des Amandiers',
         postalCode: '91110',
-        city: 'Les Ulysses'
+        city: 'Les Ulysses',
+        type: 'FLAT'
       }
     },
     insurance: {
@@ -78,7 +79,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
       defaultCapAdviceRepository.get.withArgs('myPartner', 2).resolves({ value: 6000 })
 
       // When
-      const quote: Quote = await createQuote({ partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses' } } })
+      const quote: Quote = await createQuote({ partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses', type: 'FLAT' } } })
 
       // Then
       expect(quote).to.deep.include({ partnerCode: expectedQuote.partnerCode })
@@ -222,7 +223,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
 
   it('should save the quote', async () => {
     // Given
-    const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses' } } }
+    const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses', type: 'FLAT' } } }
     quoteRepository.save.resolves()
     defaultCapAdviceRepository.get.withArgs('myPartner', 2).resolves({ value: 6000 })
 

@@ -503,7 +503,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
               address: '88 rue des prairies',
               city: 'Kyukamura',
               postalCode: '91100',
-              roomCount: 3
+              roomCount: 3,
+              type: 'FLAT'
             }
           }),
           premium: 93.84
@@ -536,7 +537,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
               roomCount: 2,
               address: '5 avenue du bitume',
               postalCode: '13840',
-              city: 'Nakamura'
+              city: 'Nakamura',
+              type: 'FLAT'
             }
           })
         }
@@ -551,7 +553,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
             roomCount: 2,
             address: '5 avenue du bitume',
             postalCode: '13840',
-            city: 'Nakamura'
+            city: 'Nakamura',
+            type: 'FLAT'
           }
         })
       })
@@ -748,7 +751,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
           roomCount: 1,
           address: '666 rue de la mer morte',
           postalCode: '66666',
-          city: 'Babylone'
+          city: 'Babylone',
+          type: 'FLAT'
         },
         person: {
           firstname: 'Lucie',
@@ -781,7 +785,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
           roomCount: 1,
           address: '666 rue de la mer morte',
           postalCode: '66666',
-          city: 'Babylone'
+          city: 'Babylone',
+          type: 'FLAT'
         },
         person: {
           firstname: 'Lucie',

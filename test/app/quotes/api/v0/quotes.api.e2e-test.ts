@@ -42,7 +42,7 @@ describe('Quotes - API - E2E', async () => {
       // When
       response = await httpServer.api()
         .post('/v0/quotes')
-        .send({ code: 'studyo', risk: { property: { room_count: 2, address: '15 Rue Des Amandiers', postal_code: '91110', city: 'Les Ulysses' } } })
+        .send({ code: 'studyo', risk: { property: { room_count: 2, address: '15 Rue Des Amandiers', postal_code: '91110', city: 'Les Ulysses', type: 'FLAT' } } })
         .set('X-Consumer-Username', 'studyo')
 
       // Then
@@ -53,7 +53,8 @@ describe('Quotes - API - E2E', async () => {
             room_count: 2,
             address: '15 Rue Des Amandiers',
             postal_code: '91110',
-            city: 'Les Ulysses'
+            city: 'Les Ulysses',
+            type: 'FLAT'
           }
         },
         insurance: {
@@ -131,7 +132,8 @@ describe('Quotes - API - E2E', async () => {
           room_count: 2,
           address: '90 rue de la nouvelle prairie',
           postal_code: '91100',
-          city: 'Neo Kyukamura'
+          city: 'Neo Kyukamura',
+          type: 'FLAT'
         },
         person: {
           firstname: 'Jeannot',
@@ -254,7 +256,8 @@ describe('Quotes - API - E2E', async () => {
             address: '90 rue de la nouvelle prairie',
             city: 'Neo Kyukamura',
             postal_code: '91100',
-            room_count: 2
+            room_count: 2,
+            type: 'FLAT'
           }
         },
         start_date: '2020-03-05',
@@ -271,7 +274,18 @@ describe('Quotes - API - E2E', async () => {
     it('should return the quote matching the given quoteId', async () => {
       // Given
       const quoteRepository = new QuoteSqlRepository()
-      const quote: Quote = createQuoteFixture({ partnerCode: 'studyo' })
+      const quote: Quote = createQuoteFixture({
+        partnerCode: 'studyo',
+        risk: createQuoteRiskFixture({
+          property: {
+            address: '88 rue des prairies',
+            city: 'Kyukamura',
+            postalCode: '91100',
+            roomCount: 2,
+            type: 'FLAT'
+          }
+        })
+      })
       await quoteRepository.save(quote)
 
       const expectedResourceQuote = {
@@ -282,7 +296,8 @@ describe('Quotes - API - E2E', async () => {
             room_count: 2,
             address: '88 rue des prairies',
             postal_code: '91100',
-            city: 'Kyukamura'
+            city: 'Kyukamura',
+            type: 'FLAT'
           },
           person: {
             firstname: 'Jean-Jean',

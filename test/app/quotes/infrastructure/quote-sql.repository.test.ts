@@ -1,7 +1,7 @@
 import { QuoteSqlRepository } from '../../../../src/app/quotes/infrastructure/quote-sql.repository'
 import { Quote } from '../../../../src/app/quotes/domain/quote'
 import { dbTestUtils, expect } from '../../../test-utils'
-import { createQuoteFixture } from '../fixtures/quote.fixture'
+import { createQuoteFixture, createQuoteRiskFixture } from '../fixtures/quote.fixture'
 import { QuoteNotFoundError } from '../../../../src/app/quotes/domain/quote.errors'
 import { QuoteRiskSqlModel } from '../../../../src/app/quotes/infrastructure/sql-models/quote-risk-sql.model'
 import { QuoteSqlModel } from '../../../../src/app/quotes/infrastructure/sql-models/quote-sql-model'
@@ -33,7 +33,16 @@ describe('Repository - Quote', async () => {
     it('should save the quote into the db', async () => {
       // Given
       const expectedQuote: Quote = createQuoteFixture({
-        id: 'RF85D4S'
+        id: 'RF85D4S',
+        risk: createQuoteRiskFixture({
+          property: {
+            roomCount: 2,
+            address: '88 rue des prairies',
+            postalCode: '91100',
+            city: 'Kyukamura',
+            type: 'FLAT'
+          }
+        })
       })
 
       // When
@@ -63,6 +72,7 @@ describe('Repository - Quote', async () => {
       expect(savedRisk.property.address).to.equal('88 rue des prairies')
       expect(savedRisk.property.postalCode).to.equal('91100')
       expect(savedRisk.property.city).to.equal('Kyukamura')
+      expect(savedRisk.property.type).to.equal('FLAT')
       expect(savedRisk.person!.firstname).to.equal('Jean-Jean')
       expect(savedRisk.person!.lastname).to.equal('Lapin')
       expect(savedRisk.otherPeople![0].firstname).to.equal('John')
@@ -100,7 +110,16 @@ describe('Repository - Quote', async () => {
     it('should return the found quote', async () => {
       // Given
       const expectedQuote: Quote = createQuoteFixture({
-        id: 'DC82S0V'
+        id: 'DC82S0V',
+        risk: createQuoteRiskFixture({
+          property: {
+            roomCount: 2,
+            address: '88 rue des prairies',
+            postalCode: '91100',
+            city: 'Kyukamura',
+            type: 'FLAT'
+          }
+        })
       })
       await quoteRepository.save(expectedQuote)
 
@@ -138,7 +157,8 @@ describe('Repository - Quote', async () => {
             roomCount: 3,
             address: 'updated address',
             postalCode: '99999',
-            city: 'updated city'
+            city: 'updated city',
+            type: undefined
           },
           person: {
             firstname: 'updated-person-firstname',
@@ -247,7 +267,8 @@ describe('Repository - Quote', async () => {
             roomCount: 3,
             address: undefined,
             postalCode: undefined,
-            city: undefined
+            city: undefined,
+            type: undefined
           },
           person: undefined,
           otherPeople: undefined

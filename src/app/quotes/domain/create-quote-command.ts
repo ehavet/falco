@@ -9,6 +9,7 @@ export interface CreateQuoteCommand {
             address?: string,
             postalCode?: string,
             city?: string,
+            type?: string
         }
     }
 }

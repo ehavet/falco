@@ -118,7 +118,8 @@ export namespace Quote {
           roomCount: risk.property.roomCount,
           address: risk.property.address ? risk.property.address : undefined,
           postalCode: risk.property.postalCode ? risk.property.postalCode : undefined,
-          city: risk.property.city ? risk.property.city : undefined
+          city: risk.property.city ? risk.property.city : undefined,
+          type: risk.property.type ? risk.property.type : undefined
         },
         person: risk.person ? {
           firstname: risk.person.firstname,
@@ -253,6 +254,7 @@ export namespace Quote.Risk {
         address?: string
         postalCode?: string
         city?: string
+        type? : string
     }
 
     export interface Person {

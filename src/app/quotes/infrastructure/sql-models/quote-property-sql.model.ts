@@ -26,4 +26,7 @@ export class QuotePropertySqlModel extends Model {
 
     @Column
     city!: string
+
+    @Column
+    type!: string
 }

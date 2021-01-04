@@ -22,7 +22,8 @@ function _toRisk (risk: Quote.Risk) {
       room_count: risk.property.roomCount,
       address: risk.property.address ? risk.property.address : null,
       postal_code: risk.property.postalCode ? risk.property.postalCode : null,
-      city: risk.property.city ? risk.property.city : null
+      city: risk.property.city ? risk.property.city : null,
+      type: risk.property.type ? risk.property.type : null
     },
     person: risk.person ? {
       firstname: risk.person.firstname,

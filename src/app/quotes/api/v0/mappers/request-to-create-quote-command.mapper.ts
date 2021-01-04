@@ -10,7 +10,8 @@ export function requestToCreateQuoteCommand (request: any): CreateQuoteCommand {
         roomCount: payload.risk.property.room_count,
         address: payload.risk.property.address,
         city: payload.risk.property.city,
-        postalCode: payload.risk.property.postal_code
+        postalCode: payload.risk.property.postal_code,
+        type: payload.risk.property.type
       }
     }
   }

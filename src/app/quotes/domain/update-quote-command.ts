@@ -30,6 +30,7 @@ export namespace UpdateQuoteCommand.Risk {
         address?: string,
         postalCode?: string,
         city?: string
+        type?: string
     }
 }
 

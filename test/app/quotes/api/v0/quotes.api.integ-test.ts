@@ -54,7 +54,8 @@ describe('Quotes - API - Integration', async () => {
             roomCount: 2,
             address: '52 Rue Beaubourg',
             postalCode: '75003',
-            city: 'Paris'
+            city: 'Paris',
+            type: 'FLAT'
           }
         },
         insurance: {
@@ -84,7 +85,8 @@ describe('Quotes - API - Integration', async () => {
             room_count: 2,
             address: '52 Rue Beaubourg',
             postal_code: '75003',
-            city: 'Paris'
+            city: 'Paris',
+            type: 'FLAT'
           }
         },
         insurance: {
@@ -105,7 +107,7 @@ describe('Quotes - API - Integration', async () => {
 
       beforeEach(async () => {
         // Given
-        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode: 'myPartner', specOpsCode: 'BLANK', risk: quote.risk }).resolves(quote)
+        sinon.stub(container, 'CreateQuote').callThrough().withArgs({ partnerCode: 'myPartner', specOpsCode: 'BLANK', risk: quote.risk }).resolves(quote)
 
         // When
         response = await httpServer.api()
@@ -117,7 +119,8 @@ describe('Quotes - API - Integration', async () => {
                 room_count: 2,
                 address: '52 Rue Beaubourg',
                 postal_code: '75003',
-                city: 'Paris'
+                city: 'Paris',
+                type: 'FLAT'
               }
             }
           })
@@ -142,7 +145,8 @@ describe('Quotes - API - Integration', async () => {
             roomCount: 2,
             address: '52 Rue Beaubourg',
             postalCode: '75003',
-            city: 'Paris'
+            city: 'Paris',
+            type: 'FLAT'
           }
         }
         const specOpsCode = 'BLANK'
@@ -158,7 +162,8 @@ describe('Quotes - API - Integration', async () => {
                 room_count: 2,
                 address: '52 Rue Beaubourg',
                 postal_code: '75003',
-                city: 'Paris'
+                city: 'Paris',
+                type: 'FLAT'
               }
             }
           })
@@ -174,7 +179,7 @@ describe('Quotes - API - Integration', async () => {
       it('should reply with status 422', async () => {
         // Given
         const partnerCode: string = 'myPartner'
-        const risk = { property: { roomCount: 2, postalCode: undefined, city: undefined, address: undefined } }
+        const risk = { property: { roomCount: 2, postalCode: undefined, city: undefined, address: undefined, type: undefined } }
         const specOpsCode = 'BLANK'
         sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, specOpsCode }).rejects(new NoPartnerInsuranceForRiskError(partnerCode, risk))
 
@@ -435,7 +440,8 @@ describe('Quotes - API - Integration', async () => {
             room_count: 2,
             address: '88 rue des prairies',
             postal_code: '91100',
-            city: 'Kyukamura'
+            city: 'Kyukamura',
+            type: 'FLAT'
           },
           person: {
             firstname: 'Jean-Jean',
@@ -487,7 +493,8 @@ describe('Quotes - API - Integration', async () => {
               roomCount: 2,
               address: '88 rue des prairies',
               postalCode: '91100',
-              city: 'Kyukamura'
+              city: 'Kyukamura',
+              type: 'FLAT'
             },
             person: {
               firstname: 'Jean-Jean',
@@ -514,7 +521,8 @@ describe('Quotes - API - Integration', async () => {
                 room_count: 2,
                 address: '88 rue des prairies',
                 postal_code: '91100',
-                city: 'Kyukamura'
+                city: 'Kyukamura',
+                type: 'FLAT'
               },
               person: {
                 firstname: 'Jean-Jean',
@@ -717,7 +725,8 @@ describe('Quotes - API - Integration', async () => {
             room_count: 2,
             address: '88 rue des prairies',
             postal_code: '91100',
-            city: 'Kyukamura'
+            city: 'Kyukamura',
+            type: 'FLAT'
           },
           person: {
             firstname: 'Jean-Jean',

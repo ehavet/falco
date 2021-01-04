@@ -11,7 +11,8 @@ export const quotePostRequestBodySchema: Joi.ObjectSchema = Joi.object({
       room_count: Joi.number().integer().max(5).required().description('Property number of rooms').example(3),
       address: Joi.string().optional().max(100).description('Property address').example('112 rue du chêne rouge'),
       postal_code: Joi.string().optional().regex(POSTALCODE_REGEX).description('Property postal code').example('95470'),
-      city: Joi.string().optional().max(50).description('Property city').example('Corbeil-Essonnes')
+      city: Joi.string().optional().max(50).description('Property city').example('Corbeil-Essonnes'),
+      type: Joi.string().optional().equal('FLAT', 'flat').description('The type of property').example('FLAT')
     }).required().description('Risks regarding the property'),
     person: Joi.object({
       firstname: Joi.string().required().max(100).description('Person firstname').example('John'),

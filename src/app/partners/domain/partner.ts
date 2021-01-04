@@ -39,7 +39,7 @@ export namespace Partner.Question {
         nextStep?: NextStepType
     }
 
-    export enum PropertyTypeValue {
+    export enum PropertyType {
         FLAT = 'FLAT',
         HOUSE = 'HOUSE'
     }
@@ -67,8 +67,8 @@ export namespace Partner.Question {
     export interface PropertyTypeQuestion {
         code: QuestionCode.PropertyType,
         toAsk: boolean,
-        options: Array<Option<PropertyTypeValue>>,
-        defaultValue: PropertyTypeValue,
+        options: Array<Option<PropertyType>>,
+        defaultValue: PropertyType,
         defaultNextStep: NextStepType
     }
 

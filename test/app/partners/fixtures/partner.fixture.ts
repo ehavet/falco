@@ -14,10 +14,10 @@ export function createPartnerFixture (attr: Partial<Partner> = {}): Partner {
         code: Partner.Question.QuestionCode.PropertyType,
         toAsk: true,
         options: [
-          { value: Partner.Question.PropertyTypeValue.FLAT },
-          { value: Partner.Question.PropertyTypeValue.HOUSE, nextStep: Partner.Question.NextStepAction.REJECT }
+          { value: Partner.Question.PropertyType.FLAT },
+          { value: Partner.Question.PropertyType.HOUSE, nextStep: Partner.Question.NextStepAction.REJECT }
         ],
-        defaultValue: Partner.Question.PropertyTypeValue.FLAT,
+        defaultValue: Partner.Question.PropertyType.FLAT,
         defaultNextStep: Partner.Question.QuestionCode.Address
       } as Partner.Question.PropertyTypeQuestion,
       {

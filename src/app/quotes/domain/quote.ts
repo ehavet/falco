@@ -83,9 +83,9 @@ export namespace Quote {
       return quote
     }
 
-    export function update (quote: Quote, partner: Partner, command: UpdateQuoteCommand, partnerAvailableCodes: Array<OperationCode>): Quote {
+    export function update (quote: Quote, partner: Partner, command: UpdateQuoteCommand, partnerAvailableCodes: Array<OperationCode>, defaultCapAdvice: DefaultCapAdvice): Quote {
       quote.risk = _buildQuoteRisk(command.risk, partner)
-      quote.insurance = getInsurance(quote.risk, partner.offer)
+      quote.insurance = getInsurance(quote.risk, partner.offer, defaultCapAdvice)
       quote.policyHolder = Quote.PolicyHolder.build(command.policyHolder, quote.policyHolder)
       _applyStartDate(quote, command.startDate)
       _applyOperationCode(quote, partnerAvailableCodes, command.specOpsCode)
@@ -172,7 +172,7 @@ export namespace Quote {
       return dayjs(date).utc()
     }
 
-    export function getInsurance (risk: Risk, partnerOffer: Partner.Offer, defaultCapAdvice?: DefaultCapAdvice): Insurance {
+    export function getInsurance (risk: Risk, partnerOffer: Partner.Offer, defaultCapAdvice: DefaultCapAdvice): Insurance {
       const estimate: Partner.Estimate | undefined = partnerOffer.pricingMatrix.get(risk.property.roomCount)
 
       if (estimate === undefined) {
@@ -183,7 +183,7 @@ export namespace Quote {
         estimate: {
           monthlyPrice: estimate.monthlyPrice,
           defaultDeductible: estimate.defaultDeductible,
-          defaultCeiling: defaultCapAdvice ? defaultCapAdvice.value : estimate.defaultCeiling
+          defaultCeiling: defaultCapAdvice.value
         },
         simplifiedCovers: partnerOffer.simplifiedCovers,
         currency: 'EUR',

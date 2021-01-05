@@ -24,6 +24,8 @@ import { OperationCodeNotApplicableError } from '../../../../src/app/policies/do
 import { Partner } from '../../../../src/app/partners/domain/partner'
 import { partnerRepositoryStub } from '../../partners/fixtures/partner-repository.test-doubles'
 import { quoteRepositoryStub } from '../fixtures/quote-repository.test-doubles'
+import { defaultCapAdviceRepositoryStub } from '../fixtures/default-cap-advice-repository.test-doubles'
+import { DefaultCapAdvice } from '../../../../src/app/quotes/domain/default-cap-advice/default-cap-advice'
 
 describe('Quotes - Usecase - Update Quote', async () => {
   const now: Date = new Date('2020-01-05T00:00:00Z')
@@ -32,6 +34,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
   let partnerRepository: SinonStubbedInstance<PartnerRepository>
   let quote: Quote
   let partner: Partner
+  const defaultCapAdviceRepository = defaultCapAdviceRepositoryStub()
   const quoteId: string = 'UDQUOT3'
   const partnerCode: string = 'myPartner'
 
@@ -90,6 +93,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
     partnerRepository.getOperationCodes.withArgs(partnerCode).resolves(
       [OperationCode.FULLYEAR, OperationCode.SEMESTER1, OperationCode.SEMESTER2, OperationCode.BLANK]
     )
+    defaultCapAdviceRepository.get.resolves({ value: 7000 })
+    updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository)
   })
 
   afterEach(() => {
@@ -115,7 +120,6 @@ describe('Quotes - Usecase - Update Quote', async () => {
       )
       quoteRepository.get.withArgs(quoteId).resolves(quote)
       quoteRepository.update.resolves(updatedQuote)
-      updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
 
       // When
       const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId, startDate: updatedStartDate })
@@ -131,7 +135,6 @@ describe('Quotes - Usecase - Update Quote', async () => {
       // Given
       quoteRepository.get.withArgs(quoteId).resolves(quote)
       const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId, specOpsCode: 'SEMESTER1' })
-      const updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
       const updatedQuote = createQuoteFixture(
         {
           id: 'UDQUOT3',
@@ -155,7 +158,6 @@ describe('Quotes - Usecase - Update Quote', async () => {
       // Given
       quoteRepository.get.withArgs(quoteId).resolves(quote)
       const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId, specOpsCode: 'SEMESTER2' })
-      const updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
       const updatedQuote = createQuoteFixture(
         {
           id: 'UDQUOT3',
@@ -179,7 +181,6 @@ describe('Quotes - Usecase - Update Quote', async () => {
       // Given
       quoteRepository.get.withArgs(quoteId).resolves(quote)
       const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId, specOpsCode: 'FULLYEAR' })
-      const updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
       const updatedQuote = createQuoteFixture(
         {
           id: 'UDQUOT3',
@@ -204,7 +205,6 @@ describe('Quotes - Usecase - Update Quote', async () => {
         // Given
         quoteRepository.get.withArgs(quoteId).resolves(quote)
         const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId, specOpsCode: '' })
-        const updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
         const updatedQuote = createQuoteFixture(
           {
             id: 'UDQUOT3',
@@ -229,7 +229,6 @@ describe('Quotes - Usecase - Update Quote', async () => {
         const quote = createQuoteFixture({ id: quoteId, specialOperationsCode: OperationCode.SEMESTER1, specialOperationsCodeAppliedAt: new Date() })
         quoteRepository.get.withArgs(quoteId).resolves(quote)
         const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quote.id, specOpsCode: '' })
-        const updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
         const updatedQuote = createQuoteFixture(
           {
             id: 'UDQUOT3',
@@ -255,7 +254,6 @@ describe('Quotes - Usecase - Update Quote', async () => {
         // Given
         quoteRepository.get.withArgs(quoteId).resolves(quote)
         const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId, specOpsCode: undefined })
-        const updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
         const updatedQuote = createQuoteFixture(
           {
             id: 'UDQUOT3',
@@ -280,7 +278,6 @@ describe('Quotes - Usecase - Update Quote', async () => {
         const quote = createQuoteFixture({ id: quoteId, specialOperationsCode: OperationCode.SEMESTER1, specialOperationsCodeAppliedAt: new Date() })
         quoteRepository.get.withArgs(quoteId).resolves(quote)
         const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quote.id, specOpsCode: undefined })
-        const updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
         const updatedQuote = createQuoteFixture(
           {
             id: 'UDQUOT3',
@@ -319,7 +316,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
           // Given
           quoteRepository.get.withArgs(quoteId).resolves(quote)
           quoteRepository.update.withArgs(updatedQuote).resolves()
-          updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+
           const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId, specOpsCode: code })
 
           // When
@@ -346,7 +343,6 @@ describe('Quotes - Usecase - Update Quote', async () => {
       )
       quoteRepository.get.withArgs(quoteId).resolves(quote)
       quoteRepository.update.resolves(updatedQuote)
-      updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
 
       const updateQuoteCommand = createUpdateQuoteCommandFixture({
         id: quoteId
@@ -385,7 +381,6 @@ describe('Quotes - Usecase - Update Quote', async () => {
       )
       quoteRepository.get.withArgs(quoteId).resolves(quote)
       quoteRepository.update.resolves(updatedQuote)
-      updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
 
       const updateQuoteCommand = createUpdateQuoteCommandFixture({
         id: quoteId,
@@ -427,7 +422,6 @@ describe('Quotes - Usecase - Update Quote', async () => {
       )
       quoteRepository.get.withArgs(quoteId).resolves(quote)
       quoteRepository.update.withArgs(updatedQuote).resolves()
-      updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
 
       const updateQuoteCommand = createUpdateQuoteCommandFixture({
         id: quoteId,
@@ -464,7 +458,6 @@ describe('Quotes - Usecase - Update Quote', async () => {
       )
       quoteRepository.get.withArgs(quoteId).resolves(quote)
       quoteRepository.update.resolves(updatedQuote)
-      updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
 
       const updateQuoteCommand = createUpdateQuoteCommandFixture({
         id: quoteId,
@@ -490,6 +483,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
   describe('updating the risk', async () => {
     it('should update the insurance estimate and premium if the room count is changed', async () => {
       // Given
+      const newRoomCount: number = 3
+      const defaultCapAdviceForRoomCountOf3: DefaultCapAdvice = { value: 10000 }
       const updatedQuote = createQuoteFixture(
         {
           id: 'UDQUOT3',
@@ -500,7 +495,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
             estimate: {
               monthlyPrice: 7.82,
               defaultDeductible: 160,
-              defaultCeiling: 8000
+              defaultCeiling: defaultCapAdviceForRoomCountOf3.value
             }
           }),
           risk: createQuoteRiskFixture({
@@ -516,10 +511,10 @@ describe('Quotes - Usecase - Update Quote', async () => {
       )
       quoteRepository.get.withArgs(quoteId).resolves(quote)
       quoteRepository.update.resolves(updatedQuote)
-      updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+      defaultCapAdviceRepository.get.withArgs(partnerCode, newRoomCount).resolves(defaultCapAdviceForRoomCountOf3)
 
       const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId })
-      updateQuoteCommand.risk.property.roomCount = 3
+      updateQuoteCommand.risk.property.roomCount = newRoomCount
 
       // When
       await updateQuote(updateQuoteCommand)
@@ -548,7 +543,6 @@ describe('Quotes - Usecase - Update Quote', async () => {
       )
       quoteRepository.get.withArgs(quoteId).resolves(quote)
       quoteRepository.update.resolves(updatedQuote)
-      updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
 
       const updateQuoteCommand = createUpdateQuoteCommandFixture({
         id: quoteId,
@@ -590,7 +584,6 @@ describe('Quotes - Usecase - Update Quote', async () => {
 
       quoteRepository.get.withArgs(quoteId).resolves(quote)
       quoteRepository.update.resolves(updatedQuote)
-      updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
 
       const updateQuoteCommand = createUpdateQuoteCommandFixture({
         id: quoteId,
@@ -624,7 +617,6 @@ describe('Quotes - Usecase - Update Quote', async () => {
       )
       quoteRepository.get.withArgs(quoteId).resolves(quote)
       quoteRepository.update.resolves(updatedQuote)
-      updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
 
       const updateQuoteCommand = createUpdateQuoteCommandFixture({
         id: quoteId,
@@ -658,7 +650,6 @@ describe('Quotes - Usecase - Update Quote', async () => {
       )
       quoteRepository.get.withArgs(quoteId).resolves(quote)
       quoteRepository.update.resolves(updatedQuote)
-      updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
 
       const updateQuoteCommand = createUpdateQuoteCommandFixture({
         id: quoteId,
@@ -693,7 +684,6 @@ describe('Quotes - Usecase - Update Quote', async () => {
       quote.risk.otherPeople = []
       quoteRepository.get.withArgs(quoteId).resolves(quote)
       quoteRepository.update.resolves(updatedQuote)
-      updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
 
       const updateQuoteCommand = createUpdateQuoteCommandFixture({
         id: quoteId,
@@ -728,7 +718,6 @@ describe('Quotes - Usecase - Update Quote', async () => {
       quote.risk.otherPeople = []
       quoteRepository.get.withArgs(quoteId).resolves(quote)
       quoteRepository.update.resolves(updatedQuote)
-      updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
 
       const updateQuoteCommand = createUpdateQuoteCommandFixture({
         id: quoteId,
@@ -748,7 +737,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
   it('should save and return the updated quote', async () => {
     // Given
     quoteRepository.get.withArgs(quoteId).resolves(quote)
-    updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+
     const expectedQuote: Quote = createQuoteFixture({
       id: quoteId,
       partnerCode: partnerCode,
@@ -777,7 +766,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
         phoneNumber: '+66666666666',
         emailValidatedAt: undefined
       },
-      insurance: createQuoteInsuranceFixture({ estimate: { defaultCeiling: 6000, defaultDeductible: 140, monthlyPrice: 4.82 } }),
+      insurance: createQuoteInsuranceFixture({ estimate: { defaultCeiling: 7000, defaultDeductible: 140, monthlyPrice: 4.82 } }),
       specialOperationsCode: OperationCode.FULLYEAR,
       specialOperationsCodeAppliedAt: new Date('2020-01-05T00:00:00.000Z'),
       startDate: new Date('2020-01-05T00:00:00.000Z'),
@@ -826,7 +815,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
     // Given
     const unknowQuoteId = 'UNKN0W'
     const updateQuoteCommand: UpdateQuoteCommand = createUpdateQuoteCommandFixture({ id: unknowQuoteId })
-    updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+
     quoteRepository.get.withArgs(unknowQuoteId).rejects(new QuoteNotFoundError(unknowQuoteId))
 
     // When
@@ -845,7 +834,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
         property: { roomCount: 3, city: '', postalCode: '', address: '' }
       })
     })
-    updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+
     quoteRepository.get.withArgs(unknowQuoteId).rejects(new QuoteRiskRoommatesNotAllowedError(3))
 
     // When
@@ -874,7 +863,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
         ]
       })
     })
-    updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+
     quoteRepository.get.withArgs(unknowQuoteId).rejects(new QuoteRiskNumberOfRoommatesError(1, 2))
 
     // When
@@ -887,7 +876,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
   it('should throw QuoteRiskPropertyRoomCountNotInsurableError when there is no coverage for the given property room count', async () => {
     // Given
     quoteRepository.get.withArgs(quoteId).resolves(quote)
-    updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+
     const updateQuoteCommand: UpdateQuoteCommand = createUpdateQuoteCommandFixture({
       id: quoteId,
       specOpsCode: undefined,
@@ -913,7 +902,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
   it('should throw OperationCodeNotApplicableError if operation code is not applicable for partner', async () => {
     // Given
     quoteRepository.get.withArgs(quoteId).resolves(quote)
-    updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+
     const updateQuoteCommande = createUpdateQuoteCommandFixture({
       id: quoteId,
       specOpsCode: 'NOTAPPLICABLECODE',
@@ -943,7 +932,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
     // Given
     const earlierThanTodayDate: Date = new Date('2009-01-27')
     quoteRepository.get.withArgs(quoteId).resolves(quote)
-    updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+
     // When
     const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId, startDate: earlierThanTodayDate })
     const promise = updateQuote(updateQuoteCommand)

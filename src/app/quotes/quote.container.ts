@@ -36,7 +36,7 @@ const sendEmailValidationLinkToQuotePolicyHolder: SendValidationLinkEmailToQuote
       emailValidationContainer.SendValidationLinkToEmailAddress
     )
 const createQuote: CreateQuote = CreateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository)
-const updateQuote: UpdateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+const updateQuote: UpdateQuote = UpdateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository)
 const getQuoteById: GetQuoteById = GetQuoteById.factory(quoteRepository)
 
 export const container: Container = {

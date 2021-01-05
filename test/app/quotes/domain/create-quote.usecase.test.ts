@@ -7,7 +7,10 @@ import { CreateQuote } from '../../../../src/app/quotes/domain/create-quote.usec
 import { quoteRepositoryMock } from '../fixtures/quote-repository.test-doubles'
 import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
 import { defaultCapAdviceRepositoryStub } from '../fixtures/default-cap-advice-repository.test-doubles'
-import { MultipleDefaultCapAdviceFoundError } from '../../../../src/app/quotes/domain/default-cap-advice/default-cap-advice.errors'
+import {
+  DefaultCapAdviceNotFoundError,
+  MultipleDefaultCapAdviceFoundError
+} from '../../../../src/app/quotes/domain/default-cap-advice/default-cap-advice.errors'
 
 describe('Quotes - Usecase - Create Quote', async () => {
   let createQuote: CreateQuote
@@ -260,5 +263,17 @@ describe('Quotes - Usecase - Create Quote', async () => {
 
     // THEN
     return expect(quotePromise).to.be.rejectedWith(MultipleDefaultCapAdviceFoundError)
+  })
+
+  it('should throw an error if there is no default cap advices for a given partner and room count', async () => {
+    // GIVEN
+    const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses' } } }
+    defaultCapAdviceRepository.get.withArgs('myPartner', 2).rejects(new DefaultCapAdviceNotFoundError('myPartner', 2))
+
+    // WHEN
+    const quotePromise = createQuote(createQuoteCommand)
+
+    // THEN
+    return expect(quotePromise).to.be.rejectedWith(DefaultCapAdviceNotFoundError)
   })
 })

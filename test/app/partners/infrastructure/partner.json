@@ -1,0 +1,115 @@
+{
+  "partnerOne": {
+    "code": "partnerOne",
+    "translationKey": "translationKey",
+    "trigram": "TRI",
+    "callbackUrl": "http://partner1-callback.com",
+    "customerSupportEmail": "customer@support.fr",
+    "firstQuestion": "property_type",
+    "questions": [
+      {
+        "code": "property_type",
+        "toAsk": true,
+        "options": [
+          { "value": "FLAT" },
+          { "value": "HOUSE", "nextStep": "REJECT" }
+        ],
+        "defaultValue": "FLAT",
+        "defaultNextStep": "address"
+      },
+      {
+        "code": "room_count",
+        "toAsk": true,
+        "options": [
+          { "value": 1 },
+          { "value": 2 },
+          { "value": 3, "nextStep": "REJECT" }
+        ],
+        "defaultNextStep": "address",
+        "defaultValue": 1
+      },
+      {
+        "code": "address",
+        "toAsk": true,
+        "defaultNextStep": "SUBMIT"
+      },
+      {
+        "code": "roommate",
+        "applicable": true,
+        "maximumNumbers": [
+          { "roomCount": 1, "value": 0 },
+          { "roomCount": 2, "value": 1 },
+          { "roomCount": 3, "value": 2 }
+        ]
+      }
+    ],
+    "offer": {
+      "simplifiedCovers": [
+        "ACDDE"
+      ],
+      "defaultDeductible": 120,
+      "pricingMatrix": [
+        [1, { "monthlyPrice": 3.30, "defaultCeiling": 5000 }]
+      ],
+      "operationCodes": ["SEMESTER1", "FULLYEAR"],
+      "productCode": "APP666",
+      "productVersion": "1.0",
+      "contractualTerms": "/path/to/contractual/terms",
+      "ipid": "/path/to/ipid"
+    }
+  },
+  "partnerTwo": {
+    "code": "partnerTwo",
+    "trigram": "PAR",
+    "translationKey": "translationKey",
+    "callbackUrl": "http://partner2-callback.com",
+    "customerSupportEmail": "customer@support.fr",
+    "firstQuestion": "room_count",
+    "questions": [
+      {
+        "code": "property_type",
+        "toAsk": true,
+        "options": [
+          { "value": "FLAT" },
+          { "value": "HOUSE", "nextStep": "REJECT" }
+        ],
+        "defaultValue": "FLAT",
+        "defaultNextStep": "property_type"
+      },
+      {
+        "code": "room_count",
+        "toAsk": true,
+        "options": [
+          { "value": 1 }
+        ],
+        "defaultNextStep": "address",
+        "defaultValue": 1
+      },
+      {
+        "code": "address",
+        "toAsk": true,
+        "defaultNextStep": "SUBMIT"
+      },
+      {
+        "code": "roommate",
+        "applicable": false
+      }
+    ],
+    "offer": {
+      "simplifiedCovers": [
+        "ACDDE",
+        "ACVOL"
+      ],
+      "defaultDeductible": 120,
+      "pricingMatrix": [
+        [1, { "monthlyPrice": 4.52, "defaultCeiling": 5000 }],
+        [2, { "monthlyPrice": 6.95, "defaultCeiling": 7000 }]
+      ],
+      "operationCodes": ["SEMESTER2", "FULLYEAR"],
+      "productCode": "MRH_Etudiant",
+      "productVersion": "1.0",
+      "contractualTerms": "/path/to/contractual/terms",
+      "ipid": "/path/to/ipid"
+    }
+  }
+}

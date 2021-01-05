@@ -89,13 +89,25 @@ function _toOffer (offer: any) : Partner.Offer {
       operationCodes: []
     }
   }
+
+  const pricing = buildPricingMatrix(offer, offer.defaultDeductible)
   return {
     simplifiedCovers: offer.simplifiedCovers,
-    pricingMatrix: new Map<RoomCount, Quote.Insurance.Estimate>(offer.pricingMatrix),
+    pricingMatrix: pricing,
     productCode: offer.productCode,
     productVersion: offer.productVersion,
     contractualTerms: offer.contractualTerms,
     ipid: offer.ipid,
     operationCodes: offer.operationCodes
   }
+}
+
+function buildPricingMatrix (offer: any, defaultDeductible: number) : Map<RoomCount, Quote.Insurance.Estimate> {
+  const offerWithMonthlyPrice = offer.pricingMatrix.map(matrixElement => {
+    const roomCount = matrixElement[0]
+    const estimate = matrixElement[1]
+    return [roomCount, { monthlyPrice: estimate.monthlyPrice, defaultDeductible: defaultDeductible, defaultCeiling: estimate.defaultCeiling }]
+  })
+
+  return new Map<RoomCount, Quote.Insurance.Estimate>(offerWithMonthlyPrice)
 }

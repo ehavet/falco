@@ -63,7 +63,7 @@ export namespace Quote {
     }
 
     export function create (command: CreateQuoteCommand, partner: Partner, defaultCapAdvice: DefaultCapAdvice): Quote {
-      if (!PartnerFunc.isValidPropertyType(partner, command.risk.property.type)) {
+      if (command.risk.property.type && !PartnerFunc.isValidPropertyType(partner, command.risk.property.type)) {
         throw new QuoteRiskPropertyTypeNotInsurableError(command.risk.property.type!)
       }
 

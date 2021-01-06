@@ -1,6 +1,7 @@
 import { Partner } from './partner'
 import { PartnerQuestionNotFoundError } from './partner.errors'
 import { Quote } from '../../quotes/domain/quote'
+import { PropertyType } from '../../common-api/domain/common-type/property-type'
 
 const NUMBER_FOR_NO_ROOMMATES = 0
 const DEMO_PARTNER_CODE_PREFIX: string = 'demo'
@@ -59,16 +60,24 @@ export function isRelatedToADemoPartner (partnerCode?: string): boolean {
   return partnerCode.startsWith(DEMO_PARTNER_CODE_PREFIX)
 }
 
-export function isValidPropertyType (partner: Partner, type?: string): boolean {
-  if (!type) return true
-  const question = partner.questions.find((question) => question.code === Partner.Question.QuestionCode.PropertyType) as Partner.Question.PropertyTypeQuestion
+function _getQuestionOnPropertyType (partner: Partner) : Partner.Question.PropertyTypeQuestion {
+  return partner.questions
+    .find((question) => question.code === Partner.Question.QuestionCode.PropertyType) as Partner.Question.PropertyTypeQuestion
+}
+
+function _getMatchingOption (options: Array<Partner.Question.Option<PropertyType>>, type: string) : Partner.Question.Option<PropertyType> | undefined {
+  return options.find(option => option.value === type)
+}
+
+export function isValidPropertyType (partner: Partner, type: PropertyType): boolean {
+  const question = _getQuestionOnPropertyType(partner)
 
   if (!question.options) {
     return type === question.defaultValue
   }
 
-  const option = question.options.find(option => option.value === type)
-  if (!option?.nextStep) return true
+  const matchingOption = _getMatchingOption(question.options, type)
+  if (!matchingOption?.nextStep) return true
 
-  return option?.nextStep !== Partner.Question.NextStepAction.REJECT
+  return matchingOption?.nextStep !== Partner.Question.NextStepAction.REJECT
 }

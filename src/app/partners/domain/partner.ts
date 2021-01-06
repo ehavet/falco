@@ -80,7 +80,7 @@ export namespace Partner.Question {
     export interface PropertyTypeQuestion {
         code: QuestionCode.PROPERTY_TYPE,
         toAsk: boolean,
-        options: Array<Option<PropertyType>>,
+        options?: Array<Option<PropertyType>>,
         defaultValue: PropertyType,
         defaultNextStep: NextStepType
     }

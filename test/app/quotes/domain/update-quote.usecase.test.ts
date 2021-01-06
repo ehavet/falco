@@ -3,8 +3,10 @@ import { UpdateQuoteCommand } from '../../../../src/app/quotes/domain/update-quo
 import { UpdateQuote } from '../../../../src/app/quotes/domain/update-quote.usecase'
 import { Quote } from '../../../../src/app/quotes/domain/quote'
 import {
-  createQuoteFixture, createQuoteInsuranceFixture,
-  createQuotePolicyHolderFixture, createQuoteRiskFixture,
+  createQuoteFixture,
+  createQuoteInsuranceFixture,
+  createQuotePolicyHolderFixture,
+  createQuoteRiskFixture,
   createUpdateQuoteCommandFixture,
   createUpdateQuoteCommandPolicyHolderFixture,
   createUpdateQuoteCommandRiskFixture
@@ -14,6 +16,7 @@ import {
   QuoteNotFoundError,
   QuoteRiskNumberOfRoommatesError,
   QuoteRiskPropertyRoomCountNotInsurableError,
+  QuoteRiskPropertyTypeNotInsurableError,
   QuoteRiskRoommatesNotAllowedError,
   QuoteStartDateConsistencyError
 } from '../../../../src/app/quotes/domain/quote.errors'
@@ -26,6 +29,7 @@ import { partnerRepositoryStub } from '../../partners/fixtures/partner-repositor
 import { quoteRepositoryStub } from '../fixtures/quote-repository.test-doubles'
 import { defaultCapAdviceRepositoryStub } from '../fixtures/default-cap-advice-repository.test-doubles'
 import { DefaultCapAdvice } from '../../../../src/app/quotes/domain/default-cap-advice/default-cap-advice'
+import { PropertyType } from '../../../../src/app/common-api/domain/common-type/property-type'
 
 describe('Quotes - Usecase - Update Quote', async () => {
   const now: Date = new Date('2020-01-05T00:00:00Z')
@@ -47,6 +51,12 @@ describe('Quotes - Usecase - Update Quote', async () => {
       {
         code: partnerCode,
         questions: [
+          {
+            code: Partner.Question.QuestionCode.PropertyType,
+            toAsk: false,
+            defaultValue: PropertyType.FLAT,
+            defaultNextStep: Partner.Question.QuestionCode.Address
+          },
           {
             code: Partner.Question.QuestionCode.ROOM_COUNT,
             toAsk: true,
@@ -504,7 +514,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
               city: 'Kyukamura',
               postalCode: '91100',
               roomCount: 3,
-              type: 'FLAT'
+              type: PropertyType.FLAT
             }
           }),
           premium: 93.84
@@ -538,7 +548,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
               address: '5 avenue du bitume',
               postalCode: '13840',
               city: 'Nakamura',
-              type: 'FLAT'
+              type: PropertyType.FLAT
             }
           })
         }
@@ -554,7 +564,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
             address: '5 avenue du bitume',
             postalCode: '13840',
             city: 'Nakamura',
-            type: 'FLAT'
+            type: PropertyType.FLAT
           }
         })
       })
@@ -752,7 +762,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
           address: '666 rue de la mer morte',
           postalCode: '66666',
           city: 'Babylone',
-          type: 'FLAT'
+          type: PropertyType.FLAT
         },
         person: {
           firstname: 'Lucie',
@@ -786,7 +796,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
           address: '666 rue de la mer morte',
           postalCode: '66666',
           city: 'Babylone',
-          type: 'FLAT'
+          type: PropertyType.FLAT
         },
         person: {
           firstname: 'Lucie',
@@ -943,5 +953,27 @@ describe('Quotes - Usecase - Update Quote', async () => {
     const promise = updateQuote(updateQuoteCommand)
     // Then
     return expect(promise).to.be.rejectedWith(QuoteStartDateConsistencyError)
+  })
+
+  it('should throw an QuoteRiskPropertyTypeNotInsurableError when property type is not insurable by the partner', async () => {
+    // Given
+    quoteRepository.get.withArgs(quoteId).resolves(quote)
+    updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+    // When
+    const updateQuoteCommand = createUpdateQuoteCommandFixture({
+      id: quoteId,
+      risk: createQuoteRiskFixture({
+        property: {
+          roomCount: 2,
+          address: '88 rue des prairies',
+          postalCode: '91100',
+          city: 'Kyukamura',
+          type: PropertyType.HOUSE
+        }
+      })
+    })
+    const promise = updateQuote(updateQuoteCommand)
+    // Then
+    return expect(promise).to.be.rejectedWith(QuoteRiskPropertyTypeNotInsurableError)
   })
 })

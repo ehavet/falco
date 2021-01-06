@@ -1,5 +1,6 @@
 import { Quote } from '../../../../src/app/quotes/domain/quote'
 import { UpdateQuoteCommand } from '../../../../src/app/quotes/domain/update-quote-command'
+import { PropertyType } from '../../../../src/app/common-api/domain/common-type/property-type'
 
 const now: Date = new Date('2020-01-05T00:00:00Z')
 
@@ -13,7 +14,7 @@ export function createQuoteFixture (attr:Partial<Quote> = {}): Quote {
         address: '88 rue des prairies',
         postalCode: '91100',
         city: 'Kyukamura',
-        type: 'FLAT'
+        type: PropertyType.FLAT
       },
       person: {
         firstname: 'Jean-Jean',
@@ -98,7 +99,7 @@ export function createQuoteRiskFixture (attr:Partial<Quote.Risk> = {}): Quote.Ri
       address: '88 rue des prairies',
       postalCode: '91100',
       city: 'Kyukamura',
-      type: 'FLAT'
+      type: PropertyType.FLAT
     },
     person: {
       firstname: 'Jean-Jean',
@@ -123,7 +124,7 @@ export function createUpdateQuoteCommandFixture (attr:Partial<UpdateQuoteCommand
         address: '88 rue des prairies',
         postalCode: '91100',
         city: 'Kyukamura',
-        type: 'FLAT'
+        type: PropertyType.FLAT
       },
       person: {
         firstname: 'Jean-Jean',
@@ -199,7 +200,7 @@ export function createUpdateQuotePayloadFixture (attr:Partial<object> = {}) {
         address: '88 rue des prairies',
         postal_code: '91100',
         city: 'Kyukamura',
-        type: 'FLAT'
+        type: PropertyType.FLAT
       },
       person: {
         firstname: 'Jean-Jean',

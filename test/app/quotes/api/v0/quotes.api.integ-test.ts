@@ -5,7 +5,8 @@ import { container, quoteRoutes } from '../../../../../src/app/quotes/quote.cont
 import { PartnerNotFoundError } from '../../../../../src/app/partners/domain/partner.errors'
 import {
   NoPartnerInsuranceForRiskError,
-  QuoteNotFoundError, QuotePartnerOwnershipError,
+  QuoteNotFoundError,
+  QuotePartnerOwnershipError,
   QuotePolicyHolderEmailNotFoundError,
   QuoteRiskNumberOfRoommatesError,
   QuoteRiskPropertyRoomCountNotInsurableError,
@@ -29,6 +30,7 @@ import {
   populatePricingMatrixSqlFixture,
   resetPricingMatrixSqlFixture
 } from '../../../partners/fixtures/pricing-matrix-sql.fixture'
+import { PropertyType } from '../../../../../src/app/common-api/domain/common-type/property-type'
 
 describe('Quotes - API - Integration', async () => {
   let httpServer: HttpServerForTesting
@@ -55,7 +57,7 @@ describe('Quotes - API - Integration', async () => {
             address: '52 Rue Beaubourg',
             postalCode: '75003',
             city: 'Paris',
-            type: 'FLAT'
+            type: PropertyType.FLAT
           }
         },
         insurance: {
@@ -517,7 +519,7 @@ describe('Quotes - API - Integration', async () => {
               address: '88 rue des prairies',
               postalCode: '91100',
               city: 'Kyukamura',
-              type: 'FLAT'
+              type: PropertyType.FLAT
             },
             person: {
               firstname: 'Jean-Jean',

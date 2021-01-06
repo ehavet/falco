@@ -10,6 +10,7 @@ import { quoteRepositoryMock } from '../fixtures/quote-repository.test-doubles'
 import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
 import { defaultCapAdviceRepositoryStub } from '../fixtures/default-cap-advice-repository.test-doubles'
 import { DefaultCapAdviceNotFoundError } from '../../../../src/app/quotes/domain/default-cap-advice/default-cap-advice.errors'
+import { PropertyType } from '../../../../src/app/common-api/domain/common-type/property-type'
 
 describe('Quotes - Usecase - Create Quote', async () => {
   let createQuote: CreateQuote
@@ -102,7 +103,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
         address: '15 Rue Des Amandiers',
         postalCode: '91110',
         city: 'Les Ulysses',
-        type: 'FLAT'
+        type: PropertyType.FLAT
       }
     },
     insurance: {
@@ -142,7 +143,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
       defaultCapAdviceRepository.get.withArgs('myPartner', 2).resolves({ value: 6000 })
 
       // When
-      const quote: Quote = await createQuote({ partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses', type: 'FLAT' } } })
+      const quote: Quote = await createQuote({ partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses', type: PropertyType.FLAT } } })
 
       // Then
       expect(quote).to.deep.include({ partnerCode: expectedQuote.partnerCode })
@@ -286,7 +287,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
 
   it('should save the quote', async () => {
     // Given
-    const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses', type: 'FLAT' } } }
+    const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses', type: PropertyType.FLAT } } }
     quoteRepository.save.resolves()
     defaultCapAdviceRepository.get.withArgs('myPartner', 2).resolves({ value: 6000 })
 
@@ -307,7 +308,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
       risk: {
         property: {
           roomCount: 2,
-          type: 'HOUSE'
+          type: PropertyType.HOUSE
         }
       }
     }

@@ -15,6 +15,7 @@ import { SpecialOperation } from '../../common-api/domain/special-operation.func
 import { CreateQuoteCommand } from './create-quote-command'
 import { Amount } from '../../common-api/domain/amount/amount'
 import { DefaultCapAdvice } from './default-cap-advice/default-cap-advice'
+import { PropertyType } from '../../common-api/domain/common-type/property-type'
 
 const DEFAULT_NUMBER_MONTHS_DUE = 12
 
@@ -88,6 +89,10 @@ export namespace Quote {
     }
 
     export function update (quote: Quote, partner: Partner, command: UpdateQuoteCommand, partnerAvailableCodes: Array<OperationCode>, defaultCapAdvice: DefaultCapAdvice): Quote {
+      if (command.risk.property.type && !PartnerFunc.isValidPropertyType(partner, command.risk.property.type)) {
+        throw new QuoteRiskPropertyTypeNotInsurableError(command.risk.property.type!)
+      }
+
       quote.risk = _buildQuoteRisk(command.risk, partner)
       quote.insurance = getInsurance(quote.risk, partner.offer, defaultCapAdvice)
       quote.policyHolder = Quote.PolicyHolder.build(command.policyHolder, quote.policyHolder)
@@ -258,7 +263,7 @@ export namespace Quote.Risk {
         address?: string
         postalCode?: string
         city?: string
-        type? : string
+        type? : PropertyType
     }
 
     export interface Person {

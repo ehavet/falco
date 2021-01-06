@@ -7,6 +7,7 @@ import { QuoteRiskSqlModel } from '../../../../src/app/quotes/infrastructure/sql
 import { QuoteSqlModel } from '../../../../src/app/quotes/infrastructure/sql-models/quote-sql-model'
 import { QuotePersonSqlModel } from '../../../../src/app/quotes/infrastructure/sql-models/quote-person-sql.model'
 import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
+import { PropertyType } from '../../../../src/app/common-api/domain/common-type/property-type'
 
 async function resetDb () {
   await QuoteSqlModel.destroy({ truncate: true, cascade: true })
@@ -40,7 +41,7 @@ describe('Repository - Quote', async () => {
             address: '88 rue des prairies',
             postalCode: '91100',
             city: 'Kyukamura',
-            type: 'FLAT'
+            type: PropertyType.FLAT
           }
         })
       })
@@ -117,7 +118,7 @@ describe('Repository - Quote', async () => {
             address: '88 rue des prairies',
             postalCode: '91100',
             city: 'Kyukamura',
-            type: 'FLAT'
+            type: PropertyType.FLAT
           }
         })
       })

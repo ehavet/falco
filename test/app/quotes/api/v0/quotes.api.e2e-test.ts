@@ -9,6 +9,7 @@ import {
   populatePricingMatrixSqlFixture,
   resetPricingMatrixSqlFixture
 } from '../../../partners/fixtures/pricing-matrix-sql.fixture'
+import { PropertyType } from '../../../../../src/app/common-api/domain/common-type/property-type'
 
 async function resetDb () {
   await QuoteSqlModel.destroy({ truncate: true, cascade: true })
@@ -282,7 +283,7 @@ describe('Quotes - API - E2E', async () => {
             city: 'Kyukamura',
             postalCode: '91100',
             roomCount: 2,
-            type: 'FLAT'
+            type: PropertyType.FLAT
           }
         })
       })

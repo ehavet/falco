@@ -1,3 +1,5 @@
+import { PropertyType } from '../../common-api/domain/common-type/property-type'
+
 export interface UpdateQuoteCommand {
     id: string
     risk: UpdateQuoteCommand.Risk,
@@ -30,7 +32,7 @@ export namespace UpdateQuoteCommand.Risk {
         address?: string,
         postalCode?: string,
         city?: string
-        type?: string
+        type?: PropertyType
     }
 }
 

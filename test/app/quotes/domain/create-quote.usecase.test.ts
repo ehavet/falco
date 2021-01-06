@@ -1,8 +1,10 @@
 import { dateFaker, expect, sinon } from '../../../test-utils'
 import { Quote } from '../../../../src/app/quotes/domain/quote'
 import { CreateQuoteCommand } from '../../../../src/app/quotes/domain/create-quote-command'
-import { Partner } from '../../../../src/app/partners/domain/partner'
-import { QuoteRiskPropertyRoomCountNotInsurableError } from '../../../../src/app/quotes/domain/quote.errors'
+import {
+  QuoteRiskPropertyRoomCountNotInsurableError,
+  QuoteRiskPropertyTypeNotInsurableError
+} from '../../../../src/app/quotes/domain/quote.errors'
 import { CreateQuote } from '../../../../src/app/quotes/domain/create-quote.usecase'
 import { quoteRepositoryMock } from '../fixtures/quote-repository.test-doubles'
 import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
@@ -16,8 +18,8 @@ describe('Quotes - Usecase - Create Quote', async () => {
   const defaultCapAdviceRepository = defaultCapAdviceRepositoryStub()
   const partnerOffer : Partner.Offer = {
     pricingMatrix: new Map([
-      [1, { monthlyPrice: 4.39, defaultDeductible: 120 }],
-      [2, { monthlyPrice: 5.82, defaultDeductible: 150 }]
+      [1, {monthlyPrice: 4.39, defaultDeductible: 120}],
+      [2, {monthlyPrice: 5.82, defaultDeductible: 150}]
     ]),
     simplifiedCovers: ['ACDDE', 'ACVOL'],
     productCode: 'MRH_Etudiant',
@@ -29,6 +31,67 @@ describe('Quotes - Usecase - Create Quote', async () => {
       OperationCode.SEMESTER2,
       OperationCode.FULLYEAR
     ]
+  }
+  const partner = {
+    code: 'myPartner',
+    translationKey: 'translationKey',
+    trigram: 'TRI',
+    callbackUrl: 'http://partner1-callback.com',
+    customerSupportEmail: 'customer@support.fr',
+    firstQuestion: 'property_type',
+    questions: [
+      {
+        code: 'property_type',
+        toAsk: true,
+        options: [
+          { value: 'FLAT' },
+          { value: 'HOUSE', nextStep: 'REJECT' }
+        ],
+        defaultValue: 'FLAT',
+        defaultNextStep: 'address'
+      },
+      {
+        code: 'room_count',
+        toAsk: true,
+        options: [
+          { value: 1 },
+          { value: 2 },
+          { value: 3, nextStep: 'REJECT' }
+        ],
+        defaultNextStep: 'address',
+        defaultValue: 1
+      },
+      {
+        code: 'address',
+        toAsk: true,
+        defaultNextStep: 'SUBMIT'
+      },
+      {
+        code: 'roommate',
+        applicable: true,
+        maximumNumbers: [
+          { roomCount: 1, value: 0 },
+          { roomCount: 2, value: 1 },
+          { roomCount: 3, value: 2 }
+        ]
+      }
+    ],
+    offer: {
+      pricingMatrix: new Map([
+        [1, { monthlyPrice: 4.39, defaultDeductible: 120, defaultCeiling: 5000 }],
+        [2, { monthlyPrice: 5.82, defaultDeductible: 150, defaultCeiling: 7000 }]
+      ]),
+      simplifiedCovers: ['ACDDE', 'ACVOL'],
+      productCode: 'MRH_Etudiant',
+      productVersion: '1.0',
+      contractualTerms: '/path/to/contractual/terms',
+      ipid: '/path/to/ipid',
+      operationCodes: [
+        OperationCode.SEMESTER1,
+        OperationCode.SEMESTER2,
+        OperationCode.FULLYEAR
+      ]
+    }
   }
   const expectedQuote: Quote = {
     id: '',
@@ -64,7 +127,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
 
   beforeEach(() => {
     dateFaker.setCurrentDate(now)
-    partnerRepository.getOffer.withArgs('myPartner').returns(partnerOffer)
+    partnerRepository.getByCode.withArgs('myPartner').returns(partner)
     createQuote = CreateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository)
   })
 
@@ -234,6 +297,30 @@ describe('Quotes - Usecase - Create Quote', async () => {
     const saveSpy = quoteRepository.save.getCall(0)
     expectedQuote.id = quote.id
     return expect(saveSpy).to.have.been.calledWith(expectedQuote)
+  })
+
+  it('should throw an error if the property type is not insured by the partner', async () => {
+    // Given
+    const createQuoteCommand: CreateQuoteCommand = {
+      partnerCode: 'myPartner',
+      specOpsCode: OperationCode.BLANK,
+      risk: {
+        property: {
+          roomCount: 2,
+          type: 'HOUSE'
+        }
+      }
+    }
+
+    // When
+    const quotePromise = createQuote(createQuoteCommand)
+
+    // Then
+    return expect(quotePromise)
+      .to.be.rejectedWith(
+        QuoteRiskPropertyTypeNotInsurableError,
+        'HOUSE is not allowed by this partner'
+      )
   })
 
   it('should throw an error if there is no insurance for the given risk', async () => {

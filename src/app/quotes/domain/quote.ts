@@ -1,7 +1,7 @@
 import { Partner } from '../../partners/domain/partner'
 import {
   QuoteRiskNumberOfRoommatesError,
-  QuoteRiskPropertyRoomCountNotInsurableError,
+  QuoteRiskPropertyRoomCountNotInsurableError, QuoteRiskPropertyTypeNotInsurableError,
   QuoteRiskRoommatesNotAllowedError,
   QuoteStartDateConsistencyError
 } from './quote.errors'
@@ -62,8 +62,12 @@ export namespace Quote {
         emailValidatedAt?: Date
     }
 
-    export function create (command: CreateQuoteCommand, partnerOffer: Partner.Offer, defaultCapAdvice: DefaultCapAdvice): Quote {
-      const insurance: Insurance = getInsurance(command.risk, partnerOffer, defaultCapAdvice)
+    export function create (command: CreateQuoteCommand, partner: Partner, defaultCapAdvice: DefaultCapAdvice): Quote {
+      if (!PartnerFunc.isValidPropertyType(partner, command.risk.property.type)) {
+        throw new QuoteRiskPropertyTypeNotInsurableError(command.risk.property.type!)
+      }
+
+      const insurance: Insurance = getInsurance(command.risk, partner.offer, defaultCapAdvice)
 
       const nbMonthsDue = DEFAULT_NUMBER_MONTHS_DUE
 
@@ -78,7 +82,7 @@ export namespace Quote {
         premium: Amount.multiply(nbMonthsDue, insurance.estimate.monthlyPrice)
       }
 
-      _applyOperationCode(quote, partnerOffer.operationCodes, command.specOpsCode)
+      _applyOperationCode(quote, partner.offer.operationCodes, command.specOpsCode)
 
       return quote
     }

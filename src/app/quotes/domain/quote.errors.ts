@@ -63,3 +63,11 @@ export class QuotePartnerOwnershipError extends Error {
     this.name = 'QuotePartnerOwnershipError'
   }
 }
+
+export class QuoteRiskPropertyTypeNotInsurableError extends Error {
+  constructor (propertyType: string) {
+    const message: string = `${propertyType} is not allowed by this partner`
+    super(message)
+    this.name = 'QuoteRiskPropertyTypeNotInsurableError'
+  }
+}

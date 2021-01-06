@@ -11,7 +11,7 @@ import {
   QuoteNotFoundError, QuotePartnerOwnershipError,
   QuotePolicyHolderEmailNotFoundError,
   QuoteRiskNumberOfRoommatesError,
-  QuoteRiskPropertyRoomCountNotInsurableError,
+  QuoteRiskPropertyRoomCountNotInsurableError, QuoteRiskPropertyTypeNotInsurableError,
   QuoteRiskRoommatesNotAllowedError,
   QuoteStartDateConsistencyError
 } from '../../domain/quote.errors'
@@ -86,7 +86,9 @@ export default function (container: Container): Array<ServerRoute> {
           if (error instanceof PartnerNotFoundError) {
             throw Boom.notFound(error.message)
           }
-          if (error instanceof NoPartnerInsuranceForRiskError || error instanceof OperationCodeNotApplicableError) {
+          if (error instanceof NoPartnerInsuranceForRiskError ||
+              error instanceof OperationCodeNotApplicableError ||
+              error instanceof QuoteRiskPropertyTypeNotInsurableError) {
             throw Boom.badData(error.message)
           }
 

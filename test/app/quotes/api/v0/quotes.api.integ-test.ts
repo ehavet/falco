@@ -136,6 +136,29 @@ describe('Quotes - API - Integration', async () => {
       })
     })
 
+    describe('when then quote is created with property.type', () => {
+      it('should reply with status 422 when type is equal to house', async () => {
+        const partnerCode = 'demo-student'
+        response = await httpServer.api()
+          .post('/v0/quotes')
+          .send({
+            code: partnerCode,
+            risk: {
+              property: {
+                room_count: 2,
+                address: '52 Rue Beaubourg',
+                postal_code: '75019',
+                city: 'Paris',
+                type: 'HOUSE'
+              }
+            }
+          })
+          .set('X-Consumer-Username', partnerCode)
+
+        expect(response).to.have.property('statusCode', 422)
+      })
+    })
+
     describe('when the partner is not found', () => {
       it('should reply with status 404', async () => {
         // Given
@@ -297,7 +320,7 @@ describe('Quotes - API - Integration', async () => {
         expect(response.body.message).to.equal(`The operation code ${invalidSpecOpsCode} is not applicable for partner : ${partnerCode}`)
       })
 
-      it('should reply with status 400 when type is not FLAT', async () => {
+      it('should reply with status 400 when type is not FLAT or HOUSE', async () => {
         const partnerCode = 'demo-student'
         response = await httpServer.api()
           .post('/v0/quotes')
@@ -309,7 +332,7 @@ describe('Quotes - API - Integration', async () => {
                 address: '52 Rue Beaubourg',
                 postal_code: '75019',
                 city: 'Paris',
-                type: 'HOUSE'
+                type: 'WRONGTYPE'
               }
             }
           })

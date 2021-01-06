@@ -1,6 +1,7 @@
 import { Partner } from '../../../../src/app/partners/domain/partner'
 import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
 import { Occupancy } from '../../../../src/app/common-api/domain/type/occupancy'
+import { PropertyType } from '../../../../src/app/common-api/domain/common-type/property-type'
 
 export function createPartnerFixture (attr: Partial<Partner> = {}): Partner {
   return {
@@ -15,10 +16,10 @@ export function createPartnerFixture (attr: Partial<Partner> = {}): Partner {
         code: Partner.Question.QuestionCode.PROPERTY_TYPE,
         toAsk: true,
         options: [
-          { value: Partner.Question.PropertyType.FLAT },
-          { value: Partner.Question.PropertyType.HOUSE, nextStep: Partner.Question.NextStepAction.REJECT }
+          { value: PropertyType.FLAT },
+          { value: PropertyType.HOUSE, nextStep: Partner.Question.NextStepAction.REJECT }
         ],
-        defaultValue: Partner.Question.PropertyType.FLAT,
+        defaultValue: PropertyType.FLAT,
         defaultNextStep: Partner.Question.QuestionCode.ADDRESS
       } as Partner.Question.PropertyTypeQuestion,
       {

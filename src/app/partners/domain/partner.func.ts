@@ -58,3 +58,17 @@ export function isRelatedToADemoPartner (partnerCode?: string): boolean {
   if (!partnerCode) return false
   return partnerCode.startsWith(DEMO_PARTNER_CODE_PREFIX)
 }
+
+export function isValidPropertyType (partner: Partner, type?: string): boolean {
+  if (!type) return true
+  const question = partner.questions.find((question) => question.code === Partner.Question.QuestionCode.PropertyType) as Partner.Question.PropertyTypeQuestion
+
+  if (!question.options) {
+    return type === question.defaultValue
+  }
+
+  const option = question.options.find(option => option.value === type)
+  if (!option?.nextStep) return true
+
+  return option?.nextStep !== Partner.Question.NextStepAction.REJECT
+}

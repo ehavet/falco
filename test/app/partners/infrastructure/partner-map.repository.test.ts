@@ -2,7 +2,6 @@ import { expect } from '../../../test-utils'
 import { PartnerMapRepository } from '../../../../src/app/partners/infrastructure/partner-map.repository'
 import { PartnerNotFoundError, PartnerPricingMatrixNotFoundError } from '../../../../src/app/partners/domain/partner.errors'
 import { Partner } from '../../../../src/app/partners/domain/partner'
-import { Quote } from '../../../../src/app/quotes/domain/quote'
 import { PartnerRepository } from '../../../../src/app/partners/domain/partner.repository'
 import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
 import partnerJson from './partner.json'
@@ -66,7 +65,7 @@ const expectedPartner: { partnerOne: Partner } = {
     offer: {
       simplifiedCovers: ['ACDDE'],
       pricingMatrix: new Map([
-        [1, { monthlyPrice: 3.30, defaultDeductible: 120, defaultCeiling: 5000 }]
+        [1, { monthlyPrice: 3.30, defaultDeductible: 120 }]
       ]),
       operationCodes: [OperationCode.SEMESTER1, OperationCode.FULLYEAR],
       productCode: 'APP666',
@@ -121,16 +120,14 @@ describe('Partners - Infra - Partner Map Repository', async () => {
   describe('#getOffer', async () => {
     it('should return the partner offer', async () => {
       // Given
-      const propertyRoomCount1Estimate: Quote.Insurance.Estimate = {
+      const propertyRoomCount1Estimate: Partner.Estimate = {
         monthlyPrice: 4.52,
-        defaultDeductible: 120,
-        defaultCeiling: 5000
+        defaultDeductible: 120
       }
 
-      const propertyRoomCount2Estimate: Quote.Insurance.Estimate = {
+      const propertyRoomCount2Estimate: Partner.Estimate = {
         monthlyPrice: 6.95,
-        defaultDeductible: 120,
-        defaultCeiling: 7000
+        defaultDeductible: 120
       }
 
       // When

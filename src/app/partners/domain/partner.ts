@@ -36,7 +36,6 @@ export namespace Partner {
     export interface Estimate {
         monthlyPrice: number,
         defaultDeductible: number,
-        defaultCeiling?: number,
     }
 }
 

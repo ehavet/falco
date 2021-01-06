@@ -1,5 +1,4 @@
 import { Partner } from '../domain/partner'
-import { Quote } from '../../quotes/domain/quote'
 import { PricingMatrixSqlModel } from './sql-models/pricing-matrix-sql.model'
 import { Amount } from '../../common-api/domain/amount/amount'
 import RoomCount = Partner.RoomCount
@@ -97,7 +96,7 @@ function _toOffer (offer: any, pricingMatrixArray: PricingMatrixSqlModel[]) : Pa
   if (offer === undefined) {
     return {
       simplifiedCovers: [],
-      pricingMatrix: new Map<RoomCount, Quote.Insurance.Estimate>(),
+      pricingMatrix: new Map<RoomCount, Partner.Estimate>(),
       productCode: '',
       productVersion: '',
       contractualTerms: '',
@@ -108,7 +107,7 @@ function _toOffer (offer: any, pricingMatrixArray: PricingMatrixSqlModel[]) : Pa
 
   return {
     simplifiedCovers: offer.simplifiedCovers,
-    pricingMatrix: buildPricingMatrix(offer, offer.defaultDeductible, pricingMatrixArray),
+    pricingMatrix: buildPricingMatrix(offer.defaultDeductible, pricingMatrixArray),
     productCode: offer.productCode,
     productVersion: offer.productVersion,
     contractualTerms: offer.contractualTerms,
@@ -118,16 +117,14 @@ function _toOffer (offer: any, pricingMatrixArray: PricingMatrixSqlModel[]) : Pa
 }
 
 function buildPricingMatrix (
-  offer: any,
   defaultDeductible: number,
   pricingMatrixArray: PricingMatrixSqlModel[]
-) : Map<RoomCount, Quote.Insurance.Estimate> {
-  const offerWithMonthlyPrice = offer.pricingMatrix.map(matrixElement => {
-    const roomCount = matrixElement[0]
-    const estimate = matrixElement[1]
-    const pricingSql = pricingMatrixArray.find(elem => elem.roomCount === roomCount)
-    return [roomCount, { monthlyPrice: Amount.toAmount(pricingSql!.coverMonthlyPrice), defaultDeductible: defaultDeductible, defaultCeiling: estimate.defaultCeiling }]
+) : Map<RoomCount, Partner.Estimate> {
+  const offerWithMonthlyPrice: Array<Array<RoomCount | Partner.Estimate>> = pricingMatrixArray.map(pricingLine => {
+    const roomCount = pricingLine.roomCount
+    return [roomCount, { monthlyPrice: Amount.toAmount(pricingLine.coverMonthlyPrice), defaultDeductible: defaultDeductible }]
   })
 
-  return new Map<RoomCount, Quote.Insurance.Estimate>(offerWithMonthlyPrice)
+  // @ts-ignore
+  return new Map<RoomCount, Partner.Estimate>(offerWithMonthlyPrice)
 }

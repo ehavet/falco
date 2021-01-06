@@ -1,14 +1,18 @@
 import { expect } from '../../../test-utils'
 import { PartnerMapRepository } from '../../../../src/app/partners/infrastructure/partner-map.repository'
-import { PartnerNotFoundError } from '../../../../src/app/partners/domain/partner.errors'
+import { PartnerNotFoundError, PartnerPricingMatrixNotFoundError } from '../../../../src/app/partners/domain/partner.errors'
 import { Partner } from '../../../../src/app/partners/domain/partner'
 import { Quote } from '../../../../src/app/quotes/domain/quote'
 import { PartnerRepository } from '../../../../src/app/partners/domain/partner.repository'
 import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
 import partnerJson from './partner.json'
 import { Occupancy } from '../../../../src/app/common-api/domain/type/occupancy'
+import {
+  populatePricingMatrixSqlFixture,
+  resetPricingMatrixSqlFixture
+} from '../fixtures/pricing-matrix-sql.fixture'
 
-const expectedPartner: {partnerOne: Partner, partnerTwo: Partner} = {
+const expectedPartner: { partnerOne: Partner } = {
   partnerOne: {
     code: 'partnerOne',
     translationKey: 'translationKey',
@@ -70,61 +74,19 @@ const expectedPartner: {partnerOne: Partner, partnerTwo: Partner} = {
       contractualTerms: '/path/to/contractual/terms',
       ipid: '/path/to/ipid'
     }
-  },
-  partnerTwo: {
-    code: 'partnerTwo',
-    trigram: 'PAR',
-    translationKey: 'translationKey',
-    callbackUrl: 'http://partner2-callback.com',
-    customerSupportEmail: 'customer@support.fr',
-    firstQuestion: Partner.Question.QuestionCode.ROOM_COUNT,
-    questions: [
-      {
-        code: Partner.Question.QuestionCode.PROPERTY_TYPE,
-        toAsk: true,
-        options: [
-          { value: Partner.Question.PropertyType.FLAT },
-          { value: Partner.Question.PropertyType.HOUSE, nextStep: Partner.Question.NextStepAction.REJECT }
-        ],
-        defaultValue: Partner.Question.PropertyType.FLAT,
-        defaultNextStep: Partner.Question.QuestionCode.PROPERTY_TYPE
-      },
-      {
-        code: Partner.Question.QuestionCode.ROOM_COUNT,
-        toAsk: true,
-        options: [
-          { value: 1 }
-        ],
-        defaultNextStep: Partner.Question.QuestionCode.ADDRESS,
-        defaultValue: 1
-      },
-      {
-        code: Partner.Question.QuestionCode.ADDRESS,
-        toAsk: true,
-        defaultNextStep: Partner.Question.NextStepAction.SUBMIT
-      },
-      {
-        code: Partner.Question.QuestionCode.ROOMMATE,
-        applicable: false
-      }
-    ],
-    offer: {
-      simplifiedCovers: ['ACDDE', 'ACVOL'],
-      pricingMatrix: new Map([
-        [1, { monthlyPrice: 4.52, defaultDeductible: 120, defaultCeiling: 5000 }],
-        [2, { monthlyPrice: 6.95, defaultDeductible: 150, defaultCeiling: 7000 }]
-      ]),
-      operationCodes: [OperationCode.SEMESTER2, OperationCode.FULLYEAR],
-      productCode: 'MRH_Etudiant',
-      productVersion: '1.0',
-      contractualTerms: '/path/to/contractual/terms',
-      ipid: '/path/to/ipid'
-    }
   }
 }
 
 describe('Partners - Infra - Partner Map Repository', async () => {
   let partnerMapRepository: PartnerRepository
+
+  before(async () => {
+    await populatePricingMatrixSqlFixture()
+  })
+
+  after(async function () {
+    await resetPricingMatrixSqlFixture()
+  })
 
   beforeEach(() => {
     partnerMapRepository = new PartnerMapRepository(partnerJson)
@@ -145,6 +107,14 @@ describe('Partners - Infra - Partner Map Repository', async () => {
 
       // THEN
       return expect(promise).to.be.rejectedWith(PartnerNotFoundError)
+    })
+
+    it('should thrown a partner pricing matrix not found error when pricing matrix is not found', async () => {
+      // WHEN
+      const promise: Promise<Partner> = partnerMapRepository.getByCode('partnerWithNoPricingMatrix')
+
+      // THEN
+      return expect(promise).to.be.rejectedWith(PartnerPricingMatrixNotFoundError)
     })
   })
 

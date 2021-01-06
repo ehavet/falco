@@ -2,6 +2,7 @@ import { Sequelize } from 'sequelize-typescript'
 import { Logger, logger } from './logger'
 import { quoteSqlModels } from '../app/quotes/quote.container'
 import { policySqlModels } from '../app/policies/policies.container'
+import { partnerSqlModels } from '../app/partners/partner.container'
 import { DatabaseInitializationError } from '../app/common-api/domain/database.errors'
 
 let sequelize: Sequelize
@@ -19,6 +20,7 @@ export async function initSequelize (config) {
   })
   sequelize.addModels(quoteSqlModels)
   sequelize.addModels(policySqlModels)
+  sequelize.addModels(partnerSqlModels)
 
   return sequelize
 }

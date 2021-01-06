@@ -11,6 +11,10 @@ import { createPolicyApiRequestFixtureV1 } from '../../fixtures/createPolicyApiR
 import { QuoteSqlRepository } from '../../../../../src/app/quotes/infrastructure/quote-sql.repository'
 import { createQuoteFixture, createQuotePolicyHolderFixture } from '../../../quotes/fixtures/quote.fixture'
 import { Quote } from '../../../../../src/app/quotes/domain/quote'
+import {
+  populatePricingMatrixSqlFixture,
+  resetPricingMatrixSqlFixture
+} from '../../../partners/fixtures/pricing-matrix-sql.fixture'
 
 async function resetDb () {
   await PolicySqlModel.destroy({ truncate: true, cascade: true })
@@ -22,6 +26,11 @@ describe('Policies - API v1 - E2E', async () => {
 
   before(async () => {
     httpServer = await newProdLikeServer()
+    await populatePricingMatrixSqlFixture()
+  })
+
+  after(async () => {
+    await resetPricingMatrixSqlFixture()
   })
 
   afterEach(async () => {

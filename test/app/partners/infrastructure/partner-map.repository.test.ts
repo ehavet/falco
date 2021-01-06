@@ -30,14 +30,14 @@ const expectedPartner: {partnerOne: Partner, partnerTwo: Partner} = {
         code: Partner.Question.QuestionCode.OCCUPANCY,
         toAsk: true,
         options: [
-          { value: Partner.Question.OccupancyValue.TENANT },
-          { value: Partner.Question.OccupancyValue.LANDLORD, nextStep: Partner.Question.NextStepAction.REJECT }
+          { value: Partner.Question.Occupancy.TENANT },
+          { value: Partner.Question.Occupancy.LANDLORD, nextStep: Partner.Question.NextStepAction.REJECT }
         ],
         defaultNextStep: Partner.Question.QuestionCode.ADDRESS,
-        defaultValue: Partner.Question.OccupancyValue.TENANT
+        defaultValue: Partner.Question.Occupancy.TENANT
       } as Partner.Question.OccupancyQuestion,
       {
-        code: Partner.Question.QuestionCode.ROOMCOUNT,
+        code: Partner.Question.QuestionCode.ROOM_COUNT,
         toAsk: true,
         options: [
           { value: 1 },
@@ -76,7 +76,7 @@ const expectedPartner: {partnerOne: Partner, partnerTwo: Partner} = {
     translationKey: 'translationKey',
     callbackUrl: 'http://partner2-callback.com',
     customerSupportEmail: 'customer@support.fr',
-    firstQuestion: Partner.Question.QuestionCode.ROOMCOUNT,
+    firstQuestion: Partner.Question.QuestionCode.ROOM_COUNT,
     questions: [
       {
         code: Partner.Question.QuestionCode.PROPERTY_TYPE,
@@ -89,7 +89,7 @@ const expectedPartner: {partnerOne: Partner, partnerTwo: Partner} = {
         defaultNextStep: Partner.Question.QuestionCode.PROPERTY_TYPE
       },
       {
-        code: Partner.Question.QuestionCode.ROOMCOUNT,
+        code: Partner.Question.QuestionCode.ROOM_COUNT,
         toAsk: true,
         options: [
           { value: 1 }

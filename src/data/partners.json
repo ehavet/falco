@@ -164,7 +164,7 @@
         "defaultValue": 1
       },
       {
-        "code": "room_count",
+        "code": "roommate",
         "applicable": false,
         "_comment":  "There is no maximum number of roommates here because Essca does not allow roommates"
       }
@@ -278,7 +278,7 @@
         "defaultValue": 1
       },
       {
-        "code": "room_count",
+        "code": "roommate",
         "applicable": false,
         "_comment":  "There is no maximum number of roommates here because Greystar does not allow roommates"
       }

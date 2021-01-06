@@ -21,7 +21,7 @@ export function createPartnerFixture (attr: Partial<Partner> = {}): Partner {
         defaultNextStep: Partner.Question.QuestionCode.ADDRESS
       } as Partner.Question.PropertyTypeQuestion,
       {
-        code: Partner.Question.QuestionCode.ROOMCOUNT,
+        code: Partner.Question.QuestionCode.ROOM_COUNT,
         toAsk: true,
         options: [
           { value: 1 },
@@ -49,11 +49,11 @@ export function createPartnerFixture (attr: Partial<Partner> = {}): Partner {
         code: Partner.Question.QuestionCode.OCCUPANCY,
         toAsk: true,
         options: [
-          { value: Partner.Question.OccupancyValue.TENANT },
-          { value: Partner.Question.OccupancyValue.LANDLORD, nextStep: Partner.Question.NextStepAction.REJECT }
+          { value: Partner.Question.Occupancy.TENANT },
+          { value: Partner.Question.Occupancy.LANDLORD, nextStep: Partner.Question.NextStepAction.REJECT }
         ],
         defaultNextStep: Partner.Question.QuestionCode.ROOMMATE,
-        defaultValue: Partner.Question.OccupancyValue.TENANT
+        defaultValue: Partner.Question.Occupancy.TENANT
       } as Partner.Question.OccupancyQuestion
     ],
     offer: {

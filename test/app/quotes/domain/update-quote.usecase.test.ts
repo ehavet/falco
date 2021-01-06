@@ -45,7 +45,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
         code: partnerCode,
         questions: [
           {
-            code: Partner.Question.QuestionCode.ROOMCOUNT,
+            code: Partner.Question.QuestionCode.ROOM_COUNT,
             toAsk: true,
             options: [
               { value: 1 },

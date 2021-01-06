@@ -1,5 +1,6 @@
 import { Quote } from '../../quotes/domain/quote'
 import { OperationCode } from '../../common-api/domain/operation-code'
+import { Occupancy } from '../../common-api/domain/common-type/occupancy'
 
 export interface Partner {
     code: string,
@@ -48,7 +49,7 @@ export namespace Partner.Question {
     }
 
     export interface RoomCountQuestion {
-        code: QuestionCode.ROOMCOUNT,
+        code: QuestionCode.ROOM_COUNT,
         options: Array<Option<number>>,
         toAsk: boolean,
         defaultValue: number,
@@ -57,9 +58,9 @@ export namespace Partner.Question {
 
     export interface OccupancyQuestion {
         code: QuestionCode.OCCUPANCY,
-        options: Array<Option<OccupancyValue>>,
+        options: Array<Option<Occupancy>>,
         toAsk: boolean,
-        defaultValue: OccupancyValue,
+        defaultValue: Occupancy,
         defaultNextStep: NextStepType
     }
 
@@ -88,14 +89,9 @@ export namespace Partner.Question {
         value: number
     }
 
-    export enum OccupancyValue {
-        TENANT = 'TENANT',
-        LANDLORD = 'LANDLORD'
-    }
-
     export enum QuestionCode {
         ADDRESS = 'address',
-        ROOMCOUNT = 'room_count',
+        ROOM_COUNT = 'room_count',
         ROOMMATE = 'roommate',
         PROPERTY_TYPE = 'property_type',
         OCCUPANCY = 'occupancy'

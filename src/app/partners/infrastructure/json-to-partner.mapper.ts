@@ -21,7 +21,7 @@ export function toPartner (partnerJson: any) : Partner {
 function _toQuestions (questions: any) {
   return questions.map(jsonQuestion => {
     switch (jsonQuestion.code) {
-      case Partner.Question.QuestionCode.ROOMCOUNT:
+      case Partner.Question.QuestionCode.ROOM_COUNT:
         return _toRoomCountQuestion(jsonQuestion)
       case Partner.Question.QuestionCode.ROOMMATE:
         return _toRoommateQuestion(jsonQuestion)
@@ -39,7 +39,7 @@ function _toQuestions (questions: any) {
 
 function _toRoomCountQuestion (jsonQuestion: any) {
   const question: Partner.Question.RoomCountQuestion = {
-    code: Partner.Question.QuestionCode.ROOMCOUNT,
+    code: Partner.Question.QuestionCode.ROOM_COUNT,
     options: jsonQuestion.options,
     toAsk: jsonQuestion.toAsk,
     defaultNextStep: jsonQuestion.defaultNextStep,

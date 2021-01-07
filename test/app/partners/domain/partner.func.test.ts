@@ -8,7 +8,7 @@ describe('Partners - Domain - Functions', () => {
   describe('#doesPartnerAllowNumberOfRoommatesForProperty', () => {
     it('should return true if the number of roommates equals the number max of roommates allowed for the given room count', () => {
       const questions: Array<Question> = [{
-        code: Partner.Question.QuestionCode.Roommate,
+        code: Partner.Question.QuestionCode.ROOMMATE,
         applicable: true,
         maximumNumbers: [{ roomCount: 2, value: 2 }]
       }]
@@ -24,7 +24,7 @@ describe('Partners - Domain - Functions', () => {
 
     it('should return true if the number of roommates is less than the number max of roommates allowed for the given room count', () => {
       const questions: Array<Question> = [{
-        code: Partner.Question.QuestionCode.Roommate,
+        code: Partner.Question.QuestionCode.ROOMMATE,
         applicable: true,
         maximumNumbers: [{ roomCount: 2, value: 2 }]
       }]
@@ -40,7 +40,7 @@ describe('Partners - Domain - Functions', () => {
 
     it('should return false if there are too many roommates for the given room count', () => {
       const questions: Array<Question> = [{
-        code: Partner.Question.QuestionCode.Roommate,
+        code: Partner.Question.QuestionCode.ROOMMATE,
         applicable: true,
         maximumNumbers: [{ roomCount: 2, value: 2 }]
       }]
@@ -56,7 +56,7 @@ describe('Partners - Domain - Functions', () => {
 
     it('should return false if there are roommates but the partner does not allow roommates', () => {
       const questions: Array<Question> = [{
-        code: Partner.Question.QuestionCode.Roommate,
+        code: Partner.Question.QuestionCode.ROOMMATE,
         applicable: false,
         maximumNumbers: [{ roomCount: 2, value: 2 }]
       }]

@@ -29,19 +29,25 @@ describe('Partners - API - E2E', async () => {
             default_next_step: 'occupancy'
           },
           {
-            code: 'room_count',
+            code: 'occupancy',
+            to_ask: false,
             default_next_step: 'address',
+            default_value: 'TENANT'
+          },
+          {
+            code: 'address',
+            default_next_step: 'room_count',
+            to_ask: true
+          },
+          {
+            code: 'room_count',
+            default_next_step: 'SUBMIT',
             default_value: 1,
             options: [
               { value: 1 },
               { value: 2 },
               { value: 3 }
             ],
-            to_ask: true
-          },
-          {
-            code: 'address',
-            default_next_step: 'SUBMIT',
             to_ask: true
           },
           {

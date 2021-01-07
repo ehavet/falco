@@ -13,14 +13,16 @@ export function partnerToResource (partner: Partner) {
 function _toQuestions (jsonQuestions: any) {
   return jsonQuestions.map((jsonQuestion) => {
     switch (jsonQuestion.code) {
-      case Partner.Question.QuestionCode.RoomCount:
+      case Partner.Question.QuestionCode.ROOM_COUNT:
         return _toRoomCountQuestion(jsonQuestion)
-      case Partner.Question.QuestionCode.Roommate:
+      case Partner.Question.QuestionCode.ROOMMATE:
         return _toRoommateQuestion(jsonQuestion)
-      case Partner.Question.QuestionCode.Address:
+      case Partner.Question.QuestionCode.ADDRESS:
         return _toAddressQuestion(jsonQuestion)
-      case Partner.Question.QuestionCode.PropertyType:
+      case Partner.Question.QuestionCode.PROPERTY_TYPE:
         return _toPropertyTypeQuestion(jsonQuestion)
+      case Partner.Question.QuestionCode.OCCUPANCY:
+        return _toOccupancyQuestion(jsonQuestion)
       default:
         return undefined
     }
@@ -30,10 +32,17 @@ function _toQuestions (jsonQuestions: any) {
 function _toRoomCountQuestion (jsonQuestion: any) {
   return {
     code: jsonQuestion.code,
-    options: jsonQuestion.options.map(option => ({
-      value: option.value,
-      next_step: option.nextStep
-    })),
+    options: _computeOptions(jsonQuestion.options),
+    to_ask: jsonQuestion.toAsk,
+    default_next_step: jsonQuestion.defaultNextStep,
+    default_value: jsonQuestion.defaultValue
+  }
+}
+
+function _toOccupancyQuestion (jsonQuestion: any) {
+  return {
+    code: jsonQuestion.code,
+    options: _computeOptions(jsonQuestion.options),
     to_ask: jsonQuestion.toAsk,
     default_next_step: jsonQuestion.defaultNextStep,
     default_value: jsonQuestion.defaultValue
@@ -76,6 +85,7 @@ function _toPropertyTypeQuestion (jsonQuestion: any) {
 }
 
 function _computeOptions (options: any) {
+  if (!options) return
   return options.map(option => ({
     value: option.value,
     next_step: option.nextStep

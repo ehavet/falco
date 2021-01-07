@@ -1,5 +1,6 @@
 import { Quote } from '../../quotes/domain/quote'
 import { OperationCode } from '../../common-api/domain/operation-code'
+import { Occupancy } from '../../common-api/domain/type/occupancy'
 
 export interface Partner {
     code: string,
@@ -14,7 +15,10 @@ export interface Partner {
 
 export namespace Partner {
 
-    export type Question = Question.RoomCountQuestion | Question.RoommateQuestion | Question.AddressQuestion
+    export type Question = Question.RoomCountQuestion
+        | Question.RoommateQuestion
+        | Question.AddressQuestion
+        | Question.OccupancyQuestion
         | Question.PropertyTypeQuestion
 
     export interface Offer {
@@ -45,27 +49,35 @@ export namespace Partner.Question {
     }
 
     export interface RoomCountQuestion {
-        code: QuestionCode.RoomCount,
+        code: QuestionCode.ROOM_COUNT,
         options: Array<Option<number>>,
         toAsk: boolean,
         defaultValue: number,
         defaultNextStep: NextStepType
     }
 
+    export interface OccupancyQuestion {
+        code: QuestionCode.OCCUPANCY,
+        options: Array<Option<Occupancy>>,
+        toAsk: boolean,
+        defaultValue: Occupancy,
+        defaultNextStep: NextStepType
+    }
+
     export interface RoommateQuestion {
-        code: QuestionCode.Roommate,
+        code: QuestionCode.ROOMMATE,
         applicable: boolean,
         maximumNumbers?: Array<MaximumNumberOfRoommates>
     }
 
     export interface AddressQuestion {
-        code: QuestionCode.Address,
+        code: QuestionCode.ADDRESS,
         toAsk: boolean,
         defaultNextStep: NextStepType
     }
 
     export interface PropertyTypeQuestion {
-        code: QuestionCode.PropertyType,
+        code: QuestionCode.PROPERTY_TYPE,
         toAsk: boolean,
         options: Array<Option<PropertyType>>,
         defaultValue: PropertyType,
@@ -78,10 +90,11 @@ export namespace Partner.Question {
     }
 
     export enum QuestionCode {
-        Address = 'address',
-        RoomCount = 'room_count',
-        Roommate = 'roommate',
-        PropertyType = 'property_type'
+        ADDRESS = 'address',
+        ROOM_COUNT = 'room_count',
+        ROOMMATE = 'roommate',
+        PROPERTY_TYPE = 'property_type',
+        OCCUPANCY = 'occupancy'
     }
 
     export enum NextStepAction {

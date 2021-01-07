@@ -45,7 +45,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
         code: partnerCode,
         questions: [
           {
-            code: Partner.Question.QuestionCode.RoomCount,
+            code: Partner.Question.QuestionCode.ROOM_COUNT,
             toAsk: true,
             options: [
               { value: 1 },
@@ -53,16 +53,16 @@ describe('Quotes - Usecase - Update Quote', async () => {
               { value: 3 },
               { value: 4, nextStep: Partner.Question.NextStepAction.REJECT }
             ],
-            defaultNextStep: Partner.Question.QuestionCode.Address,
+            defaultNextStep: Partner.Question.QuestionCode.ADDRESS,
             defaultValue: 1
           },
           {
-            code: Partner.Question.QuestionCode.Address,
+            code: Partner.Question.QuestionCode.ADDRESS,
             toAsk: true,
             defaultNextStep: Partner.Question.NextStepAction.SUBMIT
           },
           {
-            code: Partner.Question.QuestionCode.Roommate,
+            code: Partner.Question.QuestionCode.ROOMMATE,
             applicable: true,
             maximumNumbers: [
               { roomCount: 1, value: 0 },

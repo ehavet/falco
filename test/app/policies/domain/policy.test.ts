@@ -133,7 +133,7 @@ describe('Policies - Domain', async () => {
       // Given
       createPolicyCommand.risk.people.otherInsured = []
 
-      const questions: Array<Question> = [{ code: Partner.Question.QuestionCode.Roommate, applicable: false }]
+      const questions: Array<Question> = [{ code: Partner.Question.QuestionCode.ROOMMATE, applicable: false }]
       partner.questions = questions
 
       // When
@@ -245,7 +245,7 @@ describe('Policies - Domain', async () => {
 
     it('should throw an error if there are roommates but the partner does not allow it', async () => {
       // Given
-      const questions: Array<Question> = [{ code: Partner.Question.QuestionCode.Roommate, applicable: false }]
+      const questions: Array<Question> = [{ code: Partner.Question.QuestionCode.ROOMMATE, applicable: false }]
       partner.questions = questions
 
       // When
@@ -261,7 +261,7 @@ describe('Policies - Domain', async () => {
       commandWith2Roommates.risk.people.otherInsured = [{ firstname: 'John', lastname: 'Doe' }, { firstname: 'Eric', lastname: 'Smith' }]
 
       const questions: Array<Question> = [{
-        code: Partner.Question.QuestionCode.Roommate,
+        code: Partner.Question.QuestionCode.ROOMMATE,
         applicable: true,
         maximumNumbers: [{ roomCount: quote.risk.property.roomCount, value: 1 }]
       }]
@@ -280,7 +280,7 @@ describe('Policies - Domain', async () => {
       commandWith2Roommates.risk.people.otherInsured = [{ firstname: 'John', lastname: 'Doe' }]
 
       const questions: Array<Question> = [{
-        code: Partner.Question.QuestionCode.Roommate,
+        code: Partner.Question.QuestionCode.ROOMMATE,
         applicable: true,
         maximumNumbers: [{ roomCount: 5, value: 1 }]
       }]

@@ -14,6 +14,17 @@
         "defaultNextStep": "occupancy"
       },
       {
+        "code": "occupancy",
+        "toAsk": false,
+        "defaultNextStep": "address",
+        "defaultValue": "TENANT"
+      },
+      {
+        "code": "address",
+        "toAsk": true,
+        "defaultNextStep": "room_count"
+      },
+      {
         "code": "room_count",
         "toAsk": true,
         "options": [
@@ -21,13 +32,8 @@
           { "value": 2 },
           { "value": 3 }
         ],
-        "defaultNextStep": "address",
+        "defaultNextStep": "SUBMIT",
         "defaultValue": 1
-      },
-      {
-        "code": "address",
-        "toAsk": true,
-        "defaultNextStep": "SUBMIT"
       },
       {
         "code": "roommate",
@@ -61,9 +67,24 @@
     "questions": [
       {
         "code": "property_type",
-        "toAsk": false,
+        "toAsk": true,
+        "options": [
+          {"value": "FLAT"},
+          {"value": "HOUSE", "nextStep": "REJECT"}
+        ],
         "defaultValue": "FLAT",
         "defaultNextStep": "occupancy"
+      },
+      {
+        "code": "occupancy",
+        "toAsk": false,
+        "defaultNextStep": "address",
+        "defaultValue": "TENANT"
+      },
+      {
+        "code": "address",
+        "toAsk": true,
+        "defaultNextStep": "room_count"
       },
       {
         "code": "room_count",
@@ -71,16 +92,10 @@
         "options": [
           { "value": 1 },
           { "value": 2 },
-          { "value": 3 },
-          { "value": 4, "nextStep": "REJECT" }
+          { "value": 3 }
         ],
-        "defaultNextStep": "address",
+        "defaultNextStep": "SUBMIT",
         "defaultValue": 1
-      },
-      {
-        "code": "address",
-        "toAsk": true,
-        "defaultNextStep": "SUBMIT"
       },
       {
         "code": "roommate",
@@ -126,6 +141,17 @@
         "defaultNextStep": "occupancy"
       },
       {
+        "code": "occupancy",
+        "toAsk": false,
+        "defaultNextStep": "address",
+        "defaultValue": "TENANT"
+      },
+      {
+        "code": "address",
+        "toAsk": true,
+        "defaultNextStep": "room_count"
+      },
+      {
         "code": "room_count",
         "toAsk": true,
         "options": [
@@ -134,13 +160,8 @@
           { "value": 3 },
           { "value": 4, "nextStep": "REJECT" }
         ],
-        "defaultNextStep": "address",
+        "defaultNextStep": "SUBMIT",
         "defaultValue": 1
-      },
-      {
-        "code": "address",
-        "toAsk": true,
-        "defaultNextStep": "SUBMIT"
       },
       {
         "code": "roommate",
@@ -178,20 +199,25 @@
         "defaultNextStep": "occupancy"
       },
       {
-        "code": "room_count",
-        "toAsk": true,
-        "options": [
-          { "value": 1 },
-          { "value": 2 },
-          { "value": 3, "nextStep": "REJECT" }
-        ],
+        "code": "occupancy",
+        "toAsk": false,
         "defaultNextStep": "address",
-        "defaultValue": 1
+        "defaultValue": "TENANT"
       },
       {
         "code": "address",
         "toAsk": true,
-        "defaultNextStep": "SUBMIT"
+        "defaultNextStep": "room_count"
+      },
+      {
+        "code": "room_count",
+        "toAsk": true,
+        "options": [
+          { "value": 1 },
+          { "value": 2 }
+        ],
+        "defaultNextStep": "SUBMIT",
+        "defaultValue": 1
       },
       {
         "code": "roommate",
@@ -229,6 +255,17 @@
         "defaultNextStep": "occupancy"
       },
       {
+        "code": "occupancy",
+        "toAsk": false,
+        "defaultNextStep": "address",
+        "defaultValue": "TENANT"
+      },
+      {
+        "code": "address",
+        "toAsk": true,
+        "defaultNextStep": "room_count"
+      },
+      {
         "code": "room_count",
         "toAsk": true,
         "options": [
@@ -237,13 +274,8 @@
           { "value": 3 },
           { "value": 4 }
         ],
-        "defaultNextStep": "address",
+        "defaultNextStep": "SUBMIT",
         "defaultValue": 1
-      },
-      {
-        "code": "address",
-        "toAsk": true,
-        "defaultNextStep": "SUBMIT"
       },
       {
         "code": "roommate",
@@ -282,6 +314,17 @@
         "defaultNextStep": "occupancy"
       },
       {
+        "code": "occupancy",
+        "toAsk": false,
+        "defaultNextStep": "address",
+        "defaultValue": "TENANT"
+      },
+      {
+        "code": "address",
+        "toAsk": true,
+        "defaultNextStep": "room_count"
+      },
+      {
         "code": "room_count",
         "toAsk": true,
         "options": [
@@ -289,13 +332,8 @@
           { "value": 2 },
           { "value": 3 }
         ],
-        "defaultNextStep": "address",
+        "defaultNextStep": "SUBMIT",
         "defaultValue": 1
-      },
-      {
-        "code": "address",
-        "toAsk": true,
-        "defaultNextStep": "SUBMIT"
       },
       {
         "code": "roommate",
@@ -338,6 +376,21 @@
         "defaultNextStep": "occupancy"
       },
       {
+        "code": "occupancy",
+        "toAsk": true,
+        "options": [
+          { "value": "TENANT" },
+          { "value": "LANDLORD", "nextStep": "REJECT" }
+        ],
+        "defaultNextStep": "address",
+        "defaultValue": "TENANT"
+      },
+      {
+        "code": "address",
+        "toAsk": true,
+        "defaultNextStep": "room_count"
+      },
+      {
         "code": "room_count",
         "toAsk": true,
         "options": [
@@ -348,13 +401,8 @@
           { "value": 5 },
           { "value": 6, "nextStep": "REJECT" }
         ],
-        "defaultNextStep": "address",
+        "defaultNextStep": "SUBMIT",
         "defaultValue": 1
-      },
-      {
-        "code": "address",
-        "toAsk": true,
-        "defaultNextStep": "SUBMIT"
       },
       {
         "code": "roommate",

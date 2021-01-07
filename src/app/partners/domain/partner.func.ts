@@ -10,7 +10,7 @@ export function doesPartnerAllowRoommates (partner: Partner): boolean {
   if (roommateQuestion) {
     return (roommateQuestion as Partner.Question.RoommateQuestion).applicable
   }
-  throw new PartnerQuestionNotFoundError(partner.code, Partner.Question.QuestionCode.Roommate)
+  throw new PartnerQuestionNotFoundError(partner.code, Partner.Question.QuestionCode.ROOMMATE)
 }
 
 export function doesPartnerAllowNumberOfRoommatesForProperty (partner: Partner, numberOfRoommates: number, risk: Quote.Risk): boolean {
@@ -41,7 +41,7 @@ export function getTrigram (partner: Partner): string {
 
 function _getQuestionOnRoommates (partner: Partner) {
   const roommateQuestion: Partner.Question | undefined = partner.questions
-    .find(question => question.code === Partner.Question.QuestionCode.Roommate)
+    .find(question => question.code === Partner.Question.QuestionCode.ROOMMATE)
   return roommateQuestion
 }
 

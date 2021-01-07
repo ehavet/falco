@@ -18,6 +18,16 @@
         "defaultNextStep": "address"
       },
       {
+        "code": "occupancy",
+        "toAsk": true,
+        "options": [
+          { "value": "TENANT" },
+          { "value": "LANDLORD", "nextStep": "REJECT" }
+        ],
+        "defaultValue": "TENANT",
+        "defaultNextStep": "address"
+      },
+      {
         "code": "room_count",
         "toAsk": true,
         "options": [

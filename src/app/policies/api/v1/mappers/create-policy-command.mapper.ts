@@ -8,7 +8,8 @@ export function requestToCreatePolicyCommand (payload): CreatePolicyCommand {
       property: {
         address: payload.risk.property.address,
         postalCode: payload.risk.property.postal_code,
-        city: payload.risk.property.city
+        city: payload.risk.property.city,
+        type: payload.risk.property.type
       },
       people: {
         policyHolder: {

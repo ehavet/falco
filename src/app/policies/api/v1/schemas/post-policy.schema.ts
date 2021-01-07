@@ -17,7 +17,8 @@ const propertyRisksSchema: Joi.ObjectSchema = Joi.object({
   room_count: Joi.number().integer().description('Property number of rooms').example(3),
   address: Joi.string().required().max(100).description('Property address').example('112 rue du chêne rouge'),
   postal_code: Joi.number().integer().positive().required().min(0o1000).max(97680).description('Property postal code').example(95470),
-  city: Joi.string().required().max(50).description('Property city').example('Corbeil-Essonnes')
+  city: Joi.string().required().max(50).description('Property city').example('Corbeil-Essonnes'),
+  type: Joi.string().required().description('The type of property').example('FLAT')
 })
 
 const riskSchema: Joi.ObjectSchema = Joi.object({

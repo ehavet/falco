@@ -1,5 +1,6 @@
 import { Partner } from '../../../../src/app/partners/domain/partner'
 import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
+import { Occupancy } from '../../../../src/app/common-api/domain/type/occupancy'
 
 export function createPartnerFixture (attr: Partial<Partner> = {}): Partner {
   return {
@@ -49,11 +50,11 @@ export function createPartnerFixture (attr: Partial<Partner> = {}): Partner {
         code: Partner.Question.QuestionCode.OCCUPANCY,
         toAsk: true,
         options: [
-          { value: Partner.Question.Occupancy.TENANT },
-          { value: Partner.Question.Occupancy.LANDLORD, nextStep: Partner.Question.NextStepAction.REJECT }
+          { value: Occupancy.TENANT },
+          { value: Occupancy.LANDLORD, nextStep: Partner.Question.NextStepAction.REJECT }
         ],
         defaultNextStep: Partner.Question.QuestionCode.ROOMMATE,
-        defaultValue: Partner.Question.Occupancy.TENANT
+        defaultValue: Occupancy.TENANT
       } as Partner.Question.OccupancyQuestion
     ],
     offer: {

@@ -1,6 +1,6 @@
 import { Quote } from '../../quotes/domain/quote'
 import { OperationCode } from '../../common-api/domain/operation-code'
-import { Occupancy } from '../../common-api/domain/common-type/occupancy'
+import { Occupancy } from '../../common-api/domain/type/occupancy'
 
 export interface Partner {
     code: string,

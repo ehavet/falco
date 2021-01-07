@@ -6,6 +6,7 @@ import { Quote } from '../../../../src/app/quotes/domain/quote'
 import { PartnerRepository } from '../../../../src/app/partners/domain/partner.repository'
 import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
 import partnerJson from './partner.json'
+import { Occupancy } from '../../../../src/app/common-api/domain/type/occupancy'
 
 const expectedPartner: {partnerOne: Partner, partnerTwo: Partner} = {
   partnerOne: {
@@ -30,11 +31,11 @@ const expectedPartner: {partnerOne: Partner, partnerTwo: Partner} = {
         code: Partner.Question.QuestionCode.OCCUPANCY,
         toAsk: true,
         options: [
-          { value: Partner.Question.Occupancy.TENANT },
-          { value: Partner.Question.Occupancy.LANDLORD, nextStep: Partner.Question.NextStepAction.REJECT }
+          { value: Occupancy.TENANT },
+          { value: Occupancy.LANDLORD, nextStep: Partner.Question.NextStepAction.REJECT }
         ],
         defaultNextStep: Partner.Question.QuestionCode.ADDRESS,
-        defaultValue: Partner.Question.Occupancy.TENANT
+        defaultValue: Occupancy.TENANT
       } as Partner.Question.OccupancyQuestion,
       {
         code: Partner.Question.QuestionCode.ROOM_COUNT,

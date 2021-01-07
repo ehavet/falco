@@ -101,11 +101,11 @@ describe('Partners - Domain - Functions', () => {
       let partner : Partner
       before(() => {
         questions = [{
-          code: Partner.Question.QuestionCode.PropertyType,
+          code: Partner.Question.QuestionCode.PROPERTY_TYPE,
           toAsk: false,
           options: undefined,
           defaultValue: PropertyType.FLAT,
-          defaultNextStep: Partner.Question.QuestionCode.Address
+          defaultNextStep: Partner.Question.QuestionCode.ADDRESS
         }]
         partner = createPartnerFixture({ questions })
       })

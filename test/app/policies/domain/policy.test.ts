@@ -139,10 +139,10 @@ describe('Policies - Domain', async () => {
 
       partner.questions = [{ code: Partner.Question.QuestionCode.ROOMMATE, applicable: false },
         {
-          code: Partner.Question.QuestionCode.PropertyType,
+          code: Partner.Question.QuestionCode.PROPERTY_TYPE,
           toAsk: false,
           defaultValue: PropertyType.FLAT,
-          defaultNextStep: Partner.Question.QuestionCode.Address
+          defaultNextStep: Partner.Question.QuestionCode.ADDRESS
         }]
 
       // When

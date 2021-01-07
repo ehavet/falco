@@ -62,7 +62,7 @@ export function isRelatedToADemoPartner (partnerCode?: string): boolean {
 
 function _getQuestionOnPropertyType (partner: Partner) : Partner.Question.PropertyTypeQuestion {
   return partner.questions
-    .find((question) => question.code === Partner.Question.QuestionCode.PropertyType) as Partner.Question.PropertyTypeQuestion
+    .find((question) => question.code === Partner.Question.QuestionCode.PROPERTY_TYPE) as Partner.Question.PropertyTypeQuestion
 }
 
 function _getMatchingOption (options: Array<Partner.Question.Option<PropertyType>>, type: string) : Partner.Question.Option<PropertyType> | undefined {

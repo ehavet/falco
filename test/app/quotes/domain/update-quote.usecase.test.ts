@@ -52,10 +52,10 @@ describe('Quotes - Usecase - Update Quote', async () => {
         code: partnerCode,
         questions: [
           {
-            code: Partner.Question.QuestionCode.PropertyType,
+            code: Partner.Question.QuestionCode.PROPERTY_TYPE,
             toAsk: false,
             defaultValue: PropertyType.FLAT,
-            defaultNextStep: Partner.Question.QuestionCode.Address
+            defaultNextStep: Partner.Question.QuestionCode.ADDRESS
           },
           {
             code: Partner.Question.QuestionCode.ROOM_COUNT,

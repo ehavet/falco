@@ -104,6 +104,14 @@ export class PolicyRiskPropertyMissingFieldError extends Error {
   }
 }
 
+export class PolicyRiskPropertyTypeNotInsurableError extends Error {
+  constructor (propertyType: string) {
+    const message: string = `Cannot create policy, ${propertyType} is not insured by this partner`
+    super(message)
+    this.name = 'PolicyRiskPropertyTypeNotInsurableError'
+  }
+}
+
 export class CreatePolicyQuotePartnerOwnershipError extends Error {
   constructor (quoteId: string, partnerCode: string) {
     const message: string = `Could not create policy with quote ${quoteId} that does not belong to ${partnerCode}`

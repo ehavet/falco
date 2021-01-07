@@ -8,24 +8,27 @@ import { PolicyRepository } from '../../../../src/app/policies/domain/policy.rep
 import { SinonStubbedInstance } from 'sinon'
 import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles'
 import {
-  PolicyRiskRoommatesNotAllowedError,
   PolicyRiskNumberOfRoommatesError,
-  PolicyRiskPropertyMissingFieldError
+  PolicyRiskPropertyMissingFieldError,
+  PolicyRiskPropertyTypeNotInsurableError,
+  PolicyRiskRoommatesNotAllowedError
 } from '../../../../src/app/policies/domain/policies.errors'
 import { createPartnerFixture } from '../../partners/fixtures/partner.fixture'
 import { Partner } from '../../../../src/app/partners/domain/partner'
-import Question = Partner.Question
+import { PropertyType } from '../../../../src/app/common-api/domain/common-type/property-type'
+import Question = Partner.Question;
 
 describe('Policies - Domain', async () => {
   describe('#create', async () => {
     const now = new Date('2020-02-29T10:09:08Z')
     const expectedTermEndDate = new Date('2021-04-04T10:09:08.000Z')
     const policyRepository: SinonStubbedInstance<PolicyRepository> = policyRepositoryStub()
-    const quote: Quote = createQuoteFixture()
+    let quote: Quote
     let partner: Partner
     let createPolicyCommand: CreatePolicyCommand
 
     beforeEach(() => {
+      quote = createQuoteFixture()
       createPolicyCommand = createCreatePolicyCommand({ quoteId: quote.id })
       partner = createPartnerFixture()
       dateFaker.setCurrentDate(now)
@@ -106,7 +109,8 @@ describe('Policies - Domain', async () => {
           roomCount: 2,
           address: '88 rue des prairies',
           postalCode: '91100',
-          city: 'Kyukamura'
+          city: 'Kyukamura',
+          type: PropertyType.FLAT
         },
         people: {
           person: {
@@ -133,8 +137,13 @@ describe('Policies - Domain', async () => {
       // Given
       createPolicyCommand.risk.people.otherInsured = []
 
-      const questions: Array<Question> = [{ code: Partner.Question.QuestionCode.ROOMMATE, applicable: false }]
-      partner.questions = questions
+      partner.questions = [{ code: Partner.Question.QuestionCode.ROOMMATE, applicable: false },
+        {
+          code: Partner.Question.QuestionCode.PropertyType,
+          toAsk: false,
+          defaultValue: PropertyType.FLAT,
+          defaultNextStep: Partner.Question.QuestionCode.Address
+        }]
 
       // When
       const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository, partner)
@@ -333,6 +342,98 @@ describe('Policies - Domain', async () => {
       expect(policy.risk.property.city).to.be.equal(quoteWithAddress.risk.property.city)
     })
 
+    it('should take the property.type from the quote when it is present', async () => {
+      const quoteWithType: Quote = createQuoteFixture({
+        risk: {
+          property: {
+            roomCount: 2,
+            address: 'Rue de la Nouvelle Quote',
+            postalCode: '75019',
+            city: 'QuoteCity',
+            type: PropertyType.FLAT
+          }
+        }
+      } as any)
+      const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({
+        quoteId: quoteWithType.id,
+        risk: {
+          property: {
+            address: '13 rue du loup garou',
+            postalCode: '91100',
+            city: 'Corbeil-Essonnes',
+            type: undefined
+          },
+          people: {
+            policyHolder: {
+              lastname: 'Dupont',
+              firstname: 'Jean'
+            },
+            otherInsured: [
+              {
+                lastname: 'Doe',
+                firstname: 'John'
+              }
+            ]
+          }
+        }
+      })
+
+      const policy = await Policy.create(createPolicyCommand, quoteWithType, policyRepository, partner)
+
+      expect(policy.risk.property.type).to.be.equal(quoteWithType.risk.property.type)
+    })
+
+    it('should take the property.type from the command when the quote does not provide property.type', async () => {
+      const quoteWithoutType: Quote = createQuoteFixture({
+        risk: {
+          property: {
+            roomCount: 2,
+            address: 'Rue de la Nouvelle Quote',
+            postalCode: '75019',
+            city: 'QuoteCity',
+            type: undefined
+          }
+        }
+      } as any)
+      const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({
+        quoteId: quoteWithoutType.id
+      })
+
+      const policy = await Policy.create(createPolicyCommand, quoteWithoutType, policyRepository, partner)
+
+      expect(policy.risk.property.type).to.be.equal(createPolicyCommand.risk.property.type)
+    })
+
+    it('should throw an error if the property.type from the command is not insurable by the partner and no type is provided in the quote', () => {
+      // Given
+      const commandWithNotInsurableType: CreatePolicyCommand = createCreatePolicyCommand({
+        quoteId: quote.id
+      })
+      commandWithNotInsurableType.risk.property.type = PropertyType.HOUSE
+      quote.risk.property.type = undefined
+
+      // When
+      const promise = Policy.create(commandWithNotInsurableType, quote, policyRepository, partner)
+
+      // Then
+      return expect(promise).to.be.rejectedWith(PolicyRiskPropertyTypeNotInsurableError, 'Cannot create policy, HOUSE is not insured by this partner')
+    })
+
+    it('should throw an error if the property.type from the quote is not insurable by the partner and no type is provided in the command', () => {
+      // Given
+      const commandWithoutType: CreatePolicyCommand = createCreatePolicyCommand({
+        quoteId: quote.id
+      })
+      commandWithoutType.risk.property.type = undefined
+      quote.risk.property.type = PropertyType.HOUSE
+
+      // When
+      const promise = Policy.create(commandWithoutType, quote, policyRepository, partner)
+
+      // Then
+      return expect(promise).to.be.rejectedWith(PolicyRiskPropertyTypeNotInsurableError, 'Cannot create policy, HOUSE is not insured by this partner')
+    })
+
     describe('should throw an error if', () => {
       it('city is not present from quote and policy', async () => {
         const quoteWithoutCity: Quote = createQuoteFixture({
@@ -413,6 +514,35 @@ describe('Policies - Domain', async () => {
         const promise = Policy.create(createPolicyCommandWithoutPostalCode, quoteWithoutPostalCode, policyRepository, partner)
 
         return expect(promise).to.be.rejectedWith(PolicyRiskPropertyMissingFieldError, `Quote ${quoteWithoutPostalCode.id} risk property postalCode should be completed`)
+      })
+
+      it('type is not present from quote and policy', async () => {
+        const quoteWithoutType: Quote = createQuoteFixture({
+          risk: {
+            property: {
+              roomCount: 2,
+              address: '28 Rue des Acacias',
+              postalCode: '91100',
+              city: 'Villabe',
+              type: undefined
+            }
+          }
+        } as any)
+        const createPolicyCommandWithoutType: CreatePolicyCommand = createCreatePolicyCommand({
+          quoteId: quoteWithoutType.id,
+          risk: {
+            property: {
+              address: '28 Rue des Acacias',
+              postalCode: '91100',
+              city: 'Villabe',
+              type: undefined
+            }
+          }
+        } as any)
+
+        const promise = Policy.create(createPolicyCommandWithoutType, quoteWithoutType, policyRepository, partner)
+
+        return expect(promise).to.be.rejectedWith(PolicyRiskPropertyMissingFieldError, `Quote ${quoteWithoutType.id} risk property type should be completed`)
       })
     })
   })

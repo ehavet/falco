@@ -1,4 +1,5 @@
 import { CreatePolicyCommand } from '../../../../src/app/policies/domain/create-policy-command'
+import { PropertyType } from '../../../../src/app/common-api/domain/common-type/property-type'
 
 export function createCreatePolicyCommand (attr: Partial<CreatePolicyCommand> = {}): CreatePolicyCommand {
   return {
@@ -8,7 +9,8 @@ export function createCreatePolicyCommand (attr: Partial<CreatePolicyCommand> = 
       property: {
         address: '13 rue du loup garou',
         postalCode: '91100',
-        city: 'Corbeil-Essonnes'
+        city: 'Corbeil-Essonnes',
+        type: PropertyType.FLAT
       },
       people: {
         policyHolder: {

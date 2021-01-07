@@ -27,6 +27,7 @@ import { ApplySpecialOperationCodeCommand } from '../../../../../src/app/policie
 import { PartnerNotFoundError } from '../../../../../src/app/partners/domain/partner.errors'
 import { ApplyStartDateOnPolicyCommand } from '../../../../../src/app/policies/domain/apply-start-date-on-policy.usecase'
 import { PolicyForbiddenCertificateGenerationError } from '../../../../../src/app/policies/domain/certificate/certificate.errors'
+import { PropertyType } from '../../../../../src/app/common-api/domain/common-type/property-type'
 
 describe('Policies - API v0 - Integration', async () => {
   let httpServer: HttpServerForTesting
@@ -176,7 +177,8 @@ describe('Policies - API v0 - Integration', async () => {
               room_count: 2,
               address: '13 rue du loup garou',
               postal_code: '91100',
-              city: 'Corbeil-Essonnes'
+              city: 'Corbeil-Essonnes',
+              type: PropertyType.FLAT
             },
             people: {
               policy_holder: {
@@ -538,7 +540,8 @@ describe('Policies - API v0 - Integration', async () => {
               room_count: 2,
               address: '13 rue du loup garou',
               postal_code: '91100',
-              city: 'Corbeil-Essonnes'
+              city: 'Corbeil-Essonnes',
+              type: PropertyType.FLAT
             },
             people: {
               policy_holder: {
@@ -1027,7 +1030,8 @@ describe('Policies - API v0 - Integration', async () => {
             room_count: 2,
             address: '13 rue du loup garou',
             postal_code: '91100',
-            city: 'Corbeil-Essonnes'
+            city: 'Corbeil-Essonnes',
+            type: PropertyType.FLAT
           },
           people: {
             policy_holder: {
@@ -1336,7 +1340,8 @@ describe('Policies - API v0 - Integration', async () => {
             room_count: 2,
             address: '13 rue du loup garou',
             postal_code: '91100',
-            city: 'Corbeil-Essonnes'
+            city: 'Corbeil-Essonnes',
+            type: PropertyType.FLAT
           },
           people: {
             policy_holder: {

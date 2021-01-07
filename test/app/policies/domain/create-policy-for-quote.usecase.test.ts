@@ -21,6 +21,7 @@ import {
   PolicyRiskPersonMissingError,
   PolicyRiskPropertyMissingFieldError
 } from '../../../../src/app/policies/domain/policies.errors'
+import { PropertyType } from '../../../../src/app/common-api/domain/common-type/property-type'
 
 describe('Policies - Usecase - Create policy for quote', async () => {
   let quote: Quote = createQuoteFixture()
@@ -35,7 +36,8 @@ describe('Policies - Usecase - Create policy for quote', async () => {
           roomCount: 2,
           address: '88 rue des prairies',
           postalCode: '91100',
-          city: 'Kyukamura'
+          city: 'Kyukamura',
+          type: PropertyType.FLAT
         },
         people: {
           person: { firstname: 'Jean-Jean', lastname: 'Lapin' },

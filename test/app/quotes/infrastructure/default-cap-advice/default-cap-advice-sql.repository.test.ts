@@ -1,10 +1,7 @@
 import { dbTestUtils, expect } from '../../../../test-utils'
 import { DefaultCapAdviceSqlRepository } from '../../../../../src/app/quotes/infrastructure/default-cap-advice/default-cap-advice-sql.repository'
 import { DefaultCapAdviceSqlModel } from '../../../../../src/app/quotes/infrastructure/default-cap-advice/default-cap-advice-sql.model'
-import {
-  DefaultCapAdviceNotFoundError,
-  MultipleDefaultCapAdviceFoundError
-} from '../../../../../src/app/quotes/domain/default-cap-advice/default-cap-advice.errors'
+import { DefaultCapAdviceNotFoundError } from '../../../../../src/app/quotes/domain/default-cap-advice/default-cap-advice.errors'
 
 describe('Quotes - Infra - Default Cap Advice Repository', async () => {
   const defaultCapAdviceRepository = new DefaultCapAdviceSqlRepository()
@@ -54,18 +51,6 @@ describe('Quotes - Infra - Default Cap Advice Repository', async () => {
 
       // Then
       return expect(promise).to.be.rejectedWith(DefaultCapAdviceNotFoundError)
-    })
-
-    it('should throw an error if there is more than one default cap advice for the given partner and room count', async () => {
-      // Given
-      await DefaultCapAdviceSqlModel.create({ partnerCode: partnerCode, roomCount: 2, defaultCapAdvice: 5000 })
-      await DefaultCapAdviceSqlModel.create({ partnerCode: partnerCode, roomCount: 2, defaultCapAdvice: 6000 })
-
-      // When
-      const promise = defaultCapAdviceRepository.get(partnerCode, 2)
-
-      // Then
-      return expect(promise).to.be.rejectedWith(MultipleDefaultCapAdviceFoundError)
     })
   })
 })

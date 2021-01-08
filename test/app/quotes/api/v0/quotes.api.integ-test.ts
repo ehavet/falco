@@ -23,8 +23,7 @@ import {
 import { UpdateQuoteCommand } from '../../../../../src/app/quotes/domain/update-quote-command'
 import { OperationCodeNotApplicableError } from '../../../../../src/app/policies/domain/operation-code.errors'
 import {
-  DefaultCapAdviceNotFoundError,
-  MultipleDefaultCapAdviceFoundError
+  DefaultCapAdviceNotFoundError
 } from '../../../../../src/app/quotes/domain/default-cap-advice/default-cap-advice.errors'
 import {
   populatePricingMatrixSqlFixture,
@@ -198,25 +197,6 @@ describe('Quotes - API - Integration', async () => {
         const risk = { property: { roomCount: 2, postalCode: undefined, city: undefined, address: undefined } }
         const specOpsCode = 'BLANK'
         sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, specOpsCode }).rejects(new DefaultCapAdviceNotFoundError(partnerCode, risk.property.roomCount))
-
-        // When
-        response = await httpServer.api()
-          .post('/v0/quotes')
-          .send({ code: partnerCode, risk: { property: { room_count: 2 } } })
-          .set('X-Consumer-Username', partnerCode)
-
-        // Then
-        expect(response).to.have.property('statusCode', 500)
-      })
-    })
-
-    describe('when there are more than one default cap advice found', () => {
-      it('should reply with status 500 because it should not happen', async () => {
-        // Given
-        const partnerCode: string = 'myPartner'
-        const risk = { property: { roomCount: 2, postalCode: undefined, city: undefined, address: undefined } }
-        const specOpsCode = 'BLANK'
-        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, specOpsCode }).rejects(new MultipleDefaultCapAdviceFoundError(partnerCode, risk.property.roomCount))
 
         // When
         response = await httpServer.api()
@@ -691,23 +671,6 @@ describe('Quotes - API - Integration', async () => {
         // Given
         const partnerCode: string = 'myPartner'
         sinon.stub(container, 'UpdateQuote').rejects(new DefaultCapAdviceNotFoundError(partnerCode, 2))
-
-        // When
-        response = await httpServer.api()
-          .put('/v0/quotes/UD65X3')
-          .send(createUpdateQuotePayloadFixture())
-          .set('X-Consumer-Username', partnerCode)
-
-        // Then
-        expect(response).to.have.property('statusCode', 500)
-      })
-    })
-
-    describe('when there are more than one default cap advice found', () => {
-      it('should reply with status 500 because it should not happen', async () => {
-        // Given
-        const partnerCode: string = 'myPartner'
-        sinon.stub(container, 'UpdateQuote').rejects(new MultipleDefaultCapAdviceFoundError(partnerCode, 2))
 
         // When
         response = await httpServer.api()

@@ -1,4 +1,4 @@
-import { PropertyType } from '../../common-api/domain/common-type/property-type'
+import { PropertyType } from '../../common-api/domain/type/property-type'
 
 export interface UpdateQuoteCommand {
     id: string

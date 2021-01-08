@@ -14,7 +14,7 @@ import { PartnerRepository } from '../../../../src/app/partners/domain/partner.r
 import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles'
 import { createPartnerFixture } from '../../partners/fixtures/partner.fixture'
 import { quoteRepositoryStub } from '../../quotes/fixtures/quote-repository.test-doubles'
-import { PropertyType } from '../../../../src/app/common-api/domain/common-type/property-type'
+import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
 
 describe('Policies - Usecase - Create policy', async () => {
   const now = new Date('2020-01-05T00:00:00Z')

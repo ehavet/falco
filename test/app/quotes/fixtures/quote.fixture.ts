@@ -1,6 +1,6 @@
 import { Quote } from '../../../../src/app/quotes/domain/quote'
 import { UpdateQuoteCommand } from '../../../../src/app/quotes/domain/update-quote-command'
-import { PropertyType } from '../../../../src/app/common-api/domain/common-type/property-type'
+import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
 
 const now: Date = new Date('2020-01-05T00:00:00Z')
 

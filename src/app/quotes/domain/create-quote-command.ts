@@ -1,5 +1,5 @@
 import { OperationCode } from '../../common-api/domain/operation-code'
-import { PropertyType } from '../../common-api/domain/common-type/property-type'
+import { PropertyType } from '../../common-api/domain/type/property-type'
 
 export interface CreateQuoteCommand {
     partnerCode: string,

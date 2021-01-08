@@ -31,7 +31,7 @@ import { PartnerNotFoundError } from '../../../../../src/app/partners/domain/par
 import { ApplyStartDateOnPolicyCommand } from '../../../../../src/app/policies/domain/apply-start-date-on-policy.usecase'
 import { PolicyForbiddenCertificateGenerationError } from '../../../../../src/app/policies/domain/certificate/certificate.errors'
 import { CreatePolicyForQuoteCommand } from '../../../../../src/app/policies/domain/create-policy-for-quote-command'
-import { PropertyType } from '../../../../../src/app/common-api/domain/common-type/property-type'
+import { PropertyType } from '../../../../../src/app/common-api/domain/type/property-type'
 
 describe('Policies - API v1 - Integration', async () => {
   let httpServer: HttpServerForTesting

@@ -1,5 +1,5 @@
 import { Policy } from '../../../../src/app/policies/domain/policy'
-import { PropertyType } from '../../../../src/app/common-api/domain/common-type/property-type'
+import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
 
 export function createPolicyFixture (attr: Partial<Policy> = {}): Policy {
   const now: Date = new Date('2020-01-05T00:00:00Z')

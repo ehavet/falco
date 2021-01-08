@@ -10,7 +10,7 @@ import { quoteRepositoryMock } from '../fixtures/quote-repository.test-doubles'
 import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
 import { defaultCapAdviceRepositoryStub } from '../fixtures/default-cap-advice-repository.test-doubles'
 import { DefaultCapAdviceNotFoundError } from '../../../../src/app/quotes/domain/default-cap-advice/default-cap-advice.errors'
-import { PropertyType } from '../../../../src/app/common-api/domain/common-type/property-type'
+import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
 
 describe('Quotes - Usecase - Create Quote', async () => {
   let createQuote: CreateQuote

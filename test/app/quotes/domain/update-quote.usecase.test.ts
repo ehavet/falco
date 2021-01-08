@@ -29,7 +29,7 @@ import { partnerRepositoryStub } from '../../partners/fixtures/partner-repositor
 import { quoteRepositoryStub } from '../fixtures/quote-repository.test-doubles'
 import { defaultCapAdviceRepositoryStub } from '../fixtures/default-cap-advice-repository.test-doubles'
 import { DefaultCapAdvice } from '../../../../src/app/quotes/domain/default-cap-advice/default-cap-advice'
-import { PropertyType } from '../../../../src/app/common-api/domain/common-type/property-type'
+import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
 
 describe('Quotes - Usecase - Update Quote', async () => {
   const now: Date = new Date('2020-01-05T00:00:00Z')

@@ -1,7 +1,7 @@
 import { Partner } from '../../../../src/app/partners/domain/partner'
 import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
-import { Occupancy } from '../../../../src/app/common-api/domain/common-type/occupancy'
-import { PropertyType } from '../../../../src/app/common-api/domain/common-type/property-type'
+import { Occupancy } from '../../../../src/app/common-api/domain/type/occupancy'
+import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
 
 export function createPartnerFixture (attr: Partial<Partner> = {}): Partner {
   return {

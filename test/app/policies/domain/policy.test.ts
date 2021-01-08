@@ -15,7 +15,7 @@ import {
 } from '../../../../src/app/policies/domain/policies.errors'
 import { createPartnerFixture } from '../../partners/fixtures/partner.fixture'
 import { Partner } from '../../../../src/app/partners/domain/partner'
-import { PropertyType } from '../../../../src/app/common-api/domain/common-type/property-type'
+import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
 import Question = Partner.Question;
 
 describe('Policies - Domain', async () => {
@@ -541,6 +541,36 @@ describe('Policies - Domain', async () => {
         } as any)
 
         const promise = Policy.create(createPolicyCommandWithoutType, quoteWithoutType, policyRepository, partner)
+
+        return expect(promise).to.be.rejectedWith(PolicyRiskPropertyMissingFieldError, `Quote ${quoteWithoutType.id} risk property type should be completed`)
+      })
+
+      it('type is not present from quote on V1', async () => {
+        const quoteWithoutType: Quote = createQuoteFixture({
+          risk: {
+            property: {
+              roomCount: 2,
+              address: '28 Rue des Acacias',
+              postalCode: '91100',
+              city: 'Villabe',
+              type: undefined
+            },
+            person: {
+              firstname: 'Jean-Jean',
+              lastname: 'Lapin'
+            },
+            otherPeople: [
+              {
+                firstname: 'John',
+                lastname: 'Doe'
+              }
+            ]
+          }
+        } as any)
+
+        quoteWithoutType.policyHolder!.emailValidatedAt = new Date()
+
+        const promise = Policy.createFromQuote('DEMO1234', quoteWithoutType)
 
         return expect(promise).to.be.rejectedWith(PolicyRiskPropertyMissingFieldError, `Quote ${quoteWithoutType.id} risk property type should be completed`)
       })

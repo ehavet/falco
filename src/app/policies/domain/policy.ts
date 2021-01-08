@@ -17,7 +17,7 @@ import {
   PolicyRiskPropertyMissingFieldError, PolicyRiskPropertyTypeNotInsurableError
 } from './policies.errors'
 import { Amount } from '../../common-api/domain/amount/amount'
-import { PropertyType } from '../../common-api/domain/common-type/property-type'
+import { PropertyType } from '../../common-api/domain/type/property-type'
 
 const DEFAULT_NUMBER_OF_MONTHS_DUE = 12
 
@@ -195,6 +195,7 @@ function _checkQuoteConsistencyToCreatePolicy (quote: Quote): void {
   if (Quote.isPolicyRiskPropertyAddressMissing(quote)) { throw new PolicyRiskPropertyMissingFieldError(quote.id, 'address') }
   if (Quote.isPolicyRiskPropertyPostalCodeMissing(quote)) { throw new PolicyRiskPropertyMissingFieldError(quote.id, 'postalCode') }
   if (Quote.isPolicyRiskPropertyCityMissing(quote)) { throw new PolicyRiskPropertyMissingFieldError(quote.id, 'city') }
+  if (Quote.isPolicyRiskPropertyTypeMissing(quote)) { throw new PolicyRiskPropertyMissingFieldError(quote.id, 'type') }
 }
 
 function _getStartDate (createPolicyCommand: CreatePolicyCommand): Date {

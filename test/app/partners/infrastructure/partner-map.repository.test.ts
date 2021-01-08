@@ -10,7 +10,7 @@ import {
   populatePricingMatrixSqlFixture,
   resetPricingMatrixSqlFixture
 } from '../fixtures/pricing-matrix-sql.fixture'
-import { PropertyType } from '../../../../src/app/common-api/domain/common-type/property-type'
+import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
 
 const expectedPartner: { partnerOne: Partner } = {
   partnerOne: {

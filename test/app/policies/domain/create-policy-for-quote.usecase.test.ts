@@ -21,7 +21,7 @@ import {
   PolicyRiskPersonMissingError,
   PolicyRiskPropertyMissingFieldError
 } from '../../../../src/app/policies/domain/policies.errors'
-import { PropertyType } from '../../../../src/app/common-api/domain/common-type/property-type'
+import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
 
 describe('Policies - Usecase - Create policy for quote', async () => {
   let quote: Quote = createQuoteFixture()

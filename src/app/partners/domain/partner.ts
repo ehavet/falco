@@ -1,7 +1,7 @@
 import { Quote } from '../../quotes/domain/quote'
 import { OperationCode } from '../../common-api/domain/operation-code'
-import { PropertyType } from '../../common-api/domain/common-type/property-type'
-import { Occupancy } from '../../common-api/domain/common-type/occupancy'
+import { PropertyType } from '../../common-api/domain/type/property-type'
+import { Occupancy } from '../../common-api/domain/type/occupancy'
 
 export interface Partner {
     code: string,

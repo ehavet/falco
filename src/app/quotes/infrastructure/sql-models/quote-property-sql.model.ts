@@ -7,7 +7,7 @@ import {
 } from 'sequelize-typescript'
 import Sequelize from 'sequelize'
 import { v4 as uuidv4 } from 'uuid'
-import { PropertyType } from '../../../common-api/domain/common-type/property-type'
+import { PropertyType } from '../../../common-api/domain/type/property-type'
 
 @Table({ timestamps: true, tableName: 'quote_property', underscored: true })
 export class QuotePropertySqlModel extends Model {

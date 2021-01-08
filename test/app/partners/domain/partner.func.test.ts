@@ -2,7 +2,7 @@ import { expect } from '../../../test-utils'
 import * as PartnerFunc from '../../../../src/app/partners/domain/partner.func'
 import { createPartnerFixture } from '../fixtures/partner.fixture'
 import { Partner } from '../../../../src/app/partners/domain/partner'
-import { PropertyType } from '../../../../src/app/common-api/domain/common-type/property-type'
+import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
 import Question = Partner.Question
 
 describe('Partners - Domain - Functions', () => {
@@ -120,6 +120,14 @@ describe('Partners - Domain - Functions', () => {
       it('should return false if the given type is not accepted by default by partner', () => {
         // When
         const isValid = PartnerFunc.isValidPropertyType(partner, PropertyType.HOUSE)
+
+        // Then
+        expect(isValid).to.be.false
+      })
+
+      it('should return false if the given type is unknown', () => {
+        // When
+        const isValid = PartnerFunc.isValidPropertyType(partner, 'UNKNOWN_TYPE' as any)
 
         // Then
         expect(isValid).to.be.false

@@ -15,7 +15,7 @@ import { SpecialOperation } from '../../common-api/domain/special-operation.func
 import { CreateQuoteCommand } from './create-quote-command'
 import { Amount } from '../../common-api/domain/amount/amount'
 import { DefaultCapAdvice } from './default-cap-advice/default-cap-advice'
-import { PropertyType } from '../../common-api/domain/common-type/property-type'
+import { PropertyType } from '../../common-api/domain/type/property-type'
 
 const DEFAULT_NUMBER_MONTHS_DUE = 12
 

@@ -12,7 +12,7 @@ import {
   populatePricingMatrixSqlFixture,
   resetPricingMatrixSqlFixture
 } from '../../../partners/fixtures/pricing-matrix-sql.fixture'
-import { PropertyType } from '../../../../../src/app/common-api/domain/common-type/property-type'
+import { PropertyType } from '../../../../../src/app/common-api/domain/type/property-type'
 
 async function resetDb () {
   await PolicySqlModel.destroy({ truncate: true, cascade: true })

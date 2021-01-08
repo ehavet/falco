@@ -1,5 +1,5 @@
 import { CreatePolicyCommand } from '../../../../src/app/policies/domain/create-policy-command'
-import { PropertyType } from '../../../../src/app/common-api/domain/common-type/property-type'
+import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
 
 export function createCreatePolicyCommand (attr: Partial<CreatePolicyCommand> = {}): CreatePolicyCommand {
   return {

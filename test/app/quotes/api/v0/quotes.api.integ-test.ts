@@ -30,7 +30,7 @@ import {
   populatePricingMatrixSqlFixture,
   resetPricingMatrixSqlFixture
 } from '../../../partners/fixtures/pricing-matrix-sql.fixture'
-import { PropertyType } from '../../../../../src/app/common-api/domain/common-type/property-type'
+import { PropertyType } from '../../../../../src/app/common-api/domain/type/property-type'
 
 describe('Quotes - API - Integration', async () => {
   let httpServer: HttpServerForTesting

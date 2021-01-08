@@ -1,30 +1,34 @@
 import { Partner } from '../domain/partner'
 import { PartnerRepository } from '../domain/partner.repository'
-import { PartnerNotFoundError } from '../domain/partner.errors'
-import { toPartner } from './json-to-partner.mapper'
+import { PartnerNotFoundError, PartnerPricingMatrixNotFoundError } from '../domain/partner.errors'
+import { buildPartner } from './partner.builder'
 import { OperationCode } from '../../common-api/domain/operation-code'
+import { PricingMatrixSqlModel } from './sql-models/pricing-matrix-sql.model'
 
 const objectToMap = object => {
-  const map = new Map<string, Partner>()
-  Object.keys(object).forEach(key => {
-    map.set(key, toPartner(object[key]))
+  const map = new Map<string, any>()
+  Object.keys(object).forEach(async key => {
+    map.set(key, object[key])
   })
   return map
 }
 
 export class PartnerMapRepository implements PartnerRepository {
-  private partnerMap: Map<string, Partner>
+  private partnerJsonMap: Map<string, Partial<Partner>>
 
   constructor (jsonFile) {
-    this.partnerMap = objectToMap(jsonFile)
+    this.partnerJsonMap = objectToMap(jsonFile)
   }
 
   async getByCode (partnerCode: string): Promise<Partner> {
-    if (this.partnerMap.has(partnerCode)) {
-      return Promise.resolve(this.partnerMap.get(partnerCode)!)
+    if (!this.partnerJsonMap.has(partnerCode)) throw new PartnerNotFoundError(partnerCode)
+
+    const pricingMatrixArray = await PricingMatrixSqlModel.findAll({ where: { partner: partnerCode } })
+    if (pricingMatrixArray.length > 0) {
+      return await buildPartner(this.partnerJsonMap.get(partnerCode)!, pricingMatrixArray)
     }
 
-    throw new PartnerNotFoundError(partnerCode)
+    throw new PartnerPricingMatrixNotFoundError(partnerCode)
   }
 
   async getOffer (partnerCode: string): Promise<Partner.Offer> {

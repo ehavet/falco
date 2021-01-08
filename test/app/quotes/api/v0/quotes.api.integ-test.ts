@@ -22,12 +22,21 @@ import {
 } from '../../fixtures/quote.fixture'
 import { UpdateQuoteCommand } from '../../../../../src/app/quotes/domain/update-quote-command'
 import { OperationCodeNotApplicableError } from '../../../../../src/app/policies/domain/operation-code.errors'
+import {
+  populatePricingMatrixSqlFixture,
+  resetPricingMatrixSqlFixture
+} from '../../../partners/fixtures/pricing-matrix-sql.fixture'
 
 describe('Quotes - API - Integration', async () => {
   let httpServer: HttpServerForTesting
 
   before(async () => {
     httpServer = await newMinimalServer(quoteRoutes())
+    await populatePricingMatrixSqlFixture()
+  })
+
+  after(async () => {
+    await resetPricingMatrixSqlFixture()
   })
 
   describe('POST /v0/quotes', () => {

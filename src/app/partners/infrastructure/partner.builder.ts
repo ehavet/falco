@@ -1,10 +1,12 @@
 import { Partner } from '../domain/partner'
 import { Quote } from '../../quotes/domain/quote'
+import { PricingMatrixSqlModel } from './sql-models/pricing-matrix-sql.model'
+import { Amount } from '../../common-api/domain/amount/amount'
 import RoomCount = Partner.RoomCount
 
-export function toPartner (partnerJson: any) : Partner {
+export async function buildPartner (partnerJson: any, pricingMatrixSql: PricingMatrixSqlModel[]) : Promise<Partner> {
   const questions : Array<Partner.Question> = _toQuestions(partnerJson.questions)
-  const offer: Partner.Offer = _toOffer(partnerJson.offer)
+  const offer: Partner.Offer = _toOffer(partnerJson.offer, pricingMatrixSql)
 
   return {
     code: partnerJson.code,
@@ -91,7 +93,7 @@ function _toPropertyTypeQuestion (jsonQuestion: any) {
   return question
 }
 
-function _toOffer (offer: any) : Partner.Offer {
+function _toOffer (offer: any, pricingMatrixArray: PricingMatrixSqlModel[]) : Partner.Offer {
   if (offer === undefined) {
     return {
       simplifiedCovers: [],
@@ -104,10 +106,9 @@ function _toOffer (offer: any) : Partner.Offer {
     }
   }
 
-  const pricing = buildPricingMatrix(offer, offer.defaultDeductible)
   return {
     simplifiedCovers: offer.simplifiedCovers,
-    pricingMatrix: pricing,
+    pricingMatrix: buildPricingMatrix(offer, offer.defaultDeductible, pricingMatrixArray),
     productCode: offer.productCode,
     productVersion: offer.productVersion,
     contractualTerms: offer.contractualTerms,
@@ -116,11 +117,16 @@ function _toOffer (offer: any) : Partner.Offer {
   }
 }
 
-function buildPricingMatrix (offer: any, defaultDeductible: number) : Map<RoomCount, Quote.Insurance.Estimate> {
+function buildPricingMatrix (
+  offer: any,
+  defaultDeductible: number,
+  pricingMatrixArray: PricingMatrixSqlModel[]
+) : Map<RoomCount, Quote.Insurance.Estimate> {
   const offerWithMonthlyPrice = offer.pricingMatrix.map(matrixElement => {
     const roomCount = matrixElement[0]
     const estimate = matrixElement[1]
-    return [roomCount, { monthlyPrice: estimate.monthlyPrice, defaultDeductible: defaultDeductible, defaultCeiling: estimate.defaultCeiling }]
+    const pricingSql = pricingMatrixArray.find(elem => elem.roomCount === roomCount)
+    return [roomCount, { monthlyPrice: Amount.toAmount(pricingSql!.coverMonthlyPrice), defaultDeductible: defaultDeductible, defaultCeiling: estimate.defaultCeiling }]
   })
 
   return new Map<RoomCount, Quote.Insurance.Estimate>(offerWithMonthlyPrice)

@@ -23,6 +23,9 @@ import {
 import { UpdateQuoteCommand } from '../../../../../src/app/quotes/domain/update-quote-command'
 import { OperationCodeNotApplicableError } from '../../../../../src/app/policies/domain/operation-code.errors'
 import {
+  DefaultCapAdviceNotFoundError
+} from '../../../../../src/app/quotes/domain/default-cap-advice/default-cap-advice.errors'
+import {
   populatePricingMatrixSqlFixture,
   resetPricingMatrixSqlFixture
 } from '../../../partners/fixtures/pricing-matrix-sql.fixture'
@@ -184,6 +187,25 @@ describe('Quotes - API - Integration', async () => {
         // Then
         expect(response).to.have.property('statusCode', 422)
         expect(response.body).to.have.property('message', 'Partner with code myPartner does not have an insurance for risk {"property":{"roomCount":2}}')
+      })
+    })
+
+    describe('when there is no default cap advice found', () => {
+      it('should reply with status 500 because it should not happen', async () => {
+        // Given
+        const partnerCode: string = 'myPartner'
+        const risk = { property: { roomCount: 2, postalCode: undefined, city: undefined, address: undefined } }
+        const specOpsCode = 'BLANK'
+        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, specOpsCode }).rejects(new DefaultCapAdviceNotFoundError(partnerCode, risk.property.roomCount))
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/quotes')
+          .send({ code: partnerCode, risk: { property: { room_count: 2 } } })
+          .set('X-Consumer-Username', partnerCode)
+
+        // Then
+        expect(response).to.have.property('statusCode', 500)
       })
     })
 
@@ -641,6 +663,23 @@ describe('Quotes - API - Integration', async () => {
         // Then
         expect(response).to.have.property('statusCode', 422)
         expect(response.body).to.have.property('message', '3 room(s) property allows a maximum of 10 roommate(s)')
+      })
+    })
+
+    describe('when there is no default cap advice found', () => {
+      it('should reply with status 500 because it should not happen', async () => {
+        // Given
+        const partnerCode: string = 'myPartner'
+        sinon.stub(container, 'UpdateQuote').rejects(new DefaultCapAdviceNotFoundError(partnerCode, 2))
+
+        // When
+        response = await httpServer.api()
+          .put('/v0/quotes/UD65X3')
+          .send(createUpdateQuotePayloadFixture())
+          .set('X-Consumer-Username', partnerCode)
+
+        // Then
+        expect(response).to.have.property('statusCode', 500)
       })
     })
   })

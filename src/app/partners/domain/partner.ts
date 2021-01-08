@@ -22,7 +22,7 @@ export namespace Partner {
         | Question.PropertyTypeQuestion
 
     export interface Offer {
-        pricingMatrix: Map<RoomCount, Quote.Insurance.Estimate>
+        pricingMatrix: Map<RoomCount, Estimate>
         simplifiedCovers: Array<Quote.Insurance.SimplifiedCover>
         productCode: string
         productVersion: string,
@@ -32,6 +32,11 @@ export namespace Partner {
     }
 
     export type RoomCount = number
+
+    export interface Estimate {
+        monthlyPrice: number,
+        defaultDeductible: number,
+    }
 }
 
 export namespace Partner.Question {

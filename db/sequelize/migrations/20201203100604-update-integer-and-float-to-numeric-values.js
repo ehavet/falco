@@ -1,8 +1,7 @@
 'use strict'
 const Sequelize = require('sequelize')
+const DatabaseStandards = require('../database-standards')
 
-const DEFAULT_PRECISION = 14
-const DEFAULT_SCALE = 6
 const tablesToUpdate = [
   {
     tableName: 'payment',
@@ -10,12 +9,12 @@ const tablesToUpdate = [
       {
         name: 'amount',
         previousType: Sequelize.INTEGER,
-        nextType: Sequelize.DECIMAL(DEFAULT_PRECISION, DEFAULT_SCALE)
+        nextType: DatabaseStandards.DECIMAL_TYPE
       },
       {
         name: 'psp_fee',
         previousType: Sequelize.INTEGER,
-        nextType: Sequelize.DECIMAL(DEFAULT_PRECISION, DEFAULT_SCALE)
+        nextType: DatabaseStandards.DECIMAL_TYPE
       }
     ]
   },
@@ -25,17 +24,17 @@ const tablesToUpdate = [
       {
         name: 'monthly_price',
         previousType: Sequelize.FLOAT,
-        nextType: Sequelize.DECIMAL(DEFAULT_PRECISION, DEFAULT_SCALE)
+        nextType: DatabaseStandards.DECIMAL_TYPE
       },
       {
         name: 'default_deductible',
         previousType: Sequelize.FLOAT,
-        nextType: Sequelize.DECIMAL(DEFAULT_PRECISION, DEFAULT_SCALE)
+        nextType: DatabaseStandards.DECIMAL_TYPE
       },
       {
         name: 'default_ceiling',
         previousType: Sequelize.FLOAT,
-        nextType: Sequelize.DECIMAL(DEFAULT_PRECISION, DEFAULT_SCALE)
+        nextType: DatabaseStandards.DECIMAL_TYPE
       }
     ]
   },
@@ -45,17 +44,17 @@ const tablesToUpdate = [
       {
         name: 'monthly_price',
         previousType: Sequelize.FLOAT,
-        nextType: Sequelize.DECIMAL(DEFAULT_PRECISION, DEFAULT_SCALE)
+        nextType: DatabaseStandards.DECIMAL_TYPE
       },
       {
         name: 'default_deductible',
         previousType: Sequelize.FLOAT,
-        nextType: Sequelize.DECIMAL(DEFAULT_PRECISION, DEFAULT_SCALE)
+        nextType: DatabaseStandards.DECIMAL_TYPE
       },
       {
         name: 'default_ceiling',
         previousType: Sequelize.FLOAT,
-        nextType: Sequelize.DECIMAL(DEFAULT_PRECISION, DEFAULT_SCALE)
+        nextType: DatabaseStandards.DECIMAL_TYPE
       }
     ]
   },
@@ -65,7 +64,7 @@ const tablesToUpdate = [
       {
         name: 'premium',
         previousType: Sequelize.FLOAT,
-        nextType: Sequelize.DECIMAL(DEFAULT_PRECISION, DEFAULT_SCALE)
+        nextType: DatabaseStandards.DECIMAL_TYPE
       }
     ]
   },
@@ -75,7 +74,7 @@ const tablesToUpdate = [
       {
         name: 'premium',
         previousType: Sequelize.FLOAT,
-        nextType: Sequelize.DECIMAL(DEFAULT_PRECISION, DEFAULT_SCALE)
+        nextType: DatabaseStandards.DECIMAL_TYPE
       }
     ]
   }

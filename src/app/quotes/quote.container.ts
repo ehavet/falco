@@ -14,6 +14,9 @@ import { QuoteSqlModel } from './infrastructure/sql-models/quote-sql-model'
 import { UpdateQuote } from './domain/update-quote.usecase'
 import { SendValidationLinkEmailToQuotePolicyHolder } from './domain/send-validation-link-email-to-quote-policy-holder.usecase'
 import { GetQuoteById } from './domain/get-quote-by-id.usecase'
+import { DefaultCapAdviceSqlModel } from './infrastructure/default-cap-advice/default-cap-advice-sql.model'
+import { DefaultCapAdviceRepository } from './domain/default-cap-advice/default-cap-advice.repository'
+import { DefaultCapAdviceSqlRepository } from './infrastructure/default-cap-advice/default-cap-advice-sql.repository'
 
 export interface Container {
   CreateQuote: CreateQuote
@@ -25,14 +28,15 @@ export interface Container {
 
 const partnerRepository: PartnerRepository = partnerContainer.partnerRepository
 const quoteRepository: QuoteRepository = new QuoteSqlRepository()
+const defaultCapAdviceRepository: DefaultCapAdviceRepository = new DefaultCapAdviceSqlRepository()
 const sendEmailValidationLinkToQuotePolicyHolder: SendValidationLinkEmailToQuotePolicyHolder =
     SendValidationLinkEmailToQuotePolicyHolder.factory(
       quoteRepository,
       partnerRepository,
       emailValidationContainer.SendValidationLinkToEmailAddress
     )
-const createQuote: CreateQuote = CreateQuote.factory(quoteRepository, partnerRepository)
-const updateQuote: UpdateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+const createQuote: CreateQuote = CreateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository)
+const updateQuote: UpdateQuote = UpdateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository)
 const getQuoteById: GetQuoteById = GetQuoteById.factory(quoteRepository)
 
 export const container: Container = {
@@ -45,7 +49,8 @@ export const container: Container = {
 
 export const quoteSqlModels: Array<any> = [
   QuoteSqlModel, QuoteInsuranceSqlModel, QuoteRiskSqlModel,
-  QuotePropertySqlModel, QuoteRiskOtherPeopleSqlModel, QuotePersonSqlModel
+  QuotePropertySqlModel, QuoteRiskOtherPeopleSqlModel, QuotePersonSqlModel,
+  DefaultCapAdviceSqlModel
 ]
 
 export function quoteRoutes () {

@@ -45,11 +45,6 @@
     "offer": {
       "simplifiedCovers": ["ACDDE", "ACINCEX", "ACVOL", "ACASSHE", "ACDEFJU", "ACRC"],
       "defaultDeductible": 120,
-      "pricingMatrix": [
-        [1, { "monthlyPrice": 6.00, "defaultCeiling": 3000 }],
-        [2, { "monthlyPrice": 7.50, "defaultCeiling": 5000 }],
-        [3, { "monthlyPrice": 10.00, "defaultCeiling": 7000 }]
-      ],
       "operationCodes": [],
       "productCode": "APP658",
       "productVersion": "2020-07-15",
@@ -114,11 +109,6 @@
         "ACRC"
       ],
       "defaultDeductible": 120,
-      "pricingMatrix": [
-        [1, { "monthlyPrice": 7.50, "defaultCeiling": 5000 }],
-        [2, { "monthlyPrice": 9.00, "defaultCeiling": 7000 }],
-        [3, { "monthlyPrice": 11.00, "defaultCeiling": 9000 }]
-      ],
       "operationCodes": [],
       "productCode": "APP658",
       "productVersion": "2020-11-13",
@@ -172,11 +162,6 @@
     "offer": {
       "simplifiedCovers": ["ACDDE", "ACINCEX", "ACVOL", "ACASSHE", "ACDEFJU", "ACRC"],
       "defaultDeductible": 120,
-      "pricingMatrix": [
-        [1, { "monthlyPrice": 6.34, "defaultCeiling": 3000 }],
-        [2, { "monthlyPrice": 6.34, "defaultCeiling": 3000 }],
-        [3, { "monthlyPrice": 6.34, "defaultCeiling": 3000 }]
-      ],
       "operationCodes": ["SEMESTER1", "SEMESTER2", "FULLYEAR"],
       "productCode": "APP658",
       "productVersion": "2020-07-15",
@@ -229,10 +214,6 @@
     "offer": {
       "simplifiedCovers": ["ACDDE", "ACINCEX", "ACVOL", "ACASSHE", "ACDEFJU", "ACRC"],
       "defaultDeductible": 120,
-      "pricingMatrix": [
-        [1, { "monthlyPrice": 6.00, "defaultCeiling": 3000 }],
-        [2, { "monthlyPrice": 8.00, "defaultCeiling": 5000 }]
-      ],
       "operationCodes": [],
       "productCode": "APP658",
       "productVersion": "2020-12-01",
@@ -286,12 +267,6 @@
     "offer": {
       "simplifiedCovers": ["ACDDE", "ACINCEX", "ACVOL", "ACASSHE", "ACDEFJU", "ACRC"],
       "defaultDeductible": 120,
-      "pricingMatrix": [
-        [1, { "monthlyPrice": 6.00, "defaultCeiling": 3000 }],
-        [2, { "monthlyPrice": 6.00, "defaultCeiling": 3000 }],
-        [3, { "monthlyPrice": 6.00, "defaultCeiling": 3000 }],
-        [4, { "monthlyPrice": 6.00, "defaultCeiling": 3000 }]
-      ],
       "operationCodes": [],
       "productCode": "APP658",
       "productVersion": "2020-12-02",
@@ -345,11 +320,6 @@
     "offer": {
       "simplifiedCovers": ["ACDDE", "ACINCEX", "ACVOL", "ACASSHE", "ACDEFJU", "ACRC"],
       "defaultDeductible": 120,
-      "pricingMatrix": [
-        [1, { "monthlyPrice": 6.00, "defaultCeiling": 3000 }],
-        [2, { "monthlyPrice": 7.50, "defaultCeiling": 5000 }],
-        [3, { "monthlyPrice": 10.00, "defaultCeiling": 7000 }]
-      ],
       "operationCodes": ["SEMESTER1", "SEMESTER2", "FULLYEAR"],
       "productCode": "APP999",
       "productVersion": "2020-09-11",
@@ -415,13 +385,6 @@
     "offer": {
       "simplifiedCovers": ["ACDDE", "ACINCEX", "ACVOL", "ACASSHE", "ACDEFJU", "ACRC"],
       "defaultDeductible": 120,
-      "pricingMatrix": [
-        [1, { "monthlyPrice": 8.50, "defaultCeiling": 5000 }],
-        [2, { "monthlyPrice": 10.50, "defaultCeiling": 7000 }],
-        [3, { "monthlyPrice": 13.60, "defaultCeiling": 9000 }],
-        [4, { "monthlyPrice": 16.90, "defaultCeiling": 12000 }],
-        [5, { "monthlyPrice": 19.80, "defaultCeiling": 15000 }]
-      ],
       "operationCodes": [],
       "productCode": "APP978",
       "productVersion": "2020-12-10",

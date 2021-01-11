@@ -23,7 +23,7 @@ The naming of the branches needs to follow a specific convention :
 
 Depending on the work you are currently doing like developing a new feature or fixing a bug, you need to add the right prefix.
 
-prefix : `feature`, `bugfix`, `tech`, `doc`
+prefix : `feature`, `bugfix`, `task`, `doc`, `tech`
 
 Examples : `feature/55-get-quote-repository`, `feature/55-get-quote-usecase`, `tech/32-install-yarn`
 
@@ -54,7 +54,7 @@ When creating a merge request, the name must follow the following convention :
 
 `[<PREFIX>] <Description>`
 
-PREFIX : `FEATURE`, `BUGFIX`, `TECH`, `DOC`
+PREFIX : `FEATURE`, `BUGFIX`, `TASK`, `DOC`, `TECH`
 
 Example: `[FEATURE] Retrieve a quote from its id`
 

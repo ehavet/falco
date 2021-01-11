@@ -64,7 +64,7 @@ export namespace Quote {
     }
 
     export function create (command: CreateQuoteCommand, partner: Partner, defaultCapAdvice: DefaultCapAdvice): Quote {
-      if (command.risk.property.type && !PartnerFunc.isValidPropertyType(partner, command.risk.property.type)) {
+      if (!PartnerFunc.isPropertyTypeInsured(partner, command.risk.property.type)) {
         throw new QuoteRiskPropertyTypeNotInsurableError(command.risk.property.type!)
       }
 
@@ -89,7 +89,7 @@ export namespace Quote {
     }
 
     export function update (quote: Quote, partner: Partner, command: UpdateQuoteCommand, partnerAvailableCodes: Array<OperationCode>, defaultCapAdvice: DefaultCapAdvice): Quote {
-      if (command.risk.property.type && !PartnerFunc.isValidPropertyType(partner, command.risk.property.type)) {
+      if (!PartnerFunc.isPropertyTypeInsured(partner, command.risk.property.type)) {
         throw new QuoteRiskPropertyTypeNotInsurableError(command.risk.property.type!)
       }
 

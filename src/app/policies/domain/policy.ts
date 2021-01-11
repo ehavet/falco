@@ -305,11 +305,9 @@ export namespace Policy.Risk {
     }
 
     function _checkIsInsurablePropertyType (quoteRisk: Quote.Risk, commandRisk: CreatePolicyCommand.Risk, partner: Partner) {
-      if (quoteRisk.property.type && !PartnerFunc.isValidPropertyType(partner, quoteRisk.property.type)) {
-        throw new PolicyRiskPropertyTypeNotInsurableError(quoteRisk.property.type)
-      }
-      if (commandRisk.property.type && !PartnerFunc.isValidPropertyType(partner, commandRisk.property.type)) {
-        throw new PolicyRiskPropertyTypeNotInsurableError(commandRisk.property.type)
+      const propertyType : PropertyType | undefined = quoteRisk.property.type ?? commandRisk.property.type
+      if (!PartnerFunc.isPropertyTypeInsured(partner, propertyType)) {
+        throw new PolicyRiskPropertyTypeNotInsurableError(propertyType)
       }
     }
 

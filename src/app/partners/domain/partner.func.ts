@@ -65,22 +65,18 @@ function _getQuestionOnPropertyType (partner: Partner) : Partner.Question.Proper
     .find((question) => question.code === Partner.Question.QuestionCode.PROPERTY_TYPE) as Partner.Question.PropertyTypeQuestion
 }
 
-function _getMatchingPropertyTypeOption (options: Array<Partner.Question.Option<PropertyType>>, type: string) : Partner.Question.Option<PropertyType> {
-  return options.find(option => option.value === type) as Partner.Question.Option<PropertyType>
+function _getInsuredPropertyTypes (partner: Partner) : Array<PropertyType> {
+  const propertyTypeQuestion = _getQuestionOnPropertyType(partner)
+  if (propertyTypeQuestion.options) {
+    return propertyTypeQuestion.options
+      .filter(option => option.nextStep !== Partner.Question.NextStepAction.REJECT)
+      .map(option => option.value)
+  }
+  return [propertyTypeQuestion.defaultValue]
 }
 
-export function isValidPropertyType (partner: Partner, type: PropertyType): boolean {
-  const propertyTypeQuestion = _getQuestionOnPropertyType(partner)
-
-  if (!propertyTypeQuestion.options) {
-    return type === propertyTypeQuestion.defaultValue
-  }
-
-  const propertyTypeOption = _getMatchingPropertyTypeOption(propertyTypeQuestion.options, type)
-
-  if (!propertyTypeOption) return false
-
-  if (!propertyTypeOption.nextStep) return true
-
-  return propertyTypeOption.nextStep !== Partner.Question.NextStepAction.REJECT
+export function isPropertyTypeInsured (partner: Partner, propertyType: PropertyType | undefined): boolean {
+  if (!propertyType) return false
+  const insuredPropertyTypes = _getInsuredPropertyTypes(partner)
+  return insuredPropertyTypes.includes(propertyType)
 }

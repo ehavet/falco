@@ -900,7 +900,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
           roomCount: 10,
           address: '101 rue des lapins',
           postalCode: '77000',
-          city: 'Malinville'
+          city: 'Malinville',
+          type: PropertyType.FLAT
         }
       })
     })
@@ -926,7 +927,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
           roomCount: 1,
           address: '101 rue des lapins',
           postalCode: '77000',
-          city: 'Malinville'
+          city: 'Malinville',
+          type: PropertyType.FLAT
         },
         person: { firstname: 'jean', lastname: 'jean' },
         otherPeople: []

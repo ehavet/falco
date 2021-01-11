@@ -109,7 +109,7 @@ describe('Quotes - API - Integration', async () => {
 
       beforeEach(async () => {
         // Given
-        sinon.stub(container, 'CreateQuote').callThrough().withArgs({ partnerCode: 'myPartner', specOpsCode: 'BLANK', risk: quote.risk }).resolves(quote)
+        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode: 'myPartner', specOpsCode: 'BLANK', risk: quote.risk }).resolves(quote)
 
         // When
         response = await httpServer.api()
@@ -312,7 +312,8 @@ describe('Quotes - API - Integration', async () => {
                 room_count: 2,
                 address: '52 Rue Beaubourg',
                 postal_code: '75019',
-                city: 'Paris'
+                city: 'Paris',
+                type: PropertyType.FLAT
               }
             }
           })

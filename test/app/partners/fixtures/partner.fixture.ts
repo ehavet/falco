@@ -61,13 +61,14 @@ export function createPartnerFixture (attr: Partial<Partner> = {}): Partner {
     offer: {
       simplifiedCovers: ['ACDDE'],
       pricingMatrix: new Map([
-        [1, { monthlyPrice: 3.30, defaultDeductible: 120 }]
+        [1, { monthlyPrice: 3.30, defaultDeductible: 120, defaultCeiling: 5000 }],
+        [2, { monthlyPrice: 5.82, defaultDeductible: 150, defaultCeiling: 7000 }]
       ]),
       productCode: 'APP666',
       productVersion: '1.0',
       contractualTerms: '/path/to/contractual/terms',
       ipid: '/path/to/ipid',
-      operationCodes: [OperationCode.SEMESTER1, OperationCode.FULLYEAR]
+      operationCodes: [OperationCode.SEMESTER1, OperationCode.SEMESTER2, OperationCode.FULLYEAR]
     },
     ...attr
   }

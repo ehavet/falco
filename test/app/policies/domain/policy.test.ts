@@ -419,23 +419,8 @@ describe('Policies - Domain', async () => {
       return expect(promise).to.be.rejectedWith(PolicyRiskPropertyTypeNotInsurableError, 'Cannot create policy, HOUSE is not insured by this partner')
     })
 
-    it('should throw an error if the property.type from the quote is not insurable by the partner and no type is provided in the command', () => {
-      // Given
-      const commandWithoutType: CreatePolicyCommand = createCreatePolicyCommand({
-        quoteId: quote.id
-      })
-      commandWithoutType.risk.property.type = undefined
-      quote.risk.property.type = PropertyType.HOUSE
-
-      // When
-      const promise = Policy.create(commandWithoutType, quote, policyRepository, partner)
-
-      // Then
-      return expect(promise).to.be.rejectedWith(PolicyRiskPropertyTypeNotInsurableError, 'Cannot create policy, HOUSE is not insured by this partner')
-    })
-
     describe('should throw an error if', () => {
-      it('city is not present from quote and policy', async () => {
+      it('city is not present from quote and command', async () => {
         const quoteWithoutCity: Quote = createQuoteFixture({
           risk: {
             property: {
@@ -462,7 +447,7 @@ describe('Policies - Domain', async () => {
         return expect(promise).to.be.rejectedWith(PolicyRiskPropertyMissingFieldError, `Quote ${quoteWithoutCity.id} risk property city should be completed`)
       })
 
-      it('address is not present from quote and policy', async () => {
+      it('address is not present from quote and command', async () => {
         const quoteWithoutAddress: Quote = createQuoteFixture({
           risk: {
             property: {
@@ -489,7 +474,7 @@ describe('Policies - Domain', async () => {
         return expect(promise).to.be.rejectedWith(PolicyRiskPropertyMissingFieldError, `Quote ${quoteWithoutAddress.id} risk property address should be completed`)
       })
 
-      it('postalCode is not present from quote and policy', async () => {
+      it('postalCode is not present from quote and command', async () => {
         const quoteWithoutPostalCode: Quote = createQuoteFixture({
           risk: {
             property: {
@@ -516,7 +501,7 @@ describe('Policies - Domain', async () => {
         return expect(promise).to.be.rejectedWith(PolicyRiskPropertyMissingFieldError, `Quote ${quoteWithoutPostalCode.id} risk property postalCode should be completed`)
       })
 
-      it('type is not present from quote and policy', async () => {
+      it('type is not present from quote and command', async () => {
         const quoteWithoutType: Quote = createQuoteFixture({
           risk: {
             property: {

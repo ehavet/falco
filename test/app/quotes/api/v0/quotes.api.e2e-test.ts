@@ -79,7 +79,7 @@ describe('Quotes - API - E2E', async () => {
       // When
       response = await httpServer.api()
         .post('/v0/quotes')
-        .send({ code: 'essca', risk: { property: { room_count: 2 } }, spec_ops_code: 'SEMESTER1' })
+        .send({ code: 'essca', risk: { property: { room_count: 2, type: PropertyType.FLAT } }, spec_ops_code: 'SEMESTER1' })
         .set('X-Consumer-Username', 'essca')
 
       // Then
@@ -87,7 +87,8 @@ describe('Quotes - API - E2E', async () => {
         id: response.body.id,
         risk: {
           property: {
-            room_count: 2
+            room_count: 2,
+            type: PropertyType.FLAT
           }
         },
         insurance: {

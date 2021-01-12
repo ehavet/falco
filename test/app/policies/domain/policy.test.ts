@@ -404,6 +404,28 @@ describe('Policies - Domain', async () => {
       expect(policy.risk.property.type).to.be.equal(createPolicyCommand.risk.property.type)
     })
 
+    it('should take the default property.type from partner if the command and the quote do not provide property.type', async () => {
+      const quoteWithoutType: Quote = createQuoteFixture({
+        risk: {
+          property: {
+            roomCount: 2,
+            address: 'Rue de la Nouvelle Quote',
+            postalCode: '75019',
+            city: 'QuoteCity',
+            type: undefined
+          }
+        }
+      } as any)
+      const createPolicyCommandWithoutType: CreatePolicyCommand = createCreatePolicyCommand({
+        quoteId: quoteWithoutType.id
+      })
+      createPolicyCommandWithoutType.risk.property.type = undefined
+
+      const policy = await Policy.create(createPolicyCommandWithoutType, quoteWithoutType, policyRepository, partner)
+
+      expect(policy.risk.property.type).to.be.equal(PropertyType.FLAT)
+    })
+
     it('should throw an error if the property.type from the command is not insurable by the partner and no type is provided in the quote', () => {
       // Given
       const commandWithNotInsurableType: CreatePolicyCommand = createCreatePolicyCommand({
@@ -499,35 +521,6 @@ describe('Policies - Domain', async () => {
         const promise = Policy.create(createPolicyCommandWithoutPostalCode, quoteWithoutPostalCode, policyRepository, partner)
 
         return expect(promise).to.be.rejectedWith(PolicyRiskPropertyMissingFieldError, `Quote ${quoteWithoutPostalCode.id} risk property postalCode should be completed`)
-      })
-
-      it('type is not present from quote and command', async () => {
-        const quoteWithoutType: Quote = createQuoteFixture({
-          risk: {
-            property: {
-              roomCount: 2,
-              address: '28 Rue des Acacias',
-              postalCode: '91100',
-              city: 'Villabe',
-              type: undefined
-            }
-          }
-        } as any)
-        const createPolicyCommandWithoutType: CreatePolicyCommand = createCreatePolicyCommand({
-          quoteId: quoteWithoutType.id,
-          risk: {
-            property: {
-              address: '28 Rue des Acacias',
-              postalCode: '91100',
-              city: 'Villabe',
-              type: undefined
-            }
-          }
-        } as any)
-
-        const promise = Policy.create(createPolicyCommandWithoutType, quoteWithoutType, policyRepository, partner)
-
-        return expect(promise).to.be.rejectedWith(PolicyRiskPropertyMissingFieldError, `Quote ${quoteWithoutType.id} risk property type should be completed`)
       })
 
       it('type is not present from quote on V1', async () => {

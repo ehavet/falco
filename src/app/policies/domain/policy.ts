@@ -124,7 +124,6 @@ export namespace Policy {
         if (_addressIsMissingFromQuoteAndCommand(quote, createPolicyCommand)) throw new PolicyRiskPropertyMissingFieldError(quote.id, 'address')
         if (_postalCodeIsMissingFromQuoteAndCommand(quote, createPolicyCommand)) throw new PolicyRiskPropertyMissingFieldError(quote.id, 'postalCode')
         if (_cityIsMissingFromQuoteAndCommand(quote, createPolicyCommand)) throw new PolicyRiskPropertyMissingFieldError(quote.id, 'city')
-        if (_typeIsMissingFromQuoteAndCommand(quote, createPolicyCommand)) throw new PolicyRiskPropertyMissingFieldError(quote.id, 'type')
 
         // eslint-disable-next-line no-use-before-define
         const risk = Risk.createRisk(createPolicyCommand.risk, quote.risk, partner)
@@ -253,10 +252,6 @@ function _cityIsMissingFromQuoteAndCommand (quote: Quote, createPolicyCommand: C
   return (Quote.isPolicyRiskPropertyCityMissing(quote) && CreatePolicyCommand.isRiskPropertyCityMissing(createPolicyCommand))
 }
 
-function _typeIsMissingFromQuoteAndCommand (quote: Quote, createPolicyCommand: CreatePolicyCommand): boolean {
-  return (Quote.isPolicyRiskPropertyTypeMissing(quote) && CreatePolicyCommand.isRiskPropertyTypeMissing(createPolicyCommand))
-}
-
 export namespace Policy.Risk {
     export interface Property {
         roomCount: number,
@@ -283,7 +278,8 @@ export namespace Policy.Risk {
         }
       }
 
-      _checkIsInsurablePropertyType(quoteRisk, commandRisk, partner)
+      const propertyType : PropertyType = quoteRisk.property.type ?? commandRisk.property.type ?? PartnerFunc.getDefaultPropertyType(partner)
+      _checkIsInsurablePropertyType(partner, propertyType)
 
       const postalCode = quoteRisk.property.postalCode
         ? quoteRisk.property.postalCode
@@ -295,7 +291,7 @@ export namespace Policy.Risk {
           address: quoteRisk.property.address || commandRisk.property.address as string,
           postalCode,
           city: quoteRisk.property.city || commandRisk.property.city as string,
-          type: quoteRisk.property.type || commandRisk.property.type as PropertyType
+          type: propertyType
         },
         people: {
           person: commandRisk.people.policyHolder,
@@ -304,8 +300,7 @@ export namespace Policy.Risk {
       }
     }
 
-    function _checkIsInsurablePropertyType (quoteRisk: Quote.Risk, commandRisk: CreatePolicyCommand.Risk, partner: Partner) {
-      const propertyType : PropertyType | undefined = quoteRisk.property.type ?? commandRisk.property.type
+    function _checkIsInsurablePropertyType (partner: Partner, propertyType: PropertyType) : void {
       if (!PartnerFunc.isPropertyTypeInsured(partner, propertyType)) {
         throw new PolicyRiskPropertyTypeNotInsurableError(propertyType)
       }

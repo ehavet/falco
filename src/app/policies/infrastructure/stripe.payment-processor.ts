@@ -59,7 +59,9 @@ export class StripePaymentProcessor implements PaymentProcessor {
       const balanceTransactionId = stripePaymentIntent.charges.data[0].balance_transaction as string
 
       try {
-        const balanceTransaction = await this.#stripe.LiveClient.balanceTransactions.retrieve(balanceTransactionId)
+        const balanceTransaction = Partner.isRelatedToADemoPartner(stripePaymentIntent.metadata.partner_code)
+          ? await this.#stripe.TestClient.balanceTransactions.retrieve(balanceTransactionId)
+          : await this.#stripe.LiveClient.balanceTransactions.retrieve(balanceTransactionId)
         return Amount.convertCentsToEuro(balanceTransaction.fee)
       } catch (error) {
         this.#logger.error('An error occurred while calling Stripe to retrieve the balance transaction', { error, stripePaymentIntent })

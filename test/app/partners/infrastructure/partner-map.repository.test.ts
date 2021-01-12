@@ -74,56 +74,6 @@ const expectedPartner: { partnerOne: Partner } = {
       contractualTerms: '/path/to/contractual/terms',
       ipid: '/path/to/ipid'
     }
-  },
-  partnerTwo: {
-    code: 'partnerTwo',
-    trigram: 'PAR',
-    translationKey: 'translationKey',
-    callbackUrl: 'http://partner2-callback.com',
-    customerSupportEmail: 'customer@support.fr',
-    firstQuestion: Partner.Question.QuestionCode.ROOM_COUNT,
-    questions: [
-      {
-        code: Partner.Question.QuestionCode.PROPERTY_TYPE,
-        toAsk: true,
-        options: [
-          { value: PropertyType.FLAT },
-          { value: PropertyType.HOUSE, nextStep: Partner.Question.NextStepAction.REJECT }
-        ],
-        defaultValue: PropertyType.FLAT,
-        defaultNextStep: Partner.Question.QuestionCode.PROPERTY_TYPE
-      },
-      {
-        code: Partner.Question.QuestionCode.ROOM_COUNT,
-        toAsk: true,
-        options: [
-          { value: 1 }
-        ],
-        defaultNextStep: Partner.Question.QuestionCode.ADDRESS,
-        defaultValue: 1
-      },
-      {
-        code: Partner.Question.QuestionCode.ADDRESS,
-        toAsk: true,
-        defaultNextStep: Partner.Question.NextStepAction.SUBMIT
-      },
-      {
-        code: Partner.Question.QuestionCode.ROOMMATE,
-        applicable: false
-      }
-    ],
-    offer: {
-      simplifiedCovers: ['ACDDE', 'ACVOL'],
-      pricingMatrix: new Map([
-        [1, { monthlyPrice: 4.52, defaultDeductible: 120, defaultCeiling: 5000 }],
-        [2, { monthlyPrice: 6.95, defaultDeductible: 150, defaultCeiling: 7000 }]
-      ]),
-      operationCodes: [OperationCode.SEMESTER2, OperationCode.FULLYEAR],
-      productCode: 'MRH_Etudiant',
-      productVersion: '1.0',
-      contractualTerms: '/path/to/contractual/terms',
-      ipid: '/path/to/ipid'
-    }
   }
 }
 
@@ -165,34 +115,6 @@ describe('Partners - Infra - Partner Map Repository', async () => {
 
       // THEN
       return expect(promise).to.be.rejectedWith(PartnerPricingMatrixNotFoundError)
-    })
-  })
-
-  describe('#getOffer', async () => {
-    it('should return the partner offer', async () => {
-      // Given
-      const propertyRoomCount1Estimate: Partner.Estimate = {
-        monthlyPrice: 4.52,
-        defaultDeductible: 120
-      }
-
-      const propertyRoomCount2Estimate: Partner.Estimate = {
-        monthlyPrice: 6.95,
-        defaultDeductible: 120
-      }
-
-      // When
-      const partnerOffer: Partner.Offer = await partnerMapRepository.getOffer('partnerTwo')
-
-      // Then
-      expect(partnerOffer.simplifiedCovers).to.include('ACDDE', 'ACVOL')
-      expect(partnerOffer.productCode).to.equal('MRH_Etudiant')
-      expect(partnerOffer.productVersion).to.equal('1.0')
-      expect(partnerOffer.contractualTerms).to.equal('/path/to/contractual/terms')
-      expect(partnerOffer.ipid).to.equal('/path/to/ipid')
-      expect(partnerOffer.simplifiedCovers).to.include('ACDDE', 'ACVOL')
-      expect(partnerOffer.pricingMatrix.get(1)).to.deep.equal(propertyRoomCount1Estimate)
-      expect(partnerOffer.pricingMatrix.get(2)).to.deep.equal(propertyRoomCount2Estimate)
     })
   })
 

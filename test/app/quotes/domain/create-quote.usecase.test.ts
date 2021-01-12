@@ -16,7 +16,7 @@ import { createPartnerFixture } from '../../partners/fixtures/partner.fixture'
 describe('Quotes - Usecase - Create Quote', async () => {
   let createQuote: CreateQuote
   const quoteRepository = quoteRepositoryMock()
-  const partnerRepository = { getByCode: sinon.stub(), getOffer: sinon.stub(), getCallbackUrl: sinon.stub(), getOperationCodes: sinon.stub() }
+  const partnerRepository = { getByCode: sinon.stub(), getCallbackUrl: sinon.stub(), getOperationCodes: sinon.stub() }
   const defaultCapAdviceRepository = defaultCapAdviceRepositoryStub()
   const partner = createPartnerFixture({ code: 'MyPartner' })
   const expectedQuote: Quote = {

@@ -22,7 +22,7 @@ describe('Policies - Usecase - Create policy', async () => {
   const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({ quoteId: quote.id, startDate: null })
   const policyRepository: SinonStubbedInstance<PolicyRepository> = policyRepositoryStub()
   const quoteRepository: SinonStubbedInstance<QuoteRepository> = quoteRepositoryStub()
-  const partnerRepository: SinonStubbedInstance<PartnerRepository> = { getByCode: sinon.stub(), getOffer: sinon.stub(), getCallbackUrl: sinon.stub(), getOperationCodes: sinon.stub() }
+  const partnerRepository: SinonStubbedInstance<PartnerRepository> = { getByCode: sinon.stub(), getCallbackUrl: sinon.stub(), getOperationCodes: sinon.stub() }
   const sendValidationLinkToEmailAddress = sinon.stub()
   const createPolicy: CreatePolicy = CreatePolicy.factory(policyRepository, quoteRepository, partnerRepository, sendValidationLinkToEmailAddress)
 

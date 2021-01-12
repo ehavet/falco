@@ -960,7 +960,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
   it('should throw an QuoteRiskPropertyTypeNotInsurableError when property type is not insurable by the partner', async () => {
     // Given
     quoteRepository.get.withArgs(quoteId).resolves(quote)
-    updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository)
+    updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository)
     // When
     const updateQuoteCommand = createUpdateQuoteCommandFixture({
       id: quoteId,

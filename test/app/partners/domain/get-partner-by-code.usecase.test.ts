@@ -8,7 +8,7 @@ describe('Partners - Usecase - Get partner by code', async () => {
     // GIVEN
     const expectedPartner: Partner = createPartnerFixture()
 
-    const partnerRepository = { getByCode: sinon.stub(), getOffer: sinon.stub(), getCallbackUrl: sinon.stub(), getOperationCodes: sinon.stub() }
+    const partnerRepository = { getByCode: sinon.stub(), getCallbackUrl: sinon.stub(), getOperationCodes: sinon.stub() }
     partnerRepository.getByCode.withArgs('myPartner').resolves(expectedPartner)
     const getPartnerByCode : GetPartnerByCode = GetPartnerByCode.factory(partnerRepository)
 

@@ -31,12 +31,6 @@ export class PartnerMapRepository implements PartnerRepository {
     throw new PartnerPricingMatrixNotFoundError(partnerCode)
   }
 
-  async getOffer (partnerCode: string): Promise<Partner.Offer> {
-    const partner: Partner = await this.getByCode(partnerCode)
-    // @ts-ignore
-    return Promise.resolve(partner.offer)
-  }
-
   async getCallbackUrl (partnerCode: string): Promise<string> {
     const partner: Partner = await this.getByCode(partnerCode)
     return Promise.resolve(partner.callbackUrl)

@@ -9,7 +9,7 @@ import {
   QuotePartnerOwnershipError,
   QuotePolicyHolderEmailNotFoundError,
   QuoteRiskNumberOfRoommatesError,
-  QuoteRiskPropertyRoomCountNotInsurableError,
+  QuoteRiskPropertyRoomCountNotInsurableError, QuoteRiskPropertyTypeNotInsurableError,
   QuoteRiskRoommatesNotAllowedError,
   QuoteStartDateConsistencyError
 } from '../../../../../src/app/quotes/domain/quote.errors'
@@ -718,6 +718,24 @@ describe('Quotes - API - Integration', async () => {
         // Then
         expect(response).to.have.property('statusCode', 422)
         expect(response.body).to.have.property('message', '3 room(s) property allows a maximum of 10 roommate(s)')
+      })
+    })
+
+    describe('when QuoteRiskPropertyTypeNotInsurableError is thrown by usecase', () => {
+      it('should reply with status 422', async () => {
+        // Given
+        const partnerCode: string = 'myPartner'
+        sinon.stub(container, 'UpdateQuote').rejects(new QuoteRiskPropertyTypeNotInsurableError(PropertyType.HOUSE))
+
+        // When
+        response = await httpServer.api()
+          .put('/v0/quotes/UD65X3')
+          .send(createUpdateQuotePayloadFixture())
+          .set('X-Consumer-Username', partnerCode)
+
+        // Then
+        expect(response).to.have.property('statusCode', 422)
+        expect(response.body).to.have.property('message', 'Cannot create quote, HOUSE is not insured by this partner')
       })
     })
 

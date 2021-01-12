@@ -80,3 +80,8 @@ export function isPropertyTypeInsured (partner: Partner, propertyType: PropertyT
   const insuredPropertyTypes = _getInsuredPropertyTypes(partner)
   return insuredPropertyTypes.includes(propertyType)
 }
+
+export function getDefaultPropertyType (partner: Partner) : PropertyType {
+  const propertyTypeQuestion = _getQuestionOnPropertyType(partner)
+  return propertyTypeQuestion.defaultValue
+}

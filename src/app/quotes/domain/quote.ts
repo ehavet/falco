@@ -64,9 +64,7 @@ export namespace Quote {
     }
 
     export function create (command: CreateQuoteCommand, partner: Partner, defaultCapAdvice: DefaultCapAdvice): Quote {
-      if (!PartnerFunc.isPropertyTypeInsured(partner, command.risk.property.type)) {
-        throw new QuoteRiskPropertyTypeNotInsurableError(command.risk.property.type!)
-      }
+      const risk: Risk = _buildRisk(command, partner)
 
       const insurance: Insurance = getInsurance(command.risk, partner.offer, defaultCapAdvice)
 
@@ -75,7 +73,7 @@ export namespace Quote {
       const quote = {
         id: nextId(),
         partnerCode: command.partnerCode,
-        risk: command.risk,
+        risk: risk,
         insurance: insurance,
         specialOperationsCode: undefined,
         specialOperationsCodeAppliedAt: undefined,
@@ -89,10 +87,6 @@ export namespace Quote {
     }
 
     export function update (quote: Quote, partner: Partner, command: UpdateQuoteCommand, partnerAvailableCodes: Array<OperationCode>, defaultCapAdvice: DefaultCapAdvice): Quote {
-      if (!PartnerFunc.isPropertyTypeInsured(partner, command.risk.property.type)) {
-        throw new QuoteRiskPropertyTypeNotInsurableError(command.risk.property.type!)
-      }
-
       quote.risk = _buildQuoteRisk(command.risk, partner)
       quote.insurance = getInsurance(quote.risk, partner.offer, defaultCapAdvice)
       quote.policyHolder = Quote.PolicyHolder.build(command.policyHolder, quote.policyHolder)
@@ -109,6 +103,10 @@ export namespace Quote {
     function _buildQuoteRisk (risk: UpdateQuoteCommand.Risk, partner: Partner) {
       const roomCount: number = risk.property.roomCount
       const numberOfRoommates: number|null = risk.otherPeople ? risk.otherPeople?.length : null
+
+      if (!PartnerFunc.isPropertyTypeInsured(partner, risk.property.type)) {
+        throw new QuoteRiskPropertyTypeNotInsurableError(risk.property.type!)
+      }
 
       if (!PartnerFunc.isPropertyRoomCountCovered(partner, roomCount)) {
         throw new QuoteRiskPropertyRoomCountNotInsurableError(roomCount)
@@ -180,6 +178,20 @@ export namespace Quote {
     function _getUtcDayjsDate (date: Date): dayjs.Dayjs {
       date.setUTCHours(0, 0, 0, 0)
       return dayjs(date).utc()
+    }
+
+    function _buildRisk (command: CreateQuoteCommand, partner: Partner) : Risk {
+      /* WARNING : the following line has to be removed for v1 :
+      risk.property.type is optionnal on endpoint POST v0/quotes, so we have to retrieve it from partner.
+      The correct rule is : risk.property.type is mandatory and shoud be given on quote creation.
+      It should be implemented that way for POST v1/quotes */
+      const propertyType = command.risk.property.type ?? PartnerFunc.getDefaultPropertyType(partner)
+      if (!PartnerFunc.isPropertyTypeInsured(partner, propertyType)) {
+        throw new QuoteRiskPropertyTypeNotInsurableError(propertyType)
+      }
+      return {
+        property: { ...command.risk.property, type: propertyType }
+      }
     }
 
     export function getInsurance (risk: Risk, partnerOffer: Partner.Offer, defaultCapAdvice: DefaultCapAdvice): Insurance {

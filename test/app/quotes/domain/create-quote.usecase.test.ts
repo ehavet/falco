@@ -75,6 +75,17 @@ describe('Quotes - Usecase - Create Quote', async () => {
       expect(quote).to.deep.include({ risk: expectedQuote.risk })
     })
 
+    it('with the risk.property.type provided by default by partner if not provided in command', async () => {
+      // Given
+      quoteRepository.save.resolves()
+
+      // When
+      const quote: Quote = await createQuote({ partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses' } } })
+
+      // Then
+      expect(quote.risk.property.type).to.be.equal(PropertyType.FLAT)
+    })
+
     it('with the insurance', async () => {
       // Given
       const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, type: PropertyType.FLAT } } }

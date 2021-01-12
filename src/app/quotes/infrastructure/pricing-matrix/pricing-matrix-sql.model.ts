@@ -17,4 +17,7 @@ export class PricingMatrixSqlModel extends Model {
 
     @Column(AmountSQLDataType)
     coverMonthlyPrice!: string
+
+    @Column
+    cover!: string
 }

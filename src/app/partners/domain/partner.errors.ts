@@ -15,12 +15,3 @@ export class PartnerQuestionNotFoundError extends Error {
     this.name = 'PartnerQuestionNotFoundError'
   }
 }
-
-export class PartnerPricingMatrixNotFoundError extends Error {
-  constructor (partnerCode: string) {
-    const message: string = `Could not find partner pricing matrix with code : ${partnerCode}`
-    super(message)
-    this.name = '\n' +
-        'export class PartnerPricingMatrixNotFoundError'
-  }
-}

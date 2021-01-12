@@ -8,10 +8,6 @@ import { PolicySqlRepository } from '../../../../../src/app/policies/infrastruct
 import { PolicyRepository } from '../../../../../src/app/policies/domain/policy.repository'
 import fsx from 'fs-extra'
 import { QuoteSqlModel } from '../../../../../src/app/quotes/infrastructure/sql-models/quote-sql-model'
-import {
-  populatePricingMatrixSqlFixture,
-  resetPricingMatrixSqlFixture
-} from '../../../partners/fixtures/pricing-matrix-sql.fixture'
 import { PropertyType } from '../../../../../src/app/common-api/domain/type/property-type'
 
 async function resetDb () {
@@ -24,11 +20,6 @@ describe('Policies - API v0 - E2E', async () => {
 
   before(async () => {
     httpServer = await newProdLikeServer()
-    await populatePricingMatrixSqlFixture()
-  })
-
-  after(async () => {
-    await resetPricingMatrixSqlFixture()
   })
 
   afterEach(async () => {

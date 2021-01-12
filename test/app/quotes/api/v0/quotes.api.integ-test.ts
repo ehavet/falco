@@ -26,10 +26,6 @@ import { OperationCodeNotApplicableError } from '../../../../../src/app/policies
 import {
   DefaultCapAdviceNotFoundError
 } from '../../../../../src/app/quotes/domain/default-cap-advice/default-cap-advice.errors'
-import {
-  populatePricingMatrixSqlFixture,
-  resetPricingMatrixSqlFixture
-} from '../../../partners/fixtures/pricing-matrix-sql.fixture'
 import { PropertyType } from '../../../../../src/app/common-api/domain/type/property-type'
 
 describe('Quotes - API - Integration', async () => {
@@ -37,11 +33,6 @@ describe('Quotes - API - Integration', async () => {
 
   before(async () => {
     httpServer = await newMinimalServer(quoteRoutes())
-    await populatePricingMatrixSqlFixture()
-  })
-
-  after(async () => {
-    await resetPricingMatrixSqlFixture()
   })
 
   describe('POST /v0/quotes', () => {

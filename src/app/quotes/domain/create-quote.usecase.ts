@@ -18,8 +18,8 @@ export namespace CreateQuote {
         const roomCount = createQuoteCommand.risk.property.roomCount
         const partner: Partner = await partnerRepository.getByCode(partnerCode)
         const defaultCapAdvice = await defaultCapAdviceRepository.get(partnerCode, roomCount)
-        const coverMonthlyPrices = await coverRepository.getCovers(partnerCode, roomCount)
-        const quote: Quote = Quote.create(createQuoteCommand, partner, defaultCapAdvice, coverMonthlyPrices)
+        const covers = await coverRepository.getCovers(partnerCode, roomCount)
+        const quote: Quote = Quote.create(createQuoteCommand, partner, defaultCapAdvice, covers)
         await quoteRepository.save(quote)
         return quote
       }

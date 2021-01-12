@@ -93,7 +93,7 @@ function _toOffer (offer: any) : Partner.Offer {
   if (offer === undefined) {
     return {
       simplifiedCovers: [],
-      defaultDeductible: 0,
+      defaultDeductible: null,
       productCode: '',
       productVersion: '',
       contractualTerms: '',

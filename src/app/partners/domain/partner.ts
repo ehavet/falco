@@ -23,7 +23,7 @@ export namespace Partner {
         | Question.PropertyTypeQuestion
 
     export interface Offer {
-        defaultDeductible: number
+        defaultDeductible: number | null
         simplifiedCovers: Array<Quote.Insurance.SimplifiedCover>
         productCode: string
         productVersion: string,

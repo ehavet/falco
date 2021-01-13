@@ -102,7 +102,14 @@ describe('Quotes - Usecase - Update Quote', async () => {
       [OperationCode.FULLYEAR, OperationCode.SEMESTER1, OperationCode.SEMESTER2, OperationCode.BLANK]
     )
     defaultCapAdviceRepository.get.resolves({ value: 7000 })
-    coverMonthlyPriceRepository.get.resolves([{ coverMonthlyPrice: '2.500000' }, { coverMonthlyPrice: '2.500000' }, { coverMonthlyPrice: '0.820000' }])
+    coverMonthlyPriceRepository.get.resolves([{
+      coverMonthlyPrice: '2.500000', cover: 'DDEAUX'
+    }, {
+      coverMonthlyPrice: '2.500000', cover: 'INCEND'
+    },
+    {
+      coverMonthlyPrice: '0.820000', cover: 'VOLXXX'
+    }])
     updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository, coverMonthlyPriceRepository)
   })
 
@@ -523,7 +530,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
       quoteRepository.get.withArgs(quoteId).resolves(quote)
       quoteRepository.update.resolves(updatedQuote)
       defaultCapAdviceRepository.get.withArgs(partnerCode, newRoomCount).resolves(defaultCapAdviceForRoomCountOf3)
-      coverMonthlyPriceRepository.get.resolves([{ coverMonthlyPrice: '4.500000' }, { coverMonthlyPrice: '2.500000' }, { coverMonthlyPrice: '0.820000' }])
+      coverMonthlyPriceRepository.get.resolves([{ coverMonthlyPrice: '4.500000', cover: 'DDEAUX' }, { coverMonthlyPrice: '2.500000', cover: 'VOLXXX' }, { coverMonthlyPrice: '0.820000', cover: 'INCEND' }])
 
       const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId })
       updateQuoteCommand.risk.property.roomCount = newRoomCount
@@ -819,7 +826,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
 
     quoteRepository.update.resolves(expectedQuote)
 
-    coverMonthlyPriceRepository.get.resolves([{ coverMonthlyPrice: '1.500000' }, { coverMonthlyPrice: '2.500000' }, { coverMonthlyPrice: '0.820000' }])
+    coverMonthlyPriceRepository.get.resolves([{ coverMonthlyPrice: '1.500000', cover: 'INCEND' }, { coverMonthlyPrice: '2.500000', cover: 'DDEAUX' }, { coverMonthlyPrice: '0.820000', cover: 'VOLXXX' }])
 
     // When
     const result = await updateQuote(updateQuoteCommand)

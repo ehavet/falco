@@ -241,7 +241,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
     const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses', type: PropertyType.FLAT } } }
     quoteRepository.save.resolves()
     defaultCapAdviceRepository.get.withArgs('myPartner', 2).resolves({ value: 6000 })
-    coverMonthlyPriceRepository.get.withArgs('myPartner', 2).resolves([{ coverMonthlyPrice: '0.820000' }, { coverMonthlyPrice: '5.000000' }])
+    coverMonthlyPriceRepository.get.withArgs('myPartner', 2).resolves([{ coverMonthlyPrice: '0.820000', cover: 'DDEAUX' }, { coverMonthlyPrice: '5.000000', cover: 'INCEND' }])
 
     // When
     const quote = await createQuote(createQuoteCommand)

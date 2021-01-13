@@ -1,15 +1,11 @@
 import { expect } from '../../../test-utils'
 import { PartnerMapRepository } from '../../../../src/app/partners/infrastructure/partner-map.repository'
-import { PartnerNotFoundError, PartnerPricingMatrixNotFoundError } from '../../../../src/app/partners/domain/partner.errors'
+import { PartnerNotFoundError } from '../../../../src/app/partners/domain/partner.errors'
 import { Partner } from '../../../../src/app/partners/domain/partner'
 import { PartnerRepository } from '../../../../src/app/partners/domain/partner.repository'
 import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
 import partnerJson from './partner.json'
 import { Occupancy } from '../../../../src/app/common-api/domain/type/occupancy'
-import {
-  populatePricingMatrixSqlFixture,
-  resetPricingMatrixSqlFixture
-} from '../fixtures/pricing-matrix-sql.fixture'
 import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
 
 const expectedPartner: { partnerOne: Partner } = {
@@ -65,9 +61,7 @@ const expectedPartner: { partnerOne: Partner } = {
     ],
     offer: {
       simplifiedCovers: ['ACDDE'],
-      pricingMatrix: new Map([
-        [1, { monthlyPrice: 3.30, defaultDeductible: 120 }]
-      ]),
+      defaultDeductible: 120,
       operationCodes: [OperationCode.SEMESTER1, OperationCode.FULLYEAR],
       productCode: 'APP666',
       productVersion: '1.0',
@@ -79,14 +73,6 @@ const expectedPartner: { partnerOne: Partner } = {
 
 describe('Partners - Infra - Partner Map Repository', async () => {
   let partnerMapRepository: PartnerRepository
-
-  before(async () => {
-    await populatePricingMatrixSqlFixture()
-  })
-
-  after(async function () {
-    await resetPricingMatrixSqlFixture()
-  })
 
   beforeEach(() => {
     partnerMapRepository = new PartnerMapRepository(partnerJson)
@@ -107,14 +93,6 @@ describe('Partners - Infra - Partner Map Repository', async () => {
 
       // THEN
       return expect(promise).to.be.rejectedWith(PartnerNotFoundError)
-    })
-
-    it('should thrown a partner pricing matrix not found error when pricing matrix is not found', async () => {
-      // WHEN
-      const promise: Promise<Partner> = partnerMapRepository.getByCode('partnerWithNoPricingMatrix')
-
-      // THEN
-      return expect(promise).to.be.rejectedWith(PartnerPricingMatrixNotFoundError)
     })
   })
 

@@ -17,6 +17,8 @@ import { GetQuoteById } from './domain/get-quote-by-id.usecase'
 import { DefaultCapAdviceSqlModel } from './infrastructure/default-cap-advice/default-cap-advice-sql.model'
 import { DefaultCapAdviceRepository } from './domain/default-cap-advice/default-cap-advice.repository'
 import { DefaultCapAdviceSqlRepository } from './infrastructure/default-cap-advice/default-cap-advice-sql.repository'
+import { PricingMatrixSqlModel } from './infrastructure/cover-monthly-price/pricing-matrix-sql.model'
+import { CoverMonthlyPriceSqlRepository } from './infrastructure/cover-monthly-price/cover-monthly-price-sql.repository'
 
 export interface Container {
   CreateQuote: CreateQuote
@@ -29,14 +31,15 @@ export interface Container {
 const partnerRepository: PartnerRepository = partnerContainer.partnerRepository
 const quoteRepository: QuoteRepository = new QuoteSqlRepository()
 const defaultCapAdviceRepository: DefaultCapAdviceRepository = new DefaultCapAdviceSqlRepository()
+const coverMonthlyPriceSqlRepository = new CoverMonthlyPriceSqlRepository()
 const sendEmailValidationLinkToQuotePolicyHolder: SendValidationLinkEmailToQuotePolicyHolder =
     SendValidationLinkEmailToQuotePolicyHolder.factory(
       quoteRepository,
       partnerRepository,
       emailValidationContainer.SendValidationLinkToEmailAddress
     )
-const createQuote: CreateQuote = CreateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository)
-const updateQuote: UpdateQuote = UpdateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository)
+const createQuote: CreateQuote = CreateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository, coverMonthlyPriceSqlRepository)
+const updateQuote: UpdateQuote = UpdateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository, coverMonthlyPriceSqlRepository)
 const getQuoteById: GetQuoteById = GetQuoteById.factory(quoteRepository)
 
 export const container: Container = {
@@ -50,7 +53,7 @@ export const container: Container = {
 export const quoteSqlModels: Array<any> = [
   QuoteSqlModel, QuoteInsuranceSqlModel, QuoteRiskSqlModel,
   QuotePropertySqlModel, QuoteRiskOtherPeopleSqlModel, QuotePersonSqlModel,
-  DefaultCapAdviceSqlModel
+  DefaultCapAdviceSqlModel, PricingMatrixSqlModel
 ]
 
 export function quoteRoutes () {

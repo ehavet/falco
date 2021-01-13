@@ -46,10 +46,6 @@ function _getQuestionOnRoommates (partner: Partner) {
   return roommateQuestion
 }
 
-export function isPropertyRoomCountCovered (partner: Partner, propertyRoomCount): boolean {
-  return !!partner.offer.pricingMatrix.get(propertyRoomCount)
-}
-
 export function isPropertyAllowNumberOfRoommates (partner: Partner, numberOfRoommates: number, risk: Quote.Risk): boolean {
   const maxNumberOfRoommates = getMaxNumberOfRoommatesForProperty(partner, risk)
   return numberOfRoommates <= maxNumberOfRoommates
@@ -58,6 +54,14 @@ export function isPropertyAllowNumberOfRoommates (partner: Partner, numberOfRoom
 export function isRelatedToADemoPartner (partnerCode?: string): boolean {
   if (!partnerCode) return false
   return partnerCode.startsWith(DEMO_PARTNER_CODE_PREFIX)
+}
+
+export function isPropertyRoomCountCovered (partner: Partner, roomCount: number): boolean {
+  const roomCountQuestion = partner.questions.find(question => question.code === Partner.Question.QuestionCode.ROOM_COUNT) as Partner.Question.RoomCountQuestion
+
+  return !!roomCountQuestion.options.find(option => {
+    return option.value === roomCount && option.nextStep !== Partner.Question.NextStepAction.REJECT
+  })
 }
 
 function _getQuestionOnPropertyType (partner: Partner) : Partner.Question.PropertyTypeQuestion {

@@ -29,7 +29,9 @@ import { partnerRepositoryStub } from '../../partners/fixtures/partner-repositor
 import { quoteRepositoryStub } from '../fixtures/quote-repository.test-doubles'
 import { defaultCapAdviceRepositoryStub } from '../fixtures/default-cap-advice-repository.test-doubles'
 import { DefaultCapAdvice } from '../../../../src/app/quotes/domain/default-cap-advice/default-cap-advice'
+import { coverMonthlyPriceRepositoryStub } from '../fixtures/pricing-matrix-repository.test-doubles'
 import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
+import { COVER } from '../../../../src/app/quotes/domain/cover/coverMonthlyPrice'
 
 describe('Quotes - Usecase - Update Quote', async () => {
   const now: Date = new Date('2020-01-05T00:00:00Z')
@@ -39,6 +41,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
   let quote: Quote
   let partner: Partner
   const defaultCapAdviceRepository = defaultCapAdviceRepositoryStub()
+  const coverMonthlyPriceRepository = coverMonthlyPriceRepositoryStub()
   const quoteId: string = 'UDQUOT3'
   const partnerCode: string = 'myPartner'
 
@@ -86,11 +89,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
         ],
         offer: {
           simplifiedCovers: ['ACDDE', 'ACVOL'],
-          pricingMatrix: new Map([
-            [1, { monthlyPrice: 4.82, defaultDeductible: 140, defaultCeiling: 6000 }],
-            [2, { monthlyPrice: 5.82, defaultDeductible: 150, defaultCeiling: 7000 }],
-            [3, { monthlyPrice: 7.82, defaultDeductible: 160, defaultCeiling: 8000 }]
-          ]),
+          defaultDeductible: 150,
           productCode: 'APP999',
           productVersion: 'v2020-02-01',
           contractualTerms: '/path/to/contractual/terms',
@@ -104,7 +103,15 @@ describe('Quotes - Usecase - Update Quote', async () => {
       [OperationCode.FULLYEAR, OperationCode.SEMESTER1, OperationCode.SEMESTER2, OperationCode.BLANK]
     )
     defaultCapAdviceRepository.get.resolves({ value: 7000 })
-    updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository)
+    coverMonthlyPriceRepository.get.resolves([{
+      coverMonthlyPrice: '2.500000', cover: COVER.DDEAUX
+    }, {
+      coverMonthlyPrice: '2.500000', cover: COVER.INCEND
+    },
+    {
+      coverMonthlyPrice: '0.820000', cover: COVER.VOLXXX
+    }])
+    updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository, coverMonthlyPriceRepository)
   })
 
   afterEach(() => {
@@ -112,6 +119,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
     partnerRepository.getByCode.reset()
     partnerRepository.getOperationCodes.reset()
     quoteRepository.update.reset()
+    coverMonthlyPriceRepository.get.reset()
   })
 
   describe('updating the start date', async () => {
@@ -504,7 +512,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
           insurance: createQuoteInsuranceFixture({
             estimate: {
               monthlyPrice: 7.82,
-              defaultDeductible: 160,
+              defaultDeductible: 150,
               defaultCeiling: defaultCapAdviceForRoomCountOf3.value
             }
           }),
@@ -523,6 +531,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
       quoteRepository.get.withArgs(quoteId).resolves(quote)
       quoteRepository.update.resolves(updatedQuote)
       defaultCapAdviceRepository.get.withArgs(partnerCode, newRoomCount).resolves(defaultCapAdviceForRoomCountOf3)
+      coverMonthlyPriceRepository.get.resolves([{ coverMonthlyPrice: '4.500000', cover: COVER.DDEAUX }, { coverMonthlyPrice: '2.500000', cover: COVER.VOLXXX }, { coverMonthlyPrice: '0.820000', cover: COVER.INCEND }])
 
       const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId })
       updateQuoteCommand.risk.property.roomCount = newRoomCount
@@ -780,7 +789,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
         phoneNumber: '+66666666666',
         emailValidatedAt: undefined
       },
-      insurance: createQuoteInsuranceFixture({ estimate: { defaultCeiling: 7000, defaultDeductible: 140, monthlyPrice: 4.82 } }),
+      insurance: createQuoteInsuranceFixture({ estimate: { defaultCeiling: 7000, defaultDeductible: 150, monthlyPrice: 4.82 } }),
       specialOperationsCode: OperationCode.FULLYEAR,
       specialOperationsCodeAppliedAt: new Date('2020-01-05T00:00:00.000Z'),
       startDate: new Date('2020-01-05T00:00:00.000Z'),
@@ -817,6 +826,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
     }
 
     quoteRepository.update.resolves(expectedQuote)
+
+    coverMonthlyPriceRepository.get.resolves([{ coverMonthlyPrice: '1.500000', cover: COVER.INCEND }, { coverMonthlyPrice: '2.500000', cover: COVER.DDEAUX }, { coverMonthlyPrice: '0.820000', cover: COVER.VOLXXX }])
 
     // When
     const result = await updateQuote(updateQuoteCommand)
@@ -891,6 +902,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
   it('should throw QuoteRiskPropertyRoomCountNotInsurableError when there is no coverage for the given property room count', async () => {
     // Given
     quoteRepository.get.withArgs(quoteId).resolves(quote)
+    coverMonthlyPriceRepository.get.withArgs(partnerCode, 10).resolves([])
 
     const updateQuoteCommand: UpdateQuoteCommand = createUpdateQuoteCommandFixture({
       id: quoteId,
@@ -960,7 +972,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
   it('should throw an QuoteRiskPropertyTypeNotInsurableError when property type is not insurable by the partner', async () => {
     // Given
     quoteRepository.get.withArgs(quoteId).resolves(quote)
-    updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository)
+    updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository, coverMonthlyPriceRepository)
     // When
     const updateQuoteCommand = createUpdateQuoteCommandFixture({
       id: quoteId,

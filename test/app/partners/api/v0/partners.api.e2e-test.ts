@@ -1,19 +1,10 @@
 import * as supertest from 'supertest'
 import { expect, HttpServerForTesting, newProdLikeServer } from '../../../../test-utils'
-import {
-  populatePricingMatrixSqlFixture,
-  resetPricingMatrixSqlFixture
-} from '../../fixtures/pricing-matrix-sql.fixture'
 
 describe('Partners - API - E2E', async () => {
   let httpServer: HttpServerForTesting
   before(async () => {
     httpServer = await newProdLikeServer()
-    await populatePricingMatrixSqlFixture()
-  })
-
-  after(async () => {
-    await resetPricingMatrixSqlFixture()
   })
 
   describe('GET /internal/v0/partners/:id', () => {

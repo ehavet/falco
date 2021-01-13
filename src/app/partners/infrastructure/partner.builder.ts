@@ -1,11 +1,8 @@
 import { Partner } from '../domain/partner'
-import { PricingMatrixSqlModel } from './sql-models/pricing-matrix-sql.model'
-import { Amount } from '../../common-api/domain/amount/amount'
-import RoomCount = Partner.RoomCount
 
-export async function buildPartner (partnerJson: any, pricingMatrixSql: PricingMatrixSqlModel[]) : Promise<Partner> {
+export async function buildPartner (partnerJson: any) : Promise<Partner> {
   const questions : Array<Partner.Question> = _toQuestions(partnerJson.questions)
-  const offer: Partner.Offer = _toOffer(partnerJson.offer, pricingMatrixSql)
+  const offer: Partner.Offer = _toOffer(partnerJson.offer)
 
   return {
     code: partnerJson.code,
@@ -92,11 +89,11 @@ function _toPropertyTypeQuestion (jsonQuestion: any) {
   return question
 }
 
-function _toOffer (offer: any, pricingMatrixArray: PricingMatrixSqlModel[]) : Partner.Offer {
+function _toOffer (offer: any) : Partner.Offer {
   if (offer === undefined) {
     return {
       simplifiedCovers: [],
-      pricingMatrix: new Map<RoomCount, Partner.Estimate>(),
+      defaultDeductible: null,
       productCode: '',
       productVersion: '',
       contractualTerms: '',
@@ -107,24 +104,11 @@ function _toOffer (offer: any, pricingMatrixArray: PricingMatrixSqlModel[]) : Pa
 
   return {
     simplifiedCovers: offer.simplifiedCovers,
-    pricingMatrix: buildPricingMatrix(offer.defaultDeductible, pricingMatrixArray),
+    defaultDeductible: offer.defaultDeductible,
     productCode: offer.productCode,
     productVersion: offer.productVersion,
     contractualTerms: offer.contractualTerms,
     ipid: offer.ipid,
     operationCodes: offer.operationCodes
   }
-}
-
-function buildPricingMatrix (
-  defaultDeductible: number,
-  pricingMatrixArray: PricingMatrixSqlModel[]
-) : Map<RoomCount, Partner.Estimate> {
-  const offerWithMonthlyPrice: Array<Array<RoomCount | Partner.Estimate>> = pricingMatrixArray.map(pricingLine => {
-    const roomCount = pricingLine.roomCount
-    return [roomCount, { monthlyPrice: Amount.toAmount(pricingLine.coverMonthlyPrice), defaultDeductible: defaultDeductible }]
-  })
-
-  // @ts-ignore
-  return new Map<RoomCount, Partner.Estimate>(offerWithMonthlyPrice)
 }

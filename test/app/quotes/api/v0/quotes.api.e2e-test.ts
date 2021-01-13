@@ -5,10 +5,6 @@ import { QuoteRepository } from '../../../../../src/app/quotes/domain/quote.repo
 import { QuoteSqlRepository } from '../../../../../src/app/quotes/infrastructure/quote-sql.repository'
 import { Quote } from '../../../../../src/app/quotes/domain/quote'
 import { createQuoteFixture, createQuoteRiskFixture } from '../../fixtures/quote.fixture'
-import {
-  populatePricingMatrixSqlFixture,
-  resetPricingMatrixSqlFixture
-} from '../../../partners/fixtures/pricing-matrix-sql.fixture'
 import { PropertyType } from '../../../../../src/app/common-api/domain/type/property-type'
 
 async function resetDb () {
@@ -20,11 +16,6 @@ describe('Quotes - API - E2E', async () => {
 
   before(async () => {
     httpServer = await newProdLikeServer()
-    await populatePricingMatrixSqlFixture()
-  })
-
-  after(async () => {
-    await resetPricingMatrixSqlFixture()
   })
 
   describe('POST /v0/quotes/', () => {
@@ -92,7 +83,7 @@ describe('Quotes - API - E2E', async () => {
           }
         },
         insurance: {
-          monthly_price: 6.34,
+          monthly_price: 6.35,
           currency: 'EUR',
           default_deductible: 120,
           default_ceiling: 3000.00,

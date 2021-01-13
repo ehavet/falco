@@ -16,6 +16,7 @@ import { CreateQuoteCommand } from './create-quote-command'
 import { Amount } from '../../common-api/domain/amount/amount'
 import { DefaultCapAdvice } from './default-cap-advice/default-cap-advice'
 import { PropertyType } from '../../common-api/domain/type/property-type'
+import { CoverMonthlyPrice } from './cover/coverMonthlyPrice'
 
 const DEFAULT_NUMBER_MONTHS_DUE = 12
 
@@ -63,10 +64,14 @@ export namespace Quote {
         emailValidatedAt?: Date
     }
 
-    export function create (command: CreateQuoteCommand, partner: Partner, defaultCapAdvice: DefaultCapAdvice): Quote {
+    export function create (
+      command: CreateQuoteCommand,
+      partner: Partner,
+      defaultCapAdvice: DefaultCapAdvice,
+      coverMonthlyPrices: Array<CoverMonthlyPrice>): Quote {
       const risk: Risk = _buildRisk(command, partner)
 
-      const insurance: Insurance = getInsurance(command.risk, partner.offer, defaultCapAdvice)
+      const insurance: Insurance = getInsurance(partner.offer, defaultCapAdvice, coverMonthlyPrices)
 
       const nbMonthsDue = DEFAULT_NUMBER_MONTHS_DUE
 
@@ -86,9 +91,13 @@ export namespace Quote {
       return quote
     }
 
-    export function update (quote: Quote, partner: Partner, command: UpdateQuoteCommand, partnerAvailableCodes: Array<OperationCode>, defaultCapAdvice: DefaultCapAdvice): Quote {
+    export function update (
+      quote: Quote, partner: Partner,
+      command: UpdateQuoteCommand, partnerAvailableCodes: Array<OperationCode>,
+      defaultCapAdvice: DefaultCapAdvice,
+      coverMonthlyPrices: Array<CoverMonthlyPrice>): Quote {
       quote.risk = _buildQuoteRisk(command.risk, partner)
-      quote.insurance = getInsurance(quote.risk, partner.offer, defaultCapAdvice)
+      quote.insurance = getInsurance(partner.offer, defaultCapAdvice, coverMonthlyPrices)
       quote.policyHolder = Quote.PolicyHolder.build(command.policyHolder, quote.policyHolder)
       _applyStartDate(quote, command.startDate)
       _applyOperationCode(quote, partnerAvailableCodes, command.specOpsCode)
@@ -186,25 +195,26 @@ export namespace Quote {
       The correct rule is : risk.property.type is mandatory and shoud be given on quote creation.
       It should be implemented that way for POST v1/quotes */
       const propertyType = command.risk.property.type ?? PartnerFunc.getDefaultPropertyType(partner)
+      const roomCount = command.risk.property.roomCount
       if (!PartnerFunc.isPropertyTypeInsured(partner, propertyType)) {
         throw new QuoteRiskPropertyTypeNotInsurableError(propertyType)
+      }
+
+      if (!PartnerFunc.isPropertyRoomCountCovered(partner, roomCount)) {
+        throw new QuoteRiskPropertyRoomCountNotInsurableError(roomCount)
       }
       return {
         property: { ...command.risk.property, type: propertyType }
       }
     }
 
-    export function getInsurance (risk: Risk, partnerOffer: Partner.Offer, defaultCapAdvice: DefaultCapAdvice): Insurance {
-      const estimate: Partner.Estimate | undefined = partnerOffer.pricingMatrix.get(risk.property.roomCount)
-
-      if (estimate === undefined) {
-        throw new QuoteRiskPropertyRoomCountNotInsurableError(risk.property.roomCount)
-      }
+    export function getInsurance (partnerOffer: Partner.Offer, defaultCapAdvice: DefaultCapAdvice, coverMonthlyPrices: Array<CoverMonthlyPrice>): Insurance {
+      const monthlyPrice = sumCoversMonthlyPrice(coverMonthlyPrices)
 
       return <Insurance>{
         estimate: {
-          monthlyPrice: estimate.monthlyPrice,
-          defaultDeductible: estimate.defaultDeductible,
+          monthlyPrice,
+          defaultDeductible: partnerOffer.defaultDeductible,
           defaultCeiling: defaultCapAdvice.value
         },
         simplifiedCovers: partnerOffer.simplifiedCovers,
@@ -268,6 +278,16 @@ export namespace Quote {
     export function isNotIssuedForPartner (quote: Quote, partnerCode: string): boolean {
       return !(quote.partnerCode === partnerCode)
     }
+
+    function sumCoversMonthlyPrice (coverMonthlyPrices: Array<CoverMonthlyPrice>): Amount {
+      const coverMonthlyPrice = coverMonthlyPrices.reduce((monthlyPrice, acc) => {
+        return {
+          monthlyPrice: Amount.toAmount(acc.coverMonthlyPrice) + Amount.toAmount(monthlyPrice.monthlyPrice)
+        }
+      }, { monthlyPrice: 0 })
+
+      return coverMonthlyPrice.monthlyPrice
+    }
 }
 
 export namespace Quote.Risk {
@@ -287,9 +307,9 @@ export namespace Quote.Risk {
 
 export namespace Quote.Insurance {
     export interface Estimate {
-        monthlyPrice: number,
-        defaultDeductible: number,
-        defaultCeiling: Amount,
+        monthlyPrice: Amount
+        defaultDeductible: number
+        defaultCeiling: Amount
     }
 
     export type SimplifiedCover = string

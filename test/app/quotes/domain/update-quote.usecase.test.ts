@@ -31,6 +31,7 @@ import { defaultCapAdviceRepositoryStub } from '../fixtures/default-cap-advice-r
 import { DefaultCapAdvice } from '../../../../src/app/quotes/domain/default-cap-advice/default-cap-advice'
 import { coverMonthlyPriceRepositoryStub } from '../fixtures/pricing-matrix-repository.test-doubles'
 import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
+import { COVER } from '../../../../src/app/quotes/domain/cover/coverMonthlyPrice'
 
 describe('Quotes - Usecase - Update Quote', async () => {
   const now: Date = new Date('2020-01-05T00:00:00Z')
@@ -103,12 +104,12 @@ describe('Quotes - Usecase - Update Quote', async () => {
     )
     defaultCapAdviceRepository.get.resolves({ value: 7000 })
     coverMonthlyPriceRepository.get.resolves([{
-      coverMonthlyPrice: '2.500000', cover: 'DDEAUX'
+      coverMonthlyPrice: '2.500000', cover: COVER.DDEAUX
     }, {
-      coverMonthlyPrice: '2.500000', cover: 'INCEND'
+      coverMonthlyPrice: '2.500000', cover: COVER.INCEND
     },
     {
-      coverMonthlyPrice: '0.820000', cover: 'VOLXXX'
+      coverMonthlyPrice: '0.820000', cover: COVER.VOLXXX
     }])
     updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository, coverMonthlyPriceRepository)
   })
@@ -530,7 +531,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
       quoteRepository.get.withArgs(quoteId).resolves(quote)
       quoteRepository.update.resolves(updatedQuote)
       defaultCapAdviceRepository.get.withArgs(partnerCode, newRoomCount).resolves(defaultCapAdviceForRoomCountOf3)
-      coverMonthlyPriceRepository.get.resolves([{ coverMonthlyPrice: '4.500000', cover: 'DDEAUX' }, { coverMonthlyPrice: '2.500000', cover: 'VOLXXX' }, { coverMonthlyPrice: '0.820000', cover: 'INCEND' }])
+      coverMonthlyPriceRepository.get.resolves([{ coverMonthlyPrice: '4.500000', cover: COVER.DDEAUX }, { coverMonthlyPrice: '2.500000', cover: COVER.VOLXXX }, { coverMonthlyPrice: '0.820000', cover: COVER.INCEND }])
 
       const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId })
       updateQuoteCommand.risk.property.roomCount = newRoomCount
@@ -826,7 +827,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
 
     quoteRepository.update.resolves(expectedQuote)
 
-    coverMonthlyPriceRepository.get.resolves([{ coverMonthlyPrice: '1.500000', cover: 'INCEND' }, { coverMonthlyPrice: '2.500000', cover: 'DDEAUX' }, { coverMonthlyPrice: '0.820000', cover: 'VOLXXX' }])
+    coverMonthlyPriceRepository.get.resolves([{ coverMonthlyPrice: '1.500000', cover: COVER.INCEND }, { coverMonthlyPrice: '2.500000', cover: COVER.DDEAUX }, { coverMonthlyPrice: '0.820000', cover: COVER.VOLXXX }])
 
     // When
     const result = await updateQuote(updateQuoteCommand)

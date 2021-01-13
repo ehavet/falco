@@ -65,8 +65,8 @@
           {"value": "FLAT"},
           {"value": "HOUSE", "nextStep": "REJECT"}
         ],
-        "defaultValue": "FLAT",
-        "defaultNextStep": "address"
+        "defaultNextStep": "address",
+        "defaultValue": "FLAT"
       },
       {
         "code": "occupancy",
@@ -331,8 +331,8 @@
           {"value": "FLAT"},
           {"value": "HOUSE", "nextStep": "REJECT"}
         ],
-        "defaultValue": "FLAT",
-        "defaultNextStep": "occupancy"
+        "defaultNextStep": "occupancy",
+        "defaultValue": "FLAT"
       },
       {
         "code": "occupancy",

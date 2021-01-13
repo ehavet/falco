@@ -46,7 +46,7 @@ export namespace Partner.Question {
 
     export interface RoomCountQuestion {
         code: QuestionCode.ROOM_COUNT,
-        options?: Array<Option<number>>,
+        options: Array<Option<number>>,
         toAsk: boolean,
         defaultValue: number,
         defaultNextStep?: NextStepType

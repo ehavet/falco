@@ -10,7 +10,7 @@ export async function buildPartner (partnerJson: any) : Promise<Partner> {
     translationKey: partnerJson.translationKey,
     callbackUrl: partnerJson.callbackUrl,
     customerSupportEmail: partnerJson.customerSupportEmail,
-    firstQuestion: partnerJson.firstQuestion,
+    firstQuestionToAsk: partnerJson.firstQuestionToAsk,
     questions: questions,
     offer: offer
   }

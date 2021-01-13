@@ -22,7 +22,7 @@ describe('Partners - API - Integ', async () => {
         code: 'partnerOne',
         translation_key: 'translationKey',
         customer_support_email: 'customer@support.fr',
-        first_question: 'property_type',
+        first_question_to_ask: 'property_type',
         questions: [
           {
             code: 'property_type',

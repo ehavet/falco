@@ -20,7 +20,7 @@ describe('Partners - API - E2E', async () => {
         code: 'studyo',
         translation_key: 'studyo',
         customer_support_email: 'help@appenin.fr',
-        first_question: 'address',
+        first_question_to_ask: 'address',
         questions: [
           {
             code: 'property_type',

@@ -5,7 +5,7 @@
     "translationKey": "studyo",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
-    "firstQuestion": "address",
+    "firstQuestionToAsk": "address",
     "questions": [
       {
         "code": "property_type",
@@ -58,7 +58,7 @@
     "translationKey": "e-mobilia-alternant",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
-    "firstQuestion": "property_type",
+    "firstQuestionToAsk": "property_type",
     "questions": [
       {
         "code": "property_type",
@@ -122,7 +122,7 @@
     "translationKey": "essca",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
-    "firstQuestion": "address",
+    "firstQuestionToAsk": "address",
     "questions": [
       {
         "code": "property_type",
@@ -175,7 +175,7 @@
     "translationKey": "estudent",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
-    "firstQuestion": "address",
+    "firstQuestionToAsk": "address",
     "questions": [
       {
         "code": "property_type",
@@ -227,7 +227,7 @@
     "translationKey": "greystar",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
-    "firstQuestion": "address",
+    "firstQuestionToAsk": "address",
     "questions": [
       {
         "code": "property_type",
@@ -280,7 +280,7 @@
     "translationKey": "demo-student",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
-    "firstQuestion": "address",
+    "firstQuestionToAsk": "address",
     "questions": [
       {
         "code": "property_type",
@@ -333,7 +333,7 @@
     "translationKey": "demo",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
-    "firstQuestion": "property_type",
+    "firstQuestionToAsk": "property_type",
     "questions": [
       {
         "code": "property_type",

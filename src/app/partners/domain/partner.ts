@@ -9,7 +9,7 @@ export interface Partner {
     translationKey: string
     callbackUrl: string
     customerSupportEmail: string
-    firstQuestion: Partner.Question.QuestionCode
+    firstQuestionToAsk: Partner.Question.QuestionCode
     questions: Array<Partner.Question>
     offer: Partner.Offer
 }

@@ -15,7 +15,7 @@ const expectedPartner: { partnerOne: Partner } = {
     trigram: 'TRI',
     callbackUrl: 'http://partner1-callback.com',
     customerSupportEmail: 'customer@support.fr',
-    firstQuestion: Partner.Question.QuestionCode.PROPERTY_TYPE,
+    firstQuestionToAsk: Partner.Question.QuestionCode.PROPERTY_TYPE,
     questions: [
       {
         code: Partner.Question.QuestionCode.PROPERTY_TYPE,

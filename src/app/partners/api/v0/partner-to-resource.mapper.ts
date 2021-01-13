@@ -5,7 +5,7 @@ export function partnerToResource (partner: Partner) {
     code: partner.code,
     translation_key: partner.translationKey,
     customer_support_email: partner.customerSupportEmail,
-    first_question: partner.firstQuestion,
+    first_question_to_ask: partner.firstQuestionToAsk,
     questions: _toQuestions(partner.questions)
   }
 }

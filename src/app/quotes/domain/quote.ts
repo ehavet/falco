@@ -71,7 +71,7 @@ export namespace Quote {
       coverMonthlyPrices: Array<CoverMonthlyPrice>): Quote {
       const risk: Risk = _buildRisk(command, partner)
 
-      const insurance: Insurance = getInsurance(command.risk, partner.offer, defaultCapAdvice, coverMonthlyPrices)
+      const insurance: Insurance = getInsurance(partner.offer, defaultCapAdvice, coverMonthlyPrices)
 
       const nbMonthsDue = DEFAULT_NUMBER_MONTHS_DUE
 
@@ -96,8 +96,8 @@ export namespace Quote {
       command: UpdateQuoteCommand, partnerAvailableCodes: Array<OperationCode>,
       defaultCapAdvice: DefaultCapAdvice,
       coverMonthlyPrices: Array<CoverMonthlyPrice>): Quote {
-      quote.risk = _buildQuoteRisk(command.risk, partner, coverMonthlyPrices)
-      quote.insurance = getInsurance(quote.risk, partner.offer, defaultCapAdvice, coverMonthlyPrices)
+      quote.risk = _buildQuoteRisk(command.risk, partner)
+      quote.insurance = getInsurance(partner.offer, defaultCapAdvice, coverMonthlyPrices)
       quote.policyHolder = Quote.PolicyHolder.build(command.policyHolder, quote.policyHolder)
       _applyStartDate(quote, command.startDate)
       _applyOperationCode(quote, partnerAvailableCodes, command.specOpsCode)
@@ -109,7 +109,7 @@ export namespace Quote {
         return quote
     }
 
-    function _buildQuoteRisk (risk: UpdateQuoteCommand.Risk, partner: Partner, coverMonthlyPrices: Array<CoverMonthlyPrice>) {
+    function _buildQuoteRisk (risk: UpdateQuoteCommand.Risk, partner: Partner) {
       const roomCount: number = risk.property.roomCount
       const numberOfRoommates: number|null = risk.otherPeople ? risk.otherPeople?.length : null
 
@@ -117,7 +117,7 @@ export namespace Quote {
         throw new QuoteRiskPropertyTypeNotInsurableError(risk.property.type!)
       }
 
-      if (!isPropertyRoomCountCovered(coverMonthlyPrices)) {
+      if (!PartnerFunc.isPropertyRoomCountCovered(partner, roomCount)) {
         throw new QuoteRiskPropertyRoomCountNotInsurableError(roomCount)
       }
 
@@ -195,18 +195,20 @@ export namespace Quote {
       The correct rule is : risk.property.type is mandatory and shoud be given on quote creation.
       It should be implemented that way for POST v1/quotes */
       const propertyType = command.risk.property.type ?? PartnerFunc.getDefaultPropertyType(partner)
+      const roomCount = command.risk.property.roomCount
       if (!PartnerFunc.isPropertyTypeInsured(partner, propertyType)) {
         throw new QuoteRiskPropertyTypeNotInsurableError(propertyType)
+      }
+
+      if (!PartnerFunc.isPropertyRoomCountCovered(partner, roomCount)) {
+        throw new QuoteRiskPropertyRoomCountNotInsurableError(roomCount)
       }
       return {
         property: { ...command.risk.property, type: propertyType }
       }
     }
 
-    export function getInsurance (risk: Risk, partnerOffer: Partner.Offer, defaultCapAdvice: DefaultCapAdvice, coverMonthlyPrices: Array<CoverMonthlyPrice>): Insurance {
-      if (coverMonthlyPrices.length === 0) {
-        throw new QuoteRiskPropertyRoomCountNotInsurableError(risk.property.roomCount)
-      }
+    export function getInsurance (partnerOffer: Partner.Offer, defaultCapAdvice: DefaultCapAdvice, coverMonthlyPrices: Array<CoverMonthlyPrice>): Insurance {
       const monthlyPrice = sumCoversMonthlyPrice(coverMonthlyPrices)
 
       return <Insurance>{
@@ -237,7 +239,6 @@ export namespace Quote {
     export function isPolicyRiskPropertyCityMissing (quote: Quote): boolean { return !quote.risk.property.city }
     export function isPolicyRiskPropertyTypeMissing (quote: Quote): boolean { return !quote.risk.property.type }
     export function isPolicyHolderEmailNotValidated (quote: Quote): boolean { return !(quote.policyHolder?.emailValidatedAt) }
-    export function isPropertyRoomCountCovered (coverMonthlyPrices: Array<CoverMonthlyPrice>): boolean { return coverMonthlyPrices.length > 0 }
 
     function _applyOperationCode (quote: Quote, partnerApplicableCodes: Array<OperationCode>, codeToApply?: string): Quote {
       const operationCode: OperationCode = SpecialOperation.inferOperationCode(codeToApply)

@@ -56,6 +56,14 @@ export function isRelatedToADemoPartner (partnerCode?: string): boolean {
   return partnerCode.startsWith(DEMO_PARTNER_CODE_PREFIX)
 }
 
+export function isPropertyRoomCountCovered (partner: Partner, roomCount: number): boolean {
+  const roomCountQuestion = partner.questions.find(question => question.code === Partner.Question.QuestionCode.ROOM_COUNT) as Partner.Question.RoomCountQuestion
+
+  return !!roomCountQuestion.options.find(option => {
+    return option.value === roomCount && option.nextStep !== Partner.Question.NextStepAction.REJECT
+  })
+}
+
 function _getQuestionOnPropertyType (partner: Partner) : Partner.Question.PropertyTypeQuestion {
   return partner.questions
     .find((question) => question.code === Partner.Question.QuestionCode.PROPERTY_TYPE) as Partner.Question.PropertyTypeQuestion

@@ -10,13 +10,11 @@
       {
         "code": "property_type",
         "toAsk": false,
-        "defaultValue": "FLAT",
-        "defaultNextStep": "occupancy"
+        "defaultValue": "FLAT"
       },
       {
         "code": "occupancy",
         "toAsk": false,
-        "defaultNextStep": "address",
         "defaultValue": "TENANT"
       },
       {
@@ -73,7 +71,6 @@
       {
         "code": "occupancy",
         "toAsk": false,
-        "defaultNextStep": "address",
         "defaultValue": "TENANT"
       },
       {
@@ -127,13 +124,11 @@
       {
         "code": "property_type",
         "toAsk": false,
-        "defaultValue": "FLAT",
-        "defaultNextStep": "occupancy"
+        "defaultValue": "FLAT"
       },
       {
         "code": "occupancy",
         "toAsk": false,
-        "defaultNextStep": "address",
         "defaultValue": "TENANT"
       },
       {
@@ -180,13 +175,11 @@
       {
         "code": "property_type",
         "toAsk": false,
-        "defaultValue": "FLAT",
-        "defaultNextStep": "occupancy"
+        "defaultValue": "FLAT"
       },
       {
         "code": "occupancy",
         "toAsk": false,
-        "defaultNextStep": "address",
         "defaultValue": "TENANT"
       },
       {
@@ -232,13 +225,11 @@
       {
         "code": "property_type",
         "toAsk": false,
-        "defaultValue": "FLAT",
-        "defaultNextStep": "occupancy"
+        "defaultValue": "FLAT"
       },
       {
         "code": "occupancy",
         "toAsk": false,
-        "defaultNextStep": "address",
         "defaultValue": "TENANT"
       },
       {
@@ -285,13 +276,11 @@
       {
         "code": "property_type",
         "toAsk": false,
-        "defaultValue": "FLAT",
-        "defaultNextStep": "occupancy"
+        "defaultValue": "FLAT"
       },
       {
         "code": "occupancy",
         "toAsk": false,
-        "defaultNextStep": "address",
         "defaultValue": "TENANT"
       },
       {

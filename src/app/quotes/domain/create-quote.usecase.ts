@@ -14,9 +14,9 @@ export namespace CreateQuote {
     export function factory (quoteRepository: QuoteRepository, partnerRepository: PartnerRepository, defaultCapAdviceRepository: DefaultCapAdviceRepository): CreateQuote {
       return async (createQuoteCommand: CreateQuoteCommand): Promise<Quote> => {
         const partnerCode = createQuoteCommand.partnerCode
-        const partnerOffer: Partner.Offer = await partnerRepository.getOffer(partnerCode)
+        const partner: Partner = await partnerRepository.getByCode(partnerCode)
         const defaultCapAdvice = await defaultCapAdviceRepository.get(partnerCode, createQuoteCommand.risk.property.roomCount)
-        const quote: Quote = Quote.create(createQuoteCommand, partnerOffer, defaultCapAdvice)
+        const quote: Quote = Quote.create(createQuoteCommand, partner, defaultCapAdvice)
         await quoteRepository.save(quote)
         return quote
       }

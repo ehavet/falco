@@ -5,10 +5,11 @@ import { container, quoteRoutes } from '../../../../../src/app/quotes/quote.cont
 import { PartnerNotFoundError } from '../../../../../src/app/partners/domain/partner.errors'
 import {
   NoPartnerInsuranceForRiskError,
-  QuoteNotFoundError, QuotePartnerOwnershipError,
+  QuoteNotFoundError,
+  QuotePartnerOwnershipError,
   QuotePolicyHolderEmailNotFoundError,
   QuoteRiskNumberOfRoommatesError,
-  QuoteRiskPropertyRoomCountNotInsurableError,
+  QuoteRiskPropertyRoomCountNotInsurableError, QuoteRiskPropertyTypeNotInsurableError,
   QuoteRiskRoommatesNotAllowedError,
   QuoteStartDateConsistencyError
 } from '../../../../../src/app/quotes/domain/quote.errors'
@@ -29,6 +30,7 @@ import {
   populatePricingMatrixSqlFixture,
   resetPricingMatrixSqlFixture
 } from '../../../partners/fixtures/pricing-matrix-sql.fixture'
+import { PropertyType } from '../../../../../src/app/common-api/domain/type/property-type'
 
 describe('Quotes - API - Integration', async () => {
   let httpServer: HttpServerForTesting
@@ -54,7 +56,8 @@ describe('Quotes - API - Integration', async () => {
             roomCount: 2,
             address: '52 Rue Beaubourg',
             postalCode: '75003',
-            city: 'Paris'
+            city: 'Paris',
+            type: PropertyType.FLAT
           }
         },
         insurance: {
@@ -84,7 +87,8 @@ describe('Quotes - API - Integration', async () => {
             room_count: 2,
             address: '52 Rue Beaubourg',
             postal_code: '75003',
-            city: 'Paris'
+            city: 'Paris',
+            type: 'FLAT'
           }
         },
         insurance: {
@@ -117,7 +121,8 @@ describe('Quotes - API - Integration', async () => {
                 room_count: 2,
                 address: '52 Rue Beaubourg',
                 postal_code: '75003',
-                city: 'Paris'
+                city: 'Paris',
+                type: 'FLAT'
               }
             }
           })
@@ -133,6 +138,29 @@ describe('Quotes - API - Integration', async () => {
       })
     })
 
+    describe('when then quote is created with property.type', () => {
+      it('should reply with status 422 when type is equal to house', async () => {
+        const partnerCode = 'demo-student'
+        response = await httpServer.api()
+          .post('/v0/quotes')
+          .send({
+            code: partnerCode,
+            risk: {
+              property: {
+                room_count: 2,
+                address: '52 Rue Beaubourg',
+                postal_code: '75019',
+                city: 'Paris',
+                type: 'HOUSE'
+              }
+            }
+          })
+          .set('X-Consumer-Username', partnerCode)
+
+        expect(response).to.have.property('statusCode', 422)
+      })
+    })
+
     describe('when the partner is not found', () => {
       it('should reply with status 404', async () => {
         // Given
@@ -142,7 +170,8 @@ describe('Quotes - API - Integration', async () => {
             roomCount: 2,
             address: '52 Rue Beaubourg',
             postalCode: '75003',
-            city: 'Paris'
+            city: 'Paris',
+            type: 'FLAT'
           }
         }
         const specOpsCode = 'BLANK'
@@ -158,7 +187,8 @@ describe('Quotes - API - Integration', async () => {
                 room_count: 2,
                 address: '52 Rue Beaubourg',
                 postal_code: '75003',
-                city: 'Paris'
+                city: 'Paris',
+                type: 'FLAT'
               }
             }
           })
@@ -174,7 +204,7 @@ describe('Quotes - API - Integration', async () => {
       it('should reply with status 422', async () => {
         // Given
         const partnerCode: string = 'myPartner'
-        const risk = { property: { roomCount: 2, postalCode: undefined, city: undefined, address: undefined } }
+        const risk = { property: { roomCount: 2, postalCode: undefined, city: undefined, address: undefined, type: undefined } }
         const specOpsCode = 'BLANK'
         sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, specOpsCode }).rejects(new NoPartnerInsuranceForRiskError(partnerCode, risk))
 
@@ -282,7 +312,8 @@ describe('Quotes - API - Integration', async () => {
                 room_count: 2,
                 address: '52 Rue Beaubourg',
                 postal_code: '75019',
-                city: 'Paris'
+                city: 'Paris',
+                type: PropertyType.FLAT
               }
             }
           })
@@ -290,6 +321,27 @@ describe('Quotes - API - Integration', async () => {
 
         expect(response).to.have.property('statusCode', 422)
         expect(response.body.message).to.equal(`The operation code ${invalidSpecOpsCode} is not applicable for partner : ${partnerCode}`)
+      })
+
+      it('should reply with status 400 when type is not FLAT or HOUSE', async () => {
+        const partnerCode = 'demo-student'
+        response = await httpServer.api()
+          .post('/v0/quotes')
+          .send({
+            code: partnerCode,
+            risk: {
+              property: {
+                room_count: 2,
+                address: '52 Rue Beaubourg',
+                postal_code: '75019',
+                city: 'Paris',
+                type: 'WRONGTYPE'
+              }
+            }
+          })
+          .set('X-Consumer-Username', partnerCode)
+
+        expect(response).to.have.property('statusCode', 400)
       })
     })
   })
@@ -414,7 +466,8 @@ describe('Quotes - API - Integration', async () => {
             room_count: 2,
             address: '88 rue des prairies',
             postal_code: '91100',
-            city: 'Kyukamura'
+            city: 'Kyukamura',
+            type: 'FLAT'
           },
           person: {
             firstname: 'Jean-Jean',
@@ -466,7 +519,8 @@ describe('Quotes - API - Integration', async () => {
               roomCount: 2,
               address: '88 rue des prairies',
               postalCode: '91100',
-              city: 'Kyukamura'
+              city: 'Kyukamura',
+              type: PropertyType.FLAT
             },
             person: {
               firstname: 'Jean-Jean',
@@ -493,7 +547,8 @@ describe('Quotes - API - Integration', async () => {
                 room_count: 2,
                 address: '88 rue des prairies',
                 postal_code: '91100',
-                city: 'Kyukamura'
+                city: 'Kyukamura',
+                type: 'FLAT'
               },
               person: {
                 firstname: 'Jean-Jean',
@@ -666,6 +721,24 @@ describe('Quotes - API - Integration', async () => {
       })
     })
 
+    describe('when QuoteRiskPropertyTypeNotInsurableError is thrown by usecase', () => {
+      it('should reply with status 422', async () => {
+        // Given
+        const partnerCode: string = 'myPartner'
+        sinon.stub(container, 'UpdateQuote').rejects(new QuoteRiskPropertyTypeNotInsurableError(PropertyType.HOUSE))
+
+        // When
+        response = await httpServer.api()
+          .put('/v0/quotes/UD65X3')
+          .send(createUpdateQuotePayloadFixture())
+          .set('X-Consumer-Username', partnerCode)
+
+        // Then
+        expect(response).to.have.property('statusCode', 422)
+        expect(response.body).to.have.property('message', 'Cannot create quote, HOUSE is not insured by this partner')
+      })
+    })
+
     describe('when there is no default cap advice found', () => {
       it('should reply with status 500 because it should not happen', async () => {
         // Given
@@ -696,7 +769,8 @@ describe('Quotes - API - Integration', async () => {
             room_count: 2,
             address: '88 rue des prairies',
             postal_code: '91100',
-            city: 'Kyukamura'
+            city: 'Kyukamura',
+            type: 'FLAT'
           },
           person: {
             firstname: 'Jean-Jean',

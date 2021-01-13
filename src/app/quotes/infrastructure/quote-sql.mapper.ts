@@ -27,7 +27,8 @@ function _sqlToRiskMapper (quoteSql: QuoteSqlModel) {
       roomCount: quoteSql.risk.property.roomCount,
       address: quoteSql.risk.property.address ? quoteSql.risk.property.address : undefined,
       postalCode: quoteSql.risk.property.postalCode ? quoteSql.risk.property.postalCode : undefined,
-      city: quoteSql.risk.property.city ? quoteSql.risk.property.city : undefined
+      city: quoteSql.risk.property.city ? quoteSql.risk.property.city : undefined,
+      type: quoteSql.risk.property.type ? quoteSql.risk.property.type : undefined
     },
     person: (quoteSql.risk.person && quoteSql.risk.person.firstname && quoteSql.risk.person.lastname) ? {
       firstname: quoteSql.risk.person.firstname,

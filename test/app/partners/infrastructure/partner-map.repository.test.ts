@@ -10,6 +10,7 @@ import {
   populatePricingMatrixSqlFixture,
   resetPricingMatrixSqlFixture
 } from '../fixtures/pricing-matrix-sql.fixture'
+import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
 
 const expectedPartner: { partnerOne: Partner } = {
   partnerOne: {
@@ -24,10 +25,10 @@ const expectedPartner: { partnerOne: Partner } = {
         code: Partner.Question.QuestionCode.PROPERTY_TYPE,
         toAsk: true,
         options: [
-          { value: Partner.Question.PropertyType.FLAT },
-          { value: Partner.Question.PropertyType.HOUSE, nextStep: Partner.Question.NextStepAction.REJECT }
+          { value: PropertyType.FLAT },
+          { value: PropertyType.HOUSE, nextStep: Partner.Question.NextStepAction.REJECT }
         ],
-        defaultValue: Partner.Question.PropertyType.FLAT,
+        defaultValue: PropertyType.FLAT,
         defaultNextStep: Partner.Question.QuestionCode.ADDRESS
       } as Partner.Question.PropertyTypeQuestion,
       {
@@ -114,34 +115,6 @@ describe('Partners - Infra - Partner Map Repository', async () => {
 
       // THEN
       return expect(promise).to.be.rejectedWith(PartnerPricingMatrixNotFoundError)
-    })
-  })
-
-  describe('#getOffer', async () => {
-    it('should return the partner offer', async () => {
-      // Given
-      const propertyRoomCount1Estimate: Partner.Estimate = {
-        monthlyPrice: 4.52,
-        defaultDeductible: 120
-      }
-
-      const propertyRoomCount2Estimate: Partner.Estimate = {
-        monthlyPrice: 6.95,
-        defaultDeductible: 120
-      }
-
-      // When
-      const partnerOffer: Partner.Offer = await partnerMapRepository.getOffer('partnerTwo')
-
-      // Then
-      expect(partnerOffer.simplifiedCovers).to.include('ACDDE', 'ACVOL')
-      expect(partnerOffer.productCode).to.equal('MRH_Etudiant')
-      expect(partnerOffer.productVersion).to.equal('1.0')
-      expect(partnerOffer.contractualTerms).to.equal('/path/to/contractual/terms')
-      expect(partnerOffer.ipid).to.equal('/path/to/ipid')
-      expect(partnerOffer.simplifiedCovers).to.include('ACDDE', 'ACVOL')
-      expect(partnerOffer.pricingMatrix.get(1)).to.deep.equal(propertyRoomCount1Estimate)
-      expect(partnerOffer.pricingMatrix.get(2)).to.deep.equal(propertyRoomCount2Estimate)
     })
   })
 

@@ -10,7 +10,7 @@ import {
   PolicyRiskNumberOfRoommatesError,
   PolicyRiskRoommatesNotAllowedError,
   PolicyCanceledError,
-  PolicyAlreadyPaidError
+  PolicyAlreadyPaidError, PolicyRiskPropertyTypeNotInsurableError
 } from '../../../../../src/app/policies/domain/policies.errors'
 import { Policy } from '../../../../../src/app/policies/domain/policy'
 import { createOngoingPolicyFixture, createPolicyFixture } from '../../fixtures/policy.fixture'
@@ -27,6 +27,7 @@ import { ApplySpecialOperationCodeCommand } from '../../../../../src/app/policie
 import { PartnerNotFoundError } from '../../../../../src/app/partners/domain/partner.errors'
 import { ApplyStartDateOnPolicyCommand } from '../../../../../src/app/policies/domain/apply-start-date-on-policy.usecase'
 import { PolicyForbiddenCertificateGenerationError } from '../../../../../src/app/policies/domain/certificate/certificate.errors'
+import { PropertyType } from '../../../../../src/app/common-api/domain/type/property-type'
 
 describe('Policies - API v0 - Integration', async () => {
   let httpServer: HttpServerForTesting
@@ -176,7 +177,8 @@ describe('Policies - API v0 - Integration', async () => {
               room_count: 2,
               address: '13 rue du loup garou',
               postal_code: '91100',
-              city: 'Corbeil-Essonnes'
+              city: 'Corbeil-Essonnes',
+              type: PropertyType.FLAT
             },
             people: {
               policy_holder: {
@@ -261,6 +263,23 @@ describe('Policies - API v0 - Integration', async () => {
         // Then
         expect(response).to.have.property('statusCode', 422)
         expect(response.body).to.have.property('message', 'A property of 1 room(s) allows a maximum of 2 roommate(s)')
+      })
+    })
+
+    describe('when property type is not insured by the patner', async () => {
+      it('should return a 422', async () => {
+        // Given
+        sinon.stub(container, 'CreatePolicy').rejects(new PolicyRiskPropertyTypeNotInsurableError(PropertyType.HOUSE))
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies')
+          .send(requestParams)
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 422)
+        expect(response.body).to.have.property('message', 'Cannot create policy, HOUSE is not insured by this partner')
       })
     })
 
@@ -538,7 +557,8 @@ describe('Policies - API v0 - Integration', async () => {
               room_count: 2,
               address: '13 rue du loup garou',
               postal_code: '91100',
-              city: 'Corbeil-Essonnes'
+              city: 'Corbeil-Essonnes',
+              type: PropertyType.FLAT
             },
             people: {
               policy_holder: {
@@ -1027,7 +1047,8 @@ describe('Policies - API v0 - Integration', async () => {
             room_count: 2,
             address: '13 rue du loup garou',
             postal_code: '91100',
-            city: 'Corbeil-Essonnes'
+            city: 'Corbeil-Essonnes',
+            type: PropertyType.FLAT
           },
           people: {
             policy_holder: {
@@ -1336,7 +1357,8 @@ describe('Policies - API v0 - Integration', async () => {
             room_count: 2,
             address: '13 rue du loup garou',
             postal_code: '91100',
-            city: 'Corbeil-Essonnes'
+            city: 'Corbeil-Essonnes',
+            type: PropertyType.FLAT
           },
           people: {
             policy_holder: {

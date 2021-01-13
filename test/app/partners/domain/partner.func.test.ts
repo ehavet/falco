@@ -2,6 +2,7 @@ import { expect } from '../../../test-utils'
 import * as PartnerFunc from '../../../../src/app/partners/domain/partner.func'
 import { createPartnerFixture } from '../fixtures/partner.fixture'
 import { Partner } from '../../../../src/app/partners/domain/partner'
+import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
 import Question = Partner.Question
 
 describe('Partners - Domain - Functions', () => {
@@ -89,6 +90,110 @@ describe('Partners - Domain - Functions', () => {
 
       it('the partner names is undefined', () => {
         expect(PartnerFunc.isRelatedToADemoPartner(undefined)).to.be.false
+      })
+    })
+  })
+
+  describe('#isPropertyTypeInsured', () => {
+    describe('when no options are specified for partner', () => {
+      // Given
+      let questions : Array<Question>
+      let partner : Partner
+      before(() => {
+        questions = [{
+          code: Partner.Question.QuestionCode.PROPERTY_TYPE,
+          toAsk: false,
+          options: undefined,
+          defaultValue: PropertyType.FLAT,
+          defaultNextStep: Partner.Question.QuestionCode.ADDRESS
+        }]
+        partner = createPartnerFixture({ questions })
+      })
+
+      it('should return true if the given type is accepted by default by partner', () => {
+        // When
+        const isValid = PartnerFunc.isPropertyTypeInsured(partner, PropertyType.FLAT)
+
+        // Then
+        expect(isValid).to.be.true
+      })
+
+      it('should return false if the given type is not accepted by default by partner', () => {
+        // When
+        const isValid = PartnerFunc.isPropertyTypeInsured(partner, PropertyType.HOUSE)
+
+        // Then
+        expect(isValid).to.be.false
+      })
+
+      it('should return false if the given type is unknown', () => {
+        // When
+        const isValid = PartnerFunc.isPropertyTypeInsured(partner, 'UNKNOWN_TYPE' as any)
+
+        // Then
+        expect(isValid).to.be.false
+      })
+    })
+
+    describe('when options are specified for partner', () => {
+      it('should return true if the given type is present within the options', () => {
+        // Given
+        const questions: Array<Question> = [{
+          code: Partner.Question.QuestionCode.PROPERTY_TYPE,
+          toAsk: false,
+          options: [
+            { value: PropertyType.FLAT }
+          ],
+          defaultValue: PropertyType.FLAT,
+          defaultNextStep: Partner.Question.QuestionCode.ADDRESS
+        }]
+        const partner = createPartnerFixture({ questions })
+
+        // When
+        const isValid = PartnerFunc.isPropertyTypeInsured(partner, PropertyType.FLAT)
+
+        // Then
+        expect(isValid).to.be.true
+      })
+
+      it('should return false if the given type is not present within the options', () => {
+        // Given
+        const questions: Array<Question> = [{
+          code: Partner.Question.QuestionCode.PROPERTY_TYPE,
+          toAsk: false,
+          options: [
+            { value: PropertyType.FLAT }
+          ],
+          defaultValue: PropertyType.FLAT,
+          defaultNextStep: Partner.Question.QuestionCode.ADDRESS
+        }]
+        const partner = createPartnerFixture({ questions })
+
+        // When
+        const isValid = PartnerFunc.isPropertyTypeInsured(partner, PropertyType.HOUSE)
+
+        // Then
+        expect(isValid).to.be.false
+      })
+
+      it('should return false if the given type is present within the options but with a next step to rejected (which means not insurable)', () => {
+        // Given
+        const questions: Array<Question> = [{
+          code: Partner.Question.QuestionCode.PROPERTY_TYPE,
+          toAsk: false,
+          options: [
+            { value: PropertyType.HOUSE, nextStep: Partner.Question.NextStepAction.REJECT }
+          ],
+          defaultValue: PropertyType.HOUSE,
+          defaultNextStep: Partner.Question.QuestionCode.ADDRESS
+        }]
+        const partner = createPartnerFixture({ questions })
+
+        // When
+        const isValid = PartnerFunc.isPropertyTypeInsured(partner, PropertyType.HOUSE)
+
+        // Then
+        expect(isValid).to.be.false
       })
     })
   })

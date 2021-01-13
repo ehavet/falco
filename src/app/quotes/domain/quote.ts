@@ -1,7 +1,7 @@
 import { Partner } from '../../partners/domain/partner'
 import {
   QuoteRiskNumberOfRoommatesError,
-  QuoteRiskPropertyRoomCountNotInsurableError,
+  QuoteRiskPropertyRoomCountNotInsurableError, QuoteRiskPropertyTypeNotInsurableError,
   QuoteRiskRoommatesNotAllowedError,
   QuoteStartDateConsistencyError
 } from './quote.errors'
@@ -15,6 +15,7 @@ import { SpecialOperation } from '../../common-api/domain/special-operation.func
 import { CreateQuoteCommand } from './create-quote-command'
 import { Amount } from '../../common-api/domain/amount/amount'
 import { DefaultCapAdvice } from './default-cap-advice/default-cap-advice'
+import { PropertyType } from '../../common-api/domain/type/property-type'
 
 const DEFAULT_NUMBER_MONTHS_DUE = 12
 
@@ -62,15 +63,17 @@ export namespace Quote {
         emailValidatedAt?: Date
     }
 
-    export function create (command: CreateQuoteCommand, partnerOffer: Partner.Offer, defaultCapAdvice: DefaultCapAdvice): Quote {
-      const insurance: Insurance = getInsurance(command.risk, partnerOffer, defaultCapAdvice)
+    export function create (command: CreateQuoteCommand, partner: Partner, defaultCapAdvice: DefaultCapAdvice): Quote {
+      const risk: Risk = _buildRisk(command, partner)
+
+      const insurance: Insurance = getInsurance(command.risk, partner.offer, defaultCapAdvice)
 
       const nbMonthsDue = DEFAULT_NUMBER_MONTHS_DUE
 
       const quote = {
         id: nextId(),
         partnerCode: command.partnerCode,
-        risk: command.risk,
+        risk: risk,
         insurance: insurance,
         specialOperationsCode: undefined,
         specialOperationsCodeAppliedAt: undefined,
@@ -78,7 +81,7 @@ export namespace Quote {
         premium: Amount.multiply(nbMonthsDue, insurance.estimate.monthlyPrice)
       }
 
-      _applyOperationCode(quote, partnerOffer.operationCodes, command.specOpsCode)
+      _applyOperationCode(quote, partner.offer.operationCodes, command.specOpsCode)
 
       return quote
     }
@@ -101,6 +104,10 @@ export namespace Quote {
       const roomCount: number = risk.property.roomCount
       const numberOfRoommates: number|null = risk.otherPeople ? risk.otherPeople?.length : null
 
+      if (!PartnerFunc.isPropertyTypeInsured(partner, risk.property.type)) {
+        throw new QuoteRiskPropertyTypeNotInsurableError(risk.property.type!)
+      }
+
       if (!PartnerFunc.isPropertyRoomCountCovered(partner, roomCount)) {
         throw new QuoteRiskPropertyRoomCountNotInsurableError(roomCount)
       }
@@ -118,7 +125,8 @@ export namespace Quote {
           roomCount: risk.property.roomCount,
           address: risk.property.address ? risk.property.address : undefined,
           postalCode: risk.property.postalCode ? risk.property.postalCode : undefined,
-          city: risk.property.city ? risk.property.city : undefined
+          city: risk.property.city ? risk.property.city : undefined,
+          type: risk.property.type ? risk.property.type : undefined
         },
         person: risk.person ? {
           firstname: risk.person.firstname,
@@ -172,6 +180,20 @@ export namespace Quote {
       return dayjs(date).utc()
     }
 
+    function _buildRisk (command: CreateQuoteCommand, partner: Partner) : Risk {
+      /* WARNING : the following line has to be removed for v1 :
+      risk.property.type is optionnal on endpoint POST v0/quotes, so we have to retrieve it from partner.
+      The correct rule is : risk.property.type is mandatory and shoud be given on quote creation.
+      It should be implemented that way for POST v1/quotes */
+      const propertyType = command.risk.property.type ?? PartnerFunc.getDefaultPropertyType(partner)
+      if (!PartnerFunc.isPropertyTypeInsured(partner, propertyType)) {
+        throw new QuoteRiskPropertyTypeNotInsurableError(propertyType)
+      }
+      return {
+        property: { ...command.risk.property, type: propertyType }
+      }
+    }
+
     export function getInsurance (risk: Risk, partnerOffer: Partner.Offer, defaultCapAdvice: DefaultCapAdvice): Insurance {
       const estimate: Partner.Estimate | undefined = partnerOffer.pricingMatrix.get(risk.property.roomCount)
 
@@ -205,6 +227,7 @@ export namespace Quote {
     export function isPolicyRiskPropertyAddressMissing (quote: Quote): boolean { return !quote.risk.property.address }
     export function isPolicyRiskPropertyPostalCodeMissing (quote: Quote): boolean { return !quote.risk.property.postalCode }
     export function isPolicyRiskPropertyCityMissing (quote: Quote): boolean { return !quote.risk.property.city }
+    export function isPolicyRiskPropertyTypeMissing (quote: Quote): boolean { return !quote.risk.property.type }
     export function isPolicyHolderEmailNotValidated (quote: Quote): boolean { return !(quote.policyHolder?.emailValidatedAt) }
 
     function _applyOperationCode (quote: Quote, partnerApplicableCodes: Array<OperationCode>, codeToApply?: string): Quote {
@@ -253,6 +276,7 @@ export namespace Quote.Risk {
         address?: string
         postalCode?: string
         city?: string
+        type? : PropertyType
     }
 
     export interface Person {

@@ -1,6 +1,7 @@
 import { Partner } from '../../../../src/app/partners/domain/partner'
 import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
 import { Occupancy } from '../../../../src/app/common-api/domain/type/occupancy'
+import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
 
 export function createPartnerFixture (attr: Partial<Partner> = {}): Partner {
   return {
@@ -15,10 +16,10 @@ export function createPartnerFixture (attr: Partial<Partner> = {}): Partner {
         code: Partner.Question.QuestionCode.PROPERTY_TYPE,
         toAsk: true,
         options: [
-          { value: Partner.Question.PropertyType.FLAT },
-          { value: Partner.Question.PropertyType.HOUSE, nextStep: Partner.Question.NextStepAction.REJECT }
+          { value: PropertyType.FLAT },
+          { value: PropertyType.HOUSE, nextStep: Partner.Question.NextStepAction.REJECT }
         ],
-        defaultValue: Partner.Question.PropertyType.FLAT,
+        defaultValue: PropertyType.FLAT,
         defaultNextStep: Partner.Question.QuestionCode.ADDRESS
       } as Partner.Question.PropertyTypeQuestion,
       {
@@ -60,13 +61,14 @@ export function createPartnerFixture (attr: Partial<Partner> = {}): Partner {
     offer: {
       simplifiedCovers: ['ACDDE'],
       pricingMatrix: new Map([
-        [1, { monthlyPrice: 3.30, defaultDeductible: 120 }]
+        [1, { monthlyPrice: 3.30, defaultDeductible: 120, defaultCeiling: 5000 }],
+        [2, { monthlyPrice: 5.82, defaultDeductible: 150, defaultCeiling: 7000 }]
       ]),
       productCode: 'APP666',
       productVersion: '1.0',
       contractualTerms: '/path/to/contractual/terms',
       ipid: '/path/to/ipid',
-      operationCodes: [OperationCode.SEMESTER1, OperationCode.FULLYEAR]
+      operationCodes: [OperationCode.SEMESTER1, OperationCode.SEMESTER2, OperationCode.FULLYEAR]
     },
     ...attr
   }

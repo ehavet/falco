@@ -40,7 +40,8 @@ function _sqlToRiskMapper (riskSql: PolicyRiskSqlModel) {
       roomCount: riskSql.property.roomCount,
       address: riskSql.property.address,
       postalCode: riskSql.property.postalCode,
-      city: riskSql.property.city
+      city: riskSql.property.city,
+      type: riskSql.property.type
     },
     people: {
       person: {

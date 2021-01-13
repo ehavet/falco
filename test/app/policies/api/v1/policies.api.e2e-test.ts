@@ -15,6 +15,7 @@ import {
   populatePricingMatrixSqlFixture,
   resetPricingMatrixSqlFixture
 } from '../../../partners/fixtures/pricing-matrix-sql.fixture'
+import { PropertyType } from '../../../../../src/app/common-api/domain/type/property-type'
 
 async function resetDb () {
   await PolicySqlModel.destroy({ truncate: true, cascade: true })
@@ -115,7 +116,8 @@ describe('Policies - API v1 - E2E', async () => {
             room_count: 2,
             address: '88 rue des prairies',
             postal_code: '91100',
-            city: 'Kyukamura'
+            city: 'Kyukamura',
+            type: PropertyType.FLAT
           },
           other_people: [
             {
@@ -194,7 +196,8 @@ describe('Policies - API v1 - E2E', async () => {
             room_count: 2,
             address: '13 rue du loup garou',
             postal_code: '91100',
-            city: 'Corbeil-Essonnes'
+            city: 'Corbeil-Essonnes',
+            type: PropertyType.FLAT
           },
           person: {
             firstname: 'Jean',
@@ -332,7 +335,8 @@ describe('Policies - API v1 - E2E', async () => {
             room_count: 2,
             address: '13 rue du loup garou',
             postal_code: '91100',
-            city: 'Corbeil-Essonnes'
+            city: 'Corbeil-Essonnes',
+            type: PropertyType.FLAT
           },
           person: {
             firstname: 'Jean',
@@ -405,7 +409,8 @@ describe('Policies - API v1 - E2E', async () => {
             room_count: 2,
             address: '13 rue du loup garou',
             postal_code: '91100',
-            city: 'Corbeil-Essonnes'
+            city: 'Corbeil-Essonnes',
+            type: PropertyType.FLAT
           },
           person: {
             firstname: 'Jean',

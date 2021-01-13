@@ -9,7 +9,8 @@ export const quoteResponseBodySchema: Joi.ObjectSchema = Joi.object({
       room_count: Joi.number().integer().max(5).description('Property number of rooms').example(3),
       address: Joi.string().max(100).description('Property address').example('112 rue du chêne rouge'),
       postal_code: Joi.string().regex(POSTALCODE_REGEX).description('Property postal code').example('95470'),
-      city: Joi.string().max(50).description('Property city').example('Corbeil-Essonnes')
+      city: Joi.string().max(50).description('Property city').example('Corbeil-Essonnes'),
+      type: Joi.string().optional().description('The type of property').example('FLAT')
     }).description('Risks regarding the property').label('Risk.Property'),
     person: Joi.object({
       firstname: Joi.string().max(100).description('Person firstname').example('John'),
@@ -39,8 +40,8 @@ export const quoteResponseBodySchema: Joi.ObjectSchema = Joi.object({
     address: Joi.string().max(100).description('Property address').example('112 rue du chêne rouge'),
     postal_code: Joi.string().regex(POSTALCODE_REGEX).description('Property postal code').example('95470'),
     city: Joi.string().max(50).description('Property city').example('Corbeil-Essonnes'),
-    email: Joi.string().email().description('Policy holder email').example('john.doe@email.com'),
-    phone_number: Joi.string().max(15).description('Policy holder phone number').example('+33684205510'),
+    email: Joi.string().email().allow(null).description('Policy holder email').example('john.doe@email.com'),
+    phone_number: Joi.string().max(15).allow(null).description('Policy holder phone number').example('+33684205510'),
     email_validated_at: Joi.date().allow(null).description('Email validation date').example('2020-04-25T10:09:09.000')
   }).optional().allow(null).description('Policy holder contact'),
   start_date: Joi.date().description('Start date').example('2020-04-26'),

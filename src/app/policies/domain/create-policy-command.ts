@@ -1,3 +1,5 @@
+import { PropertyType } from '../../common-api/domain/type/property-type'
+
 export interface CreatePolicyCommand {
     partnerCode: string,
     quoteId: string,
@@ -28,13 +30,18 @@ export namespace CreatePolicyCommand {
     export function isRiskPropertyCityMissing (command: CreatePolicyCommand): boolean {
       return !command.risk.property.city
     }
+
+    export function isRiskPropertyTypeMissing (command: CreatePolicyCommand): boolean {
+      return !command.risk.property.type
+    }
 }
 
 export namespace CreatePolicyCommand.Risk {
     export interface Property {
         address: string | undefined,
         postalCode: string | undefined,
-        city: string | undefined
+        city: string | undefined,
+        type: PropertyType | undefined
     }
 
     export interface People {

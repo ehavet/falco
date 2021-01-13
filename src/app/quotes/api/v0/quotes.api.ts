@@ -11,7 +11,7 @@ import {
   QuoteNotFoundError, QuotePartnerOwnershipError,
   QuotePolicyHolderEmailNotFoundError,
   QuoteRiskNumberOfRoommatesError,
-  QuoteRiskPropertyRoomCountNotInsurableError,
+  QuoteRiskPropertyRoomCountNotInsurableError, QuoteRiskPropertyTypeNotInsurableError,
   QuoteRiskRoommatesNotAllowedError,
   QuoteStartDateConsistencyError
 } from '../../domain/quote.errors'
@@ -53,7 +53,8 @@ export default function (container: Container): Array<ServerRoute> {
                   room_count: Joi.number().integer().description('Property number of rooms').example(3),
                   address: Joi.string().optional().description('Property address').example('112 rue du chêne rouge'),
                   postal_code: Joi.string().optional().regex(POSTALCODE_REGEX).description('Property postal code').example('95470'),
-                  city: Joi.string().optional().max(50).description('Property city').example('Corbeil-Essonnes')
+                  city: Joi.string().optional().max(50).description('Property city').example('Corbeil-Essonnes'),
+                  type: Joi.string().optional().description('The type of property').example('FLAT')
                 }).description('Risks regarding the property').label('Risk.Property')
               }).description('Risks').label('Risk'),
               insurance: Joi.object({
@@ -85,7 +86,9 @@ export default function (container: Container): Array<ServerRoute> {
           if (error instanceof PartnerNotFoundError) {
             throw Boom.notFound(error.message)
           }
-          if (error instanceof NoPartnerInsuranceForRiskError || error instanceof OperationCodeNotApplicableError) {
+          if (error instanceof NoPartnerInsuranceForRiskError ||
+              error instanceof OperationCodeNotApplicableError ||
+              error instanceof QuoteRiskPropertyTypeNotInsurableError) {
             throw Boom.badData(error.message)
           }
 
@@ -170,6 +173,7 @@ export default function (container: Container): Array<ServerRoute> {
             case error instanceof QuoteStartDateConsistencyError:
             case error instanceof QuoteRiskRoommatesNotAllowedError:
             case error instanceof QuoteRiskNumberOfRoommatesError:
+            case error instanceof QuoteRiskPropertyTypeNotInsurableError:
               throw Boom.badData(error.message)
             default:
               throw Boom.internal(error)

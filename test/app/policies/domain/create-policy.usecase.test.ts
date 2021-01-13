@@ -13,13 +13,8 @@ import { EmailValidationQuery } from '../../../../src/app/email-validations/doma
 import { PartnerRepository } from '../../../../src/app/partners/domain/partner.repository'
 import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles'
 import { createPartnerFixture } from '../../partners/fixtures/partner.fixture'
-import {
-  PolicyRiskPropertyMissingFieldError,
-  PolicyRiskRoommatesNotAllowedError
-} from '../../../../src/app/policies/domain/policies.errors'
-import { Partner } from '../../../../src/app/partners/domain/partner'
 import { quoteRepositoryStub } from '../../quotes/fixtures/quote-repository.test-doubles'
-import Question = Partner.Question
+import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
 
 describe('Policies - Usecase - Create policy', async () => {
   const now = new Date('2020-01-05T00:00:00Z')
@@ -27,7 +22,7 @@ describe('Policies - Usecase - Create policy', async () => {
   const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({ quoteId: quote.id, startDate: null })
   const policyRepository: SinonStubbedInstance<PolicyRepository> = policyRepositoryStub()
   const quoteRepository: SinonStubbedInstance<QuoteRepository> = quoteRepositoryStub()
-  const partnerRepository: SinonStubbedInstance<PartnerRepository> = { getByCode: sinon.stub(), getOffer: sinon.stub(), getCallbackUrl: sinon.stub(), getOperationCodes: sinon.stub() }
+  const partnerRepository: SinonStubbedInstance<PartnerRepository> = { getByCode: sinon.stub(), getCallbackUrl: sinon.stub(), getOperationCodes: sinon.stub() }
   const sendValidationLinkToEmailAddress = sinon.stub()
   const createPolicy: CreatePolicy = CreatePolicy.factory(policyRepository, quoteRepository, partnerRepository, sendValidationLinkToEmailAddress)
 
@@ -57,6 +52,7 @@ describe('Policies - Usecase - Create policy', async () => {
     expectedPolicy.risk.property.address = '88 rue des prairies'
     expectedPolicy.risk.property.postalCode = '91100'
     expectedPolicy.risk.property.city = 'Kyukamura'
+    expectedPolicy.risk.property.type = PropertyType.FLAT
 
     expectedPolicy.contact.address = '88 rue des prairies'
     expectedPolicy.contact.postalCode = '91100'
@@ -104,50 +100,5 @@ describe('Policies - Usecase - Create policy', async () => {
     expect(actualEmailValidationQuery.callbackUrl).to.equal(emailValidationQuery.callbackUrl)
     expect(actualEmailValidationQuery.partnerCode).to.equal(emailValidationQuery.partnerCode)
     expect(actualEmailValidationQuery.policyId).to.exist
-  })
-
-  it('should throw an error if there are roommates but the partner does not allow it', async () => {
-    // Given
-    partnerRepository.getByCode.reset()
-    const questions: Array<Question> = [{ code: Partner.Question.QuestionCode.ROOMMATE, applicable: false }]
-    const partner = createPartnerFixture({ questions })
-    partnerRepository.getByCode.resolves(partner)
-    quoteRepository.get.withArgs(createPolicyCommand.quoteId).resolves(quote)
-
-    // When
-    const promise = createPolicy(createPolicyCommand)
-
-    // Then
-    return expect(promise).to.be.rejectedWith(PolicyRiskRoommatesNotAllowedError)
-  })
-
-  it('should throw an error if address is not complete in a quote or command', async () => {
-    // Given
-    const policyCommand = createCreatePolicyCommand({
-      risk: {
-        property: {
-          roomCount: 2,
-          address: undefined,
-          postalCode: undefined,
-          city: undefined
-        }
-      }
-    } as any)
-    quoteRepository.get.withArgs(policyCommand.quoteId).resolves(createQuoteFixture({
-      risk: {
-        property: {
-          roomCount: 2,
-          address: undefined,
-          postalCode: undefined,
-          city: undefined
-        }
-      }
-    } as any))
-
-    // When
-    const promise = createPolicy(policyCommand)
-
-    // Then
-    return expect(promise).to.be.rejectedWith(PolicyRiskPropertyMissingFieldError)
   })
 })

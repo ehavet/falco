@@ -56,7 +56,8 @@ function _toRisk (risk: Policy.Risk) {
       room_count: risk.property.roomCount,
       address: risk.property.address,
       postal_code: risk.property.postalCode,
-      city: risk.property.city
+      city: risk.property.city,
+      type: risk.property.type
     },
     people: {
       policy_holder: {

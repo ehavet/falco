@@ -14,7 +14,7 @@ describe('Policies - Usecase - Apply special operation code on policy', async ()
   const now: Date = new Date('2022-01-05T00:00:00')
   const policyStartDate = new Date('2022-01-05T00:00:00')
   const policyRepository: SinonStubbedInstance<PolicyRepository> = policyRepositoryStub()
-  const partnerRepository: SinonStubbedInstance<PartnerRepository> = { getOperationCodes: sinon.stub(), getByCode: sinon.stub(), getCallbackUrl: sinon.stub(), getOffer: sinon.stub() }
+  const partnerRepository: SinonStubbedInstance<PartnerRepository> = { getOperationCodes: sinon.stub(), getByCode: sinon.stub(), getCallbackUrl: sinon.stub() }
 
   beforeEach(() => {
     dateFaker.setCurrentDate(now)

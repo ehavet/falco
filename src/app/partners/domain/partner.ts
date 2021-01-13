@@ -1,5 +1,6 @@
 import { Quote } from '../../quotes/domain/quote'
 import { OperationCode } from '../../common-api/domain/operation-code'
+import { PropertyType } from '../../common-api/domain/type/property-type'
 import { Occupancy } from '../../common-api/domain/type/occupancy'
 
 export interface Partner {
@@ -48,11 +49,6 @@ export namespace Partner.Question {
         nextStep?: NextStepType
     }
 
-    export enum PropertyType {
-        FLAT = 'FLAT',
-        HOUSE = 'HOUSE'
-    }
-
     export interface RoomCountQuestion {
         code: QuestionCode.ROOM_COUNT,
         options: Array<Option<number>>,
@@ -84,7 +80,7 @@ export namespace Partner.Question {
     export interface PropertyTypeQuestion {
         code: QuestionCode.PROPERTY_TYPE,
         toAsk: boolean,
-        options: Array<Option<PropertyType>>,
+        options?: Array<Option<PropertyType>>,
         defaultValue: PropertyType,
         defaultNextStep: NextStepType
     }

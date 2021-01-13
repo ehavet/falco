@@ -1,6 +1,7 @@
 import { Partner } from './partner'
 import { PartnerQuestionNotFoundError } from './partner.errors'
 import { Quote } from '../../quotes/domain/quote'
+import { PropertyType } from '../../common-api/domain/type/property-type'
 
 const NUMBER_FOR_NO_ROOMMATES = 0
 const DEMO_PARTNER_CODE_PREFIX: string = 'demo'
@@ -57,4 +58,30 @@ export function isPropertyAllowNumberOfRoommates (partner: Partner, numberOfRoom
 export function isRelatedToADemoPartner (partnerCode?: string): boolean {
   if (!partnerCode) return false
   return partnerCode.startsWith(DEMO_PARTNER_CODE_PREFIX)
+}
+
+function _getQuestionOnPropertyType (partner: Partner) : Partner.Question.PropertyTypeQuestion {
+  return partner.questions
+    .find((question) => question.code === Partner.Question.QuestionCode.PROPERTY_TYPE) as Partner.Question.PropertyTypeQuestion
+}
+
+function _getInsuredPropertyTypes (partner: Partner) : Array<PropertyType> {
+  const propertyTypeQuestion = _getQuestionOnPropertyType(partner)
+  if (propertyTypeQuestion.options) {
+    return propertyTypeQuestion.options
+      .filter(option => option.nextStep !== Partner.Question.NextStepAction.REJECT)
+      .map(option => option.value)
+  }
+  return [propertyTypeQuestion.defaultValue]
+}
+
+export function isPropertyTypeInsured (partner: Partner, propertyType: PropertyType | undefined): boolean {
+  if (!propertyType) return false
+  const insuredPropertyTypes = _getInsuredPropertyTypes(partner)
+  return insuredPropertyTypes.includes(propertyType)
+}
+
+export function getDefaultPropertyType (partner: Partner) : PropertyType {
+  const propertyTypeQuestion = _getQuestionOnPropertyType(partner)
+  return propertyTypeQuestion.defaultValue
 }

@@ -3,8 +3,10 @@ import { UpdateQuoteCommand } from '../../../../src/app/quotes/domain/update-quo
 import { UpdateQuote } from '../../../../src/app/quotes/domain/update-quote.usecase'
 import { Quote } from '../../../../src/app/quotes/domain/quote'
 import {
-  createQuoteFixture, createQuoteInsuranceFixture,
-  createQuotePolicyHolderFixture, createQuoteRiskFixture,
+  createQuoteFixture,
+  createQuoteInsuranceFixture,
+  createQuotePolicyHolderFixture,
+  createQuoteRiskFixture,
   createUpdateQuoteCommandFixture,
   createUpdateQuoteCommandPolicyHolderFixture,
   createUpdateQuoteCommandRiskFixture
@@ -14,6 +16,7 @@ import {
   QuoteNotFoundError,
   QuoteRiskNumberOfRoommatesError,
   QuoteRiskPropertyRoomCountNotInsurableError,
+  QuoteRiskPropertyTypeNotInsurableError,
   QuoteRiskRoommatesNotAllowedError,
   QuoteStartDateConsistencyError
 } from '../../../../src/app/quotes/domain/quote.errors'
@@ -26,6 +29,7 @@ import { partnerRepositoryStub } from '../../partners/fixtures/partner-repositor
 import { quoteRepositoryStub } from '../fixtures/quote-repository.test-doubles'
 import { defaultCapAdviceRepositoryStub } from '../fixtures/default-cap-advice-repository.test-doubles'
 import { DefaultCapAdvice } from '../../../../src/app/quotes/domain/default-cap-advice/default-cap-advice'
+import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
 
 describe('Quotes - Usecase - Update Quote', async () => {
   const now: Date = new Date('2020-01-05T00:00:00Z')
@@ -47,6 +51,12 @@ describe('Quotes - Usecase - Update Quote', async () => {
       {
         code: partnerCode,
         questions: [
+          {
+            code: Partner.Question.QuestionCode.PROPERTY_TYPE,
+            toAsk: false,
+            defaultValue: PropertyType.FLAT,
+            defaultNextStep: Partner.Question.QuestionCode.ADDRESS
+          },
           {
             code: Partner.Question.QuestionCode.ROOM_COUNT,
             toAsk: true,
@@ -503,7 +513,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
               address: '88 rue des prairies',
               city: 'Kyukamura',
               postalCode: '91100',
-              roomCount: 3
+              roomCount: 3,
+              type: PropertyType.FLAT
             }
           }),
           premium: 93.84
@@ -536,7 +547,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
               roomCount: 2,
               address: '5 avenue du bitume',
               postalCode: '13840',
-              city: 'Nakamura'
+              city: 'Nakamura',
+              type: PropertyType.FLAT
             }
           })
         }
@@ -551,7 +563,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
             roomCount: 2,
             address: '5 avenue du bitume',
             postalCode: '13840',
-            city: 'Nakamura'
+            city: 'Nakamura',
+            type: PropertyType.FLAT
           }
         })
       })
@@ -748,7 +761,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
           roomCount: 1,
           address: '666 rue de la mer morte',
           postalCode: '66666',
-          city: 'Babylone'
+          city: 'Babylone',
+          type: PropertyType.FLAT
         },
         person: {
           firstname: 'Lucie',
@@ -781,7 +795,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
           roomCount: 1,
           address: '666 rue de la mer morte',
           postalCode: '66666',
-          city: 'Babylone'
+          city: 'Babylone',
+          type: PropertyType.FLAT
         },
         person: {
           firstname: 'Lucie',
@@ -885,7 +900,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
           roomCount: 10,
           address: '101 rue des lapins',
           postalCode: '77000',
-          city: 'Malinville'
+          city: 'Malinville',
+          type: PropertyType.FLAT
         }
       })
     })
@@ -911,7 +927,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
           roomCount: 1,
           address: '101 rue des lapins',
           postalCode: '77000',
-          city: 'Malinville'
+          city: 'Malinville',
+          type: PropertyType.FLAT
         },
         person: { firstname: 'jean', lastname: 'jean' },
         otherPeople: []
@@ -938,5 +955,27 @@ describe('Quotes - Usecase - Update Quote', async () => {
     const promise = updateQuote(updateQuoteCommand)
     // Then
     return expect(promise).to.be.rejectedWith(QuoteStartDateConsistencyError)
+  })
+
+  it('should throw an QuoteRiskPropertyTypeNotInsurableError when property type is not insurable by the partner', async () => {
+    // Given
+    quoteRepository.get.withArgs(quoteId).resolves(quote)
+    updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository)
+    // When
+    const updateQuoteCommand = createUpdateQuoteCommandFixture({
+      id: quoteId,
+      risk: createQuoteRiskFixture({
+        property: {
+          roomCount: 2,
+          address: '88 rue des prairies',
+          postalCode: '91100',
+          city: 'Kyukamura',
+          type: PropertyType.HOUSE
+        }
+      })
+    })
+    const promise = updateQuote(updateQuoteCommand)
+    // Then
+    return expect(promise).to.be.rejectedWith(QuoteRiskPropertyTypeNotInsurableError)
   })
 })

@@ -7,7 +7,6 @@ export function partnerRepositoryStub (attr = {}): SinonStubbedInstance<PartnerR
     getOperationCodes: sinon.stub(),
     getByCode: sinon.stub(),
     getCallbackUrl: sinon.stub(),
-    getOffer: sinon.stub(),
     ...attr
   }
 }

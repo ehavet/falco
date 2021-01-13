@@ -14,9 +14,10 @@ import {
   PolicyRiskPersonMissingError,
   PolicyHolderMissingPropertyError,
   PolicyHolderEmailValidationError,
-  PolicyRiskPropertyMissingFieldError
+  PolicyRiskPropertyMissingFieldError, PolicyRiskPropertyTypeNotInsurableError
 } from './policies.errors'
 import { Amount } from '../../common-api/domain/amount/amount'
+import { PropertyType } from '../../common-api/domain/type/property-type'
 
 const DEFAULT_NUMBER_OF_MONTHS_DUE = 12
 
@@ -193,6 +194,7 @@ function _checkQuoteConsistencyToCreatePolicy (quote: Quote): void {
   if (Quote.isPolicyRiskPropertyAddressMissing(quote)) { throw new PolicyRiskPropertyMissingFieldError(quote.id, 'address') }
   if (Quote.isPolicyRiskPropertyPostalCodeMissing(quote)) { throw new PolicyRiskPropertyMissingFieldError(quote.id, 'postalCode') }
   if (Quote.isPolicyRiskPropertyCityMissing(quote)) { throw new PolicyRiskPropertyMissingFieldError(quote.id, 'city') }
+  if (Quote.isPolicyRiskPropertyTypeMissing(quote)) { throw new PolicyRiskPropertyMissingFieldError(quote.id, 'type') }
 }
 
 function _getStartDate (createPolicyCommand: CreatePolicyCommand): Date {
@@ -255,7 +257,8 @@ export namespace Policy.Risk {
         roomCount: number,
         address: string,
         postalCode: string,
-        city: string
+        city: string,
+        type: PropertyType
     }
 
     export interface People {
@@ -275,6 +278,9 @@ export namespace Policy.Risk {
         }
       }
 
+      const propertyType : PropertyType = quoteRisk.property.type ?? commandRisk.property.type ?? PartnerFunc.getDefaultPropertyType(partner)
+      _checkIsInsurablePropertyType(partner, propertyType)
+
       const postalCode = quoteRisk.property.postalCode
         ? quoteRisk.property.postalCode
         : commandRisk.property.postalCode!
@@ -284,12 +290,19 @@ export namespace Policy.Risk {
           roomCount: quoteRisk.property.roomCount,
           address: quoteRisk.property.address || commandRisk.property.address as string,
           postalCode,
-          city: quoteRisk.property.city || commandRisk.property.city as string
+          city: quoteRisk.property.city || commandRisk.property.city as string,
+          type: propertyType
         },
         people: {
           person: commandRisk.people.policyHolder,
           otherPeople: commandRisk.people.otherInsured
         }
+      }
+    }
+
+    function _checkIsInsurablePropertyType (partner: Partner, propertyType: PropertyType) : void {
+      if (!PartnerFunc.isPropertyTypeInsured(partner, propertyType)) {
+        throw new PolicyRiskPropertyTypeNotInsurableError(propertyType)
       }
     }
 
@@ -303,7 +316,8 @@ export namespace Policy.Risk {
           roomCount: quoteRisk.property.roomCount,
           address: quoteRisk.property.address!,
           postalCode: quoteRisk.property.postalCode!,
-          city: quoteRisk.property.city!
+          city: quoteRisk.property.city!,
+          type: quoteRisk.property.type!
         },
         people: {
           person: quoteRisk.person!,

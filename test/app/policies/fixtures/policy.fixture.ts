@@ -1,4 +1,5 @@
 import { Policy } from '../../../../src/app/policies/domain/policy'
+import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
 
 export function createPolicyFixture (attr: Partial<Policy> = {}): Policy {
   const now: Date = new Date('2020-01-05T00:00:00Z')
@@ -23,7 +24,8 @@ export function createPolicyFixture (attr: Partial<Policy> = {}): Policy {
         roomCount: 2,
         address: '13 rue du loup garou',
         postalCode: '91100',
-        city: 'Corbeil-Essonnes'
+        city: 'Corbeil-Essonnes',
+        type: PropertyType.FLAT
       },
       people: {
         person: {

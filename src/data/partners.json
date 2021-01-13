@@ -5,18 +5,16 @@
     "translationKey": "studyo",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
-    "firstQuestion": "property_type",
+    "firstQuestionToAsk": "address",
     "questions": [
       {
         "code": "property_type",
         "toAsk": false,
-        "defaultValue": "FLAT",
-        "defaultNextStep": "occupancy"
+        "defaultValue": "FLAT"
       },
       {
         "code": "occupancy",
         "toAsk": false,
-        "defaultNextStep": "address",
         "defaultValue": "TENANT"
       },
       {
@@ -58,7 +56,7 @@
     "translationKey": "e-mobilia-alternant",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
-    "firstQuestion": "property_type",
+    "firstQuestionToAsk": "property_type",
     "questions": [
       {
         "code": "property_type",
@@ -67,13 +65,12 @@
           {"value": "FLAT"},
           {"value": "HOUSE", "nextStep": "REJECT"}
         ],
-        "defaultValue": "FLAT",
-        "defaultNextStep": "occupancy"
+        "defaultNextStep": "address",
+        "defaultValue": "FLAT"
       },
       {
         "code": "occupancy",
         "toAsk": false,
-        "defaultNextStep": "address",
         "defaultValue": "TENANT"
       },
       {
@@ -122,18 +119,16 @@
     "translationKey": "essca",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
-    "firstQuestion": "property_type",
+    "firstQuestionToAsk": "address",
     "questions": [
       {
         "code": "property_type",
         "toAsk": false,
-        "defaultValue": "FLAT",
-        "defaultNextStep": "occupancy"
+        "defaultValue": "FLAT"
       },
       {
         "code": "occupancy",
         "toAsk": false,
-        "defaultNextStep": "address",
         "defaultValue": "TENANT"
       },
       {
@@ -175,18 +170,16 @@
     "translationKey": "estudent",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
-    "firstQuestion": "property_type",
+    "firstQuestionToAsk": "address",
     "questions": [
       {
         "code": "property_type",
         "toAsk": false,
-        "defaultValue": "FLAT",
-        "defaultNextStep": "occupancy"
+        "defaultValue": "FLAT"
       },
       {
         "code": "occupancy",
         "toAsk": false,
-        "defaultNextStep": "address",
         "defaultValue": "TENANT"
       },
       {
@@ -227,18 +220,16 @@
     "translationKey": "greystar",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
-    "firstQuestion": "property_type",
+    "firstQuestionToAsk": "address",
     "questions": [
       {
         "code": "property_type",
         "toAsk": false,
-        "defaultValue": "FLAT",
-        "defaultNextStep": "occupancy"
+        "defaultValue": "FLAT"
       },
       {
         "code": "occupancy",
         "toAsk": false,
-        "defaultNextStep": "address",
         "defaultValue": "TENANT"
       },
       {
@@ -280,18 +271,16 @@
     "translationKey": "demo-student",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
-    "firstQuestion": "property_type",
+    "firstQuestionToAsk": "address",
     "questions": [
       {
         "code": "property_type",
         "toAsk": false,
-        "defaultValue": "FLAT",
-        "defaultNextStep": "occupancy"
+        "defaultValue": "FLAT"
       },
       {
         "code": "occupancy",
         "toAsk": false,
-        "defaultNextStep": "address",
         "defaultValue": "TENANT"
       },
       {
@@ -333,7 +322,7 @@
     "translationKey": "demo",
     "callbackUrl": "",
     "customerSupportEmail": "help@appenin.fr",
-    "firstQuestion": "property_type",
+    "firstQuestionToAsk": "property_type",
     "questions": [
       {
         "code": "property_type",
@@ -342,8 +331,8 @@
           {"value": "FLAT"},
           {"value": "HOUSE", "nextStep": "REJECT"}
         ],
-        "defaultValue": "FLAT",
-        "defaultNextStep": "occupancy"
+        "defaultNextStep": "occupancy",
+        "defaultValue": "FLAT"
       },
       {
         "code": "occupancy",

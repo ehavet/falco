@@ -9,7 +9,7 @@ export interface Partner {
     translationKey: string
     callbackUrl: string
     customerSupportEmail: string
-    firstQuestion: Partner.Question.QuestionCode
+    firstQuestionToAsk: Partner.Question.QuestionCode
     questions: Array<Partner.Question>
     offer: Partner.Offer
 }
@@ -49,15 +49,15 @@ export namespace Partner.Question {
         options: Array<Option<number>>,
         toAsk: boolean,
         defaultValue: number,
-        defaultNextStep: NextStepType
+        defaultNextStep?: NextStepType
     }
 
     export interface OccupancyQuestion {
         code: QuestionCode.OCCUPANCY,
-        options: Array<Option<Occupancy>>,
+        options?: Array<Option<Occupancy>>,
         toAsk: boolean,
         defaultValue: Occupancy,
-        defaultNextStep: NextStepType
+        defaultNextStep?: NextStepType
     }
 
     export interface RoommateQuestion {
@@ -69,7 +69,7 @@ export namespace Partner.Question {
     export interface AddressQuestion {
         code: QuestionCode.ADDRESS,
         toAsk: boolean,
-        defaultNextStep: NextStepType
+        defaultNextStep?: NextStepType
     }
 
     export interface PropertyTypeQuestion {
@@ -77,7 +77,7 @@ export namespace Partner.Question {
         toAsk: boolean,
         options?: Array<Option<PropertyType>>,
         defaultValue: PropertyType,
-        defaultNextStep: NextStepType
+        defaultNextStep?: NextStepType
     }
 
     export interface MaximumNumberOfRoommates {

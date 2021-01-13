@@ -5,7 +5,7 @@
     "trigram": "TRI",
     "callbackUrl": "http://partner1-callback.com",
     "customerSupportEmail": "customer@support.fr",
-    "firstQuestion": "property_type",
+    "firstQuestionToAsk": "property_type",
     "questions": [
       {
         "code": "property_type",
@@ -71,7 +71,7 @@
     "translationKey": "translationKey",
     "callbackUrl": "http://partner2-callback.com",
     "customerSupportEmail": "customer@support.fr",
-    "firstQuestion": "room_count",
+    "firstQuestionToAsk": "room_count",
     "questions": [
       {
         "code": "property_type",

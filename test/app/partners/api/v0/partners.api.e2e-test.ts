@@ -20,18 +20,16 @@ describe('Partners - API - E2E', async () => {
         code: 'studyo',
         translation_key: 'studyo',
         customer_support_email: 'help@appenin.fr',
-        first_question: 'property_type',
+        first_question_to_ask: 'address',
         questions: [
           {
             code: 'property_type',
             to_ask: false,
-            default_value: 'FLAT',
-            default_next_step: 'occupancy'
+            default_value: 'FLAT'
           },
           {
             code: 'occupancy',
             to_ask: false,
-            default_next_step: 'address',
             default_value: 'TENANT'
           },
           {

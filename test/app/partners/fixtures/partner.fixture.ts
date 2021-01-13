@@ -10,7 +10,7 @@ export function createPartnerFixture (attr: Partial<Partner> = {}): Partner {
     translationKey: 'translationKey',
     callbackUrl: 'http://partner1-callback.com',
     customerSupportEmail: 'customer@support.fr',
-    firstQuestion: Partner.Question.QuestionCode.PROPERTY_TYPE,
+    firstQuestionToAsk: Partner.Question.QuestionCode.PROPERTY_TYPE,
     questions: [
       {
         code: Partner.Question.QuestionCode.PROPERTY_TYPE,

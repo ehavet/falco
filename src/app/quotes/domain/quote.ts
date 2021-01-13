@@ -16,7 +16,7 @@ import { CreateQuoteCommand } from './create-quote-command'
 import { Amount } from '../../common-api/domain/amount/amount'
 import { DefaultCapAdvice } from './default-cap-advice/default-cap-advice'
 import { PropertyType } from '../../common-api/domain/type/property-type'
-import { Cover } from './cover/cover'
+import { CoverMonthlyPrice } from './cover/coverMonthlyPrice'
 
 const DEFAULT_NUMBER_MONTHS_DUE = 12
 
@@ -68,10 +68,10 @@ export namespace Quote {
       command: CreateQuoteCommand,
       partner: Partner,
       defaultCapAdvice: DefaultCapAdvice,
-      covers: Array<Cover>): Quote {
+      coverMonthlyPrices: Array<CoverMonthlyPrice>): Quote {
       const risk: Risk = _buildRisk(command, partner)
 
-      const insurance: Insurance = getInsurance(command.risk, partner.offer, defaultCapAdvice, covers)
+      const insurance: Insurance = getInsurance(command.risk, partner.offer, defaultCapAdvice, coverMonthlyPrices)
 
       const nbMonthsDue = DEFAULT_NUMBER_MONTHS_DUE
 
@@ -95,9 +95,9 @@ export namespace Quote {
       quote: Quote, partner: Partner,
       command: UpdateQuoteCommand, partnerAvailableCodes: Array<OperationCode>,
       defaultCapAdvice: DefaultCapAdvice,
-      covers: Array<Cover>): Quote {
-      quote.risk = _buildQuoteRisk(command.risk, partner, covers)
-      quote.insurance = getInsurance(quote.risk, partner.offer, defaultCapAdvice, covers)
+      coverMonthlyPrices: Array<CoverMonthlyPrice>): Quote {
+      quote.risk = _buildQuoteRisk(command.risk, partner, coverMonthlyPrices)
+      quote.insurance = getInsurance(quote.risk, partner.offer, defaultCapAdvice, coverMonthlyPrices)
       quote.policyHolder = Quote.PolicyHolder.build(command.policyHolder, quote.policyHolder)
       _applyStartDate(quote, command.startDate)
       _applyOperationCode(quote, partnerAvailableCodes, command.specOpsCode)
@@ -109,7 +109,7 @@ export namespace Quote {
         return quote
     }
 
-    function _buildQuoteRisk (risk: UpdateQuoteCommand.Risk, partner: Partner, covers: Array<Cover>) {
+    function _buildQuoteRisk (risk: UpdateQuoteCommand.Risk, partner: Partner, coverMonthlyPrices: Array<CoverMonthlyPrice>) {
       const roomCount: number = risk.property.roomCount
       const numberOfRoommates: number|null = risk.otherPeople ? risk.otherPeople?.length : null
 
@@ -117,7 +117,7 @@ export namespace Quote {
         throw new QuoteRiskPropertyTypeNotInsurableError(risk.property.type!)
       }
 
-      if (!isPropertyRoomCountCovered(covers)) {
+      if (!isPropertyRoomCountCovered(coverMonthlyPrices)) {
         throw new QuoteRiskPropertyRoomCountNotInsurableError(roomCount)
       }
 
@@ -203,11 +203,11 @@ export namespace Quote {
       }
     }
 
-    export function getInsurance (risk: Risk, partnerOffer: Partner.Offer, defaultCapAdvice: DefaultCapAdvice, covers: Array<Cover>): Insurance {
-      if (covers.length === 0) {
+    export function getInsurance (risk: Risk, partnerOffer: Partner.Offer, defaultCapAdvice: DefaultCapAdvice, coverMonthlyPrices: Array<CoverMonthlyPrice>): Insurance {
+      if (coverMonthlyPrices.length === 0) {
         throw new QuoteRiskPropertyRoomCountNotInsurableError(risk.property.roomCount)
       }
-      const monthlyPrice = sumCoversMonthlyPrice(covers)
+      const monthlyPrice = sumCoversMonthlyPrice(coverMonthlyPrices)
 
       return <Insurance>{
         estimate: {
@@ -237,7 +237,7 @@ export namespace Quote {
     export function isPolicyRiskPropertyCityMissing (quote: Quote): boolean { return !quote.risk.property.city }
     export function isPolicyRiskPropertyTypeMissing (quote: Quote): boolean { return !quote.risk.property.type }
     export function isPolicyHolderEmailNotValidated (quote: Quote): boolean { return !(quote.policyHolder?.emailValidatedAt) }
-    export function isPropertyRoomCountCovered (covers: Array<Cover>): boolean { return covers.length > 0 }
+    export function isPropertyRoomCountCovered (coverMonthlyPrices: Array<CoverMonthlyPrice>): boolean { return coverMonthlyPrices.length > 0 }
 
     function _applyOperationCode (quote: Quote, partnerApplicableCodes: Array<OperationCode>, codeToApply?: string): Quote {
       const operationCode: OperationCode = SpecialOperation.inferOperationCode(codeToApply)
@@ -278,14 +278,14 @@ export namespace Quote {
       return !(quote.partnerCode === partnerCode)
     }
 
-    function sumCoversMonthlyPrice (coverMonthlyPrices: Array<Cover>): Amount {
-      const converMonthlyPrice = coverMonthlyPrices.reduce((monthlyPrice, acc) => {
+    function sumCoversMonthlyPrice (coverMonthlyPrices: Array<CoverMonthlyPrice>): Amount {
+      const coverMonthlyPrice = coverMonthlyPrices.reduce((monthlyPrice, acc) => {
         return {
-          monthlyPrice: Amount.toAmount(acc.monthlyPrice) + Amount.toAmount(monthlyPrice.monthlyPrice)
+          monthlyPrice: Amount.toAmount(acc.coverMonthlyPrice) + Amount.toAmount(monthlyPrice.monthlyPrice)
         }
       }, { monthlyPrice: 0 })
 
-      return converMonthlyPrice.monthlyPrice
+      return coverMonthlyPrice.monthlyPrice
     }
 }
 

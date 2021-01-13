@@ -12,7 +12,7 @@ import { defaultCapAdviceRepositoryStub } from '../fixtures/default-cap-advice-r
 import { DefaultCapAdviceNotFoundError } from '../../../../src/app/quotes/domain/default-cap-advice/default-cap-advice.errors'
 import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
 import { createPartnerFixture } from '../../partners/fixtures/partner.fixture'
-import { coverRepositoryStub } from '../fixtures/pricing-matrix-repository.test-doubles'
+import { coverMonthlyPriceRepositoryStub } from '../fixtures/pricing-matrix-repository.test-doubles'
 
 describe('Quotes - Usecase - Create Quote', async () => {
   let createQuote: CreateQuote
@@ -33,7 +33,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
     ]
   }
   const partner = createPartnerFixture({ code: 'MyPartner', offer: partnerOffer })
-  const coverRepository = coverRepositoryStub()
+  const coverMonthlyPriceRepository = coverMonthlyPriceRepositoryStub()
   const expectedQuote: Quote = {
     id: '',
     partnerCode: 'myPartner',
@@ -69,7 +69,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
   beforeEach(() => {
     dateFaker.setCurrentDate(now)
     partnerRepository.getByCode.withArgs('myPartner').returns(partner)
-    createQuote = CreateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository, coverRepository)
+    createQuote = CreateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository, coverMonthlyPriceRepository)
   })
 
   afterEach(() => {
@@ -241,7 +241,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
     const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses', type: PropertyType.FLAT } } }
     quoteRepository.save.resolves()
     defaultCapAdviceRepository.get.withArgs('myPartner', 2).resolves({ value: 6000 })
-    coverRepository.getCovers.withArgs('myPartner', 2).resolves([{ monthlyPrice: '0.820000' }, { monthlyPrice: '5.000000' }])
+    coverMonthlyPriceRepository.get.withArgs('myPartner', 2).resolves([{ coverMonthlyPrice: '0.820000' }, { coverMonthlyPrice: '5.000000' }])
 
     // When
     const quote = await createQuote(createQuoteCommand)
@@ -279,7 +279,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
   it('should throw an error if there is no insurance for the given risk', async () => {
     // Given
     const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 3, type: PropertyType.FLAT } } }
-    coverRepository.getCovers.withArgs('myPartner', 3).resolves([])
+    coverMonthlyPriceRepository.get.withArgs('myPartner', 3).resolves([])
 
     // When
     const quotePromise = createQuote(createQuoteCommand)

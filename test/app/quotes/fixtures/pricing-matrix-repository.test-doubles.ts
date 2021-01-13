@@ -1,10 +1,10 @@
 import { sinon } from '../../../test-utils'
 import { SinonStubbedInstance } from 'sinon'
-import { CoverRepository } from '../../../../src/app/quotes/domain/cover/cover.repository'
+import { CoverMonthlyPriceRepository } from '../../../../src/app/quotes/domain/cover/coverMonthlyPriceRepository'
 
-export function coverRepositoryStub (attr = {}): SinonStubbedInstance<CoverRepository> {
+export function coverMonthlyPriceRepositoryStub (attr = {}): SinonStubbedInstance<CoverMonthlyPriceRepository> {
   return {
-    getCovers: sinon.stub(),
+    get: sinon.stub(),
     ...attr
   }
 }

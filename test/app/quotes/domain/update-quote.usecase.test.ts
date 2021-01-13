@@ -29,7 +29,7 @@ import { partnerRepositoryStub } from '../../partners/fixtures/partner-repositor
 import { quoteRepositoryStub } from '../fixtures/quote-repository.test-doubles'
 import { defaultCapAdviceRepositoryStub } from '../fixtures/default-cap-advice-repository.test-doubles'
 import { DefaultCapAdvice } from '../../../../src/app/quotes/domain/default-cap-advice/default-cap-advice'
-import { coverRepositoryStub } from '../fixtures/pricing-matrix-repository.test-doubles'
+import { coverMonthlyPriceRepositoryStub } from '../fixtures/pricing-matrix-repository.test-doubles'
 import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
 
 describe('Quotes - Usecase - Update Quote', async () => {
@@ -40,7 +40,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
   let quote: Quote
   let partner: Partner
   const defaultCapAdviceRepository = defaultCapAdviceRepositoryStub()
-  const coverRepository = coverRepositoryStub()
+  const coverMonthlyPriceRepository = coverMonthlyPriceRepositoryStub()
   const quoteId: string = 'UDQUOT3'
   const partnerCode: string = 'myPartner'
 
@@ -102,8 +102,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
       [OperationCode.FULLYEAR, OperationCode.SEMESTER1, OperationCode.SEMESTER2, OperationCode.BLANK]
     )
     defaultCapAdviceRepository.get.resolves({ value: 7000 })
-    coverRepository.getCovers.resolves([{ monthlyPrice: '2.500000' }, { monthlyPrice: '2.500000' }, { monthlyPrice: '0.820000' }])
-    updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository, coverRepository)
+    coverMonthlyPriceRepository.get.resolves([{ coverMonthlyPrice: '2.500000' }, { coverMonthlyPrice: '2.500000' }, { coverMonthlyPrice: '0.820000' }])
+    updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository, coverMonthlyPriceRepository)
   })
 
   afterEach(() => {
@@ -111,7 +111,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
     partnerRepository.getByCode.reset()
     partnerRepository.getOperationCodes.reset()
     quoteRepository.update.reset()
-    coverRepository.getCovers.reset()
+    coverMonthlyPriceRepository.get.reset()
   })
 
   describe('updating the start date', async () => {
@@ -523,7 +523,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
       quoteRepository.get.withArgs(quoteId).resolves(quote)
       quoteRepository.update.resolves(updatedQuote)
       defaultCapAdviceRepository.get.withArgs(partnerCode, newRoomCount).resolves(defaultCapAdviceForRoomCountOf3)
-      coverRepository.getCovers.resolves([{ monthlyPrice: '4.500000' }, { monthlyPrice: '2.500000' }, { monthlyPrice: '0.820000' }])
+      coverMonthlyPriceRepository.get.resolves([{ coverMonthlyPrice: '4.500000' }, { coverMonthlyPrice: '2.500000' }, { coverMonthlyPrice: '0.820000' }])
 
       const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId })
       updateQuoteCommand.risk.property.roomCount = newRoomCount
@@ -819,7 +819,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
 
     quoteRepository.update.resolves(expectedQuote)
 
-    coverRepository.getCovers.resolves([{ monthlyPrice: '1.500000' }, { monthlyPrice: '2.500000' }, { monthlyPrice: '0.820000' }])
+    coverMonthlyPriceRepository.get.resolves([{ coverMonthlyPrice: '1.500000' }, { coverMonthlyPrice: '2.500000' }, { coverMonthlyPrice: '0.820000' }])
 
     // When
     const result = await updateQuote(updateQuoteCommand)
@@ -894,7 +894,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
   it('should throw QuoteRiskPropertyRoomCountNotInsurableError when there is no coverage for the given property room count', async () => {
     // Given
     quoteRepository.get.withArgs(quoteId).resolves(quote)
-    coverRepository.getCovers.withArgs(partnerCode, 10).resolves([])
+    coverMonthlyPriceRepository.get.withArgs(partnerCode, 10).resolves([])
 
     const updateQuoteCommand: UpdateQuoteCommand = createUpdateQuoteCommandFixture({
       id: quoteId,
@@ -964,7 +964,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
   it('should throw an QuoteRiskPropertyTypeNotInsurableError when property type is not insurable by the partner', async () => {
     // Given
     quoteRepository.get.withArgs(quoteId).resolves(quote)
-    updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository, coverRepository)
+    updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository, coverMonthlyPriceRepository)
     // When
     const updateQuoteCommand = createUpdateQuoteCommandFixture({
       id: quoteId,

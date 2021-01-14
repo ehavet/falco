@@ -9,7 +9,8 @@ import {
   QuotePartnerOwnershipError,
   QuotePolicyHolderEmailNotFoundError,
   QuoteRiskNumberOfRoommatesError,
-  QuoteRiskPropertyRoomCountNotInsurableError, QuoteRiskPropertyTypeNotInsurableError,
+  QuoteRiskPropertyRoomCountNotInsurableError,
+  QuoteRiskPropertyTypeNotInsurableError,
   QuoteRiskRoommatesNotAllowedError,
   QuoteStartDateConsistencyError
 } from '../../../../../src/app/quotes/domain/quote.errors'
@@ -23,10 +24,9 @@ import {
 } from '../../fixtures/quote.fixture'
 import { UpdateQuoteCommand } from '../../../../../src/app/quotes/domain/update-quote-command'
 import { OperationCodeNotApplicableError } from '../../../../../src/app/policies/domain/operation-code.errors'
-import {
-  DefaultCapAdviceNotFoundError
-} from '../../../../../src/app/quotes/domain/default-cap-advice/default-cap-advice.errors'
+import { DefaultCapAdviceNotFoundError } from '../../../../../src/app/quotes/domain/default-cap-advice/default-cap-advice.errors'
 import { PropertyType } from '../../../../../src/app/common-api/domain/type/property-type'
+import { Occupancy } from '../../../../../src/app/common-api/domain/type/occupancy'
 
 describe('Quotes - API - Integration', async () => {
   let httpServer: HttpServerForTesting
@@ -48,7 +48,8 @@ describe('Quotes - API - Integration', async () => {
             address: '52 Rue Beaubourg',
             postalCode: '75003',
             city: 'Paris',
-            type: PropertyType.FLAT
+            type: PropertyType.FLAT,
+            occupancy: Occupancy.TENANT
           }
         },
         insurance: {
@@ -79,7 +80,8 @@ describe('Quotes - API - Integration', async () => {
             address: '52 Rue Beaubourg',
             postal_code: '75003',
             city: 'Paris',
-            type: 'FLAT'
+            type: 'FLAT',
+            occupancy: 'TENANT'
           }
         },
         insurance: {
@@ -113,7 +115,8 @@ describe('Quotes - API - Integration', async () => {
                 address: '52 Rue Beaubourg',
                 postal_code: '75003',
                 city: 'Paris',
-                type: 'FLAT'
+                type: 'FLAT',
+                occupancy: 'TENANT'
               }
             }
           })

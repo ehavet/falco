@@ -18,7 +18,8 @@ function _toRisk (risk: Quote.Risk) {
       address: risk.property.address,
       postal_code: risk.property.postalCode,
       city: risk.property.city,
-      type: risk.property.type
+      type: risk.property.type,
+      occupancy: risk.property.occupancy
     }
   }
 }

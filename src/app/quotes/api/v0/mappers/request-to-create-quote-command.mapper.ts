@@ -11,7 +11,8 @@ export function requestToCreateQuoteCommand (request: any): CreateQuoteCommand {
         address: payload.risk.property.address,
         city: payload.risk.property.city,
         postalCode: payload.risk.property.postal_code,
-        type: payload.risk.property.type
+        type: payload.risk.property.type,
+        occupancy: payload.risk.property.occupancy
       }
     }
   }

@@ -17,6 +17,7 @@ import { Amount } from '../../common-api/domain/amount/amount'
 import { DefaultCapAdvice } from './default-cap-advice/default-cap-advice'
 import { PropertyType } from '../../common-api/domain/type/property-type'
 import { CoverMonthlyPrice } from './cover/coverMonthlyPrice'
+import { Occupancy } from '../../common-api/domain/type/occupancy'
 
 const DEFAULT_NUMBER_MONTHS_DUE = 12
 
@@ -296,7 +297,8 @@ export namespace Quote.Risk {
         address?: string
         postalCode?: string
         city?: string
-        type? : PropertyType
+        type? : PropertyType,
+        occupancy?: Occupancy
     }
 
     export interface Person {

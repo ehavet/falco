@@ -6,6 +6,7 @@ import { QuoteSqlRepository } from '../../../../../src/app/quotes/infrastructure
 import { Quote } from '../../../../../src/app/quotes/domain/quote'
 import { createQuoteFixture, createQuoteRiskFixture } from '../../fixtures/quote.fixture'
 import { PropertyType } from '../../../../../src/app/common-api/domain/type/property-type'
+import { Occupancy } from '../../../../../src/app/common-api/domain/type/occupancy'
 
 async function resetDb () {
   await QuoteSqlModel.destroy({ truncate: true, cascade: true })
@@ -34,7 +35,7 @@ describe('Quotes - API - E2E', async () => {
       // When
       response = await httpServer.api()
         .post('/v0/quotes')
-        .send({ code: 'studyo', risk: { property: { room_count: 2, address: '15 Rue Des Amandiers', postal_code: '91110', city: 'Les Ulysses', type: 'FLAT' } } })
+        .send({ code: 'studyo', risk: { property: { room_count: 2, address: '15 Rue Des Amandiers', postal_code: '91110', city: 'Les Ulysses', type: 'FLAT', occupancy: 'TENANT' } } })
         .set('X-Consumer-Username', 'studyo')
 
       // Then
@@ -46,7 +47,8 @@ describe('Quotes - API - E2E', async () => {
             address: '15 Rue Des Amandiers',
             postal_code: '91110',
             city: 'Les Ulysses',
-            type: 'FLAT'
+            type: 'FLAT',
+            occupancy: 'TENANT'
           }
         },
         insurance: {
@@ -70,7 +72,7 @@ describe('Quotes - API - E2E', async () => {
       // When
       response = await httpServer.api()
         .post('/v0/quotes')
-        .send({ code: 'essca', risk: { property: { room_count: 2, type: PropertyType.FLAT } }, spec_ops_code: 'SEMESTER1' })
+        .send({ code: 'essca', risk: { property: { room_count: 2, type: PropertyType.FLAT, occupancy: 'TENANT' } }, spec_ops_code: 'SEMESTER1' })
         .set('X-Consumer-Username', 'essca')
 
       // Then
@@ -79,7 +81,8 @@ describe('Quotes - API - E2E', async () => {
         risk: {
           property: {
             room_count: 2,
-            type: PropertyType.FLAT
+            type: PropertyType.FLAT,
+            occupancy: Occupancy.TENANT
           }
         },
         insurance: {

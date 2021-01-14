@@ -14,6 +14,7 @@ import { PropertyType } from '../../../../src/app/common-api/domain/type/propert
 import { createPartnerFixture } from '../../partners/fixtures/partner.fixture'
 import { coverMonthlyPriceRepositoryStub } from '../fixtures/pricing-matrix-repository.test-doubles'
 import { COVER } from '../../../../src/app/quotes/domain/cover/coverMonthlyPrice'
+import { Occupancy } from '../../../../src/app/common-api/domain/type/occupancy'
 
 describe('Quotes - Usecase - Create Quote', async () => {
   let createQuote: CreateQuote
@@ -44,7 +45,8 @@ describe('Quotes - Usecase - Create Quote', async () => {
         address: '15 Rue Des Amandiers',
         postalCode: '91110',
         city: 'Les Ulysses',
-        type: PropertyType.FLAT
+        type: PropertyType.FLAT,
+        occupancy: Occupancy.TENANT
       }
     },
     insurance: {
@@ -82,9 +84,10 @@ describe('Quotes - Usecase - Create Quote', async () => {
       // Given
       quoteRepository.save.resolves()
       defaultCapAdviceRepository.get.withArgs('myPartner', 2).resolves({ value: 6000 })
+      coverMonthlyPriceRepository.get.withArgs('myPartner', 2).resolves([{ coverMonthlyPrice: '0.820000', cover: COVER.DDEAUX }, { coverMonthlyPrice: '5.000000', cover: COVER.INCEND }])
 
       // When
-      const quote: Quote = await createQuote({ partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses', type: PropertyType.FLAT } } })
+      const quote: Quote = await createQuote({ partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses', type: PropertyType.FLAT, occupancy: Occupancy.TENANT } } })
 
       // Then
       expect(quote).to.deep.include({ partnerCode: expectedQuote.partnerCode })
@@ -239,7 +242,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
 
   it('should save the quote', async () => {
     // Given
-    const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses', type: PropertyType.FLAT } } }
+    const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses', type: PropertyType.FLAT, occupancy: Occupancy.TENANT } } }
     quoteRepository.save.resolves()
     defaultCapAdviceRepository.get.withArgs('myPartner', 2).resolves({ value: 6000 })
     coverMonthlyPriceRepository.get.withArgs('myPartner', 2).resolves([{ coverMonthlyPrice: '0.820000', cover: COVER.DDEAUX }, { coverMonthlyPrice: '5.000000', cover: COVER.INCEND }])

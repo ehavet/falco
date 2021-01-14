@@ -111,3 +111,8 @@ export function getDefaultPropertyType (partner: Partner) : PropertyType {
   const propertyTypeQuestion = _getQuestionOnPropertyType(partner)
   return propertyTypeQuestion.defaultValue
 }
+
+export function getDefaultOccupancy (partner: Partner) : Occupancy {
+  const occupancyQuestion = _getQuestionOnOccupancy(partner)
+  return occupancyQuestion.defaultValue
+}

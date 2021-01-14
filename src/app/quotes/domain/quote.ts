@@ -201,15 +201,24 @@ export namespace Quote {
         throw new QuoteRiskPropertyTypeNotInsurableError(propertyType)
       }
 
-      if (!PartnerFunc.isOccupancyInsured(partner, command.risk.property.occupancy)) {
-        throw new QuoteRiskOccupancyNotInsurableError(command.risk.property.occupancy)
+      /* WARNING : the following line has to be removed for v1 :
+      risk.property.occupancy is optionnal on endpoint POST v0/quotes, so we have to retrieve it from partner.
+      The correct rule is : risk.property.occupancy is mandatory and shoud be given on quote creation.
+      It should be implemented that way for POST v1/quotes */
+      const occupancy = command.risk.property.occupancy ?? PartnerFunc.getDefaultOccupancy(partner)
+      if (!PartnerFunc.isOccupancyInsured(partner, occupancy)) {
+        throw new QuoteRiskOccupancyNotInsurableError(occupancy)
       }
 
       if (!PartnerFunc.isPropertyRoomCountCovered(partner, roomCount)) {
         throw new QuoteRiskPropertyRoomCountNotInsurableError(roomCount)
       }
       return {
-        property: { ...command.risk.property, type: propertyType }
+        property: {
+          ...command.risk.property,
+          type: propertyType,
+          occupancy: occupancy
+        }
       }
     }
 

@@ -8,6 +8,7 @@ import { QuoteSqlModel } from '../../../../src/app/quotes/infrastructure/sql-mod
 import { QuotePersonSqlModel } from '../../../../src/app/quotes/infrastructure/sql-models/quote-person-sql.model'
 import { OperationCode } from '../../../../src/app/common-api/domain/operation-code'
 import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
+import { Occupancy } from '../../../../src/app/common-api/domain/type/occupancy'
 
 async function resetDb () {
   await QuoteSqlModel.destroy({ truncate: true, cascade: true })
@@ -41,7 +42,8 @@ describe('Repository - Quote', async () => {
             address: '88 rue des prairies',
             postalCode: '91100',
             city: 'Kyukamura',
-            type: PropertyType.FLAT
+            type: PropertyType.FLAT,
+            occupancy: Occupancy.TENANT
           }
         })
       })
@@ -74,6 +76,7 @@ describe('Repository - Quote', async () => {
       expect(savedRisk.property.postalCode).to.equal('91100')
       expect(savedRisk.property.city).to.equal('Kyukamura')
       expect(savedRisk.property.type).to.equal('FLAT')
+      expect(savedRisk.property.occupancy).to.equal('TENANT')
       expect(savedRisk.person!.firstname).to.equal('Jean-Jean')
       expect(savedRisk.person!.lastname).to.equal('Lapin')
       expect(savedRisk.otherPeople![0].firstname).to.equal('John')
@@ -118,7 +121,8 @@ describe('Repository - Quote', async () => {
             address: '88 rue des prairies',
             postalCode: '91100',
             city: 'Kyukamura',
-            type: PropertyType.FLAT
+            type: PropertyType.FLAT,
+            occupancy: Occupancy.TENANT
           }
         })
       })
@@ -159,7 +163,8 @@ describe('Repository - Quote', async () => {
             address: 'updated address',
             postalCode: '99999',
             city: 'updated city',
-            type: undefined
+            type: PropertyType.FLAT,
+            occupancy: undefined
           },
           person: {
             firstname: 'updated-person-firstname',
@@ -269,7 +274,8 @@ describe('Repository - Quote', async () => {
             address: undefined,
             postalCode: undefined,
             city: undefined,
-            type: undefined
+            type: undefined,
+            occupancy: undefined
           },
           person: undefined,
           otherPeople: undefined

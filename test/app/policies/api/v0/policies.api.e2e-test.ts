@@ -73,7 +73,8 @@ describe('Policies - API v0 - E2E', async () => {
               address: '88 rue des prairies',
               postal_code: '01100',
               city: 'Kyukamura',
-              type: 'FLAT'
+              type: 'FLAT',
+              occupancy: 'TENANT'
             }
           }
         })

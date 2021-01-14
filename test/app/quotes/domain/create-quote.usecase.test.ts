@@ -100,7 +100,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
       quoteRepository.save.resolves()
 
       // When
-      const quote: Quote = await createQuote({ partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses' } } })
+      const quote: Quote = await createQuote({ partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses', occupancy: Occupancy.TENANT } } })
 
       // Then
       expect(quote.risk.property.type).to.be.equal(PropertyType.FLAT)
@@ -108,7 +108,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
 
     it('with the insurance', async () => {
       // Given
-      const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, type: PropertyType.FLAT } } }
+      const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT } } }
       const expectedInsurance: Quote.Insurance = expectedQuote.insurance
 
       defaultCapAdviceRepository.get.withArgs('myPartner', 2).resolves({ value: 6000 })
@@ -125,7 +125,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
     describe('with the special operations code', async () => {
       it('SEMESTER1 setting the number of months due to 5', async () => {
         // Given
-        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.SEMESTER1, risk: { property: { roomCount: 2, type: PropertyType.FLAT } } }
+        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.SEMESTER1, risk: { property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT } } }
 
         quoteRepository.save.resolves()
 
@@ -143,7 +143,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
 
       it('SEMESTER2 setting the number of months due to 5', async () => {
         // Given
-        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.SEMESTER2, risk: { property: { roomCount: 2, type: PropertyType.FLAT } } }
+        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.SEMESTER2, risk: { property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT } } }
 
         quoteRepository.save.resolves()
 
@@ -161,7 +161,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
 
       it('FULLYEAR setting the number of months due to 10', async () => {
         // Given
-        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.FULLYEAR, risk: { property: { roomCount: 2, type: PropertyType.FLAT } } }
+        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.FULLYEAR, risk: { property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT } } }
 
         quoteRepository.save.resolves()
 
@@ -179,7 +179,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
 
       it('BLANK setting the number of months due to 12', async () => {
         // Given
-        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, type: PropertyType.FLAT } } }
+        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT } } }
 
         quoteRepository.save.resolves()
 
@@ -199,7 +199,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
     describe('with a generated alphanumerical id that', async () => {
       it('has 7 characters', async () => {
         // Given
-        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, type: PropertyType.FLAT } } }
+        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT } } }
 
         quoteRepository.save.resolves()
 
@@ -212,7 +212,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
 
       it('has no I nor l nor O nor 0', async () => {
         // Given
-        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, type: PropertyType.FLAT } } }
+        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT } } }
 
         quoteRepository.save.resolves()
 
@@ -228,7 +228,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
 
       it('is returned within the quote', async () => {
         // Given
-        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, type: PropertyType.FLAT } } }
+        const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT } } }
 
         quoteRepository.save.resolves()
 
@@ -309,7 +309,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
 
   it('should throw an error if there is no insurance for the given risk', async () => {
     // Given
-    const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 3, type: PropertyType.FLAT } } }
+    const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 3, type: PropertyType.FLAT, occupancy: Occupancy.TENANT } } }
     coverMonthlyPriceRepository.get.withArgs('myPartner', 3).resolves([])
 
     // When

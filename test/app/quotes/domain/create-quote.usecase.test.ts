@@ -2,6 +2,7 @@ import { dateFaker, expect, sinon } from '../../../test-utils'
 import { Quote } from '../../../../src/app/quotes/domain/quote'
 import { CreateQuoteCommand } from '../../../../src/app/quotes/domain/create-quote-command'
 import {
+  QuoteRiskOccupancyNotInsurableError,
   QuoteRiskPropertyRoomCountNotInsurableError,
   QuoteRiskPropertyTypeNotInsurableError
 } from '../../../../src/app/quotes/domain/quote.errors'
@@ -277,6 +278,32 @@ describe('Quotes - Usecase - Create Quote', async () => {
       .to.be.rejectedWith(
         QuoteRiskPropertyTypeNotInsurableError,
         'Cannot create quote, HOUSE is not insured by this partner'
+      )
+  })
+
+  it('should throw an error if the occupancy is not insured by the partner', async () => {
+    // Given
+    const createQuoteCommand: CreateQuoteCommand = {
+      partnerCode: 'myPartner',
+      specOpsCode: OperationCode.BLANK,
+      risk: {
+        property: {
+          roomCount: 2,
+          occupancy: Occupancy.LANDLORD
+        }
+      }
+    }
+    defaultCapAdviceRepository.get.withArgs('myPartner', 2).resolves({ value: 6000 })
+    coverMonthlyPriceRepository.get.withArgs('myPartner', 2).resolves([{ coverMonthlyPrice: '0.820000', cover: COVER.DDEAUX }, { coverMonthlyPrice: '5.000000', cover: COVER.INCEND }])
+
+    // When
+    const quotePromise = createQuote(createQuoteCommand)
+
+    // Then
+    return expect(quotePromise)
+      .to.be.rejectedWith(
+        QuoteRiskOccupancyNotInsurableError,
+        'Cannot create quote, LANDLORD is not insured by this partner'
       )
   })
 

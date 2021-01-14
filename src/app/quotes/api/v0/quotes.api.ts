@@ -10,7 +10,7 @@ import {
   NoPartnerInsuranceForRiskError,
   QuoteNotFoundError, QuotePartnerOwnershipError,
   QuotePolicyHolderEmailNotFoundError,
-  QuoteRiskNumberOfRoommatesError,
+  QuoteRiskNumberOfRoommatesError, QuoteRiskOccupancyNotInsurableError,
   QuoteRiskPropertyRoomCountNotInsurableError, QuoteRiskPropertyTypeNotInsurableError,
   QuoteRiskRoommatesNotAllowedError,
   QuoteStartDateConsistencyError
@@ -89,7 +89,8 @@ export default function (container: Container): Array<ServerRoute> {
           }
           if (error instanceof NoPartnerInsuranceForRiskError ||
               error instanceof OperationCodeNotApplicableError ||
-              error instanceof QuoteRiskPropertyTypeNotInsurableError) {
+              error instanceof QuoteRiskPropertyTypeNotInsurableError ||
+              error instanceof QuoteRiskOccupancyNotInsurableError) {
             throw Boom.badData(error.message)
           }
 

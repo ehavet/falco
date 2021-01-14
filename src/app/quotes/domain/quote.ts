@@ -1,6 +1,6 @@
 import { Partner } from '../../partners/domain/partner'
 import {
-  QuoteRiskNumberOfRoommatesError,
+  QuoteRiskNumberOfRoommatesError, QuoteRiskOccupancyNotInsurableError,
   QuoteRiskPropertyRoomCountNotInsurableError, QuoteRiskPropertyTypeNotInsurableError,
   QuoteRiskRoommatesNotAllowedError,
   QuoteStartDateConsistencyError
@@ -199,6 +199,10 @@ export namespace Quote {
       const roomCount = command.risk.property.roomCount
       if (!PartnerFunc.isPropertyTypeInsured(partner, propertyType)) {
         throw new QuoteRiskPropertyTypeNotInsurableError(propertyType)
+      }
+
+      if (!PartnerFunc.isOccupancyInsured(partner, command.risk.property.occupancy)) {
+        throw new QuoteRiskOccupancyNotInsurableError(command.risk.property.occupancy)
       }
 
       if (!PartnerFunc.isPropertyRoomCountCovered(partner, roomCount)) {

@@ -3,7 +3,8 @@ import * as PartnerFunc from '../../../../src/app/partners/domain/partner.func'
 import { createPartnerFixture } from '../fixtures/partner.fixture'
 import { Partner } from '../../../../src/app/partners/domain/partner'
 import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
-import Question = Partner.Question
+import { Occupancy } from '../../../../src/app/common-api/domain/type/occupancy'
+import Question = Partner.Question;
 
 describe('Partners - Domain - Functions', () => {
   describe('#doesPartnerAllowNumberOfRoommatesForProperty', () => {
@@ -191,6 +192,109 @@ describe('Partners - Domain - Functions', () => {
 
         // When
         const isValid = PartnerFunc.isPropertyTypeInsured(partner, PropertyType.HOUSE)
+
+        // Then
+        expect(isValid).to.be.false
+      })
+    })
+  })
+
+  describe('#isOccupancyInsured', () => {
+    describe('when no options are specified for partner in occupancy question', () => {
+      // Given
+      let questions : Array<Question>
+      let partner : Partner
+      before(() => {
+        questions = [{
+          code: Partner.Question.QuestionCode.OCCUPANCY,
+          toAsk: false,
+          options: undefined,
+          defaultValue: Occupancy.TENANT
+        }]
+        partner = createPartnerFixture({ questions })
+      })
+
+      it('should return true if the given occupancy is accepted by default by partner', () => {
+        // When
+        const isValid = PartnerFunc.isOccupancyInsured(partner, Occupancy.TENANT)
+
+        // Then
+        expect(isValid).to.be.true
+      })
+
+      it('should return false if the given occupancy is not accepted by default by partner', () => {
+        // When
+        const isValid = PartnerFunc.isOccupancyInsured(partner, Occupancy.LANDLORD)
+
+        // Then
+        expect(isValid).to.be.false
+      })
+
+      it('should return false if the given occupancy is unknown', () => {
+        // When
+        const isValid = PartnerFunc.isOccupancyInsured(partner, 'UNKNOWN_OCCUPANCY' as any)
+
+        // Then
+        expect(isValid).to.be.false
+      })
+    })
+
+    describe('when options are specified for partner in occupancy question', () => {
+      it('should return true if the given occupancy is present within the options', () => {
+        // Given
+        const questions: Array<Question> = [{
+          code: Partner.Question.QuestionCode.OCCUPANCY,
+          toAsk: true,
+          options: [
+            { value: Occupancy.TENANT }
+          ],
+          defaultValue: Occupancy.TENANT,
+          defaultNextStep: Partner.Question.QuestionCode.ADDRESS
+        }]
+        const partner = createPartnerFixture({ questions })
+
+        // When
+        const isValid = PartnerFunc.isOccupancyInsured(partner, Occupancy.TENANT)
+
+        // Then
+        expect(isValid).to.be.true
+      })
+
+      it('should return false if the given occupancy is not present within the options', () => {
+        // Given
+        const questions: Array<Question> = [{
+          code: Partner.Question.QuestionCode.OCCUPANCY,
+          toAsk: true,
+          options: [
+            { value: Occupancy.TENANT }
+          ],
+          defaultValue: Occupancy.TENANT,
+          defaultNextStep: Partner.Question.QuestionCode.ADDRESS
+        }]
+        const partner = createPartnerFixture({ questions })
+
+        // When
+        const isValid = PartnerFunc.isOccupancyInsured(partner, Occupancy.LANDLORD)
+
+        // Then
+        expect(isValid).to.be.false
+      })
+
+      it('should return false if the given occupancy is present within the options but with a next step to rejected (which means not insurable)', () => {
+        // Given
+        const questions: Array<Question> = [{
+          code: Partner.Question.QuestionCode.OCCUPANCY,
+          toAsk: true,
+          options: [
+            { value: Occupancy.LANDLORD, nextStep: Partner.Question.NextStepAction.REJECT }
+          ],
+          defaultValue: Occupancy.TENANT,
+          defaultNextStep: Partner.Question.QuestionCode.ADDRESS
+        }]
+        const partner = createPartnerFixture({ questions })
+
+        // When
+        const isValid = PartnerFunc.isOccupancyInsured(partner, Occupancy.LANDLORD)
 
         // Then
         expect(isValid).to.be.false

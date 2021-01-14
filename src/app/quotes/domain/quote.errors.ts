@@ -71,3 +71,11 @@ export class QuoteRiskPropertyTypeNotInsurableError extends Error {
     this.name = 'QuoteRiskPropertyTypeNotInsurableError'
   }
 }
+
+export class QuoteRiskOccupancyNotInsurableError extends Error {
+  constructor (occupancy: string | undefined) {
+    const message: string = `Cannot create quote, ${occupancy} is not insured by this partner`
+    super(message)
+    this.name = 'QuoteRiskOccupancyNotInsurableError'
+  }
+}

@@ -2,6 +2,7 @@ import { Partner } from './partner'
 import { PartnerQuestionNotFoundError } from './partner.errors'
 import { Quote } from '../../quotes/domain/quote'
 import { PropertyType } from '../../common-api/domain/type/property-type'
+import { Occupancy } from '../../common-api/domain/type/occupancy'
 
 const NUMBER_FOR_NO_ROOMMATES = 0
 const DEMO_PARTNER_CODE_PREFIX: string = 'demo'
@@ -69,6 +70,11 @@ function _getQuestionOnPropertyType (partner: Partner) : Partner.Question.Proper
     .find((question) => question.code === Partner.Question.QuestionCode.PROPERTY_TYPE) as Partner.Question.PropertyTypeQuestion
 }
 
+function _getQuestionOnOccupancy (partner: Partner) : Partner.Question.OccupancyQuestion {
+  return partner.questions
+    .find((question) => question.code === Partner.Question.QuestionCode.OCCUPANCY) as Partner.Question.OccupancyQuestion
+}
+
 function _getInsuredPropertyTypes (partner: Partner) : Array<PropertyType> {
   const propertyTypeQuestion = _getQuestionOnPropertyType(partner)
   if (propertyTypeQuestion.options) {
@@ -79,10 +85,26 @@ function _getInsuredPropertyTypes (partner: Partner) : Array<PropertyType> {
   return [propertyTypeQuestion.defaultValue]
 }
 
+function _getInsuredOccupancies (partner: Partner) : Array<Occupancy> {
+  const occupancyQuestion = _getQuestionOnOccupancy(partner)
+  if (occupancyQuestion.options) {
+    return occupancyQuestion.options
+      .filter(option => option.nextStep !== Partner.Question.NextStepAction.REJECT)
+      .map(option => option.value)
+  }
+  return [occupancyQuestion.defaultValue]
+}
+
 export function isPropertyTypeInsured (partner: Partner, propertyType: PropertyType | undefined): boolean {
   if (!propertyType) return false
   const insuredPropertyTypes = _getInsuredPropertyTypes(partner)
   return insuredPropertyTypes.includes(propertyType)
+}
+
+export function isOccupancyInsured (partner: Partner, occupancy: Occupancy | undefined): boolean {
+  if (!occupancy) return false
+  const insuredOccupancies = _getInsuredOccupancies(partner)
+  return insuredOccupancies.includes(occupancy)
 }
 
 export function getDefaultPropertyType (partner: Partner) : PropertyType {

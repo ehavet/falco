@@ -416,6 +416,28 @@ describe('Quotes - API - Integration', async () => {
 
         expect(response).to.have.property('statusCode', 400)
       })
+
+      it('should reply with status 400 when occupancy is not TENANT or LANDLORD', async () => {
+        const partnerCode = 'demo-student'
+        response = await httpServer.api()
+          .post('/v0/quotes')
+          .send({
+            code: partnerCode,
+            risk: {
+              property: {
+                room_count: 2,
+                address: '52 Rue Beaubourg',
+                postal_code: '75019',
+                city: 'Paris',
+                type: 'FLAT',
+                occupancy: 'WRONG_OCCUPANCY'
+              }
+            }
+          })
+          .set('X-Consumer-Username', partnerCode)
+
+        expect(response).to.have.property('statusCode', 400)
+      })
     })
   })
 

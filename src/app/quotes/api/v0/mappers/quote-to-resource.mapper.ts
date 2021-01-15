@@ -35,13 +35,10 @@ function _toRisk (risk: Quote.Risk) {
   }
 }
 
-function _toOtherPeople (otherInsured: Quote.Risk.Person[] | undefined) {
-  if (otherInsured) {
-    return otherInsured.map(insured => {
-      return { firstname: insured.firstname, lastname: insured.lastname }
-    })
-  }
-  return []
+function _toOtherPeople (otherInsured: Quote.Risk.Person[]) {
+  return otherInsured.map(insured => {
+    return { firstname: insured.firstname, lastname: insured.lastname }
+  })
 }
 
 function _toInsurance (insurance: Quote.Insurance) {

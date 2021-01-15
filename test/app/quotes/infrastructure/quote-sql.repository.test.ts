@@ -117,19 +117,7 @@ describe('Repository - Quote', async () => {
   describe('#get', async () => {
     it('should return the found quote', async () => {
       // Given
-      const expectedQuote: Quote = createQuoteFixture({
-        id: 'DC82S0V',
-        risk: createQuoteRiskFixture({
-          property: {
-            roomCount: 2,
-            address: '88 rue des prairies',
-            postalCode: '91100',
-            city: 'Kyukamura',
-            type: PropertyType.FLAT,
-            occupancy: Occupancy.TENANT
-          }
-        })
-      })
+      const expectedQuote: Quote = createQuoteFixture({ id: 'DC82S0V' })
       await quoteRepository.save(expectedQuote)
 
       // When

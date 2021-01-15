@@ -294,7 +294,7 @@ export namespace Policy.Risk {
           postalCode,
           city: quoteRisk.property.city || commandRisk.property.city as string,
           type: propertyType,
-          occupancy: quoteRisk.property.occupancy
+          occupancy: quoteRisk.property.occupancy ?? commandRisk.property.occupancy
         },
         people: {
           person: commandRisk.people.policyHolder,

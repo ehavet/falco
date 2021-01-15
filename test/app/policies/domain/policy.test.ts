@@ -453,6 +453,19 @@ describe('Policies - Domain', async () => {
       expect(policy.risk.property.occupancy).to.be.equal(createPolicyCommand.risk.property.occupancy)
     })
 
+    it('should take the default occupancy from partner if the command and the quote do not provide occupancy', async () => {
+      const quoteWithoutOccupancy: Quote = createQuoteFixture()
+      quoteWithoutOccupancy.risk.property.occupancy = undefined
+      const createPolicyCommandWithoutOccupancy: CreatePolicyCommand = createCreatePolicyCommand({
+        quoteId: quoteWithoutOccupancy.id
+      })
+      createPolicyCommandWithoutOccupancy.risk.property.occupancy = undefined
+
+      const policy = await Policy.create(createPolicyCommandWithoutOccupancy, quoteWithoutOccupancy, policyRepository, partner)
+
+      expect(policy.risk.property.occupancy).to.be.equal(Occupancy.TENANT)
+    })
+
     it('should throw an error if the property.type from the command is not insurable by the partner and no type is provided in the quote', () => {
       // Given
       const commandWithNotInsurableType: CreatePolicyCommand = createCreatePolicyCommand({

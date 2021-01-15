@@ -283,6 +283,8 @@ export namespace Policy.Risk {
       const propertyType : PropertyType = quoteRisk.property.type ?? commandRisk.property.type ?? PartnerFunc.getDefaultPropertyType(partner)
       _checkIsInsurablePropertyType(partner, propertyType)
 
+      const occupancy : Occupancy = quoteRisk.property.occupancy ?? commandRisk.property.occupancy ?? PartnerFunc.getDefaultOccupancy(partner)
+
       const postalCode = quoteRisk.property.postalCode
         ? quoteRisk.property.postalCode
         : commandRisk.property.postalCode!
@@ -294,7 +296,7 @@ export namespace Policy.Risk {
           postalCode,
           city: quoteRisk.property.city || commandRisk.property.city as string,
           type: propertyType,
-          occupancy: quoteRisk.property.occupancy ?? commandRisk.property.occupancy
+          occupancy
         },
         people: {
           person: commandRisk.people.policyHolder,

@@ -865,7 +865,8 @@ describe('Quotes - API - Integration', async () => {
             address: '88 rue des prairies',
             postal_code: '91100',
             city: 'Kyukamura',
-            type: 'FLAT'
+            type: 'FLAT',
+            occupancy: 'TENANT'
           },
           person: {
             firstname: 'Jean-Jean',

@@ -1,8 +1,8 @@
 import { Quote } from '../../../domain/quote'
 import dayjs from '../../../../../libs/dayjs'
 
-// TODO: Use quote-to-resource.mapper.ts when developing the US allowing to update the quote occupancy
-export function updatedQuoteToResource (quote: Quote) {
+// This mapper should be the reference for all the endpoints returning a quote
+export function quoteToResource (quote: Quote) {
   return {
     id: quote.id,
     code: quote.partnerCode,
@@ -24,7 +24,8 @@ function _toRisk (risk: Quote.Risk) {
       address: risk.property.address ? risk.property.address : null,
       postal_code: risk.property.postalCode ? risk.property.postalCode : null,
       city: risk.property.city ? risk.property.city : null,
-      type: risk.property.type ? risk.property.type : null
+      type: risk.property.type ? risk.property.type : null,
+      occupancy: risk.property.occupancy ? risk.property.occupancy : null
     },
     person: risk.person ? {
       firstname: risk.person.firstname,

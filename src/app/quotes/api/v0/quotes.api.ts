@@ -3,7 +3,7 @@ import Joi from 'joi'
 import * as HttpErrorSchema from '../../../common-api/HttpErrorSchema'
 import { ServerRoute } from '@hapi/hapi'
 import { CreateQuoteCommand } from '../../domain/create-quote-command'
-import { quoteToResource } from './quote-to-resource.mapper'
+import { createdQuoteToResource } from './created-quote-to-resource.mapper'
 import { Container } from '../../quote.container'
 import { PartnerNotFoundError } from '../../../partners/domain/partner.errors'
 import {
@@ -26,6 +26,7 @@ import { requestToCreateQuoteCommand } from './mappers/request-to-create-quote-c
 import { GetQuoteById } from '../../domain/get-quote-by-id.usecase'
 import { POSTALCODE_REGEX } from '../../../common-api/domain/regexp'
 import { commonHeadersSchema } from '../../../common-api/api/common-headers.schema'
+import { quoteToResource } from './mappers/quote-to-resource.mapper'
 import GetQuoteByIdQuery = GetQuoteById.GetQuoteByIdQuery
 
 const TAGS = ['api', 'quotes']
@@ -81,7 +82,7 @@ export default function (container: Container): Array<ServerRoute> {
         const createQuoteCommand: CreateQuoteCommand = requestToCreateQuoteCommand(request)
         try {
           const quote = await container.CreateQuote(createQuoteCommand)
-          const quoteAsResource = quoteToResource(quote)
+          const quoteAsResource = createdQuoteToResource(quote)
           return h.response(quoteAsResource).code(201)
         } catch (error) {
           if (error instanceof PartnerNotFoundError) {
@@ -211,7 +212,7 @@ export default function (container: Container): Array<ServerRoute> {
 
         try {
           const quote = await container.GetQuoteById(query)
-          const quoteAsResource = updatedQuoteToResource(quote)
+          const quoteAsResource = quoteToResource(quote)
           return h.response(quoteAsResource).code(200)
         } catch (error) {
           switch (true) {

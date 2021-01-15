@@ -16,6 +16,7 @@ import {
 import { createPartnerFixture } from '../../partners/fixtures/partner.fixture'
 import { Partner } from '../../../../src/app/partners/domain/partner'
 import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
+import { Occupancy } from '../../../../src/app/common-api/domain/type/occupancy'
 import Question = Partner.Question;
 
 describe('Policies - Domain', async () => {
@@ -102,7 +103,7 @@ describe('Policies - Domain', async () => {
       expect(createdPolicy.insurance).to.deep.equal(quote.insurance)
     })
 
-    it('should set the risk from the quote and the query', async () => {
+    it('should set the risk from the quote and the command', async () => {
       // Given
       const expectedRisk: Policy.Risk = {
         property: {
@@ -110,7 +111,8 @@ describe('Policies - Domain', async () => {
           address: '88 rue des prairies',
           postalCode: '91100',
           city: 'Kyukamura',
-          type: PropertyType.FLAT
+          type: PropertyType.FLAT,
+          occupancy: Occupancy.TENANT
         },
         people: {
           person: {
@@ -361,7 +363,8 @@ describe('Policies - Domain', async () => {
             address: '13 rue du loup garou',
             postalCode: '91100',
             city: 'Corbeil-Essonnes',
-            type: undefined
+            type: undefined,
+            occupancy: undefined
           },
           people: {
             policyHolder: {
@@ -424,6 +427,18 @@ describe('Policies - Domain', async () => {
       const policy = await Policy.create(createPolicyCommandWithoutType, quoteWithoutType, policyRepository, partner)
 
       expect(policy.risk.property.type).to.be.equal(PropertyType.FLAT)
+    })
+
+    it('should take the occupancy from the quote when it is present', async () => {
+      const quoteWithOccupancy: Quote = createQuoteFixture()
+      const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({
+        quoteId: quoteWithOccupancy.id
+      })
+      createPolicyCommand.risk.property.occupancy = undefined
+
+      const policy = await Policy.create(createPolicyCommand, quoteWithOccupancy, policyRepository, partner)
+
+      expect(policy.risk.property.occupancy).to.be.equal(quoteWithOccupancy.risk.property.occupancy)
     })
 
     it('should throw an error if the property.type from the command is not insurable by the partner and no type is provided in the quote', () => {

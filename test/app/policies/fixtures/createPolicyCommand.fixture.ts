@@ -1,5 +1,6 @@
 import { CreatePolicyCommand } from '../../../../src/app/policies/domain/create-policy-command'
 import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
+import { Occupancy } from '../../../../src/app/common-api/domain/type/occupancy'
 
 export function createCreatePolicyCommand (attr: Partial<CreatePolicyCommand> = {}): CreatePolicyCommand {
   return {
@@ -10,7 +11,8 @@ export function createCreatePolicyCommand (attr: Partial<CreatePolicyCommand> = 
         address: '13 rue du loup garou',
         postalCode: '91100',
         city: 'Corbeil-Essonnes',
-        type: PropertyType.FLAT
+        type: PropertyType.FLAT,
+        occupancy: Occupancy.TENANT
       },
       people: {
         policyHolder: {

@@ -15,6 +15,7 @@ import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles
 import { createPartnerFixture } from '../../partners/fixtures/partner.fixture'
 import { quoteRepositoryStub } from '../../quotes/fixtures/quote-repository.test-doubles'
 import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
+import { Occupancy } from '../../../../src/app/common-api/domain/type/occupancy'
 
 describe('Policies - Usecase - Create policy', async () => {
   const now = new Date('2020-01-05T00:00:00Z')
@@ -53,6 +54,7 @@ describe('Policies - Usecase - Create policy', async () => {
     expectedPolicy.risk.property.postalCode = '91100'
     expectedPolicy.risk.property.city = 'Kyukamura'
     expectedPolicy.risk.property.type = PropertyType.FLAT
+    expectedPolicy.risk.property.occupancy = Occupancy.TENANT
 
     expectedPolicy.contact.address = '88 rue des prairies'
     expectedPolicy.contact.postalCode = '91100'

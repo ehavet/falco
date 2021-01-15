@@ -18,6 +18,7 @@ import {
 } from './policies.errors'
 import { Amount } from '../../common-api/domain/amount/amount'
 import { PropertyType } from '../../common-api/domain/type/property-type'
+import { Occupancy } from '../../common-api/domain/type/occupancy'
 
 const DEFAULT_NUMBER_OF_MONTHS_DUE = 12
 
@@ -258,7 +259,8 @@ export namespace Policy.Risk {
         address: string,
         postalCode: string,
         city: string,
-        type: PropertyType
+        type: PropertyType,
+        occupancy?: Occupancy
     }
 
     export interface People {
@@ -291,7 +293,8 @@ export namespace Policy.Risk {
           address: quoteRisk.property.address || commandRisk.property.address as string,
           postalCode,
           city: quoteRisk.property.city || commandRisk.property.city as string,
-          type: propertyType
+          type: propertyType,
+          occupancy: quoteRisk.property.occupancy
         },
         people: {
           person: commandRisk.people.policyHolder,

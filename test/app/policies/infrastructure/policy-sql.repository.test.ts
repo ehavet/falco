@@ -1,7 +1,7 @@
 import { PolicyRepository } from '../../../../src/app/policies/domain/policy.repository'
 import { PolicySqlRepository } from '../../../../src/app/policies/infrastructure/policy-sql.repository'
 import { Policy } from '../../../../src/app/policies/domain/policy'
-import { createPolicyFixture } from '../fixtures/policy.fixture'
+import { createPolicyFixture, createPolicyFixtureWithNoOccupancy } from '../fixtures/policy.fixture'
 import { dbTestUtils, expect } from '../../../test-utils'
 import { PolicySqlModel } from '../../../../src/app/policies/infrastructure/policy-sql.model'
 import { PolicyRiskSqlModel } from '../../../../src/app/quotes/infrastructure/policy-risk-sql.model'
@@ -47,7 +47,7 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
 
     it('should return the created policy', async () => {
       // Given
-      const expectedPolicy: Policy = createPolicyFixture(
+      const expectedPolicy: Policy = createPolicyFixtureWithNoOccupancy(
         {
           startDate: new Date('2020-01-05T00:00:00Z'),
           termStartDate: new Date('2020-01-05T00:00:00Z'),
@@ -91,7 +91,7 @@ describe('Policies - Infra - Policy SQL Repository', async () => {
     it('should return a Policy for a given existing id', async () => {
       // Given
       const policyId: string = 'APP463109486'
-      const expectedPolicy: Policy = createPolicyFixture({
+      const expectedPolicy: Policy = createPolicyFixtureWithNoOccupancy({
         id: policyId,
         startDate: new Date('2020-01-05T00:00:00Z'),
         termStartDate: new Date('2020-01-05T00:00:00Z'),

@@ -1,4 +1,5 @@
 import { PropertyType } from '../../common-api/domain/type/property-type'
+import { Occupancy } from '../../common-api/domain/type/occupancy'
 
 export interface CreatePolicyCommand {
     partnerCode: string,
@@ -41,7 +42,8 @@ export namespace CreatePolicyCommand.Risk {
         address: string | undefined,
         postalCode: string | undefined,
         city: string | undefined,
-        type: PropertyType | undefined
+        type: PropertyType | undefined,
+        occupancy: Occupancy | undefined
     }
 
     export interface People {

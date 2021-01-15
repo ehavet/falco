@@ -14,7 +14,9 @@ import {
   PolicyRiskPersonMissingError,
   PolicyHolderMissingPropertyError,
   PolicyHolderEmailValidationError,
-  PolicyRiskPropertyMissingFieldError, PolicyRiskPropertyTypeNotInsurableError
+  PolicyRiskPropertyMissingFieldError,
+  PolicyRiskPropertyTypeNotInsurableError,
+  PolicyRiskPropertyOccupancyNotInsurableError
 } from './policies.errors'
 import { Amount } from '../../common-api/domain/amount/amount'
 import { PropertyType } from '../../common-api/domain/type/property-type'
@@ -284,6 +286,7 @@ export namespace Policy.Risk {
       _checkIsInsurablePropertyType(partner, propertyType)
 
       const occupancy : Occupancy = quoteRisk.property.occupancy ?? commandRisk.property.occupancy ?? PartnerFunc.getDefaultOccupancy(partner)
+      _checkIsInsurableOccupancy(partner, occupancy)
 
       const postalCode = quoteRisk.property.postalCode
         ? quoteRisk.property.postalCode
@@ -308,6 +311,12 @@ export namespace Policy.Risk {
     function _checkIsInsurablePropertyType (partner: Partner, propertyType: PropertyType) : void {
       if (!PartnerFunc.isPropertyTypeInsured(partner, propertyType)) {
         throw new PolicyRiskPropertyTypeNotInsurableError(propertyType)
+      }
+    }
+
+    function _checkIsInsurableOccupancy (partner: Partner, occupancy: Occupancy) : void {
+      if (!PartnerFunc.isOccupancyInsured(partner, occupancy)) {
+        throw new PolicyRiskPropertyOccupancyNotInsurableError(occupancy)
       }
     }
 

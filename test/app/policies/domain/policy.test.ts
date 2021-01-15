@@ -10,6 +10,7 @@ import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles
 import {
   PolicyRiskNumberOfRoommatesError,
   PolicyRiskPropertyMissingFieldError,
+  PolicyRiskPropertyOccupancyNotInsurableError,
   PolicyRiskPropertyTypeNotInsurableError,
   PolicyRiskRoommatesNotAllowedError
 } from '../../../../src/app/policies/domain/policies.errors'
@@ -145,7 +146,14 @@ describe('Policies - Domain', async () => {
           toAsk: false,
           defaultValue: PropertyType.FLAT,
           defaultNextStep: Partner.Question.QuestionCode.ADDRESS
-        }]
+        },
+        {
+          code: Partner.Question.QuestionCode.OCCUPANCY,
+          toAsk: false,
+          defaultValue: Occupancy.TENANT,
+          defaultNextStep: Partner.Question.QuestionCode.ADDRESS
+        }
+      ]
 
       // When
       const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository, partner)
@@ -479,6 +487,21 @@ describe('Policies - Domain', async () => {
 
       // Then
       return expect(promise).to.be.rejectedWith(PolicyRiskPropertyTypeNotInsurableError, 'Cannot create policy, HOUSE is not insured by this partner')
+    })
+
+    it('should throw an error if the occupancy from the command is not insurable by the partner and no occupancy is provided in the quote', () => {
+      // Given
+      const commandWithNotInsurableOccupancy: CreatePolicyCommand = createCreatePolicyCommand({
+        quoteId: quote.id
+      })
+      commandWithNotInsurableOccupancy.risk.property.occupancy = Occupancy.LANDLORD
+      quote.risk.property.occupancy = undefined
+
+      // When
+      const promise = Policy.create(commandWithNotInsurableOccupancy, quote, policyRepository, partner)
+
+      // Then
+      return expect(promise).to.be.rejectedWith(PolicyRiskPropertyOccupancyNotInsurableError, 'Cannot create policy, LANDLORD is not insured by this partner')
     })
 
     describe('should throw an error if', () => {

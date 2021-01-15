@@ -112,6 +112,14 @@ export class PolicyRiskPropertyTypeNotInsurableError extends Error {
   }
 }
 
+export class PolicyRiskPropertyOccupancyNotInsurableError extends Error {
+  constructor (occupancy: string | undefined) {
+    const message: string = `Cannot create policy, ${occupancy} is not insured by this partner`
+    super(message)
+    this.name = 'PolicyRiskPropertyOccupancyNotInsurableError'
+  }
+}
+
 export class CreatePolicyQuotePartnerOwnershipError extends Error {
   constructor (quoteId: string, partnerCode: string) {
     const message: string = `Could not create policy with quote ${quoteId} that does not belong to ${partnerCode}`

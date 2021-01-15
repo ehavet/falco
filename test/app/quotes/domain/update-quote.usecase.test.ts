@@ -3,7 +3,7 @@ import { UpdateQuoteCommand } from '../../../../src/app/quotes/domain/update-quo
 import { UpdateQuote } from '../../../../src/app/quotes/domain/update-quote.usecase'
 import { Quote } from '../../../../src/app/quotes/domain/quote'
 import {
-  createQuoteFixture,
+  createQuoteFixtureWithNoOccupancy,
   createQuoteInsuranceFixture,
   createQuotePolicyHolderFixture,
   createQuoteRiskFixture,
@@ -47,7 +47,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
 
   beforeEach(() => {
     dateFaker.setCurrentDate(now)
-    quote = createQuoteFixture({ id: quoteId })
+    quote = createQuoteFixtureWithNoOccupancy({ id: quoteId })
     quoteRepository = quoteRepositoryStub({ update: sinon.mock() })
     partnerRepository = partnerRepositoryStub()
     partner = createPartnerFixture(
@@ -126,7 +126,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
     it('should update start date, term start date and term end date when start date is changed', async () => {
       // Given
       const updatedStartDate: Date = new Date('2020-07-01')
-      const updatedQuote = createQuoteFixture(
+      const updatedQuote = createQuoteFixtureWithNoOccupancy(
         {
           id: 'UDQUOT3',
           startDate: new Date('2020-07-01T00:00:00.000Z'),
@@ -153,7 +153,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
       // Given
       quoteRepository.get.withArgs(quoteId).resolves(quote)
       const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId, specOpsCode: 'SEMESTER1' })
-      const updatedQuote = createQuoteFixture(
+      const updatedQuote = createQuoteFixtureWithNoOccupancy(
         {
           id: 'UDQUOT3',
           premium: 29.1,
@@ -176,7 +176,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
       // Given
       quoteRepository.get.withArgs(quoteId).resolves(quote)
       const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId, specOpsCode: 'SEMESTER2' })
-      const updatedQuote = createQuoteFixture(
+      const updatedQuote = createQuoteFixtureWithNoOccupancy(
         {
           id: 'UDQUOT3',
           premium: 29.1,
@@ -199,7 +199,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
       // Given
       quoteRepository.get.withArgs(quoteId).resolves(quote)
       const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId, specOpsCode: 'FULLYEAR' })
-      const updatedQuote = createQuoteFixture(
+      const updatedQuote = createQuoteFixtureWithNoOccupancy(
         {
           id: 'UDQUOT3',
           premium: 58.2,
@@ -223,7 +223,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
         // Given
         quoteRepository.get.withArgs(quoteId).resolves(quote)
         const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId, specOpsCode: '' })
-        const updatedQuote = createQuoteFixture(
+        const updatedQuote = createQuoteFixtureWithNoOccupancy(
           {
             id: 'UDQUOT3',
             premium: 69.84,
@@ -244,10 +244,10 @@ describe('Quotes - Usecase - Update Quote', async () => {
 
       it('should update premium on 12 months with specialOperationsCode null and specialOperationsCodeAppliedAt filled up when a spec ops code has been applied previously', async () => {
         // Given
-        const quote = createQuoteFixture({ id: quoteId, specialOperationsCode: OperationCode.SEMESTER1, specialOperationsCodeAppliedAt: new Date() })
+        const quote = createQuoteFixtureWithNoOccupancy({ id: quoteId, specialOperationsCode: OperationCode.SEMESTER1, specialOperationsCodeAppliedAt: new Date() })
         quoteRepository.get.withArgs(quoteId).resolves(quote)
         const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quote.id, specOpsCode: '' })
-        const updatedQuote = createQuoteFixture(
+        const updatedQuote = createQuoteFixtureWithNoOccupancy(
           {
             id: 'UDQUOT3',
             premium: 69.84,
@@ -272,7 +272,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
         // Given
         quoteRepository.get.withArgs(quoteId).resolves(quote)
         const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quoteId, specOpsCode: undefined })
-        const updatedQuote = createQuoteFixture(
+        const updatedQuote = createQuoteFixtureWithNoOccupancy(
           {
             id: 'UDQUOT3',
             premium: 69.84,
@@ -293,10 +293,10 @@ describe('Quotes - Usecase - Update Quote', async () => {
 
       it('should update premium on 12 months with specialOperationsCode null and specialOperationsCodeAppliedAt filled up when a spec ops code has been applied previously', async () => {
         // Given
-        const quote = createQuoteFixture({ id: quoteId, specialOperationsCode: OperationCode.SEMESTER1, specialOperationsCodeAppliedAt: new Date() })
+        const quote = createQuoteFixtureWithNoOccupancy({ id: quoteId, specialOperationsCode: OperationCode.SEMESTER1, specialOperationsCodeAppliedAt: new Date() })
         quoteRepository.get.withArgs(quoteId).resolves(quote)
         const updateQuoteCommand = createUpdateQuoteCommandFixture({ id: quote.id, specOpsCode: undefined })
-        const updatedQuote = createQuoteFixture(
+        const updatedQuote = createQuoteFixtureWithNoOccupancy(
           {
             id: 'UDQUOT3',
             premium: 69.84,
@@ -318,7 +318,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
 
     describe('should apply operation code when valid code contains spaces or non alphanumeric characters', async () => {
       const codesList = ['FULL   YEAR', 'FULL_YEAR', 'FULL.YEAR', 'fullyear', 'full@year', 'FUll!ç&Year']
-      const updatedQuote = createQuoteFixture(
+      const updatedQuote = createQuoteFixtureWithNoOccupancy(
         {
           id: 'UDQUOT3',
           nbMonthsDue: 10,
@@ -351,7 +351,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
     it('should add a policy holder with no email validation date when former quote policy holder is undefined', async () => {
       // Given
       quote.policyHolder = undefined
-      const updatedQuote = createQuoteFixture(
+      const updatedQuote = createQuoteFixtureWithNoOccupancy(
         {
           id: 'UDQUOT3',
           specialOperationsCode: null,
@@ -375,7 +375,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
 
     it('should update the email and reset the email validation date when email is changed', async () => {
       // Given
-      const quote = createQuoteFixture(
+      const quote = createQuoteFixtureWithNoOccupancy(
         {
           id: 'UDQUOT3',
           policyHolder: createQuotePolicyHolderFixture({
@@ -385,7 +385,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
         }
       )
 
-      const updatedQuote = createQuoteFixture(
+      const updatedQuote = createQuoteFixtureWithNoOccupancy(
         {
           id: 'UDQUOT3',
           specialOperationsCode: null,
@@ -416,7 +416,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
 
     it('should not reset the email validation date when email is not changed', async () => {
       // Given
-      const quote = createQuoteFixture(
+      const quote = createQuoteFixtureWithNoOccupancy(
         {
           id: 'UDQUOT3',
           policyHolder: createQuotePolicyHolderFixture({
@@ -426,7 +426,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
         }
       )
 
-      const updatedQuote = createQuoteFixture(
+      const updatedQuote = createQuoteFixtureWithNoOccupancy(
         {
           id: 'UDQUOT3',
           specialOperationsCode: null,
@@ -457,7 +457,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
 
     it('should update policy holder properties when they have changed', async () => {
       // Given
-      const updatedQuote = createQuoteFixture(
+      const updatedQuote = createQuoteFixtureWithNoOccupancy(
         {
           id: 'UDQUOT3',
           specialOperationsCode: null,
@@ -503,7 +503,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
       // Given
       const newRoomCount: number = 3
       const defaultCapAdviceForRoomCountOf3: DefaultCapAdvice = { value: 10000 }
-      const updatedQuote = createQuoteFixture(
+      const updatedQuote = createQuoteFixtureWithNoOccupancy(
         {
           id: 'UDQUOT3',
           specialOperationsCode: null,
@@ -545,7 +545,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
 
     it('should update risk if risk address, postal code and city are changed', async () => {
       // Given
-      const updatedQuote = createQuoteFixture(
+      const updatedQuote = createQuoteFixtureWithNoOccupancy(
         {
           id: 'UDQUOT3',
           specialOperationsCode: null,
@@ -592,7 +592,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
         firstname: 'Jean-Jean',
         lastname: 'Lapin'
       }
-      const updatedQuote = createQuoteFixture(
+      const updatedQuote = createQuoteFixtureWithNoOccupancy(
         {
           id: 'UDQUOT3',
           specialOperationsCode: null,
@@ -623,7 +623,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
 
     it('should update the risk person if firstname and lastname have changed', async () => {
       // Given
-      const updatedQuote = createQuoteFixture(
+      const updatedQuote = createQuoteFixtureWithNoOccupancy(
         {
           id: 'UDQUOT3',
           specialOperationsCode: null,
@@ -659,7 +659,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
 
     it('should remove the person if the risk on the person is deleted', async () => {
       // Given
-      const updatedQuote = createQuoteFixture(
+      const updatedQuote = createQuoteFixtureWithNoOccupancy(
         {
           id: 'UDQUOT3',
           specialOperationsCode: null,
@@ -689,7 +689,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
 
     it('should update risk on the other people if the risk on the other people is changed', async () => {
       // Given
-      const updatedQuote = createQuoteFixture(
+      const updatedQuote = createQuoteFixtureWithNoOccupancy(
         {
           id: 'UDQUOT3',
           specialOperationsCode: null,
@@ -725,7 +725,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
 
     it('should remove the risk on the other people if the risk on the other people is deleted', async () => {
       // Given
-      const updatedQuote = createQuoteFixture(
+      const updatedQuote = createQuoteFixtureWithNoOccupancy(
         {
           id: 'UDQUOT3',
           specialOperationsCode: null,
@@ -760,7 +760,7 @@ describe('Quotes - Usecase - Update Quote', async () => {
     // Given
     quoteRepository.get.withArgs(quoteId).resolves(quote)
 
-    const expectedQuote: Quote = createQuoteFixture({
+    const expectedQuote: Quote = createQuoteFixtureWithNoOccupancy({
       id: quoteId,
       partnerCode: partnerCode,
       nbMonthsDue: 10,

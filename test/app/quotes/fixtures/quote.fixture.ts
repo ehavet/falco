@@ -1,10 +1,70 @@
 import { Quote } from '../../../../src/app/quotes/domain/quote'
 import { UpdateQuoteCommand } from '../../../../src/app/quotes/domain/update-quote-command'
 import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
+import { Occupancy } from '../../../../src/app/common-api/domain/type/occupancy'
 
 const now: Date = new Date('2020-01-05T00:00:00Z')
 
 export function createQuoteFixture (attr:Partial<Quote> = {}): Quote {
+  return {
+    id: 'UD65X3A',
+    partnerCode: 'myPartner',
+    risk: {
+      property: {
+        roomCount: 2,
+        address: '88 rue des prairies',
+        postalCode: '91100',
+        city: 'Kyukamura',
+        type: PropertyType.FLAT,
+        occupancy: Occupancy.TENANT
+      },
+      person: {
+        firstname: 'Jean-Jean',
+        lastname: 'Lapin'
+      },
+      otherPeople: [
+        {
+          firstname: 'John',
+          lastname: 'Doe'
+        }
+      ]
+    },
+    insurance: {
+      estimate: {
+        monthlyPrice: 5.82,
+        defaultDeductible: 150,
+        defaultCeiling: 7000
+      },
+      currency: 'EUR',
+      simplifiedCovers: ['ACDDE', 'ACVOL'],
+      productCode: 'APP999',
+      productVersion: 'v2020-02-01',
+      contractualTerms: '/path/to/contractual/terms',
+      ipid: '/path/to/ipid'
+    },
+    policyHolder: {
+      firstname: 'Jean-Jean',
+      lastname: 'Lapin',
+      address: '88 rue des prairies',
+      postalCode: '91100',
+      city: 'Kyukamura',
+      email: 'jeanjean@email.com',
+      phoneNumber: '+33684205510',
+      emailValidatedAt: undefined
+    },
+    premium: 69.84,
+    nbMonthsDue: 12,
+    specialOperationsCode: undefined,
+    specialOperationsCodeAppliedAt: undefined,
+    startDate: now,
+    termStartDate: now,
+    termEndDate: now,
+    ...attr
+  }
+}
+
+// TODO To remove when US about adding occupancy on update has been developed
+export function createQuoteFixtureWithNoOccupancy (attr:Partial<Quote> = {}): Quote {
   return {
     id: 'UD65X3A',
     partnerCode: 'myPartner',

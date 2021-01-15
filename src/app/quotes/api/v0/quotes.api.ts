@@ -10,7 +10,7 @@ import {
   NoPartnerInsuranceForRiskError,
   QuoteNotFoundError, QuotePartnerOwnershipError,
   QuotePolicyHolderEmailNotFoundError,
-  QuoteRiskNumberOfRoommatesError,
+  QuoteRiskNumberOfRoommatesError, QuoteRiskOccupancyNotInsurableError,
   QuoteRiskPropertyRoomCountNotInsurableError, QuoteRiskPropertyTypeNotInsurableError,
   QuoteRiskRoommatesNotAllowedError,
   QuoteStartDateConsistencyError
@@ -54,7 +54,8 @@ export default function (container: Container): Array<ServerRoute> {
                   address: Joi.string().optional().description('Property address').example('112 rue du chêne rouge'),
                   postal_code: Joi.string().optional().regex(POSTALCODE_REGEX).description('Property postal code').example('95470'),
                   city: Joi.string().optional().max(50).description('Property city').example('Corbeil-Essonnes'),
-                  type: Joi.string().optional().description('The type of property').example('FLAT')
+                  type: Joi.string().optional().description('The type of property').example('FLAT'),
+                  occupancy: Joi.string().optional().description('The occupancy of the property').example('TENANT')
                 }).description('Risks regarding the property').label('Risk.Property')
               }).description('Risks').label('Risk'),
               insurance: Joi.object({
@@ -88,7 +89,8 @@ export default function (container: Container): Array<ServerRoute> {
           }
           if (error instanceof NoPartnerInsuranceForRiskError ||
               error instanceof OperationCodeNotApplicableError ||
-              error instanceof QuoteRiskPropertyTypeNotInsurableError) {
+              error instanceof QuoteRiskPropertyTypeNotInsurableError ||
+              error instanceof QuoteRiskOccupancyNotInsurableError) {
             throw Boom.badData(error.message)
           }
 

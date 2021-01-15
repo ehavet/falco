@@ -2,12 +2,14 @@ import { Partner } from './partner'
 import { PartnerQuestionNotFoundError } from './partner.errors'
 import { Quote } from '../../quotes/domain/quote'
 import { PropertyType } from '../../common-api/domain/type/property-type'
+import { Occupancy } from '../../common-api/domain/type/occupancy'
+import Question = Partner.Question;
 
 const NUMBER_FOR_NO_ROOMMATES = 0
 const DEMO_PARTNER_CODE_PREFIX: string = 'demo'
 
 export function doesPartnerAllowRoommates (partner: Partner): boolean {
-  const roommateQuestion = _getQuestionOnRoommates(partner)
+  const roommateQuestion = _getQuestion(partner, Partner.Question.QuestionCode.ROOMMATE) as Partner.Question.RoommateQuestion
   if (roommateQuestion) {
     return (roommateQuestion as Partner.Question.RoommateQuestion).applicable
   }
@@ -25,7 +27,7 @@ export function doesPartnerAllowNumberOfRoommatesForProperty (partner: Partner, 
 export function getMaxNumberOfRoommatesForProperty (partner: Partner, risk: Quote.Risk): number {
   if (doesPartnerAllowRoommates(partner)) {
     const roomCount: number = risk.property.roomCount
-    const roommateQuestion = _getQuestionOnRoommates(partner)
+    const roommateQuestion = _getQuestion(partner, Partner.Question.QuestionCode.ROOMMATE) as Partner.Question.RoommateQuestion
     const maxNumberOfRoommates = (roommateQuestion as Partner.Question.RoommateQuestion).maximumNumbers!.find(maximumNumber => maximumNumber.roomCount === roomCount)
     return maxNumberOfRoommates ? maxNumberOfRoommates.value : NUMBER_FOR_NO_ROOMMATES
   }
@@ -38,12 +40,6 @@ export function getProductCode (partner: Partner): string {
 
 export function getTrigram (partner: Partner): string {
   return partner.trigram
-}
-
-function _getQuestionOnRoommates (partner: Partner) {
-  const roommateQuestion: Partner.Question | undefined = partner.questions
-    .find(question => question.code === Partner.Question.QuestionCode.ROOMMATE)
-  return roommateQuestion
 }
 
 export function isPropertyAllowNumberOfRoommates (partner: Partner, numberOfRoommates: number, risk: Quote.Risk): boolean {
@@ -64,13 +60,8 @@ export function isPropertyRoomCountCovered (partner: Partner, roomCount: number)
   })
 }
 
-function _getQuestionOnPropertyType (partner: Partner) : Partner.Question.PropertyTypeQuestion {
-  return partner.questions
-    .find((question) => question.code === Partner.Question.QuestionCode.PROPERTY_TYPE) as Partner.Question.PropertyTypeQuestion
-}
-
 function _getInsuredPropertyTypes (partner: Partner) : Array<PropertyType> {
-  const propertyTypeQuestion = _getQuestionOnPropertyType(partner)
+  const propertyTypeQuestion = _getQuestion(partner, Partner.Question.QuestionCode.PROPERTY_TYPE) as Partner.Question.PropertyTypeQuestion
   if (propertyTypeQuestion.options) {
     return propertyTypeQuestion.options
       .filter(option => option.nextStep !== Partner.Question.NextStepAction.REJECT)
@@ -79,13 +70,39 @@ function _getInsuredPropertyTypes (partner: Partner) : Array<PropertyType> {
   return [propertyTypeQuestion.defaultValue]
 }
 
+function _getInsuredOccupancies (partner: Partner) : Array<Occupancy> {
+  const occupancyQuestion = _getQuestion(partner, Partner.Question.QuestionCode.OCCUPANCY) as Partner.Question.OccupancyQuestion
+  if (occupancyQuestion.options) {
+    return occupancyQuestion.options
+      .filter(option => option.nextStep !== Partner.Question.NextStepAction.REJECT)
+      .map(option => option.value)
+  }
+  return [occupancyQuestion.defaultValue]
+}
+
 export function isPropertyTypeInsured (partner: Partner, propertyType: PropertyType | undefined): boolean {
   if (!propertyType) return false
   const insuredPropertyTypes = _getInsuredPropertyTypes(partner)
   return insuredPropertyTypes.includes(propertyType)
 }
 
+export function isOccupancyInsured (partner: Partner, occupancy: Occupancy | undefined): boolean {
+  if (!occupancy) return false
+  const insuredOccupancies = _getInsuredOccupancies(partner)
+  return insuredOccupancies.includes(occupancy)
+}
+
 export function getDefaultPropertyType (partner: Partner) : PropertyType {
-  const propertyTypeQuestion = _getQuestionOnPropertyType(partner)
+  const propertyTypeQuestion = _getQuestion(partner, Partner.Question.QuestionCode.PROPERTY_TYPE) as Partner.Question.PropertyTypeQuestion
   return propertyTypeQuestion.defaultValue
+}
+
+export function getDefaultOccupancy (partner: Partner) : Occupancy {
+  const occupancyQuestion = _getQuestion(partner, Partner.Question.QuestionCode.OCCUPANCY) as Partner.Question.OccupancyQuestion
+  return occupancyQuestion.defaultValue
+}
+
+function _getQuestion (partner: Partner, questionCode: Partner.Question.QuestionCode) : Question {
+  return partner.questions
+    .find((question) => question.code === questionCode) as Partner.Question
 }

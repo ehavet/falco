@@ -8,8 +8,9 @@ import {
   QuoteNotFoundError,
   QuotePartnerOwnershipError,
   QuotePolicyHolderEmailNotFoundError,
-  QuoteRiskNumberOfRoommatesError,
-  QuoteRiskPropertyRoomCountNotInsurableError, QuoteRiskPropertyTypeNotInsurableError,
+  QuoteRiskNumberOfRoommatesError, QuoteRiskOccupancyNotInsurableError,
+  QuoteRiskPropertyRoomCountNotInsurableError,
+  QuoteRiskPropertyTypeNotInsurableError,
   QuoteRiskRoommatesNotAllowedError,
   QuoteStartDateConsistencyError
 } from '../../../../../src/app/quotes/domain/quote.errors'
@@ -23,10 +24,9 @@ import {
 } from '../../fixtures/quote.fixture'
 import { UpdateQuoteCommand } from '../../../../../src/app/quotes/domain/update-quote-command'
 import { OperationCodeNotApplicableError } from '../../../../../src/app/policies/domain/operation-code.errors'
-import {
-  DefaultCapAdviceNotFoundError
-} from '../../../../../src/app/quotes/domain/default-cap-advice/default-cap-advice.errors'
+import { DefaultCapAdviceNotFoundError } from '../../../../../src/app/quotes/domain/default-cap-advice/default-cap-advice.errors'
 import { PropertyType } from '../../../../../src/app/common-api/domain/type/property-type'
+import { Occupancy } from '../../../../../src/app/common-api/domain/type/occupancy'
 
 describe('Quotes - API - Integration', async () => {
   let httpServer: HttpServerForTesting
@@ -48,7 +48,8 @@ describe('Quotes - API - Integration', async () => {
             address: '52 Rue Beaubourg',
             postalCode: '75003',
             city: 'Paris',
-            type: PropertyType.FLAT
+            type: PropertyType.FLAT,
+            occupancy: Occupancy.TENANT
           }
         },
         insurance: {
@@ -79,7 +80,8 @@ describe('Quotes - API - Integration', async () => {
             address: '52 Rue Beaubourg',
             postal_code: '75003',
             city: 'Paris',
-            type: 'FLAT'
+            type: 'FLAT',
+            occupancy: 'TENANT'
           }
         },
         insurance: {
@@ -113,7 +115,8 @@ describe('Quotes - API - Integration', async () => {
                 address: '52 Rue Beaubourg',
                 postal_code: '75003',
                 city: 'Paris',
-                type: 'FLAT'
+                type: 'FLAT',
+                occupancy: 'TENANT'
               }
             }
           })
@@ -131,7 +134,23 @@ describe('Quotes - API - Integration', async () => {
 
     describe('when then quote is created with property.type', () => {
       it('should reply with status 422 when type is equal to house', async () => {
+        // Given
         const partnerCode = 'demo-student'
+        const propertyTypeNotInsured = PropertyType.HOUSE
+        const risk = {
+          property: {
+            roomCount: 2,
+            address: '52 Rue Beaubourg',
+            postalCode: '75019',
+            city: 'Paris',
+            type: propertyTypeNotInsured,
+            occupancy: Occupancy.TENANT
+          }
+        }
+        const specOpsCode = 'BLANK'
+        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, specOpsCode }).rejects(new QuoteRiskPropertyTypeNotInsurableError(propertyTypeNotInsured))
+
+        // When
         response = await httpServer.api()
           .post('/v0/quotes')
           .send({
@@ -142,13 +161,58 @@ describe('Quotes - API - Integration', async () => {
                 address: '52 Rue Beaubourg',
                 postal_code: '75019',
                 city: 'Paris',
-                type: 'HOUSE'
+                type: propertyTypeNotInsured,
+                occupancy: 'TENANT'
               }
             }
           })
           .set('X-Consumer-Username', partnerCode)
 
+        // Then
         expect(response).to.have.property('statusCode', 422)
+        expect(response.body).to.have.property('message', `Cannot create quote, ${propertyTypeNotInsured} is not insured by this partner`)
+      })
+    })
+
+    describe('when then quote is created with occupancy', () => {
+      it('should reply with status 422 when the occupancy is not insured by the partner', async () => {
+        // Given
+        const partnerCode = 'myPartner'
+        const occupancyNotInsured = Occupancy.LANDLORD
+        const risk = {
+          property: {
+            roomCount: 2,
+            address: '52 rue Beaubourg',
+            postalCode: '75019',
+            city: 'Paris',
+            type: PropertyType.FLAT,
+            occupancy: occupancyNotInsured
+          }
+        }
+        const specOpsCode = 'BLANK'
+        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, specOpsCode }).rejects(new QuoteRiskOccupancyNotInsurableError(occupancyNotInsured))
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/quotes')
+          .send({
+            code: partnerCode,
+            risk: {
+              property: {
+                room_count: 2,
+                address: '52 rue Beaubourg',
+                postal_code: '75019',
+                city: 'Paris',
+                type: 'FLAT',
+                occupancy: occupancyNotInsured
+              }
+            }
+          })
+          .set('X-Consumer-Username', partnerCode)
+
+        // Then
+        expect(response).to.have.property('statusCode', 422)
+        expect(response.body).to.have.property('message', `Cannot create quote, ${occupancyNotInsured} is not insured by this partner`)
       })
     })
 
@@ -162,7 +226,8 @@ describe('Quotes - API - Integration', async () => {
             address: '52 Rue Beaubourg',
             postalCode: '75003',
             city: 'Paris',
-            type: 'FLAT'
+            type: 'FLAT',
+            occupancy: 'TENANT'
           }
         }
         const specOpsCode = 'BLANK'
@@ -179,7 +244,8 @@ describe('Quotes - API - Integration', async () => {
                 address: '52 Rue Beaubourg',
                 postal_code: '75003',
                 city: 'Paris',
-                type: 'FLAT'
+                type: 'FLAT',
+                occupancy: 'TENANT'
               }
             }
           })
@@ -195,7 +261,7 @@ describe('Quotes - API - Integration', async () => {
       it('should reply with status 422', async () => {
         // Given
         const partnerCode: string = 'myPartner'
-        const risk = { property: { roomCount: 2, postalCode: undefined, city: undefined, address: undefined, type: undefined } }
+        const risk = { property: { roomCount: 2, postalCode: undefined, city: undefined, address: undefined, type: undefined, occupancy: undefined } }
         const specOpsCode = 'BLANK'
         sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, specOpsCode }).rejects(new NoPartnerInsuranceForRiskError(partnerCode, risk))
 
@@ -291,8 +357,22 @@ describe('Quotes - API - Integration', async () => {
       })
 
       it('Should reply with status 422 when special operations code is not applicable for selected partner', async () => {
+        // Given
         const invalidSpecOpsCode = '!Nv4l!D'
         const partnerCode = 'demo-student'
+        const risk = {
+          property: {
+            roomCount: 2,
+            address: '52 Rue Beaubourg',
+            postalCode: '75019',
+            city: 'Paris',
+            type: PropertyType.FLAT,
+            occupancy: Occupancy.TENANT
+          }
+        }
+        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, specOpsCode: invalidSpecOpsCode }).rejects(new OperationCodeNotApplicableError(invalidSpecOpsCode, partnerCode))
+
+        // When
         response = await httpServer.api()
           .post('/v0/quotes')
           .send({
@@ -304,12 +384,14 @@ describe('Quotes - API - Integration', async () => {
                 address: '52 Rue Beaubourg',
                 postal_code: '75019',
                 city: 'Paris',
-                type: PropertyType.FLAT
+                type: PropertyType.FLAT,
+                occupancy: Occupancy.TENANT
               }
             }
           })
           .set('X-Consumer-Username', partnerCode)
 
+        // Then
         expect(response).to.have.property('statusCode', 422)
         expect(response.body.message).to.equal(`The operation code ${invalidSpecOpsCode} is not applicable for partner : ${partnerCode}`)
       })
@@ -327,6 +409,28 @@ describe('Quotes - API - Integration', async () => {
                 postal_code: '75019',
                 city: 'Paris',
                 type: 'WRONGTYPE'
+              }
+            }
+          })
+          .set('X-Consumer-Username', partnerCode)
+
+        expect(response).to.have.property('statusCode', 400)
+      })
+
+      it('should reply with status 400 when occupancy is not TENANT or LANDLORD', async () => {
+        const partnerCode = 'demo-student'
+        response = await httpServer.api()
+          .post('/v0/quotes')
+          .send({
+            code: partnerCode,
+            risk: {
+              property: {
+                room_count: 2,
+                address: '52 Rue Beaubourg',
+                postal_code: '75019',
+                city: 'Paris',
+                type: 'FLAT',
+                occupancy: 'WRONG_OCCUPANCY'
               }
             }
           })

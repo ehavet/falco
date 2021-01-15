@@ -1,5 +1,6 @@
 import { OperationCode } from '../../common-api/domain/operation-code'
 import { PropertyType } from '../../common-api/domain/type/property-type'
+import { Occupancy } from '../../common-api/domain/type/occupancy'
 
 export interface CreateQuoteCommand {
     partnerCode: string,
@@ -10,7 +11,8 @@ export interface CreateQuoteCommand {
             address?: string,
             postalCode?: string,
             city?: string,
-            type?: PropertyType
+            type?: PropertyType,
+            occupancy?: Occupancy
         }
     }
 }

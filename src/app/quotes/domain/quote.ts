@@ -1,6 +1,6 @@
 import { Partner } from '../../partners/domain/partner'
 import {
-  QuoteRiskNumberOfRoommatesError,
+  QuoteRiskNumberOfRoommatesError, QuoteRiskOccupancyNotInsurableError,
   QuoteRiskPropertyRoomCountNotInsurableError, QuoteRiskPropertyTypeNotInsurableError,
   QuoteRiskRoommatesNotAllowedError,
   QuoteStartDateConsistencyError
@@ -17,6 +17,7 @@ import { Amount } from '../../common-api/domain/amount/amount'
 import { DefaultCapAdvice } from './default-cap-advice/default-cap-advice'
 import { PropertyType } from '../../common-api/domain/type/property-type'
 import { CoverMonthlyPrice } from './cover/coverMonthlyPrice'
+import { Occupancy } from '../../common-api/domain/type/occupancy'
 
 const DEFAULT_NUMBER_MONTHS_DUE = 12
 
@@ -192,7 +193,7 @@ export namespace Quote {
     function _buildRisk (command: CreateQuoteCommand, partner: Partner) : Risk {
       /* WARNING : the following line has to be removed for v1 :
       risk.property.type is optionnal on endpoint POST v0/quotes, so we have to retrieve it from partner.
-      The correct rule is : risk.property.type is mandatory and shoud be given on quote creation.
+      The correct rule is : risk.property.type is mandatory and should be given on quote creation.
       It should be implemented that way for POST v1/quotes */
       const propertyType = command.risk.property.type ?? PartnerFunc.getDefaultPropertyType(partner)
       const roomCount = command.risk.property.roomCount
@@ -200,11 +201,24 @@ export namespace Quote {
         throw new QuoteRiskPropertyTypeNotInsurableError(propertyType)
       }
 
+      /* WARNING : the following line has to be removed for v1 :
+      risk.property.occupancy is optionnal on endpoint POST v0/quotes, so we have to retrieve it from partner.
+      The correct rule is : risk.property.occupancy is mandatory and should be given on quote creation.
+      It should be implemented that way for POST v1/quotes */
+      const occupancy = command.risk.property.occupancy ?? PartnerFunc.getDefaultOccupancy(partner)
+      if (!PartnerFunc.isOccupancyInsured(partner, occupancy)) {
+        throw new QuoteRiskOccupancyNotInsurableError(occupancy)
+      }
+
       if (!PartnerFunc.isPropertyRoomCountCovered(partner, roomCount)) {
         throw new QuoteRiskPropertyRoomCountNotInsurableError(roomCount)
       }
       return {
-        property: { ...command.risk.property, type: propertyType }
+        property: {
+          ...command.risk.property,
+          type: propertyType,
+          occupancy: occupancy
+        }
       }
     }
 
@@ -296,7 +310,8 @@ export namespace Quote.Risk {
         address?: string
         postalCode?: string
         city?: string
-        type? : PropertyType
+        type? : PropertyType,
+        occupancy?: Occupancy
     }
 
     export interface Person {

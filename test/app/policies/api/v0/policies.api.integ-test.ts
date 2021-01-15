@@ -13,7 +13,10 @@ import {
   PolicyAlreadyPaidError, PolicyRiskPropertyTypeNotInsurableError
 } from '../../../../../src/app/policies/domain/policies.errors'
 import { Policy } from '../../../../../src/app/policies/domain/policy'
-import { createOngoingPolicyFixture, createPolicyFixture } from '../../fixtures/policy.fixture'
+import {
+  createOngoingPolicyFixture,
+  createPolicyFixture
+} from '../../fixtures/policy.fixture'
 import { createPolicyApiRequestFixture } from '../../fixtures/createPolicyApiRequest.fixture'
 import { QuoteNotFoundError } from '../../../../../src/app/quotes/domain/quote.errors'
 import { GetPolicyQuery } from '../../../../../src/app/policies/domain/get-policy-query'
@@ -28,6 +31,7 @@ import { PartnerNotFoundError } from '../../../../../src/app/partners/domain/par
 import { ApplyStartDateOnPolicyCommand } from '../../../../../src/app/policies/domain/apply-start-date-on-policy.usecase'
 import { PolicyForbiddenCertificateGenerationError } from '../../../../../src/app/policies/domain/certificate/certificate.errors'
 import { PropertyType } from '../../../../../src/app/common-api/domain/type/property-type'
+import { Occupancy } from '../../../../../src/app/common-api/domain/type/occupancy'
 
 describe('Policies - API v0 - Integration', async () => {
   let httpServer: HttpServerForTesting
@@ -178,7 +182,8 @@ describe('Policies - API v0 - Integration', async () => {
               address: '13 rue du loup garou',
               postal_code: '91100',
               city: 'Corbeil-Essonnes',
-              type: PropertyType.FLAT
+              type: PropertyType.FLAT,
+              occupancy: Occupancy.TENANT
             },
             people: {
               policy_holder: {
@@ -558,7 +563,8 @@ describe('Policies - API v0 - Integration', async () => {
               address: '13 rue du loup garou',
               postal_code: '91100',
               city: 'Corbeil-Essonnes',
-              type: PropertyType.FLAT
+              type: PropertyType.FLAT,
+              occupancy: Occupancy.TENANT
             },
             people: {
               policy_holder: {
@@ -1048,7 +1054,8 @@ describe('Policies - API v0 - Integration', async () => {
             address: '13 rue du loup garou',
             postal_code: '91100',
             city: 'Corbeil-Essonnes',
-            type: PropertyType.FLAT
+            type: PropertyType.FLAT,
+            occupancy: Occupancy.TENANT
           },
           people: {
             policy_holder: {
@@ -1358,7 +1365,8 @@ describe('Policies - API v0 - Integration', async () => {
             address: '13 rue du loup garou',
             postal_code: '91100',
             city: 'Corbeil-Essonnes',
-            type: PropertyType.FLAT
+            type: PropertyType.FLAT,
+            occupancy: Occupancy.TENANT
           },
           people: {
             policy_holder: {

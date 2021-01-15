@@ -11,7 +11,7 @@ export function requestToCreatePolicyCommand (payload): CreatePolicyCommand {
         postalCode: payload.risk.property?.postal_code,
         city: payload.risk.property?.city,
         type: payload.risk.property?.type,
-        occupancy: undefined
+        occupancy: payload.risk.property?.occupancy
       },
       people: {
         policyHolder: {

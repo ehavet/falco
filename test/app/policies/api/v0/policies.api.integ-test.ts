@@ -10,7 +10,7 @@ import {
   PolicyRiskNumberOfRoommatesError,
   PolicyRiskRoommatesNotAllowedError,
   PolicyCanceledError,
-  PolicyAlreadyPaidError, PolicyRiskPropertyTypeNotInsurableError
+  PolicyAlreadyPaidError, PolicyRiskPropertyTypeNotInsurableError, PolicyRiskPropertyOccupancyNotInsurableError
 } from '../../../../../src/app/policies/domain/policies.errors'
 import { Policy } from '../../../../../src/app/policies/domain/policy'
 import {
@@ -271,7 +271,7 @@ describe('Policies - API v0 - Integration', async () => {
       })
     })
 
-    describe('when property type is not insured by the patner', async () => {
+    describe('when property type is not insured by the partner', async () => {
       it('should return a 422', async () => {
         // Given
         sinon.stub(container, 'CreatePolicy').rejects(new PolicyRiskPropertyTypeNotInsurableError(PropertyType.HOUSE))
@@ -285,6 +285,23 @@ describe('Policies - API v0 - Integration', async () => {
         // Then
         expect(response).to.have.property('statusCode', 422)
         expect(response.body).to.have.property('message', 'Cannot create policy, HOUSE is not insured by this partner')
+      })
+    })
+
+    describe('when occupancy is not insured by the partner', async () => {
+      it('should return a 422', async () => {
+        // Given
+        sinon.stub(container, 'CreatePolicy').rejects(new PolicyRiskPropertyOccupancyNotInsurableError(Occupancy.LANDLORD))
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies')
+          .send(requestParams)
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 422)
+        expect(response.body).to.have.property('message', 'Cannot create policy, LANDLORD is not insured by this partner')
       })
     })
 

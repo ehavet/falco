@@ -518,19 +518,12 @@ describe('Policies - API v0 - Integration', async () => {
         })
       })
 
-      it('should reply with status 400 when invalid postalCode was send', async () => {
-        const policyFixture = createPolicyFixture({
-          risk: {
-            property: {
-              roomCount: 2,
-              postalCode: 'INv4L!DE'
-            }
-          }
-        } as any)
+      it('should reply with status 400 when invalid postal_code was send', async () => {
+        requestParams.risk.property.postal_code = 'INv4L!DE'
 
         response = await httpServer.api()
           .post('/v0/policies')
-          .send(policyFixture)
+          .send(requestParams)
           .set('X-Consumer-Username', 'myPartner')
 
         expect(response).to.have.property('statusCode', 400)

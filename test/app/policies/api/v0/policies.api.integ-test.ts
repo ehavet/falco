@@ -535,6 +535,28 @@ describe('Policies - API v0 - Integration', async () => {
 
         expect(response).to.have.property('statusCode', 400)
       })
+
+      it('should reply with status 400 when property type is not FLAT or HOUSE', async () => {
+        requestParams.risk.property.type = 'WRONG_TYPE'
+
+        response = await httpServer.api()
+          .post('/v0/policies')
+          .send(requestParams)
+          .set('X-Consumer-Username', 'myPartner')
+
+        expect(response).to.have.property('statusCode', 400)
+      })
+
+      it('should reply with status 400 when occupancy is not TENANT or LANDLORD', async () => {
+        requestParams.risk.property.occupancy = 'WRONG_OCCUPANCY'
+
+        response = await httpServer.api()
+          .post('/v0/policies')
+          .send(requestParams)
+          .set('X-Consumer-Username', 'myPartner')
+
+        expect(response).to.have.property('statusCode', 400)
+      })
     })
   })
 

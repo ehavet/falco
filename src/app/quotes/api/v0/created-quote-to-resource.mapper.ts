@@ -1,6 +1,7 @@
 import { Quote } from '../../domain/quote'
 
-export function quoteToResource (quote: Quote) {
+// TODO refacto : the quote returned by the POST /quotes should use the quote-to-resource.mapper.ts
+export function createdQuoteToResource (quote: Quote) {
   return {
     id: quote.id,
     code: quote.partnerCode,

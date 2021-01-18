@@ -1,7 +1,11 @@
 import { QuoteSqlRepository } from '../../../../src/app/quotes/infrastructure/quote-sql.repository'
 import { Quote } from '../../../../src/app/quotes/domain/quote'
 import { dbTestUtils, expect } from '../../../test-utils'
-import { createQuoteFixture, createQuoteRiskFixture } from '../fixtures/quote.fixture'
+import {
+  createQuoteFixture,
+  createQuoteFixtureWithNoOccupancy,
+  createQuoteRiskFixture
+} from '../fixtures/quote.fixture'
 import { QuoteNotFoundError } from '../../../../src/app/quotes/domain/quote.errors'
 import { QuoteRiskSqlModel } from '../../../../src/app/quotes/infrastructure/sql-models/quote-risk-sql.model'
 import { QuoteSqlModel } from '../../../../src/app/quotes/infrastructure/sql-models/quote-sql-model'
@@ -113,19 +117,7 @@ describe('Repository - Quote', async () => {
   describe('#get', async () => {
     it('should return the found quote', async () => {
       // Given
-      const expectedQuote: Quote = createQuoteFixture({
-        id: 'DC82S0V',
-        risk: createQuoteRiskFixture({
-          property: {
-            roomCount: 2,
-            address: '88 rue des prairies',
-            postalCode: '91100',
-            city: 'Kyukamura',
-            type: PropertyType.FLAT,
-            occupancy: Occupancy.TENANT
-          }
-        })
-      })
+      const expectedQuote: Quote = createQuoteFixture({ id: 'DC82S0V' })
       await quoteRepository.save(expectedQuote)
 
       // When
@@ -150,10 +142,10 @@ describe('Repository - Quote', async () => {
     it('should update a given quote then return it', async () => {
       // Given
       const validationDate: Date = new Date('2020-01-13T00:00:00Z')
-      const initialQuote: Quote = createQuoteFixture({
+      const initialQuote: Quote = createQuoteFixtureWithNoOccupancy({
         id: 'RF85D4S'
       })
-      const updatedQuote: Quote = createQuoteFixture({
+      const updatedQuote: Quote = createQuoteFixtureWithNoOccupancy({
         id: 'RF85D4S',
         premium: 101.65,
         nbMonthsDue: 12,
@@ -263,8 +255,8 @@ describe('Repository - Quote', async () => {
 
     it('should update with null when undefined quote values', async () => {
       // Given
-      const initialQuote: Quote = createQuoteFixture({ id: 'RF85D4S' })
-      const updatedQuote: Quote = createQuoteFixture({
+      const initialQuote: Quote = createQuoteFixtureWithNoOccupancy({ id: 'RF85D4S' })
+      const updatedQuote: Quote = createQuoteFixtureWithNoOccupancy({
         id: 'RF85D4S',
         premium: 101,
         nbMonthsDue: 12,

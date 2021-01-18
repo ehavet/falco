@@ -267,6 +267,7 @@ describe('Quotes - API - E2E', async () => {
     afterEach(async () => {
       await resetDb()
     })
+
     it('should return the quote matching the given quoteId', async () => {
       // Given
       const quoteRepository = new QuoteSqlRepository()
@@ -278,7 +279,8 @@ describe('Quotes - API - E2E', async () => {
             city: 'Kyukamura',
             postalCode: '91100',
             roomCount: 2,
-            type: PropertyType.FLAT
+            type: PropertyType.FLAT,
+            occupancy: Occupancy.TENANT
           }
         })
       })
@@ -293,7 +295,8 @@ describe('Quotes - API - E2E', async () => {
             address: '88 rue des prairies',
             postal_code: '91100',
             city: 'Kyukamura',
-            type: 'FLAT'
+            type: 'FLAT',
+            occupancy: 'TENANT'
           },
           person: {
             firstname: 'Jean-Jean',

@@ -838,6 +838,24 @@ describe('Quotes - API - Integration', async () => {
       })
     })
 
+    describe('when QuoteRiskOccupancyNotInsurableError is thrown by usecase', () => {
+      it('should reply with status 422', async () => {
+        // Given
+        const partnerCode: string = 'myPartner'
+        sinon.stub(container, 'UpdateQuote').rejects(new QuoteRiskOccupancyNotInsurableError(Occupancy.LANDLORD))
+
+        // When
+        response = await httpServer.api()
+          .put('/v0/quotes/UD65X3')
+          .send(createUpdateQuotePayloadFixture())
+          .set('X-Consumer-Username', partnerCode)
+
+        // Then
+        expect(response).to.have.property('statusCode', 422)
+        expect(response.body).to.have.property('message', 'Cannot create quote, LANDLORD is not insured by this partner')
+      })
+    })
+
     describe('when there is no default cap advice found', () => {
       it('should reply with status 500 because it should not happen', async () => {
         // Given

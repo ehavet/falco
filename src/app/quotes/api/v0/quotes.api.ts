@@ -176,6 +176,7 @@ export default function (container: Container): Array<ServerRoute> {
             case error instanceof QuoteRiskRoommatesNotAllowedError:
             case error instanceof QuoteRiskNumberOfRoommatesError:
             case error instanceof QuoteRiskPropertyTypeNotInsurableError:
+            case error instanceof QuoteRiskOccupancyNotInsurableError:
               throw Boom.badData(error.message)
             default:
               throw Boom.internal(error)

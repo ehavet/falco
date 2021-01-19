@@ -10,8 +10,8 @@ export const quoteResponseBodySchema: Joi.ObjectSchema = Joi.object({
       address: Joi.string().max(100).description('Property address').example('112 rue du chêne rouge'),
       postal_code: Joi.string().regex(POSTALCODE_REGEX).description('Property postal code').example('95470'),
       city: Joi.string().max(50).description('Property city').example('Corbeil-Essonnes'),
-      type: Joi.string().optional().description('The type of property').example('FLAT'),
-      occupancy: Joi.string().optional().description('The occupancy').example('TENANT')
+      type: Joi.string().optional().allow(null).description('The type of property').example('FLAT'),
+      occupancy: Joi.string().optional().allow(null).description('The occupancy').example('TENANT')
     }).description('Risks regarding the property').label('Risk.Property'),
     person: Joi.object({
       firstname: Joi.string().max(100).description('Person firstname').example('John'),

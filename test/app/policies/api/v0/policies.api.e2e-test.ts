@@ -9,6 +9,7 @@ import { PolicyRepository } from '../../../../../src/app/policies/domain/policy.
 import fsx from 'fs-extra'
 import { QuoteSqlModel } from '../../../../../src/app/quotes/infrastructure/sql-models/quote-sql-model'
 import { PropertyType } from '../../../../../src/app/common-api/domain/type/property-type'
+import { Occupancy } from '../../../../../src/app/common-api/domain/type/occupancy'
 
 async function resetDb () {
   await PolicySqlModel.destroy({ truncate: true, cascade: true })
@@ -111,7 +112,8 @@ describe('Policies - API v0 - E2E', async () => {
             address: '88 rue des prairies',
             postal_code: '01100',
             city: 'Kyukamura',
-            type: PropertyType.FLAT
+            type: PropertyType.FLAT,
+            occupancy: Occupancy.TENANT
           },
           people: {
             other_insured: [
@@ -193,7 +195,8 @@ describe('Policies - API v0 - E2E', async () => {
             address: '13 rue du loup garou',
             postal_code: '91100',
             city: 'Corbeil-Essonnes',
-            type: PropertyType.FLAT
+            type: PropertyType.FLAT,
+            occupancy: Occupancy.TENANT
           },
           people: {
             policy_holder: {
@@ -334,7 +337,8 @@ describe('Policies - API v0 - E2E', async () => {
             address: '13 rue du loup garou',
             postal_code: '91100',
             city: 'Corbeil-Essonnes',
-            type: PropertyType.FLAT
+            type: PropertyType.FLAT,
+            occupancy: Occupancy.TENANT
           },
           people: {
             policy_holder: {
@@ -410,7 +414,8 @@ describe('Policies - API v0 - E2E', async () => {
             address: '13 rue du loup garou',
             postal_code: '91100',
             city: 'Corbeil-Essonnes',
-            type: PropertyType.FLAT
+            type: PropertyType.FLAT,
+            occupancy: Occupancy.TENANT
           },
           people: {
             policy_holder: {

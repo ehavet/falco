@@ -10,12 +10,14 @@ import { policyRepositoryStub } from '../fixtures/policy-repository.test-doubles
 import {
   PolicyRiskNumberOfRoommatesError,
   PolicyRiskPropertyMissingFieldError,
+  PolicyRiskPropertyOccupancyNotInsurableError,
   PolicyRiskPropertyTypeNotInsurableError,
   PolicyRiskRoommatesNotAllowedError
 } from '../../../../src/app/policies/domain/policies.errors'
 import { createPartnerFixture } from '../../partners/fixtures/partner.fixture'
 import { Partner } from '../../../../src/app/partners/domain/partner'
 import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
+import { Occupancy } from '../../../../src/app/common-api/domain/type/occupancy'
 import Question = Partner.Question;
 
 describe('Policies - Domain', async () => {
@@ -102,7 +104,7 @@ describe('Policies - Domain', async () => {
       expect(createdPolicy.insurance).to.deep.equal(quote.insurance)
     })
 
-    it('should set the risk from the quote and the query', async () => {
+    it('should set the risk from the quote and the command', async () => {
       // Given
       const expectedRisk: Policy.Risk = {
         property: {
@@ -110,7 +112,8 @@ describe('Policies - Domain', async () => {
           address: '88 rue des prairies',
           postalCode: '91100',
           city: 'Kyukamura',
-          type: PropertyType.FLAT
+          type: PropertyType.FLAT,
+          occupancy: Occupancy.TENANT
         },
         people: {
           person: {
@@ -143,7 +146,14 @@ describe('Policies - Domain', async () => {
           toAsk: false,
           defaultValue: PropertyType.FLAT,
           defaultNextStep: Partner.Question.QuestionCode.ADDRESS
-        }]
+        },
+        {
+          code: Partner.Question.QuestionCode.OCCUPANCY,
+          toAsk: false,
+          defaultValue: Occupancy.TENANT,
+          defaultNextStep: Partner.Question.QuestionCode.ADDRESS
+        }
+      ]
 
       // When
       const createdPolicy: Policy = await Policy.create(createPolicyCommand, quote, policyRepository, partner)
@@ -361,7 +371,8 @@ describe('Policies - Domain', async () => {
             address: '13 rue du loup garou',
             postalCode: '91100',
             city: 'Corbeil-Essonnes',
-            type: undefined
+            type: undefined,
+            occupancy: undefined
           },
           people: {
             policyHolder: {
@@ -426,6 +437,43 @@ describe('Policies - Domain', async () => {
       expect(policy.risk.property.type).to.be.equal(PropertyType.FLAT)
     })
 
+    it('should take the occupancy from the quote when it is present', async () => {
+      const quoteWithOccupancy: Quote = createQuoteFixture()
+      const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({
+        quoteId: quoteWithOccupancy.id
+      })
+      createPolicyCommand.risk.property.occupancy = undefined
+
+      const policy = await Policy.create(createPolicyCommand, quoteWithOccupancy, policyRepository, partner)
+
+      expect(policy.risk.property.occupancy).to.be.equal(quoteWithOccupancy.risk.property.occupancy)
+    })
+
+    it('should take the occupancy from the command when the quote does not provide occupancy', async () => {
+      const quoteWithoutOccupancy: Quote = createQuoteFixture()
+      const createPolicyCommand: CreatePolicyCommand = createCreatePolicyCommand({
+        quoteId: quoteWithoutOccupancy.id
+      })
+      quoteWithoutOccupancy.risk.property.occupancy = undefined
+
+      const policy = await Policy.create(createPolicyCommand, quoteWithoutOccupancy, policyRepository, partner)
+
+      expect(policy.risk.property.occupancy).to.be.equal(createPolicyCommand.risk.property.occupancy)
+    })
+
+    it('should take the default occupancy from partner if the command and the quote do not provide occupancy', async () => {
+      const quoteWithoutOccupancy: Quote = createQuoteFixture()
+      quoteWithoutOccupancy.risk.property.occupancy = undefined
+      const createPolicyCommandWithoutOccupancy: CreatePolicyCommand = createCreatePolicyCommand({
+        quoteId: quoteWithoutOccupancy.id
+      })
+      createPolicyCommandWithoutOccupancy.risk.property.occupancy = undefined
+
+      const policy = await Policy.create(createPolicyCommandWithoutOccupancy, quoteWithoutOccupancy, policyRepository, partner)
+
+      expect(policy.risk.property.occupancy).to.be.equal(Occupancy.TENANT)
+    })
+
     it('should throw an error if the property.type from the command is not insurable by the partner and no type is provided in the quote', () => {
       // Given
       const commandWithNotInsurableType: CreatePolicyCommand = createCreatePolicyCommand({
@@ -439,6 +487,21 @@ describe('Policies - Domain', async () => {
 
       // Then
       return expect(promise).to.be.rejectedWith(PolicyRiskPropertyTypeNotInsurableError, 'Cannot create policy, HOUSE is not insured by this partner')
+    })
+
+    it('should throw an error if the occupancy from the command is not insurable by the partner and no occupancy is provided in the quote', () => {
+      // Given
+      const commandWithNotInsurableOccupancy: CreatePolicyCommand = createCreatePolicyCommand({
+        quoteId: quote.id
+      })
+      commandWithNotInsurableOccupancy.risk.property.occupancy = Occupancy.LANDLORD
+      quote.risk.property.occupancy = undefined
+
+      // When
+      const promise = Policy.create(commandWithNotInsurableOccupancy, quote, policyRepository, partner)
+
+      // Then
+      return expect(promise).to.be.rejectedWith(PolicyRiskPropertyOccupancyNotInsurableError, 'Cannot create policy, LANDLORD is not insured by this partner')
     })
 
     describe('should throw an error if', () => {

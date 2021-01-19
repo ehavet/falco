@@ -10,7 +10,8 @@ export function requestToCreatePolicyCommand (payload): CreatePolicyCommand {
         // eslint-disable-next-line camelcase
         postalCode: payload.risk.property?.postal_code,
         city: payload.risk.property?.city,
-        type: payload.risk.property?.type
+        type: payload.risk.property?.type,
+        occupancy: payload.risk.property?.occupancy
       },
       people: {
         policyHolder: {

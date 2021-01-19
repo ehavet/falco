@@ -6,7 +6,9 @@ export function createPolicyApiRequestFixture (attr = {}) {
       property: {
         address: '13 rue du loup garou',
         postal_code: '91100',
-        city: 'Corbeil-Essonnes'
+        city: 'Corbeil-Essonnes',
+        type: 'FLAT',
+        occupancy: 'TENANT'
       },
       people: {
         policy_holder: {

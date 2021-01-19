@@ -14,10 +14,13 @@ import {
   PolicyRiskPersonMissingError,
   PolicyHolderMissingPropertyError,
   PolicyHolderEmailValidationError,
-  PolicyRiskPropertyMissingFieldError, PolicyRiskPropertyTypeNotInsurableError
+  PolicyRiskPropertyMissingFieldError,
+  PolicyRiskPropertyTypeNotInsurableError,
+  PolicyRiskPropertyOccupancyNotInsurableError
 } from './policies.errors'
 import { Amount } from '../../common-api/domain/amount/amount'
 import { PropertyType } from '../../common-api/domain/type/property-type'
+import { Occupancy } from '../../common-api/domain/type/occupancy'
 
 const DEFAULT_NUMBER_OF_MONTHS_DUE = 12
 
@@ -258,7 +261,8 @@ export namespace Policy.Risk {
         address: string,
         postalCode: string,
         city: string,
-        type: PropertyType
+        type: PropertyType,
+        occupancy?: Occupancy
     }
 
     export interface People {
@@ -281,6 +285,9 @@ export namespace Policy.Risk {
       const propertyType : PropertyType = quoteRisk.property.type ?? commandRisk.property.type ?? PartnerFunc.getDefaultPropertyType(partner)
       _checkIsInsurablePropertyType(partner, propertyType)
 
+      const occupancy : Occupancy = quoteRisk.property.occupancy ?? commandRisk.property.occupancy ?? PartnerFunc.getDefaultOccupancy(partner)
+      _checkIsInsurableOccupancy(partner, occupancy)
+
       const postalCode = quoteRisk.property.postalCode
         ? quoteRisk.property.postalCode
         : commandRisk.property.postalCode!
@@ -291,7 +298,8 @@ export namespace Policy.Risk {
           address: quoteRisk.property.address || commandRisk.property.address as string,
           postalCode,
           city: quoteRisk.property.city || commandRisk.property.city as string,
-          type: propertyType
+          type: propertyType,
+          occupancy
         },
         people: {
           person: commandRisk.people.policyHolder,
@@ -303,6 +311,12 @@ export namespace Policy.Risk {
     function _checkIsInsurablePropertyType (partner: Partner, propertyType: PropertyType) : void {
       if (!PartnerFunc.isPropertyTypeInsured(partner, propertyType)) {
         throw new PolicyRiskPropertyTypeNotInsurableError(propertyType)
+      }
+    }
+
+    function _checkIsInsurableOccupancy (partner: Partner, occupancy: Occupancy) : void {
+      if (!PartnerFunc.isOccupancyInsured(partner, occupancy)) {
+        throw new PolicyRiskPropertyOccupancyNotInsurableError(occupancy)
       }
     }
 

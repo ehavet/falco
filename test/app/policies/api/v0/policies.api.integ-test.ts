@@ -10,10 +10,13 @@ import {
   PolicyRiskNumberOfRoommatesError,
   PolicyRiskRoommatesNotAllowedError,
   PolicyCanceledError,
-  PolicyAlreadyPaidError, PolicyRiskPropertyTypeNotInsurableError
+  PolicyAlreadyPaidError, PolicyRiskPropertyTypeNotInsurableError, PolicyRiskPropertyOccupancyNotInsurableError
 } from '../../../../../src/app/policies/domain/policies.errors'
 import { Policy } from '../../../../../src/app/policies/domain/policy'
-import { createOngoingPolicyFixture, createPolicyFixture } from '../../fixtures/policy.fixture'
+import {
+  createOngoingPolicyFixture,
+  createPolicyFixture
+} from '../../fixtures/policy.fixture'
 import { createPolicyApiRequestFixture } from '../../fixtures/createPolicyApiRequest.fixture'
 import { QuoteNotFoundError } from '../../../../../src/app/quotes/domain/quote.errors'
 import { GetPolicyQuery } from '../../../../../src/app/policies/domain/get-policy-query'
@@ -28,6 +31,7 @@ import { PartnerNotFoundError } from '../../../../../src/app/partners/domain/par
 import { ApplyStartDateOnPolicyCommand } from '../../../../../src/app/policies/domain/apply-start-date-on-policy.usecase'
 import { PolicyForbiddenCertificateGenerationError } from '../../../../../src/app/policies/domain/certificate/certificate.errors'
 import { PropertyType } from '../../../../../src/app/common-api/domain/type/property-type'
+import { Occupancy } from '../../../../../src/app/common-api/domain/type/occupancy'
 
 describe('Policies - API v0 - Integration', async () => {
   let httpServer: HttpServerForTesting
@@ -178,7 +182,8 @@ describe('Policies - API v0 - Integration', async () => {
               address: '13 rue du loup garou',
               postal_code: '91100',
               city: 'Corbeil-Essonnes',
-              type: PropertyType.FLAT
+              type: PropertyType.FLAT,
+              occupancy: Occupancy.TENANT
             },
             people: {
               policy_holder: {
@@ -266,7 +271,7 @@ describe('Policies - API v0 - Integration', async () => {
       })
     })
 
-    describe('when property type is not insured by the patner', async () => {
+    describe('when property type is not insured by the partner', async () => {
       it('should return a 422', async () => {
         // Given
         sinon.stub(container, 'CreatePolicy').rejects(new PolicyRiskPropertyTypeNotInsurableError(PropertyType.HOUSE))
@@ -280,6 +285,23 @@ describe('Policies - API v0 - Integration', async () => {
         // Then
         expect(response).to.have.property('statusCode', 422)
         expect(response.body).to.have.property('message', 'Cannot create policy, HOUSE is not insured by this partner')
+      })
+    })
+
+    describe('when occupancy is not insured by the partner', async () => {
+      it('should return a 422', async () => {
+        // Given
+        sinon.stub(container, 'CreatePolicy').rejects(new PolicyRiskPropertyOccupancyNotInsurableError(Occupancy.LANDLORD))
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/policies')
+          .send(requestParams)
+          .set('X-Consumer-Username', 'myPartner')
+
+        // Then
+        expect(response).to.have.property('statusCode', 422)
+        expect(response.body).to.have.property('message', 'Cannot create policy, LANDLORD is not insured by this partner')
       })
     })
 
@@ -496,19 +518,34 @@ describe('Policies - API v0 - Integration', async () => {
         })
       })
 
-      it('should reply with status 400 when invalid postalCode was send', async () => {
-        const policyFixture = createPolicyFixture({
-          risk: {
-            property: {
-              roomCount: 2,
-              postalCode: 'INv4L!DE'
-            }
-          }
-        } as any)
+      it('should reply with status 400 when invalid postal_code was send', async () => {
+        requestParams.risk.property.postal_code = 'INv4L!DE'
 
         response = await httpServer.api()
           .post('/v0/policies')
-          .send(policyFixture)
+          .send(requestParams)
+          .set('X-Consumer-Username', 'myPartner')
+
+        expect(response).to.have.property('statusCode', 400)
+      })
+
+      it('should reply with status 400 when property type is not FLAT or HOUSE', async () => {
+        requestParams.risk.property.type = 'WRONG_TYPE'
+
+        response = await httpServer.api()
+          .post('/v0/policies')
+          .send(requestParams)
+          .set('X-Consumer-Username', 'myPartner')
+
+        expect(response).to.have.property('statusCode', 400)
+      })
+
+      it('should reply with status 400 when occupancy is not TENANT or LANDLORD', async () => {
+        requestParams.risk.property.occupancy = 'WRONG_OCCUPANCY'
+
+        response = await httpServer.api()
+          .post('/v0/policies')
+          .send(requestParams)
           .set('X-Consumer-Username', 'myPartner')
 
         expect(response).to.have.property('statusCode', 400)
@@ -558,7 +595,8 @@ describe('Policies - API v0 - Integration', async () => {
               address: '13 rue du loup garou',
               postal_code: '91100',
               city: 'Corbeil-Essonnes',
-              type: PropertyType.FLAT
+              type: PropertyType.FLAT,
+              occupancy: Occupancy.TENANT
             },
             people: {
               policy_holder: {
@@ -1048,7 +1086,8 @@ describe('Policies - API v0 - Integration', async () => {
             address: '13 rue du loup garou',
             postal_code: '91100',
             city: 'Corbeil-Essonnes',
-            type: PropertyType.FLAT
+            type: PropertyType.FLAT,
+            occupancy: Occupancy.TENANT
           },
           people: {
             policy_holder: {
@@ -1358,7 +1397,8 @@ describe('Policies - API v0 - Integration', async () => {
             address: '13 rue du loup garou',
             postal_code: '91100',
             city: 'Corbeil-Essonnes',
-            type: PropertyType.FLAT
+            type: PropertyType.FLAT,
+            occupancy: Occupancy.TENANT
           },
           people: {
             policy_holder: {

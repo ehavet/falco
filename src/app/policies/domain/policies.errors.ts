@@ -105,7 +105,7 @@ export class PolicyRiskPropertyMissingFieldError extends Error {
 }
 
 export class PolicyRiskPropertyTypeNotInsurableError extends Error {
-  constructor (propertyType: string | undefined) {
+  constructor (propertyType: string) {
     const message: string = `Cannot create policy, ${propertyType} is not insured by this partner`
     super(message)
     this.name = 'PolicyRiskPropertyTypeNotInsurableError'
@@ -113,7 +113,7 @@ export class PolicyRiskPropertyTypeNotInsurableError extends Error {
 }
 
 export class PolicyRiskPropertyOccupancyNotInsurableError extends Error {
-  constructor (occupancy: string | undefined) {
+  constructor (occupancy: string) {
     const message: string = `Cannot create policy, ${occupancy} is not insured by this partner`
     super(message)
     this.name = 'PolicyRiskPropertyOccupancyNotInsurableError'

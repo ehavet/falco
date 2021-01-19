@@ -118,6 +118,10 @@ export namespace Quote {
         throw new QuoteRiskPropertyTypeNotInsurableError(risk.property.type!)
       }
 
+      if (!PartnerFunc.isOccupancyInsured(partner, risk.property.occupancy)) {
+        throw new QuoteRiskOccupancyNotInsurableError(risk.property.occupancy!)
+      }
+
       if (!PartnerFunc.isPropertyRoomCountCovered(partner, roomCount)) {
         throw new QuoteRiskPropertyRoomCountNotInsurableError(roomCount)
       }

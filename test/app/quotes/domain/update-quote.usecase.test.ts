@@ -15,6 +15,7 @@ import { SinonStubbedInstance } from 'sinon'
 import {
   QuoteNotFoundError,
   QuoteRiskNumberOfRoommatesError,
+  QuoteRiskOccupancyNotInsurableError,
   QuoteRiskPropertyRoomCountNotInsurableError,
   QuoteRiskPropertyTypeNotInsurableError,
   QuoteRiskRoommatesNotAllowedError,
@@ -59,6 +60,12 @@ describe('Quotes - Usecase - Update Quote', async () => {
             code: Partner.Question.QuestionCode.PROPERTY_TYPE,
             toAsk: false,
             defaultValue: PropertyType.FLAT,
+            defaultNextStep: Partner.Question.QuestionCode.ADDRESS
+          },
+          {
+            code: Partner.Question.QuestionCode.OCCUPANCY,
+            toAsk: false,
+            defaultValue: Occupancy.TENANT,
             defaultNextStep: Partner.Question.QuestionCode.ADDRESS
           },
           {
@@ -919,7 +926,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
           address: '101 rue des lapins',
           postalCode: '77000',
           city: 'Malinville',
-          type: PropertyType.FLAT
+          type: PropertyType.FLAT,
+          occupancy: Occupancy.TENANT
         }
       })
     })
@@ -946,7 +954,8 @@ describe('Quotes - Usecase - Update Quote', async () => {
           address: '101 rue des lapins',
           postalCode: '77000',
           city: 'Malinville',
-          type: PropertyType.FLAT
+          type: PropertyType.FLAT,
+          occupancy: Occupancy.TENANT
         },
         person: { firstname: 'jean', lastname: 'jean' },
         otherPeople: []
@@ -995,5 +1004,28 @@ describe('Quotes - Usecase - Update Quote', async () => {
     const promise = updateQuote(updateQuoteCommand)
     // Then
     return expect(promise).to.be.rejectedWith(QuoteRiskPropertyTypeNotInsurableError)
+  })
+
+  it('should throw an QuoteRiskOccupancyNotInsurableError when occupancy is not insurable by the partner', async () => {
+    // Given
+    const updateQuoteCommand = createUpdateQuoteCommandFixture({
+      id: quoteId,
+      risk: createQuoteRiskFixture({
+        property: {
+          roomCount: 2,
+          address: '88 rue des prairies',
+          postalCode: '91100',
+          city: 'Kyukamura',
+          type: PropertyType.FLAT,
+          occupancy: Occupancy.LANDLORD
+        }
+      })
+    })
+    quoteRepository.get.withArgs(quoteId).resolves(quote)
+    updateQuote = UpdateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository, coverMonthlyPriceRepository)
+    // When
+    const promise = updateQuote(updateQuoteCommand)
+    // Then
+    return expect(promise).to.be.rejectedWith(QuoteRiskOccupancyNotInsurableError)
   })
 })

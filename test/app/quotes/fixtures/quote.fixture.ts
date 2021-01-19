@@ -204,7 +204,8 @@ export function createUpdateQuotePayloadFixture (attr:Partial<object> = {}) {
         address: '88 rue des prairies',
         postal_code: '91100',
         city: 'Kyukamura',
-        type: PropertyType.FLAT
+        type: PropertyType.FLAT,
+        occupancy: Occupancy.TENANT
       },
       person: {
         firstname: 'Jean-Jean',

@@ -18,7 +18,8 @@ function _toRisk (risk): UpdateQuoteCommand.Risk {
       address: risk.property.address ? risk.property.address : undefined,
       postalCode: risk.property.postal_code ? risk.property.postal_code : undefined,
       city: risk.property.city ? risk.property.city : undefined,
-      type: risk.property.type ? risk.property.type : undefined
+      type: risk.property.type ? risk.property.type : undefined,
+      occupancy: risk.property.occupancy ? risk.property.occupancy : undefined
     },
     person: risk.person ? { firstname: risk.person.firstname, lastname: risk.person.lastname } : undefined,
     otherPeople: risk.other_people ? risk.other_people.map(person => {

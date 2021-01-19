@@ -16,7 +16,6 @@ import {
   QuoteStartDateConsistencyError
 } from '../../domain/quote.errors'
 import { UpdateQuoteCommand } from '../../domain/update-quote-command'
-import { updatedQuoteToResource } from './mappers/updated-quote-to-resource.mapper'
 import { OperationCodeNotApplicableError } from '../../../policies/domain/operation-code.errors'
 import { quoteResponseBodySchema } from './schemas/quotes-response.schema'
 import { quotePutRequestBodySchema } from './schemas/quotes-put-request.schema'
@@ -164,7 +163,7 @@ export default function (container: Container): Array<ServerRoute> {
 
         try {
           const quote = await container.UpdateQuote(updateQuoteCommand)
-          const quoteAsResource = updatedQuoteToResource(quote)
+          const quoteAsResource = quoteToResource(quote)
           return h.response(quoteAsResource).code(200)
         } catch (error) {
           switch (true) {

@@ -3,7 +3,6 @@ import { Quote } from '../../../../src/app/quotes/domain/quote'
 import { dbTestUtils, expect } from '../../../test-utils'
 import {
   createQuoteFixture,
-  createQuoteFixtureWithNoOccupancy,
   createQuoteRiskFixture
 } from '../fixtures/quote.fixture'
 import { QuoteNotFoundError } from '../../../../src/app/quotes/domain/quote.errors'
@@ -142,10 +141,10 @@ describe('Repository - Quote', async () => {
     it('should update a given quote then return it', async () => {
       // Given
       const validationDate: Date = new Date('2020-01-13T00:00:00Z')
-      const initialQuote: Quote = createQuoteFixtureWithNoOccupancy({
+      const initialQuote: Quote = createQuoteFixture({
         id: 'RF85D4S'
       })
-      const updatedQuote: Quote = createQuoteFixtureWithNoOccupancy({
+      const updatedQuote: Quote = createQuoteFixture({
         id: 'RF85D4S',
         premium: 101.65,
         nbMonthsDue: 12,
@@ -156,7 +155,7 @@ describe('Repository - Quote', async () => {
             postalCode: '99999',
             city: 'updated city',
             type: PropertyType.FLAT,
-            occupancy: undefined
+            occupancy: Occupancy.TENANT
           },
           person: {
             firstname: 'updated-person-firstname',
@@ -224,6 +223,8 @@ describe('Repository - Quote', async () => {
       expect(savedRisk.property.address).to.equal('updated address')
       expect(savedRisk.property.postalCode).to.equal('99999')
       expect(savedRisk.property.city).to.equal('updated city')
+      expect(savedRisk.property.type).to.equal('FLAT')
+      expect(savedRisk.property.occupancy).to.equal('TENANT')
       expect(savedRisk.person!.firstname).to.equal('updated-person-firstname')
       expect(savedRisk.person!.lastname).to.equal('updated-person-lastname')
       expect(savedRisk.otherPeople!.map(person => { return { firstname: person.firstname, lastname: person.lastname } }))
@@ -255,8 +256,8 @@ describe('Repository - Quote', async () => {
 
     it('should update with null when undefined quote values', async () => {
       // Given
-      const initialQuote: Quote = createQuoteFixtureWithNoOccupancy({ id: 'RF85D4S' })
-      const updatedQuote: Quote = createQuoteFixtureWithNoOccupancy({
+      const initialQuote: Quote = createQuoteFixture({ id: 'RF85D4S' })
+      const updatedQuote: Quote = createQuoteFixture({
         id: 'RF85D4S',
         premium: 101,
         nbMonthsDue: 12,
@@ -308,6 +309,8 @@ describe('Repository - Quote', async () => {
       expect(savedRisk.property.address).to.equal(null)
       expect(savedRisk.property.postalCode).to.equal(null)
       expect(savedRisk.property.city).to.equal(null)
+      expect(savedRisk.property.type).to.equal(null)
+      expect(savedRisk.property.occupancy).to.equal(null)
       expect(savedRisk.person!.firstname).to.equal(null)
       expect(savedRisk.person!.lastname).to.equal(null)
 

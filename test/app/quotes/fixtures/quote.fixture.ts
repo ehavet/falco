@@ -63,64 +63,6 @@ export function createQuoteFixture (attr:Partial<Quote> = {}): Quote {
   }
 }
 
-// TODO To remove when US about adding occupancy on update has been developed
-export function createQuoteFixtureWithNoOccupancy (attr:Partial<Quote> = {}): Quote {
-  return {
-    id: 'UD65X3A',
-    partnerCode: 'myPartner',
-    risk: {
-      property: {
-        roomCount: 2,
-        address: '88 rue des prairies',
-        postalCode: '91100',
-        city: 'Kyukamura',
-        type: PropertyType.FLAT
-      },
-      person: {
-        firstname: 'Jean-Jean',
-        lastname: 'Lapin'
-      },
-      otherPeople: [
-        {
-          firstname: 'John',
-          lastname: 'Doe'
-        }
-      ]
-    },
-    insurance: {
-      estimate: {
-        monthlyPrice: 5.82,
-        defaultDeductible: 150,
-        defaultCeiling: 7000
-      },
-      currency: 'EUR',
-      simplifiedCovers: ['ACDDE', 'ACVOL'],
-      productCode: 'APP999',
-      productVersion: 'v2020-02-01',
-      contractualTerms: '/path/to/contractual/terms',
-      ipid: '/path/to/ipid'
-    },
-    policyHolder: {
-      firstname: 'Jean-Jean',
-      lastname: 'Lapin',
-      address: '88 rue des prairies',
-      postalCode: '91100',
-      city: 'Kyukamura',
-      email: 'jeanjean@email.com',
-      phoneNumber: '+33684205510',
-      emailValidatedAt: undefined
-    },
-    premium: 69.84,
-    nbMonthsDue: 12,
-    specialOperationsCode: undefined,
-    specialOperationsCodeAppliedAt: undefined,
-    startDate: now,
-    termStartDate: now,
-    termEndDate: now,
-    ...attr
-  }
-}
-
 export function createQuotePolicyHolderFixture (attr:Partial<Quote.PolicyHolder> = {}): Quote.PolicyHolder {
   return {
     firstname: 'Jean-Jean',

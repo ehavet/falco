@@ -136,7 +136,8 @@ export namespace Quote {
           address: risk.property.address ? risk.property.address : undefined,
           postalCode: risk.property.postalCode ? risk.property.postalCode : undefined,
           city: risk.property.city ? risk.property.city : undefined,
-          type: risk.property.type ? risk.property.type : undefined
+          type: risk.property.type ? risk.property.type : undefined,
+          occupancy: risk.property.occupancy ? risk.property.occupancy : undefined
         },
         person: risk.person ? {
           firstname: risk.person.firstname,

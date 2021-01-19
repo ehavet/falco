@@ -159,7 +159,8 @@ export function createQuoteRiskFixture (attr:Partial<Quote.Risk> = {}): Quote.Ri
       address: '88 rue des prairies',
       postalCode: '91100',
       city: 'Kyukamura',
-      type: PropertyType.FLAT
+      type: PropertyType.FLAT,
+      occupancy: Occupancy.TENANT
     },
     person: {
       firstname: 'Jean-Jean',
@@ -184,7 +185,8 @@ export function createUpdateQuoteCommandFixture (attr:Partial<UpdateQuoteCommand
         address: '88 rue des prairies',
         postalCode: '91100',
         city: 'Kyukamura',
-        type: PropertyType.FLAT
+        type: PropertyType.FLAT,
+        occupancy: Occupancy.TENANT
       },
       person: {
         firstname: 'Jean-Jean',

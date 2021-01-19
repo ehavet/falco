@@ -635,6 +635,19 @@ describe('Policies - Domain', async () => {
 
         return expect(promise).to.be.rejectedWith(PolicyRiskPropertyMissingFieldError, `Quote ${quoteWithoutType.id} risk property type should be completed`)
       })
+
+      it('occupancy is not present from quote on V1', async () => {
+        // Given
+        const quoteWithoutOccupancy: Quote = createQuoteFixture()
+        quoteWithoutOccupancy.policyHolder!.emailValidatedAt = new Date()
+        quoteWithoutOccupancy.risk.property.occupancy = undefined
+
+        // When
+        const promise = Policy.createFromQuote('DEMO1234', quoteWithoutOccupancy)
+
+        // Then
+        return expect(promise).to.be.rejectedWith(PolicyRiskPropertyMissingFieldError, `Quote ${quoteWithoutOccupancy.id} risk property occupancy should be completed`)
+      })
     })
   })
 })

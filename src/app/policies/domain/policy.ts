@@ -331,7 +331,8 @@ export namespace Policy.Risk {
           address: quoteRisk.property.address!,
           postalCode: quoteRisk.property.postalCode!,
           city: quoteRisk.property.city!,
-          type: quoteRisk.property.type!
+          type: quoteRisk.property.type!,
+          occupancy: quoteRisk.property.occupancy!
         },
         people: {
           person: quoteRisk.person!,

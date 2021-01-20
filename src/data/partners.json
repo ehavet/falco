@@ -265,6 +265,71 @@
       "ipid": "/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf"
     }
   },
+  "e-mobilia": {
+     "code": "e-mobilia",
+     "trigram": "EMO",
+     "translationKey": "e-mobilia",
+     "callbackUrl": "",
+     "customerSupportEmail": "help@appenin.fr",
+     "firstQuestionToAsk": "property_type",
+     "questions": [
+       {
+         "code": "property_type",
+         "toAsk": true,
+         "options": [
+           {"value": "FLAT"},
+           {"value": "HOUSE", "nextStep": "REJECT"}
+         ],
+         "defaultNextStep": "occupancy",
+         "defaultValue": "FLAT"
+       },
+       {
+         "code": "occupancy",
+         "toAsk": true,
+         "options": [
+           { "value": "TENANT" },
+           { "value": "LANDLORD", "nextStep": "REJECT" }
+         ],
+         "defaultNextStep": "address",
+         "defaultValue": "TENANT"
+       },
+       {
+         "code": "address",
+         "toAsk": true,
+         "defaultNextStep": "room_count"
+       },
+       {
+         "code": "room_count",
+         "toAsk": true,
+         "options": [
+           { "value": 1 },
+           { "value": 2 },
+           { "value": 3 },
+           { "value": 4 },
+           { "value": 5 },
+           { "value": 6, "nextStep": "REJECT" }
+         ],
+         "defaultNextStep": "SUBMIT",
+         "defaultValue": 1
+       },
+       {
+         "code": "roommate",
+         "applicable": true,
+         "_comment":  "The rule for the maximum number of roommates for demo is the following : roomcount - 1",
+         "maximumNumbers": [{ "roomCount": 1, "value": 0 }, { "roomCount": 2, "value": 1 }, { "roomCount": 3, "value": 2 },
+           { "roomCount": 4, "value": 3 }, { "roomCount": 5, "value": 4 }]
+       }
+     ],
+     "offer": {
+       "simplifiedCovers": ["ACDDE", "ACINCEX", "ACVOL", "ACASSHE", "ACDEFJU", "ACRC"],
+       "defaultDeductible": 120,
+       "operationCodes": [],
+       "productCode": "APP978",
+       "productVersion": "2020-12-10",
+       "contractualTerms": "/docs/Appenin_Conditions_Generales_assurance_habitation_APP978.pdf",
+       "ipid": "/docs/Appenin_Document_Information_assurance_habitation_APP978.pdf"
+     }
+   },
   "demo-student": {
     "code": "demo-student",
     "trigram": "DST",

@@ -60,7 +60,7 @@ export function isPropertyRoomCountCovered (partner: Partner, roomCount: number)
   })
 }
 
-function _getInsuredPropertyTypes (partner: Partner) : Array<PropertyType> {
+function _getInsurablePropertyTypes (partner: Partner) : Array<PropertyType> {
   const propertyTypeQuestion = _getQuestion(partner, Partner.Question.QuestionCode.PROPERTY_TYPE) as Partner.Question.PropertyTypeQuestion
   if (propertyTypeQuestion.options) {
     return propertyTypeQuestion.options
@@ -70,7 +70,7 @@ function _getInsuredPropertyTypes (partner: Partner) : Array<PropertyType> {
   return [propertyTypeQuestion.defaultValue]
 }
 
-function _getInsuredOccupancies (partner: Partner) : Array<Occupancy> {
+function _getInsurableOccupancies (partner: Partner) : Array<Occupancy> {
   const occupancyQuestion = _getQuestion(partner, Partner.Question.QuestionCode.OCCUPANCY) as Partner.Question.OccupancyQuestion
   if (occupancyQuestion.options) {
     return occupancyQuestion.options
@@ -80,16 +80,16 @@ function _getInsuredOccupancies (partner: Partner) : Array<Occupancy> {
   return [occupancyQuestion.defaultValue]
 }
 
-export function isPropertyTypeInsured (partner: Partner, propertyType: PropertyType | undefined): boolean {
+export function isPropertyTypeInsurable (partner: Partner, propertyType: PropertyType | undefined): boolean {
   if (!propertyType) return false
-  const insuredPropertyTypes = _getInsuredPropertyTypes(partner)
-  return insuredPropertyTypes.includes(propertyType)
+  const insurablePropertyTypes = _getInsurablePropertyTypes(partner)
+  return insurablePropertyTypes.includes(propertyType)
 }
 
-export function isOccupancyInsured (partner: Partner, occupancy: Occupancy | undefined): boolean {
+export function isOccupancyInsurable (partner: Partner, occupancy: Occupancy | undefined): boolean {
   if (!occupancy) return false
-  const insuredOccupancies = _getInsuredOccupancies(partner)
-  return insuredOccupancies.includes(occupancy)
+  const insurableOccupancies = _getInsurableOccupancies(partner)
+  return insurableOccupancies.includes(occupancy)
 }
 
 export function getDefaultPropertyType (partner: Partner) : PropertyType {

@@ -309,13 +309,13 @@ export namespace Policy.Risk {
     }
 
     function _checkIsInsurablePropertyType (partner: Partner, propertyType: PropertyType) : void {
-      if (!PartnerFunc.isPropertyTypeInsured(partner, propertyType)) {
+      if (!PartnerFunc.isPropertyTypeInsurable(partner, propertyType)) {
         throw new PolicyRiskPropertyTypeNotInsurableError(propertyType)
       }
     }
 
     function _checkIsInsurableOccupancy (partner: Partner, occupancy: Occupancy) : void {
-      if (!PartnerFunc.isOccupancyInsured(partner, occupancy)) {
+      if (!PartnerFunc.isOccupancyInsurable(partner, occupancy)) {
         throw new PolicyRiskPropertyOccupancyNotInsurableError(occupancy)
       }
     }

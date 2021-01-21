@@ -114,11 +114,11 @@ export namespace Quote {
       const roomCount: number = risk.property.roomCount
       const numberOfRoommates: number|null = risk.otherPeople ? risk.otherPeople?.length : null
 
-      if (!PartnerFunc.isPropertyTypeInsured(partner, risk.property.type)) {
+      if (!PartnerFunc.isPropertyTypeInsurable(partner, risk.property.type)) {
         throw new QuoteRiskPropertyTypeNotInsurableError(risk.property.type!)
       }
 
-      if (!PartnerFunc.isOccupancyInsured(partner, risk.property.occupancy)) {
+      if (!PartnerFunc.isOccupancyInsurable(partner, risk.property.occupancy)) {
         throw new QuoteRiskOccupancyNotInsurableError(risk.property.occupancy!)
       }
 
@@ -202,7 +202,7 @@ export namespace Quote {
       It should be implemented that way for POST v1/quotes */
       const propertyType = command.risk.property.type ?? PartnerFunc.getDefaultPropertyType(partner)
       const roomCount = command.risk.property.roomCount
-      if (!PartnerFunc.isPropertyTypeInsured(partner, propertyType)) {
+      if (!PartnerFunc.isPropertyTypeInsurable(partner, propertyType)) {
         throw new QuoteRiskPropertyTypeNotInsurableError(propertyType)
       }
 
@@ -211,7 +211,7 @@ export namespace Quote {
       The correct rule is : risk.property.occupancy is mandatory and should be given on quote creation.
       It should be implemented that way for POST v1/quotes */
       const occupancy = command.risk.property.occupancy ?? PartnerFunc.getDefaultOccupancy(partner)
-      if (!PartnerFunc.isOccupancyInsured(partner, occupancy)) {
+      if (!PartnerFunc.isOccupancyInsurable(partner, occupancy)) {
         throw new QuoteRiskOccupancyNotInsurableError(occupancy)
       }
 

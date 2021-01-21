@@ -113,7 +113,7 @@ describe('Partners - Domain - Functions', () => {
 
       it('should return true if the given type is accepted by default by partner', () => {
         // When
-        const isValid = PartnerFunc.isPropertyTypeInsured(partner, PropertyType.FLAT)
+        const isValid = PartnerFunc.isPropertyTypeInsurable(partner, PropertyType.FLAT)
 
         // Then
         expect(isValid).to.be.true
@@ -121,7 +121,7 @@ describe('Partners - Domain - Functions', () => {
 
       it('should return false if the given type is not accepted by default by partner', () => {
         // When
-        const isValid = PartnerFunc.isPropertyTypeInsured(partner, PropertyType.HOUSE)
+        const isValid = PartnerFunc.isPropertyTypeInsurable(partner, PropertyType.HOUSE)
 
         // Then
         expect(isValid).to.be.false
@@ -129,7 +129,7 @@ describe('Partners - Domain - Functions', () => {
 
       it('should return false if the given type is unknown', () => {
         // When
-        const isValid = PartnerFunc.isPropertyTypeInsured(partner, 'UNKNOWN_TYPE' as any)
+        const isValid = PartnerFunc.isPropertyTypeInsurable(partner, 'UNKNOWN_TYPE' as any)
 
         // Then
         expect(isValid).to.be.false
@@ -151,7 +151,7 @@ describe('Partners - Domain - Functions', () => {
         const partner = createPartnerFixture({ questions })
 
         // When
-        const isValid = PartnerFunc.isPropertyTypeInsured(partner, PropertyType.FLAT)
+        const isValid = PartnerFunc.isPropertyTypeInsurable(partner, PropertyType.FLAT)
 
         // Then
         expect(isValid).to.be.true
@@ -171,7 +171,7 @@ describe('Partners - Domain - Functions', () => {
         const partner = createPartnerFixture({ questions })
 
         // When
-        const isValid = PartnerFunc.isPropertyTypeInsured(partner, PropertyType.HOUSE)
+        const isValid = PartnerFunc.isPropertyTypeInsurable(partner, PropertyType.HOUSE)
 
         // Then
         expect(isValid).to.be.false
@@ -191,7 +191,7 @@ describe('Partners - Domain - Functions', () => {
         const partner = createPartnerFixture({ questions })
 
         // When
-        const isValid = PartnerFunc.isPropertyTypeInsured(partner, PropertyType.HOUSE)
+        const isValid = PartnerFunc.isPropertyTypeInsurable(partner, PropertyType.HOUSE)
 
         // Then
         expect(isValid).to.be.false
@@ -216,7 +216,7 @@ describe('Partners - Domain - Functions', () => {
 
       it('should return true if the given occupancy is accepted by default by partner', () => {
         // When
-        const isValid = PartnerFunc.isOccupancyInsured(partner, Occupancy.TENANT)
+        const isValid = PartnerFunc.isOccupancyInsurable(partner, Occupancy.TENANT)
 
         // Then
         expect(isValid).to.be.true
@@ -224,7 +224,7 @@ describe('Partners - Domain - Functions', () => {
 
       it('should return false if the given occupancy is not accepted by default by partner', () => {
         // When
-        const isValid = PartnerFunc.isOccupancyInsured(partner, Occupancy.LANDLORD)
+        const isValid = PartnerFunc.isOccupancyInsurable(partner, Occupancy.LANDLORD)
 
         // Then
         expect(isValid).to.be.false
@@ -232,7 +232,7 @@ describe('Partners - Domain - Functions', () => {
 
       it('should return false if the given occupancy is unknown', () => {
         // When
-        const isValid = PartnerFunc.isOccupancyInsured(partner, 'UNKNOWN_OCCUPANCY' as any)
+        const isValid = PartnerFunc.isOccupancyInsurable(partner, 'UNKNOWN_OCCUPANCY' as any)
 
         // Then
         expect(isValid).to.be.false
@@ -254,7 +254,7 @@ describe('Partners - Domain - Functions', () => {
         const partner = createPartnerFixture({ questions })
 
         // When
-        const isValid = PartnerFunc.isOccupancyInsured(partner, Occupancy.TENANT)
+        const isValid = PartnerFunc.isOccupancyInsurable(partner, Occupancy.TENANT)
 
         // Then
         expect(isValid).to.be.true
@@ -274,7 +274,7 @@ describe('Partners - Domain - Functions', () => {
         const partner = createPartnerFixture({ questions })
 
         // When
-        const isValid = PartnerFunc.isOccupancyInsured(partner, Occupancy.LANDLORD)
+        const isValid = PartnerFunc.isOccupancyInsurable(partner, Occupancy.LANDLORD)
 
         // Then
         expect(isValid).to.be.false
@@ -294,7 +294,7 @@ describe('Partners - Domain - Functions', () => {
         const partner = createPartnerFixture({ questions })
 
         // When
-        const isValid = PartnerFunc.isOccupancyInsured(partner, Occupancy.LANDLORD)
+        const isValid = PartnerFunc.isOccupancyInsurable(partner, Occupancy.LANDLORD)
 
         // Then
         expect(isValid).to.be.false

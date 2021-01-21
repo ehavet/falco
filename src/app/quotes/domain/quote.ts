@@ -114,8 +114,12 @@ export namespace Quote {
       const roomCount: number = risk.property.roomCount
       const numberOfRoommates: number|null = risk.otherPeople ? risk.otherPeople?.length : null
 
-      if (!PartnerFunc.isPropertyTypeInsured(partner, risk.property.type)) {
+      if (!PartnerFunc.isPropertyTypeInsurable(partner, risk.property.type)) {
         throw new QuoteRiskPropertyTypeNotInsurableError(risk.property.type!)
+      }
+
+      if (!PartnerFunc.isOccupancyInsurable(partner, risk.property.occupancy)) {
+        throw new QuoteRiskOccupancyNotInsurableError(risk.property.occupancy!)
       }
 
       if (!PartnerFunc.isPropertyRoomCountCovered(partner, roomCount)) {
@@ -136,7 +140,8 @@ export namespace Quote {
           address: risk.property.address ? risk.property.address : undefined,
           postalCode: risk.property.postalCode ? risk.property.postalCode : undefined,
           city: risk.property.city ? risk.property.city : undefined,
-          type: risk.property.type ? risk.property.type : undefined
+          type: risk.property.type ? risk.property.type : undefined,
+          occupancy: risk.property.occupancy ? risk.property.occupancy : undefined
         },
         person: risk.person ? {
           firstname: risk.person.firstname,
@@ -197,7 +202,7 @@ export namespace Quote {
       It should be implemented that way for POST v1/quotes */
       const propertyType = command.risk.property.type ?? PartnerFunc.getDefaultPropertyType(partner)
       const roomCount = command.risk.property.roomCount
-      if (!PartnerFunc.isPropertyTypeInsured(partner, propertyType)) {
+      if (!PartnerFunc.isPropertyTypeInsurable(partner, propertyType)) {
         throw new QuoteRiskPropertyTypeNotInsurableError(propertyType)
       }
 
@@ -206,7 +211,7 @@ export namespace Quote {
       The correct rule is : risk.property.occupancy is mandatory and should be given on quote creation.
       It should be implemented that way for POST v1/quotes */
       const occupancy = command.risk.property.occupancy ?? PartnerFunc.getDefaultOccupancy(partner)
-      if (!PartnerFunc.isOccupancyInsured(partner, occupancy)) {
+      if (!PartnerFunc.isOccupancyInsurable(partner, occupancy)) {
         throw new QuoteRiskOccupancyNotInsurableError(occupancy)
       }
 

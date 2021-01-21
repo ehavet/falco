@@ -129,7 +129,8 @@ describe('Quotes - API - E2E', async () => {
           address: '90 rue de la nouvelle prairie',
           postal_code: '91100',
           city: 'Neo Kyukamura',
-          type: 'FLAT'
+          type: 'FLAT',
+          occupancy: 'TENANT'
         },
         person: {
           firstname: 'Jeannot',
@@ -253,7 +254,8 @@ describe('Quotes - API - E2E', async () => {
             city: 'Neo Kyukamura',
             postal_code: '91100',
             room_count: 2,
-            type: 'FLAT'
+            type: 'FLAT',
+            occupancy: 'TENANT'
           }
         },
         start_date: '2020-03-05',

@@ -1,4 +1,5 @@
 import { PropertyType } from '../../common-api/domain/type/property-type'
+import { Occupancy } from '../../common-api/domain/type/occupancy'
 
 export interface UpdateQuoteCommand {
     id: string
@@ -32,7 +33,8 @@ export namespace UpdateQuoteCommand.Risk {
         address?: string,
         postalCode?: string,
         city?: string
-        type?: PropertyType
+        type?: PropertyType,
+        occupancy?: Occupancy
     }
 }
 

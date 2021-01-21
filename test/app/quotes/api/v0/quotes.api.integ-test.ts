@@ -8,7 +8,8 @@ import {
   QuoteNotFoundError,
   QuotePartnerOwnershipError,
   QuotePolicyHolderEmailNotFoundError,
-  QuoteRiskNumberOfRoommatesError, QuoteRiskOccupancyNotInsurableError,
+  QuoteRiskNumberOfRoommatesError,
+  QuoteRiskOccupancyNotInsurableError,
   QuoteRiskPropertyRoomCountNotInsurableError,
   QuoteRiskPropertyTypeNotInsurableError,
   QuoteRiskRoommatesNotAllowedError,
@@ -562,7 +563,8 @@ describe('Quotes - API - Integration', async () => {
             address: '88 rue des prairies',
             postal_code: '91100',
             city: 'Kyukamura',
-            type: 'FLAT'
+            type: 'FLAT',
+            occupancy: 'TENANT'
           },
           person: {
             firstname: 'Jean-Jean',
@@ -615,7 +617,8 @@ describe('Quotes - API - Integration', async () => {
               address: '88 rue des prairies',
               postalCode: '91100',
               city: 'Kyukamura',
-              type: PropertyType.FLAT
+              type: PropertyType.FLAT,
+              occupancy: Occupancy.TENANT
             },
             person: {
               firstname: 'Jean-Jean',
@@ -643,7 +646,8 @@ describe('Quotes - API - Integration', async () => {
                 address: '88 rue des prairies',
                 postal_code: '91100',
                 city: 'Kyukamura',
-                type: 'FLAT'
+                type: 'FLAT',
+                occupancy: 'TENANT'
               },
               person: {
                 firstname: 'Jean-Jean',
@@ -831,6 +835,24 @@ describe('Quotes - API - Integration', async () => {
         // Then
         expect(response).to.have.property('statusCode', 422)
         expect(response.body).to.have.property('message', 'Cannot create quote, HOUSE is not insured by this partner')
+      })
+    })
+
+    describe('when QuoteRiskOccupancyNotInsurableError is thrown by usecase', () => {
+      it('should reply with status 422', async () => {
+        // Given
+        const partnerCode: string = 'myPartner'
+        sinon.stub(container, 'UpdateQuote').rejects(new QuoteRiskOccupancyNotInsurableError(Occupancy.LANDLORD))
+
+        // When
+        response = await httpServer.api()
+          .put('/v0/quotes/UD65X3')
+          .send(createUpdateQuotePayloadFixture())
+          .set('X-Consumer-Username', partnerCode)
+
+        // Then
+        expect(response).to.have.property('statusCode', 422)
+        expect(response.body).to.have.property('message', 'Cannot create quote, LANDLORD is not insured by this partner')
       })
     })
 

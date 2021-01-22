@@ -3,11 +3,11 @@ import path from 'path'
 import { Policy } from '../../domain/policy'
 import { SpecificTerms } from '../../domain/specific-terms/specific-terms'
 import {
-  _encodeForPdf,
+  _encodeForPdf, _formatAmount,
   _formatDate,
   _formatNumber,
   _formatOtherInsured,
-  _formatPolicyId
+  _formatPolicyId, formatRoundAmount
 } from '../../../common-api/infrastructure/pdf-formatter'
 import { SpecificTermsGenerator } from '../../domain/specific-terms/specific-terms.generator'
 import { PDFProcessor } from '../pdf/pdf-processor'
@@ -50,6 +50,10 @@ export class SpecificTermsPdfGenerator implements SpecificTermsGenerator {
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[default_ceiling]', _formatNumber(policy.insurance.estimate.defaultCeiling))
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[default_deduction]', _formatNumber(policy.insurance.estimate.defaultDeductible))
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[subscribtion_date]', _encodeForPdf(_formatDate(new Date())))
+    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[deduc]', _encodeForPdf(_formatAmount(policy.insurance.estimate.defaultDeductible)))
+    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[defcap]', _encodeForPdf(_formatAmount(policy.insurance.estimate.defaultCeiling)))
+    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[50p100_defcap]', _encodeForPdf(formatRoundAmount(Policy.getDefaultCapAdvice50p100(policy))))
+    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[20p100_defcap]', _encodeForPdf(formatRoundAmount(Policy.getDefaultCapAdvice20p100(policy))))
 
     const filledUpSpecificTermsBuffer = await this.#pdfProcessor.formatPdfBufferProperly(specificTermsTemplateBuffer)
 

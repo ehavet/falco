@@ -68,6 +68,14 @@ export namespace Policy {
         Cancelled = 'CANCELLED'
     }
 
+    export function getDefaultCapAdvice50p100 (policy : Policy): Amount {
+      return Amount.divide(policy.insurance.estimate.defaultCeiling, 2)
+    }
+
+    export function getDefaultCapAdvice20p100 (policy : Policy): Amount {
+      return Amount.divide(policy.insurance.estimate.defaultCeiling, 5)
+    }
+
     export function isEmailNotValidated (policy: Policy): boolean {
       return policy.emailValidationDate === undefined || policy.emailValidationDate === null
     }

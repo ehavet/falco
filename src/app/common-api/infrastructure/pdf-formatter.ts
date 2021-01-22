@@ -1,4 +1,5 @@
 import { Policy } from '../../policies/domain/policy'
+import { Amount } from '../domain/amount/amount'
 
 export function _encodeForPdf (value: string): string {
   const dict = {
@@ -32,6 +33,14 @@ export function _formatNumber (number: number): string {
     return formattedNumber.replace(/\s/g, ' ')
   }
   return ''
+}
+
+export function _formatAmount (amount: Amount): string {
+  return _formatNumber(amount) + ' euros'
+}
+
+export function formatRoundAmount (amount: Amount): string {
+  return _formatNumber(Math.round(amount)) + ' euros'
 }
 
 export function _formatOtherInsured (otherInsured: Policy.Risk.People.OtherPeople[]): string {

@@ -54,6 +54,7 @@ export class SpecificTermsPdfGenerator implements SpecificTermsGenerator {
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[defcap]', _encodeForPdf(_formatAmount(policy.insurance.estimate.defaultCeiling)))
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[50p100_defcap]', _encodeForPdf(formatRoundAmount(Policy.getDefaultCapAdvice50p100(policy))))
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[20p100_defcap]', _encodeForPdf(formatRoundAmount(Policy.getDefaultCapAdvice20p100(policy))))
+    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[name]', _encodeForPdf(policy.contact.firstname.concat(' ', policy.contact.lastname)))
 
     const filledUpSpecificTermsBuffer = await this.#pdfProcessor.formatPdfBufferProperly(specificTermsTemplateBuffer)
 

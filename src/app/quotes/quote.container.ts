@@ -19,6 +19,8 @@ import { DefaultCapAdviceRepository } from './domain/default-cap-advice/default-
 import { DefaultCapAdviceSqlRepository } from './infrastructure/default-cap-advice/default-cap-advice-sql.repository'
 import { PricingMatrixSqlModel } from './infrastructure/cover-monthly-price/pricing-matrix-sql.model'
 import { CoverMonthlyPriceSqlRepository } from './infrastructure/cover-monthly-price/cover-monthly-price-sql.repository'
+import { CoverPricingZoneSqlModel } from './infrastructure/cover-pricing-zone/cover-pricing-zone-sql.model'
+import { CoverPricingZoneSqlRepository } from './infrastructure/cover-pricing-zone/cover-pricing-zone-sql.repository'
 
 export interface Container {
   CreateQuote: CreateQuote
@@ -32,14 +34,15 @@ const partnerRepository: PartnerRepository = partnerContainer.partnerRepository
 const quoteRepository: QuoteRepository = new QuoteSqlRepository()
 const defaultCapAdviceRepository: DefaultCapAdviceRepository = new DefaultCapAdviceSqlRepository()
 const coverMonthlyPriceSqlRepository = new CoverMonthlyPriceSqlRepository()
+const pricingZoneSqlRepository = new CoverPricingZoneSqlRepository()
 const sendEmailValidationLinkToQuotePolicyHolder: SendValidationLinkEmailToQuotePolicyHolder =
     SendValidationLinkEmailToQuotePolicyHolder.factory(
       quoteRepository,
       partnerRepository,
       emailValidationContainer.SendValidationLinkToEmailAddress
     )
-const createQuote: CreateQuote = CreateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository, coverMonthlyPriceSqlRepository)
-const updateQuote: UpdateQuote = UpdateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository, coverMonthlyPriceSqlRepository)
+const createQuote: CreateQuote = CreateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository, coverMonthlyPriceSqlRepository, pricingZoneSqlRepository)
+const updateQuote: UpdateQuote = UpdateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository, coverMonthlyPriceSqlRepository, pricingZoneSqlRepository)
 const getQuoteById: GetQuoteById = GetQuoteById.factory(quoteRepository)
 
 export const container: Container = {
@@ -53,7 +56,7 @@ export const container: Container = {
 export const quoteSqlModels: Array<any> = [
   QuoteSqlModel, QuoteInsuranceSqlModel, QuoteRiskSqlModel,
   QuotePropertySqlModel, QuoteRiskOtherPeopleSqlModel, QuotePersonSqlModel,
-  DefaultCapAdviceSqlModel, PricingMatrixSqlModel
+  DefaultCapAdviceSqlModel, PricingMatrixSqlModel, CoverPricingZoneSqlModel
 ]
 
 export function quoteRoutes () {

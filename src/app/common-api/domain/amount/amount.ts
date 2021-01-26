@@ -2,6 +2,7 @@ import currency from 'currency.js'
 const currentLibrary = currency
 
 export type Amount = number
+export type AmountWithFiveDecimal = string
 
 export namespace Amount {
   const DEFAULT_PRECISION = 2

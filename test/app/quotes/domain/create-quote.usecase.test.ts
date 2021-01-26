@@ -17,6 +17,7 @@ import { coverMonthlyPriceRepositoryStub } from '../fixtures/cover-monthly-price
 import { Occupancy } from '../../../../src/app/common-api/domain/type/occupancy'
 import { pricingZoneRepositoryStub } from '../fixtures/pricing-zone-repository.test-doubles'
 import { CoverPricingZone } from '../../../../src/app/quotes/domain/cover-pricing-zone/cover-pricing-zone'
+import { sumCoverMonthlyPrices } from '../../../../src/app/quotes/domain/cover-monthly-price/cover-monthly-price.func'
 
 describe('Quotes - Usecase - Create Quote', async () => {
   let createQuote: CreateQuote
@@ -430,5 +431,67 @@ describe('Quotes - Usecase - Create Quote', async () => {
 
     // Then
     sinon.assert.calledWithExactly(coverMonthlyPriceRepository.getAllForPartnerWithoutZone, partnerCode, 2)
+  })
+
+  describe('Quotes - Domain - coverMonthlyPrice#sumCoverMonthlyPrices', () => {
+    it('should return 0 when there is no coverMonthlyPrices', () => {
+      expect(sumCoverMonthlyPrices([])).to.be.equal(0)
+    })
+
+    describe('should round numbers correctly', () => {
+      it('when the third digit is below 5', () => {
+        expect(sumCoverMonthlyPrices([
+          { price: '1.99467', cover: 'DDEAUX' }
+        ])).to.be.equal(1.99)
+      })
+
+      it('when the third digit is above 5', () => {
+        expect(sumCoverMonthlyPrices([
+          { price: '1.99977', cover: 'DDEAUX' }
+        ])).to.be.equal(2)
+      })
+
+      it('when the third digit is 5', () => {
+        expect(sumCoverMonthlyPrices([
+          { price: '1.99500', cover: 'DDEAUX' }
+        ])).to.be.equal(2)
+      })
+    })
+
+    describe('should sum the coverMonthlyPrices correctly', () => {
+      it('when there is 1 coverMonthlyPrice', () => {
+        expect(sumCoverMonthlyPrices([
+          { price: '0.12000', cover: 'DDEAUX' }
+        ])).to.be.equal(0.12)
+      })
+
+      it('when there is no decimal point in the result', () => {
+        expect(sumCoverMonthlyPrices([
+          { price: '0.12000', cover: 'DDEAUX' },
+          { price: '0.29250', cover: 'DDEAUX' },
+          { price: '0.47167', cover: 'DDEAUX' },
+          { price: '0.02333', cover: 'DDEAUX' },
+          { price: '1.81333', cover: 'DDEAUX' },
+          { price: '0.84417', cover: 'DDEAUX' },
+          { price: '1.16750', cover: 'DDEAUX' },
+          { price: '0.17917', cover: 'DDEAUX' },
+          { price: '1.08833', cover: 'DDEAUX' }
+        ])).to.be.equal(6)
+      })
+
+      it('when there is a decimal point in the result', () => {
+        expect(sumCoverMonthlyPrices([
+          { price: '0.02420', cover: 'DDEAUX' },
+          { price: '0.12833', cover: 'DDEAUX' },
+          { price: '0.19083', cover: 'DDEAUX' },
+          { price: '0.31166', cover: 'DDEAUX' },
+          { price: '0.49666', cover: 'DDEAUX' },
+          { price: '0.84583', cover: 'DDEAUX' },
+          { price: '1.16166', cover: 'DDEAUX' },
+          { price: '1.24500', cover: 'DDEAUX' },
+          { price: '1.93583', cover: 'DDEAUX' }
+        ])).to.be.equal(6.34)
+      })
+    })
   })
 })

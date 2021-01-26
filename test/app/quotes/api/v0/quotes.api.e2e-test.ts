@@ -59,7 +59,7 @@ describe('Quotes - API - E2E', async () => {
           }
         },
         insurance: {
-          monthly_price: 3.82,
+          monthly_price: 3.83,
           currency: 'EUR',
           default_deductible: 120,
           default_ceiling: 5000.00,
@@ -76,6 +76,9 @@ describe('Quotes - API - E2E', async () => {
     })
 
     it('should return the quote with special operations code', async () => {
+      // Given
+      await clearPricingZoneSqlFixture()
+      await clearPricingMatrixSqlFixture()
       // When
       response = await httpServer.api()
         .post('/v0/quotes')
@@ -93,7 +96,7 @@ describe('Quotes - API - E2E', async () => {
           }
         },
         insurance: {
-          monthly_price: 22.02,
+          monthly_price: 7.5,
           currency: 'EUR',
           default_deductible: 120,
           default_ceiling: 5000.00,
@@ -221,7 +224,7 @@ describe('Quotes - API - E2E', async () => {
           default_cap: 5000,
           default_deductible: 120,
           ipid: '/docs/Appenin_Document_Information_assurance_habitation_APP999.pdf',
-          monthly_price: 3.82,
+          monthly_price: 3.83,
           product_code: 'APP999',
           product_version: '2020-09-11',
           simplified_covers: [
@@ -244,7 +247,7 @@ describe('Quotes - API - E2E', async () => {
           postal_code: '91100',
           email_validated_at: null
         },
-        premium: 45.84,
+        premium: 45.96,
         risk: {
           other_people: [
             {

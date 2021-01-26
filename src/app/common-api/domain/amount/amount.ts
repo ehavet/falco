@@ -5,9 +5,17 @@ export type Amount = number
 export type AmountWithFiveDecimal = string
 
 export namespace Amount {
+  export type Options = {
+    precision: number
+  }
+
   const DEFAULT_PRECISION = 2
-  const options = {
+  const options: Amount.Options = {
     precision: DEFAULT_PRECISION
+  }
+
+  export function add (firstNumber: string | number, secondNumber: string | number, amountOptions = options): Amount {
+    return currentLibrary(firstNumber, amountOptions).add(secondNumber).value
   }
 
   export function toAmount (value: string | number): Amount {

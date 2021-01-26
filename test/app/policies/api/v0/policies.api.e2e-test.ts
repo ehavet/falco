@@ -74,7 +74,7 @@ describe('Policies - API v0 - E2E', async () => {
       response = await httpServer.api()
         .post('/v0/quotes')
         .send({
-          code: 'demo-student',
+          code: partnerCode,
           risk: {
             property: {
               room_count: 2,
@@ -86,7 +86,7 @@ describe('Policies - API v0 - E2E', async () => {
             }
           }
         })
-        .set('X-Consumer-Username', 'studyo')
+        .set('X-Consumer-Username', partnerCode)
 
       requestParams.quote_id = response.body.id
 
@@ -94,7 +94,7 @@ describe('Policies - API v0 - E2E', async () => {
       response = await httpServer.api()
         .post('/v0/policies')
         .send(requestParams)
-        .set('X-Consumer-Username', 'studyo')
+        .set('X-Consumer-Username', partnerCode)
     })
 
     afterEach(async () => {
@@ -108,7 +108,7 @@ describe('Policies - API v0 - E2E', async () => {
         id: 'MYP936794823',
         code: partnerCode,
         insurance: {
-          monthly_price: 3.82,
+          monthly_price: 3.83,
           default_deductible: 120,
           default_ceiling: 5000,
           currency: 'EUR',
@@ -150,7 +150,7 @@ describe('Policies - API v0 - E2E', async () => {
           phone_number: '+33684205510'
         },
         nb_months_due: 12,
-        premium: 45.84,
+        premium: 45.96,
         start_date: '2020-04-05',
         term_start_date: '2020-04-05',
         term_end_date: '2021-04-04',

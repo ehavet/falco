@@ -18,7 +18,7 @@ import { DefaultCapAdvice } from './default-cap-advice/default-cap-advice'
 import { PropertyType } from '../../common-api/domain/type/property-type'
 import { CoverMonthlyPrice } from './cover-monthly-price/cover-monthly-price'
 import { Occupancy } from '../../common-api/domain/type/occupancy'
-import { sumCoversMonthlyPrice } from './cover-monthly-price/cover-monthly-price.func'
+import { sumCoverMonthlyPrices } from './cover-monthly-price/cover-monthly-price.func'
 
 const DEFAULT_NUMBER_MONTHS_DUE = 12
 
@@ -229,7 +229,7 @@ export namespace Quote {
     }
 
     export function getInsurance (partnerOffer: Partner.Offer, defaultCapAdvice: DefaultCapAdvice, coverMonthlyPrices: Array<CoverMonthlyPrice>): Insurance {
-      const monthlyPrice = sumCoversMonthlyPrice(coverMonthlyPrices)
+      const monthlyPrice = sumCoverMonthlyPrices(coverMonthlyPrices)
 
       return <Insurance>{
         estimate: {

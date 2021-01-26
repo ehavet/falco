@@ -14,9 +14,17 @@ describe('Policies - Infra - Specific terms PDF Generator', () => {
     const specificTermsPdfGenerator : SpecificTermsPdfGenerator = new SpecificTermsPdfGenerator(pdfProcessor)
 
     let policy: Policy
+    let demoStudentPartnerPolicy: Policy
     let demoPartnerPolicy: Policy
     let specificTerms: SpecificTerms
+
+    /*
+      INFO: partners demo and e-mobilia's CP templates are generated with a different mechanism compared to
+      other partners, this is why we have two tests, one for demo and the other for demo-student
+    */
+    let demoStudentPartnerSpecificTerms: SpecificTerms
     let demoPartnerSpecificTerms: SpecificTerms
+
     before(async function () {
       this.timeout(10000)
       // GIVEN
@@ -25,11 +33,15 @@ describe('Policies - Infra - Specific terms PDF Generator', () => {
       policy.termEndDate = dayjs(policy.termStartDate).add(1, 'month').toDate()
       policy.insurance.productCode = 'APP1234'
 
-      demoPartnerPolicy = createPolicyFixture({ partnerCode: 'demo-student' })
-      demoPartnerPolicy.insurance.productCode = 'APP1234'
+      demoStudentPartnerPolicy = createPolicyFixture({ partnerCode: 'demo-student' })
+      demoStudentPartnerPolicy.insurance.productCode = 'APP1234'
 
+      demoPartnerPolicy = createPolicyFixture({ partnerCode: 'demo' })
+      demoPartnerPolicy.insurance.productCode = 'APP1234'
       // When
       specificTerms = await specificTermsPdfGenerator.generate(policy)
+
+      demoStudentPartnerSpecificTerms = await specificTermsPdfGenerator.generate(demoStudentPartnerPolicy)
 
       demoPartnerSpecificTerms = await specificTermsPdfGenerator.generate(demoPartnerPolicy)
     })
@@ -53,8 +65,43 @@ describe('Policies - Infra - Specific terms PDF Generator', () => {
       expect(specificTermsUncompressed.includes('Fait \\340 Paris, le 12\\05707\\0572020')).to.be.true
     }).timeout(10000)
 
+    it('should generate a new specific terms document (new CP template)', async () => {
+      // Then
+      const specificTermsUncompressed = await pdftk.input(demoPartnerSpecificTerms.buffer).uncompress().output()
+      expect(specificTerms.name).to.equal('Appenin_Condition_Particulieres_assurance_habitation_APP753210859.pdf')
+      expect(specificTermsUncompressed.includes('05\\05701\\0572020')).to.be.true
+      expect(specificTermsUncompressed.includes('APP)-200(753)-200(210)-200(859')).to.be.true
+      expect(specificTermsUncompressed.includes('69\\05484')).to.be.true
+      expect(specificTermsUncompressed.includes('Jean)-200(Dupont')).to.be.true
+      expect(specificTermsUncompressed.includes('jeandupont\\100email\\056com')).to.be.true
+      expect(specificTermsUncompressed.includes('John)-200(Doe')).to.be.true
+      expect(specificTermsUncompressed.includes('13)-200(rue)-200(du)-200(loup)-200(garou\\054)-200(91100)-200(Corbeil\\055Essonnes')).to.be.true
+      expect(specificTermsUncompressed.includes('[_room_count]')).to.be.false
+      expect(specificTermsUncompressed.includes('7)-200(000)-200(euros')).to.be.true
+      expect(specificTermsUncompressed.includes('150)-200(euros')).to.be.true
+      expect(specificTermsUncompressed.includes('3)-200(500)-200(euros')).to.be.true
+      expect(specificTermsUncompressed.includes('1)-200(400)-200(euros')).to.be.true
+      expect(specificTermsUncompressed.includes('12\\05707\\0572020')).to.be.true
+    }).timeout(10000)
+
+    it('should generate a new specific terms document (new CP template) with amount rounded to the nearest', async () => {
+      // Given
+      demoPartnerPolicy = createPolicyFixture({ partnerCode: 'demo' })
+      demoPartnerPolicy.insurance.productCode = 'APP1234'
+      demoPartnerPolicy.insurance.estimate.defaultCeiling = 7001
+
+      // When
+      demoPartnerSpecificTerms = await specificTermsPdfGenerator.generate(demoPartnerPolicy)
+
+      // Then
+      const specificTermsUncompressed = await pdftk.input(demoPartnerSpecificTerms.buffer).uncompress().output()
+      expect(specificTermsUncompressed.includes('7)-200(001)-200(euros')).to.be.true
+      expect(specificTermsUncompressed.includes('3)-200(501)-200(euros')).to.be.true
+      expect(specificTermsUncompressed.includes('1)-200(400)-200(euros')).to.be.true
+    }).timeout(10000)
+
     describe('For a partner which is not a demo partner', async () => {
-      it('should add specimen stamp on generated terms document', async () => {
+      it('should not add specimen stamp on generated terms document', async () => {
         // Then
         const specificTermsUncompressed = await pdftk.input(specificTerms.buffer).uncompress().output()
         expect(specificTermsUncompressed.includes('SPECIMEN')).to.be.false
@@ -62,9 +109,9 @@ describe('Policies - Infra - Specific terms PDF Generator', () => {
     })
 
     describe('For a demo partners', async () => {
-      it('should not add specimen stamp on generated terms document', async () => {
+      it('should add specimen stamp on generated terms document', async () => {
         // Then
-        const specificTermsUncompressed = await pdftk.input(demoPartnerSpecificTerms.buffer).uncompress().output()
+        const specificTermsUncompressed = await pdftk.input(demoStudentPartnerSpecificTerms.buffer).uncompress().output()
         expect(specificTermsUncompressed.includes('SPECIMEN')).to.be.true
       }).timeout(10000)
     })
@@ -75,7 +122,9 @@ describe('Policies - Infra - Specific terms PDF Generator', () => {
     const specificTermsPdfGenerator : SpecificTermsPdfGenerator = new SpecificTermsPdfGenerator(pdfProcessor)
 
     let policy: Policy
+    let demoPartnerPolicy: Policy
     let specificTerms: SpecificTerms
+    let demoPartnerSpecificTerms: SpecificTerms
     before(async function () {
       this.timeout(10000)
       // Given
@@ -84,8 +133,11 @@ describe('Policies - Infra - Specific terms PDF Generator', () => {
       policy.termEndDate = dayjs(policy.termStartDate).add(1, 'month').toDate()
       policy.insurance.productCode = 'APP1234'
 
+      demoPartnerPolicy = createPolicyFixture({ partnerCode: 'demo' })
+
       // When
       specificTerms = await specificTermsPdfGenerator.generate(policy)
+      demoPartnerSpecificTerms = await specificTermsPdfGenerator.generate(demoPartnerPolicy)
     })
 
     it('should generate a new specific terms document', async () => {
@@ -107,6 +159,43 @@ describe('Policies - Infra - Specific terms PDF Generator', () => {
       expect(specificTermsUncompressed.includes('Fait \\340 Paris, le 12\\05707\\0572020')).to.be.true
     }).timeout(10000)
 
+    it('should generate a new specific terms document (new CP template)', async () => {
+      // Then
+      const specificTermsUncompressed = await pdftk.input(demoPartnerSpecificTerms.buffer).uncompress().output()
+      expect(specificTerms.name).to.equal('Appenin_Condition_Particulieres_assurance_habitation_APP753210859.pdf')
+      expect(specificTermsUncompressed.includes('05\\05701\\0572020')).to.be.true
+      expect(specificTermsUncompressed.includes('APP)-200(753)-200(210)-200(859')).to.be.true
+      expect(specificTermsUncompressed.includes('69\\05484')).to.be.true
+      expect(specificTermsUncompressed.includes('Jean)-200(Dupont')).to.be.true
+      expect(specificTermsUncompressed.includes('jeandupont\\100email\\056com')).to.be.true
+      expect(specificTermsUncompressed.includes('John)-200(Doe')).to.be.true
+      expect(specificTermsUncompressed.includes('13)-200(rue)-200(du)-200(loup)-200(garou\\054)-200(91100)-200(Corbeil\\055Essonnes')).to.be.true
+      /*
+        INFO : due to the pdf format/encoding, we cannot find the sentence with the room_count so we check that its placeholder is no in the
+        pdf anymore, which means it has been replaced.
+      */
+      expect(specificTermsUncompressed.includes('[_room_count]')).to.be.false
+      expect(specificTermsUncompressed.includes('7)-200(000)-200(euros')).to.be.true
+      expect(specificTermsUncompressed.includes('150)-200(euros')).to.be.true
+      expect(specificTermsUncompressed.includes('3)-200(500)-200(euros')).to.be.true
+      expect(specificTermsUncompressed.includes('1)-200(400)-200(euros')).to.be.true
+      expect(specificTermsUncompressed.includes('12\\05707\\0572020')).to.be.true
+    }).timeout(10000)
+
+    it('should generate a new specific terms document (new CP template) with amount rounded to the nearest', async () => {
+      // Given
+      demoPartnerPolicy.insurance.estimate.defaultCeiling = 7001
+
+      // When
+      demoPartnerSpecificTerms = await specificTermsPdfGenerator.generate(demoPartnerPolicy)
+
+      // Then
+      const specificTermsUncompressed = await pdftk.input(demoPartnerSpecificTerms.buffer).uncompress().output()
+      expect(specificTermsUncompressed.includes('7)-200(001)-200(euros')).to.be.true
+      expect(specificTermsUncompressed.includes('3)-200(501)-200(euros')).to.be.true
+      expect(specificTermsUncompressed.includes('1)-200(400)-200(euros')).to.be.true
+    }).timeout(10000)
+
     describe('For a partner which is not a demo partner', async () => {
       it('should add specimen stamp on generated terms document', async () => {
         // Then
@@ -116,7 +205,7 @@ describe('Policies - Infra - Specific terms PDF Generator', () => {
     })
 
     describe('For a demo partners', async () => {
-      it('should not add specimen stamp on generated terms document', async () => {
+      it('should add specimen stamp on generated terms document', async () => {
         // Given
         dateFaker.setCurrentDate(new Date('2020-07-12T00:00:00.000Z'))
         const policy: Policy = createPolicyFixture({ partnerCode: 'demo-student' })

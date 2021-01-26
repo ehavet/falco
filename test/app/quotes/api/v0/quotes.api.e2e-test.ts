@@ -93,7 +93,7 @@ describe('Quotes - API - E2E', async () => {
           }
         },
         insurance: {
-          monthly_price: 22.02,
+          monthly_price: 6.34,
           currency: 'EUR',
           default_deductible: 120,
           default_ceiling: 5000.00,

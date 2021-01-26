@@ -16,7 +16,7 @@ import { CreateQuoteCommand } from './create-quote-command'
 import { Amount } from '../../common-api/domain/amount/amount'
 import { DefaultCapAdvice } from './default-cap-advice/default-cap-advice'
 import { PropertyType } from '../../common-api/domain/type/property-type'
-import { CoverMonthlyPrice } from './cover/coverMonthlyPrice'
+import { CoverMonthlyPrice } from './cover-monthly-price/cover-monthly-price'
 import { Occupancy } from '../../common-api/domain/type/occupancy'
 
 const DEFAULT_NUMBER_MONTHS_DUE = 12
@@ -301,7 +301,7 @@ export namespace Quote {
     function sumCoversMonthlyPrice (coverMonthlyPrices: Array<CoverMonthlyPrice>): Amount {
       const coverMonthlyPrice = coverMonthlyPrices.reduce((monthlyPrice, acc) => {
         return {
-          monthlyPrice: Amount.toAmount(acc.coverMonthlyPrice) + Amount.toAmount(monthlyPrice.monthlyPrice)
+          monthlyPrice: Amount.toAmount(acc.price) + Amount.toAmount(monthlyPrice.monthlyPrice)
         }
       }, { monthlyPrice: 0 })
 

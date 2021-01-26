@@ -9,6 +9,8 @@ import { PolicyRepository } from '../../../../../src/app/policies/domain/policy.
 import fsx from 'fs-extra'
 import { QuoteSqlModel } from '../../../../../src/app/quotes/infrastructure/sql-models/quote-sql-model'
 import { PropertyType } from '../../../../../src/app/common-api/domain/type/property-type'
+import { clearPricingZoneSqlFixture, setPricingZoneSqlFixture } from '../../../quotes/fixtures/pricing-zone.sql.fixture'
+import { clearPricingMatrixSqlFixture, setPricingMatrixSqlFixture } from '../../../quotes/fixtures/pricing-matrix.sql.fixture'
 import { Occupancy } from '../../../../../src/app/common-api/domain/type/occupancy'
 
 async function resetDb () {
@@ -59,21 +61,26 @@ describe('Policies - API v0 - E2E', async () => {
   describe('POST /v0/policies', async () => {
     let response: supertest.Response
     const now = new Date('2020-04-18T00:00:00Z')
-    const requestParams: any = createPolicyApiRequestFixture({ code: 'studyo' })
+    const productCode = 'APP999'
+    const partnerCode = 'demo-student'
+    const requestParams: any = createPolicyApiRequestFixture({ code: partnerCode })
 
     beforeEach(async () => {
       // Given
       dateFaker.setCurrentDate(now)
+      await setPricingZoneSqlFixture(productCode, 'Paris', '75000')
+      await setPricingMatrixSqlFixture(partnerCode, 2)
+
       response = await httpServer.api()
         .post('/v0/quotes')
         .send({
-          code: 'studyo',
+          code: 'demo-student',
           risk: {
             property: {
               room_count: 2,
               address: '88 rue des prairies',
-              postal_code: '01100',
-              city: 'Kyukamura',
+              postal_code: '75000',
+              city: 'Paris',
               type: 'FLAT',
               occupancy: 'TENANT'
             }
@@ -90,28 +97,33 @@ describe('Policies - API v0 - E2E', async () => {
         .set('X-Consumer-Username', 'studyo')
     })
 
+    afterEach(async () => {
+      await clearPricingZoneSqlFixture()
+      await clearPricingMatrixSqlFixture()
+    })
+
     it('should return the policy', async () => {
       // Given
       const expectedPolicy = {
         id: 'MYP936794823',
-        code: 'studyo',
+        code: partnerCode,
         insurance: {
-          monthly_price: 7.5,
+          monthly_price: 3.82,
           default_deductible: 120,
           default_ceiling: 5000,
           currency: 'EUR',
           simplified_covers: ['ACDDE', 'ACINCEX', 'ACVOL', 'ACASSHE', 'ACDEFJU', 'ACRC'],
-          product_code: 'APP658',
-          product_version: '2020-07-15',
-          contractual_terms: '/docs/Appenin_Conditions_Generales_assurance_habitation_APP658.pdf',
-          ipid: '/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf'
+          product_code: productCode,
+          product_version: '2020-09-11',
+          contractual_terms: '/docs/Appenin_Conditions_Generales_assurance_habitation_APP999.pdf',
+          ipid: '/docs/Appenin_Document_Information_assurance_habitation_APP999.pdf'
         },
         risk: {
           property: {
             room_count: 2,
             address: '88 rue des prairies',
-            postal_code: '01100',
-            city: 'Kyukamura',
+            postal_code: '75000',
+            city: 'Paris',
             type: PropertyType.FLAT,
             occupancy: Occupancy.TENANT
           },
@@ -132,13 +144,13 @@ describe('Policies - API v0 - E2E', async () => {
           lastname: 'Dupont',
           firstname: 'Jean',
           address: '88 rue des prairies',
-          postal_code: '01100',
-          city: 'Kyukamura',
+          postal_code: '75000',
+          city: 'Paris',
           email: 'jeandupont@email.com',
           phone_number: '+33684205510'
         },
         nb_months_due: 12,
-        premium: 90,
+        premium: 45.84,
         start_date: '2020-04-05',
         term_start_date: '2020-04-05',
         term_end_date: '2021-04-04',

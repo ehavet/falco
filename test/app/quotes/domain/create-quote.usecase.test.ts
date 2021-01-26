@@ -13,9 +13,10 @@ import { defaultCapAdviceRepositoryStub } from '../fixtures/default-cap-advice-r
 import { DefaultCapAdviceNotFoundError } from '../../../../src/app/quotes/domain/default-cap-advice/default-cap-advice.errors'
 import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
 import { createPartnerFixture } from '../../partners/fixtures/partner.fixture'
-import { coverMonthlyPriceRepositoryStub } from '../fixtures/pricing-matrix-repository.test-doubles'
-import { COVER } from '../../../../src/app/quotes/domain/cover/coverMonthlyPrice'
+import { coverMonthlyPriceRepositoryStub } from '../fixtures/cover-monthly-price-repository.test-doubles'
 import { Occupancy } from '../../../../src/app/common-api/domain/type/occupancy'
+import { pricingZoneRepositoryStub } from '../fixtures/pricing-zone-repository.test-doubles'
+import { CoverPricingZone } from '../../../../src/app/quotes/domain/cover-pricing-zone/cover-pricing-zone'
 
 describe('Quotes - Usecase - Create Quote', async () => {
   let createQuote: CreateQuote
@@ -69,11 +70,17 @@ describe('Quotes - Usecase - Create Quote', async () => {
     specialOperationsCodeAppliedAt: null
   }
   const now = new Date('2020-04-18T10:09:08Z')
+  const pricingZoneRepository = pricingZoneRepositoryStub()
+  const pricingZones: CoverPricingZone[] = [
+    { zone: 'ZD1', cover: 'DDEAUX' },
+    { zone: 'ZB2', cover: 'INCEND' },
+    { zone: 'ZC3', cover: 'VOLXXX' }
+  ]
 
   beforeEach(() => {
     dateFaker.setCurrentDate(now)
     partnerRepository.getByCode.withArgs('myPartner').returns(partner)
-    createQuote = CreateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository, coverMonthlyPriceRepository)
+    createQuote = CreateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository, coverMonthlyPriceRepository, pricingZoneRepository)
   })
 
   afterEach(() => {
@@ -81,10 +88,18 @@ describe('Quotes - Usecase - Create Quote', async () => {
   })
 
   describe('should return the quote', async () => {
-    before(() => {
+    beforeEach(() => {
       quoteRepository.save.resolves()
       defaultCapAdviceRepository.get.withArgs('myPartner', 2).resolves({ value: 6000 })
-      coverMonthlyPriceRepository.get.withArgs('myPartner', 2).resolves([{ coverMonthlyPrice: '0.820000', cover: COVER.DDEAUX }, { coverMonthlyPrice: '5.000000', cover: COVER.INCEND }])
+      pricingZoneRepository.getAllForProductByLocation.resolves(pricingZones)
+      coverMonthlyPriceRepository.getAllForPartnerByPricingZone.resolves([{ price: '0.82000', cover: 'DDEAUX' }, { price: '5.00000', cover: 'INCEND' }])
+      coverMonthlyPriceRepository.getAllForPartnerWithoutZone.resolves([{ price: '0.82000', cover: 'DDEAUX' }, { price: '5.00000', cover: 'INCEND' }])
+    })
+    afterEach(() => {
+      defaultCapAdviceRepository.get.reset()
+      pricingZoneRepository.getAllForProductByLocation.reset()
+      coverMonthlyPriceRepository.getAllForPartnerByPricingZone.reset()
+      coverMonthlyPriceRepository.getAllForPartnerWithoutZone.reset()
     })
 
     it('with the partner code and the risk', async () => {
@@ -114,7 +129,13 @@ describe('Quotes - Usecase - Create Quote', async () => {
 
     it('with the insurance', async () => {
       // Given
-      const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT } } }
+      const createQuoteCommand: CreateQuoteCommand = {
+        partnerCode: 'myPartner',
+        specOpsCode: OperationCode.BLANK,
+        risk: {
+          property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT }
+        }
+      }
       const expectedInsurance: Quote.Insurance = expectedQuote.insurance
 
       // When
@@ -231,10 +252,35 @@ describe('Quotes - Usecase - Create Quote', async () => {
 
   it('should save the quote', async () => {
     // Given
-    const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses', type: PropertyType.FLAT, occupancy: Occupancy.TENANT } } }
+    const city = 'Les Ulysses'
+    const postalCode = '91110'
+    const createQuoteCommand: CreateQuoteCommand = {
+      partnerCode: 'myPartner',
+      specOpsCode: OperationCode.BLANK,
+      risk: {
+        property: {
+          roomCount: 2,
+          address: '15 Rue Des Amandiers',
+          postalCode,
+          city,
+          type: PropertyType.FLAT,
+          occupancy: Occupancy.TENANT
+        }
+      }
+    }
+    const pricingZones: CoverPricingZone[] = [
+      { zone: 'ZD1', cover: 'DDEAUX' },
+      { zone: 'ZB2', cover: 'INCEND' }
+    ]
     quoteRepository.save.resolves()
     defaultCapAdviceRepository.get.withArgs('myPartner', 2).resolves({ value: 6000 })
-    coverMonthlyPriceRepository.get.withArgs('myPartner', 2).resolves([{ coverMonthlyPrice: '0.820000', cover: COVER.DDEAUX }, { coverMonthlyPrice: '5.000000', cover: COVER.INCEND }])
+    pricingZoneRepository.getAllForProductByLocation.withArgs(partner.offer.productCode, city, postalCode).resolves(pricingZones)
+    coverMonthlyPriceRepository.getAllForPartnerByPricingZone
+      .withArgs('myPartner', pricingZones, 2)
+      .resolves([
+        { price: '0.82000', cover: 'DDEAUX' },
+        { price: '5.00000', cover: 'INCEND' }
+      ])
 
     // When
     const quote = await createQuote(createQuoteCommand)
@@ -282,7 +328,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
       }
     }
     defaultCapAdviceRepository.get.withArgs('myPartner', 2).resolves({ value: 6000 })
-    coverMonthlyPriceRepository.get.withArgs('myPartner', 2).resolves([{ coverMonthlyPrice: '0.820000', cover: COVER.DDEAUX }, { coverMonthlyPrice: '5.000000', cover: COVER.INCEND }])
+    coverMonthlyPriceRepository.getAllForPartnerByPricingZone.withArgs('myPartner', pricingZones, 2).resolves([{ price: '0.820000', cover: 'DDEAUX' }, { price: '5.000000', cover: 'INCEND' }])
 
     // When
     const quotePromise = createQuote(createQuoteCommand)
@@ -298,7 +344,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
   it('should throw an error if there is no insurance for the given risk', async () => {
     // Given
     const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 3, type: PropertyType.FLAT, occupancy: Occupancy.TENANT } } }
-    coverMonthlyPriceRepository.get.withArgs('myPartner', 3).resolves([])
+    coverMonthlyPriceRepository.getAllForPartnerByPricingZone.withArgs('myPartner', pricingZones, 3).resolves([])
 
     // When
     const quotePromise = createQuote(createQuoteCommand)
@@ -321,5 +367,68 @@ describe('Quotes - Usecase - Create Quote', async () => {
 
     // THEN
     return expect(quotePromise).to.be.rejectedWith(DefaultCapAdviceNotFoundError)
+  })
+
+  it('should return cover monthly prices when no city or postal code are found', async () => {
+    // Given
+    const postalCode = '66666'
+    const city = 'Babylone'
+    const partnerCode = 'myPartner'
+
+    const createQuoteCommand: CreateQuoteCommand = {
+      partnerCode,
+      specOpsCode: OperationCode.BLANK,
+      risk: {
+        property: {
+          roomCount: 2,
+          address: '15 Rue Des Amandiers',
+          postalCode,
+          city,
+          type: PropertyType.FLAT,
+          occupancy: Occupancy.TENANT
+        }
+      }
+    }
+
+    pricingZoneRepository.getAllForProductByLocation.withArgs(partner.offer.productCode, city, postalCode).resolves([])
+    defaultCapAdviceRepository.get.withArgs(partnerCode, 2).resolves({ value: 6000 })
+    coverMonthlyPriceRepository.getAllForPartnerWithoutZone.resolves([{ price: '0.25233', cover: 'ZNOTFOUND' }])
+
+    // When
+    await createQuote(createQuoteCommand)
+
+    // Then
+    sinon.assert.calledWithExactly(coverMonthlyPriceRepository.getAllForPartnerWithoutZone, partnerCode, 2)
+  })
+
+  it('should return cover monthly prices when no city or postal code are provided', async () => {
+    // Given
+    const postalCode = '75019'
+    const city = undefined
+    const partnerCode = 'myPartner'
+
+    const createQuoteCommand: CreateQuoteCommand = {
+      partnerCode,
+      specOpsCode: OperationCode.BLANK,
+      risk: {
+        property: {
+          roomCount: 2,
+          address: '15 Rue Des Amandiers',
+          postalCode,
+          city,
+          type: PropertyType.FLAT,
+          occupancy: Occupancy.TENANT
+        }
+      }
+    }
+
+    coverMonthlyPriceRepository.getAllForPartnerWithoutZone.resolves([{ price: '0.25233', cover: 'ZNOTFOUND' }])
+    defaultCapAdviceRepository.get.withArgs('myPartner', 2).resolves({ value: 6000 })
+
+    // When
+    await createQuote(createQuoteCommand)
+
+    // Then
+    sinon.assert.calledWithExactly(coverMonthlyPriceRepository.getAllForPartnerWithoutZone, partnerCode, 2)
   })
 })

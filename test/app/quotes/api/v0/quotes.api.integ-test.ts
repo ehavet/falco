@@ -28,6 +28,14 @@ import { OperationCodeNotApplicableError } from '../../../../../src/app/policies
 import { DefaultCapAdviceNotFoundError } from '../../../../../src/app/quotes/domain/default-cap-advice/default-cap-advice.errors'
 import { PropertyType } from '../../../../../src/app/common-api/domain/type/property-type'
 import { Occupancy } from '../../../../../src/app/common-api/domain/type/occupancy'
+import {
+  PricingZoneConsistencyError,
+  PricingZoneNotFoundError
+} from '../../../../../src/app/quotes/domain/cover-pricing-zone/cover-pricing-zone.errors'
+import {
+  CoverMonthlyPriceConsistencyError,
+  CoverMonthlyPriceNotFoundError
+} from '../../../../../src/app/quotes/domain/cover-monthly-price/cover-monthly-price.error'
 
 describe('Quotes - API - Integration', async () => {
   let httpServer: HttpServerForTesting
@@ -278,6 +286,47 @@ describe('Quotes - API - Integration', async () => {
       })
     })
 
+    describe('when the usecase throw an error', async () => {
+      const expectedStatus = 500
+      const partnerCode: string = 'myPartner'
+      const city = 'Beverly'
+      const productCode = 'APP999'
+      const postalCode = '76523'
+      const requestParams = {
+        code: partnerCode,
+        risk: {
+          property: {
+            room_count: 2,
+            city,
+            postalCode
+          }
+        }
+      }
+      const errors = [
+        { instance: new DefaultCapAdviceNotFoundError(partnerCode, requestParams.risk.property.room_count), expectedStatus },
+        { instance: new PricingZoneNotFoundError(productCode, postalCode, city), expectedStatus },
+        { instance: new PricingZoneConsistencyError(productCode, postalCode, city), expectedStatus },
+        { instance: new CoverMonthlyPriceNotFoundError(partnerCode), expectedStatus },
+        { instance: new CoverMonthlyPriceConsistencyError(partnerCode), expectedStatus }
+      ]
+
+      errors.forEach(async (error) => {
+        it(`${error.instance.constructor.name} should return a ${error.expectedStatus} status`, async () => {
+          // Given
+          sinon.stub(container, 'CreateQuote').rejects(error.instance)
+
+          // When
+          response = await httpServer.api()
+            .post('/v0/quotes')
+            .send(requestParams)
+            .set('X-Consumer-Username', partnerCode)
+
+          // Then
+          expect(response).to.have.property('statusCode', error.expectedStatus)
+        })
+      })
+    })
+
     describe('when there is no default cap advice found', () => {
       it('should reply with status 500 because it should not happen', async () => {
         // Given
@@ -290,6 +339,48 @@ describe('Quotes - API - Integration', async () => {
         response = await httpServer.api()
           .post('/v0/quotes')
           .send({ code: partnerCode, risk: { property: { room_count: 2 } } })
+          .set('X-Consumer-Username', partnerCode)
+
+        // Then
+        expect(response).to.have.property('statusCode', 500)
+      })
+    })
+
+    describe('when there is no pricing zone found', () => {
+      it('should reply with status 500', async () => {
+        // Given
+        const partnerCode: string = 'myPartner'
+        const risk = { property: { roomCount: 2, postalCode: '77777', city: 'Paradise', address: undefined } }
+        const specOpsCode = 'BLANK'
+        sinon.stub(container, 'CreateQuote')
+          .withArgs({ partnerCode, risk, specOpsCode })
+          .rejects(new PricingZoneNotFoundError('APP999', '77777', 'Paradise'))
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/quotes')
+          .send({ code: partnerCode, risk: { property: { room_count: 2, postal_code: '77777', city: 'Paradise' } } })
+          .set('X-Consumer-Username', partnerCode)
+
+        // Then
+        expect(response).to.have.property('statusCode', 500)
+      })
+    })
+
+    describe('when there is a pricing zone consistency error', () => {
+      it('should reply with status 500', async () => {
+        // Given
+        const partnerCode: string = 'myPartner'
+        const risk = { property: { roomCount: 2, postalCode: '77777', city: 'Paradise', address: undefined } }
+        const specOpsCode = 'BLANK'
+        sinon.stub(container, 'CreateQuote')
+          .withArgs({ partnerCode, risk, specOpsCode })
+          .rejects(new PricingZoneConsistencyError('APP999', '77777', 'Paradise'))
+
+        // When
+        response = await httpServer.api()
+          .post('/v0/quotes')
+          .send({ code: partnerCode, risk: { property: { room_count: 2, postal_code: '77777', city: 'Paradise' } } })
           .set('X-Consumer-Username', partnerCode)
 
         // Then
@@ -682,93 +773,40 @@ describe('Quotes - API - Integration', async () => {
       })
     })
 
-    describe('when PartnerNotFoundError is thrown by usecase', () => {
-      it('should reply with status 404', async () => {
-        // Given
-        const partnerCode: string = 'unknownPartner'
-        sinon.stub(container, 'UpdateQuote').rejects(new PartnerNotFoundError(partnerCode))
+    describe('when the usecase throw an error', async () => {
+      const quoteId = 'UD65X3'
+      const partnerCode = 'studyo'
+      const errors = [
+        { instance: new PartnerNotFoundError(partnerCode), expectedStatus: 404, expectedMessage: `Could not find partner with code : ${partnerCode}` },
+        { instance: new QuoteNotFoundError(quoteId), expectedStatus: 404, expectedMessage: `Could not find quote with id : ${quoteId}` },
+        { instance: new QuoteRiskPropertyRoomCountNotInsurableError(2), expectedStatus: 422, expectedMessage: '2 room(s) property is not insurable' },
+        { instance: new OperationCodeNotApplicableError('SEMESTER33', partnerCode), expectedStatus: 422, expectedMessage: `The operation code SEMESTER33 is not applicable for partner : ${partnerCode}` },
+        { instance: new QuoteStartDateConsistencyError(), expectedStatus: 422, expectedMessage: 'Start date cannot be earlier than today' },
+        { instance: new QuoteRiskRoommatesNotAllowedError(10), expectedStatus: 422, expectedMessage: '10 room(s) property does not allow roommates' },
+        { instance: new QuoteRiskNumberOfRoommatesError(10, 3), expectedStatus: 422, expectedMessage: '3 room(s) property allows a maximum of 10 roommate(s)' },
+        { instance: new QuoteRiskPropertyTypeNotInsurableError(PropertyType.HOUSE), expectedStatus: 422, expectedMessage: 'Cannot create quote, HOUSE is not insured by this partner' },
+        { instance: new DefaultCapAdviceNotFoundError(partnerCode, 2), expectedStatus: 500 },
+        { instance: new PricingZoneNotFoundError('APP999', '91100', 'Kyukamura'), expectedStatus: 500 },
+        { instance: new PricingZoneConsistencyError('APP999', '91100', 'Kyukamura'), expectedStatus: 500 },
+        { instance: new CoverMonthlyPriceNotFoundError(partnerCode), expectedStatus: 500 },
+        { instance: new CoverMonthlyPriceConsistencyError(partnerCode), expectedStatus: 500 }
+      ]
 
-        // When
-        response = await httpServer.api()
-          .put('/v0/quotes/UD65X3')
-          .send(createUpdateQuotePayloadFixture())
-          .set('X-Consumer-Username', partnerCode)
+      errors.forEach(async (error) => {
+        it(`${error.instance.constructor.name} should return a ${error.expectedStatus} status`, async () => {
+          // Given
+          sinon.stub(container, 'UpdateQuote').rejects(error.instance)
 
-        // Then
-        expect(response).to.have.property('statusCode', 404)
-        expect(response.body).to.have.property('message', `Could not find partner with code : ${partnerCode}`)
-      })
-    })
+          // When
+          response = await httpServer.api()
+            .put(`/v0/quotes/${quoteId}`)
+            .send(createUpdateQuotePayloadFixture())
+            .set('X-Consumer-Username', partnerCode)
 
-    describe('when QuoteNotFoundError is thrown by usecase', () => {
-      it('should reply with status 404', async () => {
-        // Given
-        const partnerCode: string = 'unknownPartner'
-        sinon.stub(container, 'UpdateQuote').rejects(new QuoteNotFoundError('UD65X3'))
-
-        // When
-        response = await httpServer.api()
-          .put('/v0/quotes/UD65X3')
-          .send(createUpdateQuotePayloadFixture())
-          .set('X-Consumer-Username', partnerCode)
-
-        // Then
-        expect(response).to.have.property('statusCode', 404)
-        expect(response.body).to.have.property('message', 'Could not find quote with id : UD65X3')
-      })
-    })
-
-    describe('when QuoteRiskPropertyRoomCountNotInsurableError is thrown by usecase', () => {
-      it('should reply with status 422', async () => {
-        // Given
-        const partnerCode: string = 'myPartner'
-        sinon.stub(container, 'UpdateQuote').rejects(new QuoteRiskPropertyRoomCountNotInsurableError(2))
-
-        // When
-        response = await httpServer.api()
-          .put('/v0/quotes/UD65X3')
-          .send(createUpdateQuotePayloadFixture())
-          .set('X-Consumer-Username', partnerCode)
-
-        // Then
-        expect(response).to.have.property('statusCode', 422)
-        expect(response.body).to.have.property('message', '2 room(s) property is not insurable')
-      })
-    })
-
-    describe('when OperationCodeNotApplicableError is thrown by usecase', () => {
-      it('should reply with status 422', async () => {
-        // Given
-        const partnerCode: string = 'myPartner'
-        sinon.stub(container, 'UpdateQuote').rejects(new OperationCodeNotApplicableError('SEMESTER33', partnerCode))
-
-        // When
-        response = await httpServer.api()
-          .put('/v0/quotes/UD65X3')
-          .send(createUpdateQuotePayloadFixture())
-          .set('X-Consumer-Username', partnerCode)
-
-        // Then
-        expect(response).to.have.property('statusCode', 422)
-        expect(response.body).to.have.property('message', 'The operation code SEMESTER33 is not applicable for partner : myPartner')
-      })
-    })
-
-    describe('when QuoteStartDateConsistencyError is thrown by usecase', () => {
-      it('should reply with status 422', async () => {
-        // Given
-        const partnerCode: string = 'myPartner'
-        sinon.stub(container, 'UpdateQuote').rejects(new QuoteStartDateConsistencyError())
-
-        // When
-        response = await httpServer.api()
-          .put('/v0/quotes/UD65X3')
-          .send(createUpdateQuotePayloadFixture())
-          .set('X-Consumer-Username', partnerCode)
-
-        // Then
-        expect(response).to.have.property('statusCode', 422)
-        expect(response.body).to.have.property('message', 'Start date cannot be earlier than today')
+          // Then
+          expect(response).to.have.property('statusCode', error.expectedStatus)
+          if (error.expectedMessage) expect(response.body).to.have.property('message', error.expectedMessage)
+        })
       })
     })
 

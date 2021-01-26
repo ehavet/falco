@@ -1,7 +1,6 @@
 import { Column, Default, Model, PrimaryKey, Table } from 'sequelize-typescript'
-import { AmountSQLDataType } from '../../../common-api/infrastructure/amount/amount-sql'
+import { AmountSQLDataTypeScaleFive } from '../../../common-api/infrastructure/amount/amount-sql'
 import { v4 as uuidv4 } from 'uuid'
-import { COVER } from '../../domain/cover/coverMonthlyPrice'
 
 @Table({ timestamps: true, tableName: 'pricing_matrix', underscored: true })
 export class PricingMatrixSqlModel extends Model {
@@ -16,9 +15,12 @@ export class PricingMatrixSqlModel extends Model {
     @Column
     roomCount!: number
 
-    @Column(AmountSQLDataType)
+    @Column(AmountSQLDataTypeScaleFive)
     coverMonthlyPrice!: string
 
     @Column
-    cover!: COVER
+    cover!: string
+
+    @Column
+    pricingZone!: string
 }

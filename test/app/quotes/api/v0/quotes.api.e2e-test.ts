@@ -7,6 +7,8 @@ import { Quote } from '../../../../../src/app/quotes/domain/quote'
 import { createQuoteFixture, createQuoteRiskFixture } from '../../fixtures/quote.fixture'
 import { PropertyType } from '../../../../../src/app/common-api/domain/type/property-type'
 import { Occupancy } from '../../../../../src/app/common-api/domain/type/occupancy'
+import { clearPricingZoneSqlFixture, setPricingZoneSqlFixture } from '../../fixtures/pricing-zone.sql.fixture'
+import { clearPricingMatrixSqlFixture, setPricingMatrixSqlFixture } from '../../fixtures/pricing-matrix.sql.fixture'
 
 async function resetDb () {
   await QuoteSqlModel.destroy({ truncate: true, cascade: true })
@@ -14,29 +16,34 @@ async function resetDb () {
 
 describe('Quotes - API - E2E', async () => {
   let httpServer: HttpServerForTesting
+  const now = new Date('2020-04-18T10:09:08Z')
+  const productCode = 'APP999'
+  const partnerCode = 'demo-student'
 
   before(async () => {
     httpServer = await newProdLikeServer()
   })
 
+  beforeEach(async () => {
+    dateFaker.setCurrentDate(now)
+    await setPricingZoneSqlFixture(productCode, 'Paris', '75000')
+    await setPricingMatrixSqlFixture(partnerCode, 2)
+  })
+
+  afterEach(async () => {
+    await clearPricingZoneSqlFixture()
+    await clearPricingMatrixSqlFixture()
+  })
+
   describe('POST /v0/quotes/', () => {
     let response: supertest.Response
-    const now = new Date('2020-04-18T10:09:08Z')
-
-    beforeEach(() => {
-      dateFaker.setCurrentDate(now)
-    })
-
-    afterEach(async () => {
-      await resetDb()
-    })
 
     it('should return the quote', async () => {
       // When
       response = await httpServer.api()
         .post('/v0/quotes')
-        .send({ code: 'studyo', risk: { property: { room_count: 2, address: '15 Rue Des Amandiers', postal_code: '91110', city: 'Les Ulysses', type: 'FLAT', occupancy: 'TENANT' } } })
-        .set('X-Consumer-Username', 'studyo')
+        .send({ code: partnerCode, risk: { property: { room_count: 2, address: '15 Rue Des Amandiers', postal_code: '75000', city: 'Paris', type: 'FLAT', occupancy: 'TENANT' } } })
+        .set('X-Consumer-Username', partnerCode)
 
       // Then
       expect(response.body).to.deep.equal({
@@ -45,24 +52,24 @@ describe('Quotes - API - E2E', async () => {
           property: {
             room_count: 2,
             address: '15 Rue Des Amandiers',
-            postal_code: '91110',
-            city: 'Les Ulysses',
+            postal_code: '75000',
+            city: 'Paris',
             type: 'FLAT',
             occupancy: 'TENANT'
           }
         },
         insurance: {
-          monthly_price: 7.50,
+          monthly_price: 3.82,
           currency: 'EUR',
           default_deductible: 120,
           default_ceiling: 5000.00,
           simplified_covers: ['ACDDE', 'ACINCEX', 'ACVOL', 'ACASSHE', 'ACDEFJU', 'ACRC'],
-          product_code: 'APP658',
-          product_version: '2020-07-15',
-          contractual_terms: '/docs/Appenin_Conditions_Generales_assurance_habitation_APP658.pdf',
-          ipid: '/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf'
+          product_code: productCode,
+          product_version: '2020-09-11',
+          contractual_terms: '/docs/Appenin_Conditions_Generales_assurance_habitation_APP999.pdf',
+          ipid: '/docs/Appenin_Document_Information_assurance_habitation_APP999.pdf'
         },
-        code: 'studyo',
+        code: partnerCode,
         special_operations_code: null,
         special_operations_code_applied_at: null
       })
@@ -72,8 +79,8 @@ describe('Quotes - API - E2E', async () => {
       // When
       response = await httpServer.api()
         .post('/v0/quotes')
-        .send({ code: 'essca', risk: { property: { room_count: 2, type: PropertyType.FLAT, occupancy: 'TENANT' } }, spec_ops_code: 'SEMESTER1' })
-        .set('X-Consumer-Username', 'essca')
+        .send({ code: partnerCode, risk: { property: { room_count: 2, type: PropertyType.FLAT, occupancy: 'TENANT' } }, spec_ops_code: 'SEMESTER1' })
+        .set('X-Consumer-Username', partnerCode)
 
       // Then
       expect(response.body).to.deep.equal({
@@ -86,19 +93,19 @@ describe('Quotes - API - E2E', async () => {
           }
         },
         insurance: {
-          monthly_price: 6.35,
+          monthly_price: 22.02,
           currency: 'EUR',
           default_deductible: 120,
-          default_ceiling: 3000.00,
+          default_ceiling: 5000.00,
           simplified_covers: ['ACDDE', 'ACINCEX', 'ACVOL', 'ACASSHE', 'ACDEFJU', 'ACRC'],
-          product_code: 'APP658',
-          product_version: '2020-07-15',
-          contractual_terms: '/docs/Appenin_Conditions_Generales_assurance_habitation_APP658.pdf',
-          ipid: '/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf'
+          product_code: productCode,
+          product_version: '2020-09-11',
+          contractual_terms: '/docs/Appenin_Conditions_Generales_assurance_habitation_APP999.pdf',
+          ipid: '/docs/Appenin_Document_Information_assurance_habitation_APP999.pdf'
         },
         special_operations_code: 'SEMESTER1',
         special_operations_code_applied_at: '2020-04-18T10:09:08.000Z',
-        code: 'essca'
+        code: partnerCode
       })
     })
 
@@ -106,8 +113,8 @@ describe('Quotes - API - E2E', async () => {
       // When
       response = await httpServer.api()
         .post('/v0/quotes')
-        .send({ code: 'essca', risk: { property: { room_count: 2 } } })
-        .set('X-Consumer-Username', 'essca')
+        .send({ code: partnerCode, risk: { property: { room_count: 2 } } })
+        .set('X-Consumer-Username', partnerCode)
 
       // Then
       const savedQuote = await QuoteSqlModel.findByPk(response.body.id)
@@ -127,8 +134,8 @@ describe('Quotes - API - E2E', async () => {
         property: {
           room_count: 2,
           address: '90 rue de la nouvelle prairie',
-          postal_code: '91100',
-          city: 'Neo Kyukamura',
+          postal_code: '75000',
+          city: 'Paris',
           type: 'FLAT',
           occupancy: 'TENANT'
         },
@@ -160,7 +167,7 @@ describe('Quotes - API - E2E', async () => {
       const quote: Quote = createQuoteFixture(
         {
           id: quoteId,
-          partnerCode: 'studyo',
+          partnerCode: partnerCode,
           risk: createQuoteRiskFixture(
             {
               property: {
@@ -189,7 +196,7 @@ describe('Quotes - API - E2E', async () => {
       response = await httpServer.api()
         .put(`/v0/quotes/${quoteId}`)
         .send(updateQuotePayload)
-        .set('X-Consumer-Username', 'studyo')
+        .set('X-Consumer-Username', partnerCode)
 
       // Then
       const updatedQuote = await QuoteSqlModel.findByPk(response.body.id)
@@ -202,21 +209,21 @@ describe('Quotes - API - E2E', async () => {
       response = await httpServer.api()
         .put(`/v0/quotes/${quoteId}`)
         .send(updateQuotePayload)
-        .set('X-Consumer-Username', 'studyo')
+        .set('X-Consumer-Username', partnerCode)
 
       // Then
       expect(response.body).to.deep.equal({
-        code: 'studyo',
+        code: partnerCode,
         id: 'UD65X3A',
         insurance: {
-          contractual_terms: '/docs/Appenin_Conditions_Generales_assurance_habitation_APP658.pdf',
+          contractual_terms: '/docs/Appenin_Conditions_Generales_assurance_habitation_APP999.pdf',
           currency: 'EUR',
           default_cap: 5000,
           default_deductible: 120,
-          ipid: '/docs/Appenin_Document_Information_assurance_habitation_APP658.pdf',
-          monthly_price: 7.5,
-          product_code: 'APP658',
-          product_version: '2020-07-15',
+          ipid: '/docs/Appenin_Document_Information_assurance_habitation_APP999.pdf',
+          monthly_price: 3.82,
+          product_code: 'APP999',
+          product_version: '2020-09-11',
           simplified_covers: [
             'ACDDE',
             'ACINCEX',
@@ -237,7 +244,7 @@ describe('Quotes - API - E2E', async () => {
           postal_code: '91100',
           email_validated_at: null
         },
-        premium: 90,
+        premium: 45.84,
         risk: {
           other_people: [
             {
@@ -251,8 +258,8 @@ describe('Quotes - API - E2E', async () => {
           },
           property: {
             address: '90 rue de la nouvelle prairie',
-            city: 'Neo Kyukamura',
-            postal_code: '91100',
+            city: 'Paris',
+            postal_code: '75000',
             room_count: 2,
             type: 'FLAT',
             occupancy: 'TENANT'
@@ -274,7 +281,7 @@ describe('Quotes - API - E2E', async () => {
       // Given
       const quoteRepository = new QuoteSqlRepository()
       const quote: Quote = createQuoteFixture({
-        partnerCode: 'studyo',
+        partnerCode: partnerCode,
         risk: createQuoteRiskFixture({
           property: {
             address: '88 rue des prairies',
@@ -359,7 +366,7 @@ describe('Quotes - API - E2E', async () => {
       const quote: Quote = createQuoteFixture(
         {
           id: quoteId,
-          partnerCode: 'studyo'
+          partnerCode: partnerCode
         }
       )
       await quoteRepository.save(quote)
@@ -373,7 +380,7 @@ describe('Quotes - API - E2E', async () => {
       // When
       response = await httpServer.api()
         .post(`/v0/quotes/${quoteId}/policy-holder/send-email-validation-email`)
-        .set('X-Consumer-Username', 'studyo')
+        .set('X-Consumer-Username', partnerCode)
 
       // Then
       expect(response.status).is.equal(204)

@@ -2,14 +2,15 @@ import currency from 'currency.js'
 const currentLibrary = currency
 
 export type Amount = number
-export type AmountOptions = {
-  precision: number
-}
 export type AmountWithFiveDecimal = string
 
 export namespace Amount {
+  export type options = {
+    precision: number
+  }
+
   const DEFAULT_PRECISION = 2
-  const options: AmountOptions = {
+  const options: Amount.options = {
     precision: DEFAULT_PRECISION
   }
 

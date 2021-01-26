@@ -299,14 +299,14 @@ export namespace Quote {
       return !(quote.partnerCode === partnerCode)
     }
 
-    function sumCoversMonthlyPrice (coverMonthlyPrices: Array<CoverMonthlyPrice>): Amount {
+    export function sumCoversMonthlyPrice (coverMonthlyPrices: Array<CoverMonthlyPrice>): Amount {
       const coverMonthlyPrice = coverMonthlyPrices.reduce((monthlyPrice, acc) => {
         return {
-          monthlyPrice: Amount.toAmount(acc.price) + Amount.toAmount(monthlyPrice.monthlyPrice)
+          monthlyPrice: Amount.add(acc.coverMonthlyPrice, monthlyPrice.monthlyPrice, { precision: 5 })
         }
       }, { monthlyPrice: 0 })
 
-      return coverMonthlyPrice.monthlyPrice
+      return Amount.toAmount(coverMonthlyPrice.monthlyPrice)
     }
 }
 

@@ -431,4 +431,66 @@ describe('Quotes - Usecase - Create Quote', async () => {
     // Then
     sinon.assert.calledWithExactly(coverMonthlyPriceRepository.getAllForPartnerWithoutZone, partnerCode, 2)
   })
+
+  describe('Quotes - UseCase - sumCoverMonthlyPrices', () => {
+    it('should return 0 when there is no coverMonthlyPrices', () => {
+      expect(Quote.sumCoversMonthlyPrice([])).to.be.equal(0)
+    })
+
+    describe('should round numbers correctly', () => {
+      it('when the third digit is below 5', () => {
+        expect(Quote.sumCoversMonthlyPrice([
+          { coverMonthlyPrice: '1.99467', cover: COVER.DDEAUX }
+        ])).to.be.equal(1.99)
+      })
+
+      it('when the third digit is above 5', () => {
+        expect(Quote.sumCoversMonthlyPrice([
+          { coverMonthlyPrice: '1.99977', cover: COVER.DDEAUX }
+        ])).to.be.equal(2)
+      })
+
+      it('when the third digit is 5', () => {
+        expect(Quote.sumCoversMonthlyPrice([
+          { coverMonthlyPrice: '1.99500', cover: COVER.DDEAUX }
+        ])).to.be.equal(2)
+      })
+    })
+
+    describe('should sum the coverMonthlyPrices correctly', () => {
+      it('when there is 1 coverMonthlyPrice', () => {
+        expect(Quote.sumCoversMonthlyPrice([
+          { coverMonthlyPrice: '0.12000', cover: COVER.DDEAUX }
+        ])).to.be.equal(0.12)
+      })
+
+      it('when there is no decimal point in the result', () => {
+        expect(Quote.sumCoversMonthlyPrice([
+          { coverMonthlyPrice: '0.12000', cover: COVER.DDEAUX },
+          { coverMonthlyPrice: '0.29250', cover: COVER.DDEAUX },
+          { coverMonthlyPrice: '0.47167', cover: COVER.DDEAUX },
+          { coverMonthlyPrice: '0.02333', cover: COVER.DDEAUX },
+          { coverMonthlyPrice: '1.81333', cover: COVER.DDEAUX },
+          { coverMonthlyPrice: '0.84417', cover: COVER.DDEAUX },
+          { coverMonthlyPrice: '1.16750', cover: COVER.DDEAUX },
+          { coverMonthlyPrice: '0.17917', cover: COVER.DDEAUX },
+          { coverMonthlyPrice: '1.08833', cover: COVER.DDEAUX }
+        ])).to.be.equal(6)
+      })
+
+      it('when there is a decimal point in the result', () => {
+        expect(Quote.sumCoversMonthlyPrice([
+          { coverMonthlyPrice: '0.02420', cover: COVER.DDEAUX },
+          { coverMonthlyPrice: '0.12833', cover: COVER.DDEAUX },
+          { coverMonthlyPrice: '0.19083', cover: COVER.DDEAUX },
+          { coverMonthlyPrice: '0.31166', cover: COVER.DDEAUX },
+          { coverMonthlyPrice: '0.49666', cover: COVER.DDEAUX },
+          { coverMonthlyPrice: '0.84583', cover: COVER.DDEAUX },
+          { coverMonthlyPrice: '1.16166', cover: COVER.DDEAUX },
+          { coverMonthlyPrice: '1.24500', cover: COVER.DDEAUX },
+          { coverMonthlyPrice: '1.93583', cover: COVER.DDEAUX }
+        ])).to.be.equal(6.34)
+      })
+    })
+  })
 })

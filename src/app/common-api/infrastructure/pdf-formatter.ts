@@ -1,7 +1,7 @@
 import { Policy } from '../../policies/domain/policy'
 import { Amount } from '../domain/amount/amount'
 
-export function _encodeForPdf (value: string): string {
+export function encodeForPdf (value: string): string {
   const dict = {
     '€': '\\200',
     Š: '\\212',
@@ -14,7 +14,7 @@ export function _encodeForPdf (value: string): string {
     char => dict[char] || '\\' + ('000' + char.charCodeAt(0).toString(8)).slice(-3))
 }
 
-export function _formatPolicyId (policyId: string): string {
+export function formatPolicyId (policyId: string): string {
   const sub1 = policyId.substr(0, 3)
   const sub2 = policyId.substr(3, 3)
   const sub3 = policyId.substr(6, 3)
@@ -22,11 +22,11 @@ export function _formatPolicyId (policyId: string): string {
   return `${sub1} ${sub2} ${sub3} ${sub4}`
 }
 
-export function _formatDate (date: Date): string {
+export function formatDate (date: Date): string {
   return date ? new Intl.DateTimeFormat('fr-FR').format(date) : ''
 }
 
-export function _formatNumber (number: number): string {
+export function formatNumber (number: number): string {
   if (number) {
     const formattedNumber = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 }).format(number)
     // Replacing non breaking spaces
@@ -35,15 +35,15 @@ export function _formatNumber (number: number): string {
   return ''
 }
 
-export function _formatAmount (amount: Amount): string {
-  return _formatNumber(amount) + ' euros'
+export function formatAmount (amount: Amount): string {
+  return `${formatNumber(amount)} euros`
 }
 
 export function formatRoundAmount (amount: Amount): string {
-  return _formatNumber(Math.round(amount)) + ' euros'
+  return `${formatNumber(Math.round(amount))} euros`
 }
 
-export function _formatOtherInsured (otherInsured: Policy.Risk.People.OtherPeople[]): string {
+export function formatOtherInsured (otherInsured: Policy.Risk.People.OtherPeople[]): string {
   if (otherInsured.length === 0) {
     return 'Aucun'
   }
@@ -55,11 +55,11 @@ export function _formatOtherInsured (otherInsured: Policy.Risk.People.OtherPeopl
 }
 
 export function formatName (contact: Policy.Holder): string {
-  return contact.firstname.concat(' ', contact.lastname)
+  return `${contact.firstname} ${contact.lastname}`
 }
 
 export function formatHomeAddress (contact: Policy.Holder): string {
-  return contact.address.concat(', ', contact.postalCode.concat(' ', contact.city))
+  return `${contact.address}, ${contact.postalCode} ${contact.city}`
 }
 
 export function encodeSpacesForPdf (value: string): string {

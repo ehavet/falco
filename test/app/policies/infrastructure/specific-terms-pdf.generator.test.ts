@@ -69,19 +69,23 @@ describe('Policies - Infra - Specific terms PDF Generator', () => {
       // Then
       const specificTermsUncompressed = await pdftk.input(demoPartnerSpecificTerms.buffer).uncompress().output()
       expect(specificTerms.name).to.equal('Appenin_Condition_Particulieres_assurance_habitation_APP753210859.pdf')
-      expect(specificTermsUncompressed.includes('05\\05701\\0572020')).to.be.true
-      expect(specificTermsUncompressed.includes('APP)-200(753)-200(210)-200(859')).to.be.true
-      expect(specificTermsUncompressed.includes('69\\05484')).to.be.true
+      expect(specificTermsUncompressed.includes('05\\05701\\0572020')).to.be.true // 05/01/2020
+      expect(specificTermsUncompressed.includes('APP)-200(753)-200(210)-200(859')).to.be.true // APP 753 210 859
+      expect(specificTermsUncompressed.includes('69\\05484')).to.be.true // 69,84
       expect(specificTermsUncompressed.includes('Jean)-200(Dupont')).to.be.true
       expect(specificTermsUncompressed.includes('jeandupont\\100email\\056com')).to.be.true
       expect(specificTermsUncompressed.includes('John)-200(Doe')).to.be.true
       expect(specificTermsUncompressed.includes('13)-200(rue)-200(du)-200(loup)-200(garou\\054)-200(91100)-200(Corbeil\\055Essonnes')).to.be.true
+      /*
+        INFO : due to the pdf format/encoding, we cannot find the sentence with the room_count so we check that its placeholder is no in the
+        pdf anymore, which means it has been replaced.
+      */
       expect(specificTermsUncompressed.includes('[_room_count]')).to.be.false
       expect(specificTermsUncompressed.includes('7)-200(000)-200(euros')).to.be.true
       expect(specificTermsUncompressed.includes('150)-200(euros')).to.be.true
       expect(specificTermsUncompressed.includes('3)-200(500)-200(euros')).to.be.true
       expect(specificTermsUncompressed.includes('1)-200(400)-200(euros')).to.be.true
-      expect(specificTermsUncompressed.includes('12\\05707\\0572020')).to.be.true
+      expect(specificTermsUncompressed.includes('12\\05707\\0572020')).to.be.true // 12/07/2020
     }).timeout(10000)
 
     it('should generate a new specific terms document (new CP template) with amount rounded to the nearest', async () => {
@@ -163,9 +167,9 @@ describe('Policies - Infra - Specific terms PDF Generator', () => {
       // Then
       const specificTermsUncompressed = await pdftk.input(demoPartnerSpecificTerms.buffer).uncompress().output()
       expect(specificTerms.name).to.equal('Appenin_Condition_Particulieres_assurance_habitation_APP753210859.pdf')
-      expect(specificTermsUncompressed.includes('05\\05701\\0572020')).to.be.true
-      expect(specificTermsUncompressed.includes('APP)-200(753)-200(210)-200(859')).to.be.true
-      expect(specificTermsUncompressed.includes('69\\05484')).to.be.true
+      expect(specificTermsUncompressed.includes('05\\05701\\0572020')).to.be.true // 05/01/2020
+      expect(specificTermsUncompressed.includes('APP)-200(753)-200(210)-200(859')).to.be.true // APP 753 210 859
+      expect(specificTermsUncompressed.includes('69\\05484')).to.be.true // 69,84
       expect(specificTermsUncompressed.includes('Jean)-200(Dupont')).to.be.true
       expect(specificTermsUncompressed.includes('jeandupont\\100email\\056com')).to.be.true
       expect(specificTermsUncompressed.includes('John)-200(Doe')).to.be.true
@@ -179,7 +183,7 @@ describe('Policies - Infra - Specific terms PDF Generator', () => {
       expect(specificTermsUncompressed.includes('150)-200(euros')).to.be.true
       expect(specificTermsUncompressed.includes('3)-200(500)-200(euros')).to.be.true
       expect(specificTermsUncompressed.includes('1)-200(400)-200(euros')).to.be.true
-      expect(specificTermsUncompressed.includes('12\\05707\\0572020')).to.be.true
+      expect(specificTermsUncompressed.includes('12\\05707\\0572020')).to.be.true // 12/07/2020
     }).timeout(10000)
 
     it('should generate a new specific terms document (new CP template) with amount rounded to the nearest', async () => {

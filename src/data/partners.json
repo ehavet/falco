@@ -325,7 +325,7 @@
        "defaultDeductible": 120,
        "operationCodes": [],
        "productCode": "APP978",
-       "productVersion": "2020-12-10",
+       "productVersion": "2021-01-20",
        "contractualTerms": "/docs/Appenin_Conditions_Generales_assurance_habitation_APP978.pdf",
        "ipid": "/docs/Appenin_Document_Information_assurance_habitation_APP978.pdf"
      }
@@ -441,7 +441,7 @@
       "defaultDeductible": 120,
       "operationCodes": [],
       "productCode": "APP978",
-      "productVersion": "2020-12-10",
+      "productVersion": "2021-01-20",
       "contractualTerms": "/docs/Appenin_Conditions_Generales_assurance_habitation_APP978.pdf",
       "ipid": "/docs/Appenin_Document_Information_assurance_habitation_APP978.pdf"
     }

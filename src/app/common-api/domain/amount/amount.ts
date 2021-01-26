@@ -5,12 +5,12 @@ export type Amount = number
 export type AmountWithFiveDecimal = string
 
 export namespace Amount {
-  export type options = {
+  export type Options = {
     precision: number
   }
 
   const DEFAULT_PRECISION = 2
-  const options: Amount.options = {
+  const options: Amount.Options = {
     precision: DEFAULT_PRECISION
   }
 

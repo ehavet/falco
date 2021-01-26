@@ -32,6 +32,7 @@ import { ApplyStartDateOnPolicyCommand } from '../../../../../src/app/policies/d
 import { PolicyForbiddenCertificateGenerationError } from '../../../../../src/app/policies/domain/certificate/certificate.errors'
 import { CreatePolicyForQuoteCommand } from '../../../../../src/app/policies/domain/create-policy-for-quote-command'
 import { PropertyType } from '../../../../../src/app/common-api/domain/type/property-type'
+import { Occupancy } from '../../../../../src/app/common-api/domain/type/occupancy'
 
 describe('Policies - API v1 - Integration', async () => {
   let httpServer: HttpServerForTesting
@@ -183,7 +184,8 @@ describe('Policies - API v1 - Integration', async () => {
               address: '13 rue du loup garou',
               postal_code: '91100',
               city: 'Corbeil-Essonnes',
-              type: PropertyType.FLAT
+              type: PropertyType.FLAT,
+              occupancy: Occupancy.TENANT
             },
             person: {
               firstname: 'Jean',
@@ -326,7 +328,8 @@ describe('Policies - API v1 - Integration', async () => {
               address: '13 rue du loup garou',
               postal_code: '91100',
               city: 'Corbeil-Essonnes',
-              type: PropertyType.FLAT
+              type: PropertyType.FLAT,
+              occupancy: Occupancy.TENANT
             },
             person: {
               firstname: 'Jean',
@@ -814,7 +817,8 @@ describe('Policies - API v1 - Integration', async () => {
             address: '13 rue du loup garou',
             postal_code: '91100',
             city: 'Corbeil-Essonnes',
-            type: PropertyType.FLAT
+            type: PropertyType.FLAT,
+            occupancy: Occupancy.TENANT
           },
           person: {
             firstname: 'Jean',
@@ -1122,7 +1126,8 @@ describe('Policies - API v1 - Integration', async () => {
             address: '13 rue du loup garou',
             postal_code: '91100',
             city: 'Corbeil-Essonnes',
-            type: PropertyType.FLAT
+            type: PropertyType.FLAT,
+            occupancy: Occupancy.TENANT
           },
           person: {
             firstname: 'Jean',

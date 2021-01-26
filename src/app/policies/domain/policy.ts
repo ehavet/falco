@@ -198,6 +198,7 @@ function _checkQuoteConsistencyToCreatePolicy (quote: Quote): void {
   if (Quote.isPolicyRiskPropertyPostalCodeMissing(quote)) { throw new PolicyRiskPropertyMissingFieldError(quote.id, 'postalCode') }
   if (Quote.isPolicyRiskPropertyCityMissing(quote)) { throw new PolicyRiskPropertyMissingFieldError(quote.id, 'city') }
   if (Quote.isPolicyRiskPropertyTypeMissing(quote)) { throw new PolicyRiskPropertyMissingFieldError(quote.id, 'type') }
+  if (Quote.isPolicyRiskPropertyOccupancyMissing(quote)) { throw new PolicyRiskPropertyMissingFieldError(quote.id, 'occupancy') }
 }
 
 function _getStartDate (createPolicyCommand: CreatePolicyCommand): Date {
@@ -331,7 +332,8 @@ export namespace Policy.Risk {
           address: quoteRisk.property.address!,
           postalCode: quoteRisk.property.postalCode!,
           city: quoteRisk.property.city!,
-          type: quoteRisk.property.type!
+          type: quoteRisk.property.type!,
+          occupancy: quoteRisk.property.occupancy!
         },
         people: {
           person: quoteRisk.person!,

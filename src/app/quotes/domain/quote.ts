@@ -257,6 +257,7 @@ export namespace Quote {
     export function isPolicyRiskPropertyPostalCodeMissing (quote: Quote): boolean { return !quote.risk.property.postalCode }
     export function isPolicyRiskPropertyCityMissing (quote: Quote): boolean { return !quote.risk.property.city }
     export function isPolicyRiskPropertyTypeMissing (quote: Quote): boolean { return !quote.risk.property.type }
+    export function isPolicyRiskPropertyOccupancyMissing (quote: Quote): boolean { return !quote.risk.property.occupancy }
     export function isPolicyHolderEmailNotValidated (quote: Quote): boolean { return !(quote.policyHolder?.emailValidatedAt) }
 
     function _applyOperationCode (quote: Quote, partnerApplicableCodes: Array<OperationCode>, codeToApply?: string): Quote {

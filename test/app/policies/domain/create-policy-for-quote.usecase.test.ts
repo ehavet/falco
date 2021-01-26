@@ -15,13 +15,15 @@ import { partnerRepositoryStub } from '../../partners/fixtures/partner-repositor
 import { Policy } from '../../../../src/app/policies/domain/policy'
 import { QuoteNotFoundError } from '../../../../src/app/quotes/domain/quote.errors'
 import {
+  CreatePolicyQuotePartnerOwnershipError,
   PolicyHolderEmailValidationError,
   PolicyHolderMissingError,
-  PolicyHolderMissingPropertyError, CreatePolicyQuotePartnerOwnershipError,
+  PolicyHolderMissingPropertyError,
   PolicyRiskPersonMissingError,
   PolicyRiskPropertyMissingFieldError
 } from '../../../../src/app/policies/domain/policies.errors'
 import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
+import { Occupancy } from '../../../../src/app/common-api/domain/type/occupancy'
 
 describe('Policies - Usecase - Create policy for quote', async () => {
   let quote: Quote = createQuoteFixture()
@@ -37,7 +39,8 @@ describe('Policies - Usecase - Create policy for quote', async () => {
           address: '88 rue des prairies',
           postalCode: '91100',
           city: 'Kyukamura',
-          type: PropertyType.FLAT
+          type: PropertyType.FLAT,
+          occupancy: Occupancy.TENANT
         },
         people: {
           person: { firstname: 'Jean-Jean', lastname: 'Lapin' },

@@ -7,7 +7,7 @@ import {
   _formatDate,
   _formatNumber,
   _formatOtherInsured,
-  _formatPolicyId, formatRoundAmount
+  _formatPolicyId, encodeSpacesForPdf, formatHomeAddress, formatName, formatRoundAmount
 } from '../../../common-api/infrastructure/pdf-formatter'
 import { SpecificTermsGenerator } from '../../domain/specific-terms/specific-terms.generator'
 import { PDFProcessor } from '../pdf/pdf-processor'
@@ -50,11 +50,23 @@ export class SpecificTermsPdfGenerator implements SpecificTermsGenerator {
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[default_ceiling]', _formatNumber(policy.insurance.estimate.defaultCeiling))
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[default_deduction]', _formatNumber(policy.insurance.estimate.defaultDeductible))
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[subscribtion_date]', _encodeForPdf(_formatDate(new Date())))
-    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[deduc]', _encodeForPdf(_formatAmount(policy.insurance.estimate.defaultDeductible)))
-    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[defcap]', _encodeForPdf(_formatAmount(policy.insurance.estimate.defaultCeiling)))
-    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[50p100_defcap]', _encodeForPdf(formatRoundAmount(Policy.getDefaultCapAdvice50p100(policy))))
-    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[20p100_defcap]', _encodeForPdf(formatRoundAmount(Policy.getDefaultCapAdvice20p100(policy))))
-    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[name]', _encodeForPdf(policy.contact.firstname.concat(' ', policy.contact.lastname)))
+
+    // specific to e-mobilia and demo (new pdfs)
+    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[_start_date]', encodeSpacesForPdf(_encodeForPdf(_formatDate(policy.termStartDate))))
+    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[_policy_id]', encodeSpacesForPdf(_encodeForPdf(_formatPolicyId(policy.id))))
+    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[_product_id]', encodeSpacesForPdf(_encodeForPdf(policy.insurance.productCode)))
+    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[_term_end_date]', encodeSpacesForPdf(_encodeForPdf(_formatDate(policy.termEndDate))))
+    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[_total_price]', encodeSpacesForPdf(_encodeForPdf(_formatNumber(policy.premium))))
+    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[_name]', encodeSpacesForPdf(_encodeForPdf(formatName(policy.contact))))
+    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[_email]', encodeSpacesForPdf(_encodeForPdf(policy.contact.email)))
+    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[_other_insured]', encodeSpacesForPdf(_encodeForPdf(_formatOtherInsured(policy.risk.people.otherPeople))))
+    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[_home_address]', encodeSpacesForPdf(_encodeForPdf(formatHomeAddress(policy.contact))))
+    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[_room_count]', encodeSpacesForPdf(_encodeForPdf(policy.risk.property.roomCount.toString())))
+    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[_subscribtion_date]', encodeSpacesForPdf(_encodeForPdf(_formatDate(new Date()))))
+    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[_deduc]', encodeSpacesForPdf(_encodeForPdf(_formatAmount(policy.insurance.estimate.defaultDeductible))))
+    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[_defcap]', encodeSpacesForPdf(_encodeForPdf(_formatAmount(policy.insurance.estimate.defaultCeiling))))
+    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[_50p100_defcap]', encodeSpacesForPdf(_encodeForPdf(formatRoundAmount(Policy.getDefaultCapAdvice50p100(policy)))))
+    specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[_20p100_defcap]', encodeSpacesForPdf(_encodeForPdf(formatRoundAmount(Policy.getDefaultCapAdvice20p100(policy)))))
 
     const filledUpSpecificTermsBuffer = await this.#pdfProcessor.formatPdfBufferProperly(specificTermsTemplateBuffer)
 

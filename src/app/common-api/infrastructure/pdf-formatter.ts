@@ -53,3 +53,15 @@ export function _formatOtherInsured (otherInsured: Policy.Risk.People.OtherPeopl
     return accumulator.concat(`, ${formattedInsured}`)
   })
 }
+
+export function formatName (contact: Policy.Holder): string {
+  return contact.firstname.concat(' ', contact.lastname)
+}
+
+export function formatHomeAddress (contact: Policy.Holder): string {
+  return contact.address.concat(', ', contact.postalCode.concat(' ', contact.city))
+}
+
+export function encodeSpacesForPdf (value: string): string {
+  return value.replace(/[' ']/g, ')-200(')
+}

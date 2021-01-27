@@ -28,7 +28,10 @@ export function formatDate (date: Date): string {
 
 export function formatNumber (number: number): string {
   if (number) {
-    const formattedNumber = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 }).format(number)
+    const formattedNumber =
+        number % 1 === 0
+          ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 }).format(number)
+          : new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(number)
     // Replacing non breaking spaces
     return formattedNumber.replace(/\s/g, ' ')
   }

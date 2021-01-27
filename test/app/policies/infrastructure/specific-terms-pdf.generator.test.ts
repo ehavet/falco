@@ -104,6 +104,20 @@ describe('Policies - Infra - Specific terms PDF Generator', () => {
       expect(specificTermsUncompressed.includes('1)-200(400)-200(euros')).to.be.true
     }).timeout(10000)
 
+    it('should generate a new specific terms document (new CP template) with 2 decimals displayed for a premium with 1 decimal', async () => {
+      // Given
+      demoPartnerPolicy = createPolicyFixture({ partnerCode: 'demo' })
+      demoPartnerPolicy.insurance.productCode = 'APP1234'
+      demoPartnerPolicy.premium = 69.1
+
+      // When
+      demoPartnerSpecificTerms = await specificTermsPdfGenerator.generate(demoPartnerPolicy)
+
+      // Then
+      const specificTermsUncompressed = await pdftk.input(demoPartnerSpecificTerms.buffer).uncompress().output()
+      expect(specificTermsUncompressed.includes('69\\05410')).to.be.true // 69,10
+    }).timeout(10000)
+
     describe('For a partner which is not a demo partner', async () => {
       it('should not add specimen stamp on generated terms document', async () => {
         // Then

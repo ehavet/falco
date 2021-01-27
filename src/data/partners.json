@@ -322,7 +322,7 @@
      ],
      "offer": {
        "simplifiedCovers": ["ACDDE", "ACINCEX", "ACVOL", "ACASSHE", "ACDEFJU", "ACRC"],
-       "defaultDeductible": 120,
+       "defaultDeductible": 150,
        "operationCodes": [],
        "productCode": "APP978",
        "productVersion": "2021-01-20",
@@ -438,7 +438,7 @@
     ],
     "offer": {
       "simplifiedCovers": ["ACDDE", "ACINCEX", "ACVOL", "ACASSHE", "ACDEFJU", "ACRC"],
-      "defaultDeductible": 120,
+      "defaultDeductible": 150,
       "operationCodes": [],
       "productCode": "APP978",
       "productVersion": "2021-01-20",

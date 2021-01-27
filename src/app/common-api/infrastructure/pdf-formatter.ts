@@ -26,12 +26,12 @@ export function formatDate (date: Date): string {
   return date ? new Intl.DateTimeFormat('fr-FR').format(date) : ''
 }
 
-export function formatNumber (number: number): string {
-  if (number) {
+export function formatNumber (numberToFormat: number): string {
+  if (numberToFormat) {
     const formattedNumber =
-        number % 1 === 0
-          ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 }).format(number)
-          : new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(number)
+        numberToFormat % 1 === 0
+          ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 }).format(numberToFormat)
+          : new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(numberToFormat)
     // Replacing non breaking spaces
     return formattedNumber.replace(/\s/g, ' ')
   }

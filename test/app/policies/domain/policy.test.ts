@@ -656,12 +656,13 @@ describe('Policies - Domain', async () => {
     it('should return the default cap advice divided by 2', async () => {
       // Given
       const policyFixture : Policy = createPolicyFixture()
+      policyFixture.insurance.estimate.defaultCeiling = 7001
 
       // When
       const defaultCapAdvice50p100 = Policy.getDefaultCapAdvice50p100(policyFixture)
 
       // Then
-      expect(defaultCapAdvice50p100).to.equal(3500)
+      expect(defaultCapAdvice50p100).to.equal(3500.5)
     })
   })
 
@@ -669,12 +670,13 @@ describe('Policies - Domain', async () => {
     it('should return the default cap advice divided by 5', async () => {
       // Given
       const policyFixture : Policy = createPolicyFixture()
+      policyFixture.insurance.estimate.defaultCeiling = 7001
 
       // When
       const defaultCapAdvice20p100 = Policy.getDefaultCapAdvice20p100(policyFixture)
 
       // Then
-      expect(defaultCapAdvice20p100).to.equal(1400)
+      expect(defaultCapAdvice20p100).to.equal(1400.2)
     })
   })
 })

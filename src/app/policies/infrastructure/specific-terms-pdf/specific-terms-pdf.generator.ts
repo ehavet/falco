@@ -34,6 +34,7 @@ export class SpecificTermsPdfGenerator implements SpecificTermsGenerator {
     const templateName: string = `specific-terms-template-${policy.partnerCode}.pdf`
     let specificTermsTemplateBuffer = await this.#pdfProcessor.readPdfFile(path.join(__dirname, templateName), policy.partnerCode)
 
+    // for student partners old templates pdfs, which will tend to be generated the same way than e-mobilia and demo
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[start_date]', encodeForPdf(formatDate(policy.termStartDate)))
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[policy_id]', encodeForPdf(formatPolicyId(policy.id)))
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[product_id]', encodeForPdf(policy.insurance.productCode))
@@ -51,7 +52,7 @@ export class SpecificTermsPdfGenerator implements SpecificTermsGenerator {
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[default_deduction]', formatNumber(policy.insurance.estimate.defaultDeductible))
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[subscribtion_date]', encodeForPdf(formatDate(new Date())))
 
-    // specific to e-mobilia and demo (new pdfs)
+    // for general partners new template pdfs, only applied for now to e-mobilia and demo
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[_start_date]', encodeSpacesForPdf(encodeForPdf(formatDate(policy.termStartDate))))
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[_policy_id]', encodeSpacesForPdf(encodeForPdf(formatPolicyId(policy.id))))
     specificTermsTemplateBuffer = replace(specificTermsTemplateBuffer, '[_product_id]', encodeSpacesForPdf(encodeForPdf(policy.insurance.productCode)))

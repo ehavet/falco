@@ -18,6 +18,7 @@ import { createPartnerFixture } from '../../partners/fixtures/partner.fixture'
 import { Partner } from '../../../../src/app/partners/domain/partner'
 import { PropertyType } from '../../../../src/app/common-api/domain/type/property-type'
 import { Occupancy } from '../../../../src/app/common-api/domain/type/occupancy'
+import { createPolicyFixture } from '../fixtures/policy.fixture'
 import Question = Partner.Question;
 
 describe('Policies - Domain', async () => {
@@ -648,6 +649,34 @@ describe('Policies - Domain', async () => {
         // Then
         return expect(promise).to.be.rejectedWith(PolicyRiskPropertyMissingFieldError, `Quote ${quoteWithoutOccupancy.id} risk property occupancy should be completed`)
       })
+    })
+  })
+
+  describe('#getDefaultCapAvice50p100', async () => {
+    it('should return the default cap advice divided by 2', async () => {
+      // Given
+      const policyFixture : Policy = createPolicyFixture()
+      policyFixture.insurance.estimate.defaultCeiling = 7001
+
+      // When
+      const defaultCapAdvice50p100 = Policy.getDefaultCapAdvice50p100(policyFixture)
+
+      // Then
+      expect(defaultCapAdvice50p100).to.equal(3500.5)
+    })
+  })
+
+  describe('#getDefaultCapAvice20p100', async () => {
+    it('should return the default cap advice divided by 5', async () => {
+      // Given
+      const policyFixture : Policy = createPolicyFixture()
+      policyFixture.insurance.estimate.defaultCeiling = 7001
+
+      // When
+      const defaultCapAdvice20p100 = Policy.getDefaultCapAdvice20p100(policyFixture)
+
+      // Then
+      expect(defaultCapAdvice20p100).to.equal(1400.2)
     })
   })
 })

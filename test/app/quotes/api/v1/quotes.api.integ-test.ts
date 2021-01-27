@@ -91,12 +91,14 @@ describe('Quotes - API v1 - Integration', async () => {
             city: 'Paris',
             type: 'FLAT',
             occupancy: 'TENANT'
-          }
+          },
+          person: null,
+          other_people: null
         },
         insurance: {
           monthly_price: 5.82,
           default_deductible: 150,
-          default_ceiling: 7000,
+          default_cap: 7000,
           currency: 'EUR',
           simplified_covers: ['ACDDE', 'ACVOL'],
           product_code: 'APP658',
@@ -104,9 +106,22 @@ describe('Quotes - API v1 - Integration', async () => {
           contractual_terms: '/path/to/contractual/terms',
           ipid: '/path/to/ipid'
         },
+        policy_holder: {
+          address: null,
+          city: null,
+          email: null,
+          email_validated_at: null,
+          firstname: null,
+          lastname: null,
+          phone_number: null,
+          postal_code: null
+        },
         code: 'myPartner',
-        special_operations_code: null,
-        special_operations_code_applied_at: null
+        premium: 69.84,
+        nb_months_due: 12,
+        start_date: null,
+        term_start_date: null,
+        term_end_date: null
       }
 
       beforeEach(async () => {
@@ -429,7 +444,7 @@ describe('Quotes - API v1 - Integration', async () => {
         expect(response).to.have.property('statusCode', 400)
       })
 
-      it('Should reply with status 400 when the code postal is invalid', async () => {
+      it('should reply with status 400 when the code postal is invalid', async () => {
         response = await httpServer.api()
           .post('/v1/quotes')
           .send({
@@ -448,7 +463,7 @@ describe('Quotes - API v1 - Integration', async () => {
         expect(response).to.have.property('statusCode', 400)
       })
 
-      it('Should reply with status 422 when special operations code is not applicable for selected partner', async () => {
+      it('should reply with status 422 when special operations code is not applicable for selected partner', async () => {
         // Given
         const invalidSpecOpsCode = '!Nv4l!D'
         const partnerCode = 'demo-student'

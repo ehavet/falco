@@ -56,26 +56,38 @@ describe('Quotes - API v1 - E2E', async () => {
             city: 'Paris',
             type: 'FLAT',
             occupancy: 'TENANT'
-          }
+          },
+          person: null,
+          other_people: null
         },
         insurance: {
           monthly_price: 3.83,
           currency: 'EUR',
           default_deductible: 120,
-          default_ceiling: 5000.00,
+          default_cap: 5000.00,
           simplified_covers: ['ACDDE', 'ACINCEX', 'ACVOL', 'ACASSHE', 'ACDEFJU', 'ACRC'],
           product_code: productCode,
           product_version: '2020-09-11',
           contractual_terms: '/docs/Appenin_Conditions_Generales_assurance_habitation_APP999.pdf',
           ipid: '/docs/Appenin_Document_Information_assurance_habitation_APP999.pdf'
         },
+        policy_holder: null,
         code: partnerCode,
-        special_operations_code: null,
-        special_operations_code_applied_at: null
+        nb_months_due: 12,
+        premium: 45.96,
+        start_date: null,
+        term_start_date: null,
+        term_end_date: null
       })
+
+      // When
+      response = await httpServer.api()
+        .post('/v1/quotes')
+        .send({ code: partnerCode, risk: { property: { room_count: 2, address: '15 Rue Des Amandiers', postal_code: '75000', city: 'Paris', type: 'FLAT', occupancy: 'TENANT' } } })
+        .set('X-Consumer-Username', partnerCode)
     })
 
-    it('should return the quote with special operations code', async () => {
+    it.skip('should return the quote with special operations code', async () => {
       // Given
       await clearPricingZoneSqlFixture()
       await clearPricingMatrixSqlFixture()

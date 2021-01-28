@@ -37,14 +37,14 @@ import {
   CoverMonthlyPriceNotFoundError
 } from '../../../../../src/app/quotes/domain/cover-monthly-price/cover-monthly-price.error'
 
-describe('Quotes - API v0 - Integration', async () => {
+describe('Quotes - API v1 - Integration', async () => {
   let httpServer: HttpServerForTesting
 
   before(async () => {
     httpServer = await newMinimalServer(quoteRoutes())
   })
 
-  describe('POST /v0/quotes', () => {
+  describe('POST /v1/quotes', () => {
     let response: supertest.Response
 
     describe('when the quote is created', () => {
@@ -115,7 +115,7 @@ describe('Quotes - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post('/v0/quotes')
+          .post('/v1/quotes')
           .send({
             code: 'myPartner',
             risk: {
@@ -161,7 +161,7 @@ describe('Quotes - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post('/v0/quotes')
+          .post('/v1/quotes')
           .send({
             code: partnerCode,
             risk: {
@@ -203,7 +203,7 @@ describe('Quotes - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post('/v0/quotes')
+          .post('/v1/quotes')
           .send({
             code: partnerCode,
             risk: {
@@ -244,7 +244,7 @@ describe('Quotes - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post('/v0/quotes')
+          .post('/v1/quotes')
           .send({
             code: partnerCode,
             risk: {
@@ -276,7 +276,7 @@ describe('Quotes - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post('/v0/quotes')
+          .post('/v1/quotes')
           .send({ code: partnerCode, risk: { property: { room_count: 2 } } })
           .set('X-Consumer-Username', partnerCode)
 
@@ -317,7 +317,7 @@ describe('Quotes - API v0 - Integration', async () => {
 
           // When
           response = await httpServer.api()
-            .post('/v0/quotes')
+            .post('/v1/quotes')
             .send(requestParams)
             .set('X-Consumer-Username', partnerCode)
 
@@ -337,7 +337,7 @@ describe('Quotes - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post('/v0/quotes')
+          .post('/v1/quotes')
           .send({ code: partnerCode, risk: { property: { room_count: 2 } } })
           .set('X-Consumer-Username', partnerCode)
 
@@ -358,7 +358,7 @@ describe('Quotes - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post('/v0/quotes')
+          .post('/v1/quotes')
           .send({ code: partnerCode, risk: { property: { room_count: 2, postal_code: '77777', city: 'Paradise' } } })
           .set('X-Consumer-Username', partnerCode)
 
@@ -379,7 +379,7 @@ describe('Quotes - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post('/v0/quotes')
+          .post('/v1/quotes')
           .send({ code: partnerCode, risk: { property: { room_count: 2, postal_code: '77777', city: 'Paradise' } } })
           .set('X-Consumer-Username', partnerCode)
 
@@ -392,7 +392,7 @@ describe('Quotes - API v0 - Integration', async () => {
       it('should reply with status 400 when there is no code', async () => {
         // When
         response = await httpServer.api()
-          .post('/v0/quotes')
+          .post('/v1/quotes')
           .send({ risk: { property: { room_count: 2 } } })
           .set('X-Consumer-Username', 'myPartner')
 
@@ -402,7 +402,7 @@ describe('Quotes - API v0 - Integration', async () => {
       it('should reply with status 400 when there is no risk', async () => {
         // When
         response = await httpServer.api()
-          .post('/v0/quotes')
+          .post('/v1/quotes')
           .send({ code: 'myPartner' })
           .set('X-Consumer-Username', 'myPartner')
 
@@ -412,7 +412,7 @@ describe('Quotes - API v0 - Integration', async () => {
       it('should reply with status 400 when there is a risk but no property risk', async () => {
         // When
         response = await httpServer.api()
-          .post('/v0/quotes')
+          .post('/v1/quotes')
           .send({ code: 'myPartner', risk: {} })
           .set('X-Consumer-Username', 'myPartner')
 
@@ -422,7 +422,7 @@ describe('Quotes - API v0 - Integration', async () => {
       it('should reply with status 400 when there is a property risk but no room count', async () => {
         // When
         response = await httpServer.api()
-          .post('/v0/quotes')
+          .post('/v1/quotes')
           .send({ code: 'myPartner', risk: { property: {} } })
           .set('X-Consumer-Username', 'myPartner')
 
@@ -431,7 +431,7 @@ describe('Quotes - API v0 - Integration', async () => {
 
       it('Should reply with status 400 when the code postal is invalid', async () => {
         response = await httpServer.api()
-          .post('/v0/quotes')
+          .post('/v1/quotes')
           .send({
             code: 'myPartner',
             risk: {
@@ -466,7 +466,7 @@ describe('Quotes - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post('/v0/quotes')
+          .post('/v1/quotes')
           .send({
             code: partnerCode,
             spec_ops_code: invalidSpecOpsCode,
@@ -491,7 +491,7 @@ describe('Quotes - API v0 - Integration', async () => {
       it('should reply with status 400 when type is not FLAT or HOUSE', async () => {
         const partnerCode = 'demo-student'
         response = await httpServer.api()
-          .post('/v0/quotes')
+          .post('/v1/quotes')
           .send({
             code: partnerCode,
             risk: {
@@ -512,7 +512,7 @@ describe('Quotes - API v0 - Integration', async () => {
       it('should reply with status 400 when occupancy is not TENANT or LANDLORD', async () => {
         const partnerCode = 'demo-student'
         response = await httpServer.api()
-          .post('/v0/quotes')
+          .post('/v1/quotes')
           .send({
             code: partnerCode,
             risk: {
@@ -533,7 +533,7 @@ describe('Quotes - API v0 - Integration', async () => {
     })
   })
 
-  describe('POST /v0/quotes/{id}/policy-holder/send-email-validation-email', () => {
+  describe('POST /v1/quotes/{id}/policy-holder/send-email-validation-email', () => {
     let response: supertest.Response
     const quoteId: string = 'QU0T31D'
 
@@ -543,7 +543,7 @@ describe('Quotes - API v0 - Integration', async () => {
         sinon.stub(container, 'SendValidationLinkEmailToQuotePolicyHolder').withArgs(quoteId).resolves()
         // When
         response = await httpServer.api()
-          .post(`/v0/quotes/${quoteId}/policy-holder/send-email-validation-email`)
+          .post(`/v1/quotes/${quoteId}/policy-holder/send-email-validation-email`)
           .set('X-Consumer-Username', 'myPartner')
         // Then
         expect(response).to.have.property('statusCode', 204)
@@ -559,7 +559,7 @@ describe('Quotes - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post(`/v0/quotes/${quoteId}/policy-holder/send-email-validation-email`)
+          .post(`/v1/quotes/${quoteId}/policy-holder/send-email-validation-email`)
           .set('X-Consumer-Username', 'myPartner')
 
         // Then
@@ -578,7 +578,7 @@ describe('Quotes - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post(`/v0/quotes/${quoteId}/policy-holder/send-email-validation-email`)
+          .post(`/v1/quotes/${quoteId}/policy-holder/send-email-validation-email`)
           .set('X-Consumer-Username', partnerCode)
 
         // Then
@@ -596,7 +596,7 @@ describe('Quotes - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post(`/v0/quotes/${quoteId}/policy-holder/send-email-validation-email`)
+          .post(`/v1/quotes/${quoteId}/policy-holder/send-email-validation-email`)
           .set('X-Consumer-Username', 'myPartner')
 
         // Then
@@ -612,7 +612,7 @@ describe('Quotes - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .post(`/v0/quotes/${wrongQuoteId}/policy-holder/send-email-validation-email`)
+          .post(`/v1/quotes/${wrongQuoteId}/policy-holder/send-email-validation-email`)
           .set('X-Consumer-Username', 'myPartner')
 
         expect(response).to.have.property('statusCode', 400)
@@ -620,7 +620,7 @@ describe('Quotes - API v0 - Integration', async () => {
     })
   })
 
-  describe('PUT /v0/quotes/{id}', () => {
+  describe('PUT /v1/quotes/{id}', () => {
     let response: supertest.Response
 
     describe('when the quote is updated', () => {
@@ -727,7 +727,7 @@ describe('Quotes - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .put(`/v0/quotes/${quoteId}`)
+          .put(`/v1/quotes/${quoteId}`)
           .send({
             start_date: '2020-01-05',
             spec_ops_code: 'SEMESTER1',
@@ -799,7 +799,7 @@ describe('Quotes - API v0 - Integration', async () => {
 
           // When
           response = await httpServer.api()
-            .put(`/v0/quotes/${quoteId}`)
+            .put(`/v1/quotes/${quoteId}`)
             .send(createUpdateQuotePayloadFixture())
             .set('X-Consumer-Username', partnerCode)
 
@@ -814,7 +814,7 @@ describe('Quotes - API v0 - Integration', async () => {
       it('should reply with status 400 when there is no code', async () => {
         // When
         response = await httpServer.api()
-          .put('/v0/quotes/UD65X3')
+          .put('/v1/quotes/UD65X3')
           .send({ wrong: { payload: '1o1' } })
           .set('X-Consumer-Username', 'myPartner')
 
@@ -830,7 +830,7 @@ describe('Quotes - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .put('/v0/quotes/UD65X3')
+          .put('/v1/quotes/UD65X3')
           .send(createUpdateQuotePayloadFixture())
           .set('X-Consumer-Username', partnerCode)
 
@@ -848,7 +848,7 @@ describe('Quotes - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .put('/v0/quotes/UD65X3')
+          .put('/v1/quotes/UD65X3')
           .send(createUpdateQuotePayloadFixture())
           .set('X-Consumer-Username', partnerCode)
 
@@ -866,7 +866,7 @@ describe('Quotes - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .put('/v0/quotes/UD65X3')
+          .put('/v1/quotes/UD65X3')
           .send(createUpdateQuotePayloadFixture())
           .set('X-Consumer-Username', partnerCode)
 
@@ -884,7 +884,7 @@ describe('Quotes - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .put('/v0/quotes/UD65X3')
+          .put('/v1/quotes/UD65X3')
           .send(createUpdateQuotePayloadFixture())
           .set('X-Consumer-Username', partnerCode)
 
@@ -902,7 +902,7 @@ describe('Quotes - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .put('/v0/quotes/UD65X3')
+          .put('/v1/quotes/UD65X3')
           .send(createUpdateQuotePayloadFixture())
           .set('X-Consumer-Username', partnerCode)
 
@@ -912,7 +912,7 @@ describe('Quotes - API v0 - Integration', async () => {
     })
   })
 
-  describe('GET /v0/quotes/{id}', () => {
+  describe('GET /v1/quotes/{id}', () => {
     describe('when the quote is found', () => {
       let response: supertest.Response
       const quote = createQuoteFixture()
@@ -973,7 +973,7 @@ describe('Quotes - API v0 - Integration', async () => {
 
         // When
         response = await httpServer.api()
-          .get(`/v0/quotes/${expectedResourceQuote.id}`)
+          .get(`/v1/quotes/${expectedResourceQuote.id}`)
           .set('X-Consumer-Username', 'myPartner')
       })
 
@@ -994,7 +994,7 @@ describe('Quotes - API v0 - Integration', async () => {
 
         // When
         const response = await httpServer.api()
-          .get(`/v0/quotes/${quoteId}`)
+          .get(`/v1/quotes/${quoteId}`)
           .set('X-Consumer-Username', 'myPartner')
 
         // Then
@@ -1011,7 +1011,7 @@ describe('Quotes - API v0 - Integration', async () => {
 
         // When
         const response = await httpServer.api()
-          .get(`/v0/quotes/${quoteId}`)
+          .get(`/v1/quotes/${quoteId}`)
           .set('X-Consumer-Username', 'myPartner')
 
         // Then
@@ -1024,7 +1024,7 @@ describe('Quotes - API v0 - Integration', async () => {
       it('should reply with status 400 when quoteId has a wrong format', async () => {
         // When
         const response = await httpServer.api()
-          .get('/v0/quotes/small')
+          .get('/v1/quotes/small')
           .set('X-Consumer-Username', 'myPartner')
 
         expect(response).to.have.property('statusCode', 400)

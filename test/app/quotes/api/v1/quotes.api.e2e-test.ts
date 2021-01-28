@@ -14,7 +14,7 @@ async function resetDb () {
   await QuoteSqlModel.destroy({ truncate: true, cascade: true })
 }
 
-describe('Quotes - API v0 - E2E', async () => {
+describe('Quotes - API v1 - E2E', async () => {
   let httpServer: HttpServerForTesting
   const now = new Date('2020-04-18T10:09:08Z')
   const productCode = 'APP999'
@@ -35,13 +35,13 @@ describe('Quotes - API v0 - E2E', async () => {
     await clearPricingMatrixSqlFixture()
   })
 
-  describe('POST /v0/quotes/', () => {
+  describe('POST /v1/quotes/', () => {
     let response: supertest.Response
 
     it('should return the quote', async () => {
       // When
       response = await httpServer.api()
-        .post('/v0/quotes')
+        .post('/v1/quotes')
         .send({ code: partnerCode, risk: { property: { room_count: 2, address: '15 Rue Des Amandiers', postal_code: '75000', city: 'Paris', type: 'FLAT', occupancy: 'TENANT' } } })
         .set('X-Consumer-Username', partnerCode)
 
@@ -81,7 +81,7 @@ describe('Quotes - API v0 - E2E', async () => {
       await clearPricingMatrixSqlFixture()
       // When
       response = await httpServer.api()
-        .post('/v0/quotes')
+        .post('/v1/quotes')
         .send({ code: partnerCode, risk: { property: { room_count: 2, type: PropertyType.FLAT, occupancy: 'TENANT' } }, spec_ops_code: 'SEMESTER1' })
         .set('X-Consumer-Username', partnerCode)
 
@@ -115,7 +115,7 @@ describe('Quotes - API v0 - E2E', async () => {
     it('should save the quote', async () => {
       // When
       response = await httpServer.api()
-        .post('/v0/quotes')
+        .post('/v1/quotes')
         .send({ code: partnerCode, risk: { property: { room_count: 2 } } })
         .set('X-Consumer-Username', partnerCode)
 
@@ -125,7 +125,7 @@ describe('Quotes - API v0 - E2E', async () => {
     })
   })
 
-  describe('PUT /v0/quotes/{id}', () => {
+  describe('PUT /v1/quotes/{id}', () => {
     let response: supertest.Response
     let quoteRepository: QuoteRepository
     const now: Date = new Date('2020-01-13T10:09:08Z')
@@ -197,7 +197,7 @@ describe('Quotes - API v0 - E2E', async () => {
     it('should update the quote', async () => {
       // When
       response = await httpServer.api()
-        .put(`/v0/quotes/${quoteId}`)
+        .put(`/v1/quotes/${quoteId}`)
         .send(updateQuotePayload)
         .set('X-Consumer-Username', partnerCode)
 
@@ -210,7 +210,7 @@ describe('Quotes - API v0 - E2E', async () => {
     it('should return the quote', async () => {
       // When
       response = await httpServer.api()
-        .put(`/v0/quotes/${quoteId}`)
+        .put(`/v1/quotes/${quoteId}`)
         .send(updateQuotePayload)
         .set('X-Consumer-Username', partnerCode)
 
@@ -275,7 +275,7 @@ describe('Quotes - API v0 - E2E', async () => {
     })
   })
 
-  describe('GET /v0/quotes/{id}', () => {
+  describe('GET /v1/quotes/{id}', () => {
     afterEach(async () => {
       await resetDb()
     })
@@ -351,7 +351,7 @@ describe('Quotes - API v0 - E2E', async () => {
 
       // When
       const response: supertest.Response = await httpServer.api()
-        .get(`/v0/quotes/${quote.id}`)
+        .get(`/v1/quotes/${quote.id}`)
         .set('X-Consumer-Username', quote.partnerCode)
 
       // Then
@@ -359,7 +359,7 @@ describe('Quotes - API v0 - E2E', async () => {
     })
   })
 
-  describe('POST /v0/quotes/{id}/policy-holder/send-email-validation-email', () => {
+  describe('POST /v1/quotes/{id}/policy-holder/send-email-validation-email', () => {
     let response: supertest.Response
     let quoteRepository: QuoteRepository
     const quoteId: string = 'UD65X3A'
@@ -382,7 +382,7 @@ describe('Quotes - API v0 - E2E', async () => {
     it('should send email validation email to quote policy holder', async () => {
       // When
       response = await httpServer.api()
-        .post(`/v0/quotes/${quoteId}/policy-holder/send-email-validation-email`)
+        .post(`/v1/quotes/${quoteId}/policy-holder/send-email-validation-email`)
         .set('X-Consumer-Username', partnerCode)
 
       // Then

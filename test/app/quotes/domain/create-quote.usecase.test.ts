@@ -146,7 +146,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
       expect(quote).to.deep.include({ insurance: expectedInsurance })
     })
 
-    describe('with the special operations code', async () => {
+    describe('with thue special operations code', async () => {
       it('SEMESTER1 setting the number of months due to 5', async () => {
         // Given
         const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.SEMESTER1, risk: { property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT } } }

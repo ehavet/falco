@@ -1,4 +1,5 @@
-import routes from './api/v0/quotes.api'
+import routesV0 from './api/v0/quotes.api'
+import routesV1 from './api/v1/quotes.api'
 import { CreateQuote } from './domain/create-quote.usecase'
 import { QuoteSqlRepository } from './infrastructure/quote-sql.repository'
 import { QuoteRepository } from './domain/quote.repository'
@@ -60,5 +61,6 @@ export const quoteSqlModels: Array<any> = [
 ]
 
 export function quoteRoutes () {
-  return routes(container)
+  return routesV0(container)
+    .concat(routesV1(container))
 }

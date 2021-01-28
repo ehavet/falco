@@ -48,7 +48,17 @@ describe('Repository - Quote', async () => {
             type: PropertyType.FLAT,
             occupancy: Occupancy.TENANT
           }
-        })
+        }),
+        policyHolder: {
+          firstname: 'June',
+          lastname: 'Did',
+          address: '74 avenue des églantines',
+          postalCode: '75011',
+          city: 'Paris',
+          email: 'june@did.com',
+          phoneNumber: '+33645290841',
+          emailValidatedAt: undefined
+        }
       })
 
       // When
@@ -103,13 +113,14 @@ describe('Repository - Quote', async () => {
 
       const savedPolicyHolder = savedQuote.policyHolder
       expect(savedInsurance.id).to.be.a('string')
-      expect(savedPolicyHolder!.firstname).to.equal('Jean-Jean')
-      expect(savedPolicyHolder!.lastname).to.equal('Lapin')
-      expect(savedPolicyHolder!.address).to.equal('88 rue des prairies')
-      expect(savedPolicyHolder!.postalCode).to.equal('91100')
-      expect(savedPolicyHolder!.city).to.equal('Kyukamura')
-      expect(savedPolicyHolder!.email).to.equal('jeanjean@email.com')
-      expect(savedPolicyHolder!.phoneNumber).to.equal('+33684205510')
+      expect(savedPolicyHolder!.firstname).to.equal('June')
+      expect(savedPolicyHolder!.lastname).to.equal('Did')
+      expect(savedPolicyHolder!.address).to.equal('74 avenue des églantines')
+      expect(savedPolicyHolder!.postalCode).to.equal('75011')
+      expect(savedPolicyHolder!.city).to.equal('Paris')
+      expect(savedPolicyHolder!.email).to.equal('june@did.com')
+      expect(savedPolicyHolder!.phoneNumber).to.equal('+33645290841')
+      expect(savedPolicyHolder!.emailValidatedAt).to.be.null
     })
   })
 

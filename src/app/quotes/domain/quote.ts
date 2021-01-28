@@ -82,6 +82,7 @@ export namespace Quote {
         partnerCode: command.partnerCode,
         risk: risk,
         insurance: insurance,
+        policyHolder: command.policyHolder,
         specialOperationsCode: undefined,
         specialOperationsCodeAppliedAt: undefined,
         nbMonthsDue: nbMonthsDue,

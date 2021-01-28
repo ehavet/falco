@@ -65,6 +65,15 @@ describe('Quotes - Usecase - Create Quote', async () => {
       contractualTerms: '/path/to/contractual/terms',
       ipid: '/path/to/ipid'
     },
+    policyHolder: {
+      firstname: 'June',
+      lastname: 'Did',
+      address: '74 avenue des églantines',
+      postalCode: '75011',
+      city: 'Paris',
+      email: 'june@did.com',
+      phoneNumber: '+33645290841'
+    },
     nbMonthsDue: 12,
     premium: 69.84,
     specialOperationsCode: null,
@@ -148,7 +157,34 @@ describe('Quotes - Usecase - Create Quote', async () => {
       expect(quote).to.deep.include({ insurance: expectedInsurance })
     })
 
-    describe('with thue special operations code', async () => {
+    it('with the policy holder if specified', async () => {
+      // Given
+      const createQuoteCommand: CreateQuoteCommand = {
+        partnerCode: 'myPartner',
+        specOpsCode: OperationCode.BLANK,
+        risk: {
+          property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT }
+        },
+        policyHolder: {
+          firstname: 'June',
+          lastname: 'Did',
+          address: '74 avenue des églantines',
+          postalCode: '75011',
+          city: 'Paris',
+          email: 'june@did.com',
+          phoneNumber: '+33645290841'
+        }
+      }
+      const expectedPolicyHolder = expectedQuote.policyHolder
+
+      // When
+      const quote: Quote = await createQuote(createQuoteCommand)
+
+      // Then
+      expect(quote).to.deep.include({ policyHolder: expectedPolicyHolder })
+    })
+
+    describe('with the special operations code', async () => {
       it('SEMESTER1 setting the number of months due to 5', async () => {
         // Given
         const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.SEMESTER1, risk: { property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT } } }
@@ -269,6 +305,15 @@ describe('Quotes - Usecase - Create Quote', async () => {
           type: PropertyType.FLAT,
           occupancy: Occupancy.TENANT
         }
+      },
+      policyHolder: {
+        firstname: 'June',
+        lastname: 'Did',
+        address: '74 avenue des églantines',
+        postalCode: '75011',
+        city: 'Paris',
+        email: 'june@did.com',
+        phoneNumber: '+33645290841'
       }
     }
     const pricingZones: CoverPricingZone[] = [

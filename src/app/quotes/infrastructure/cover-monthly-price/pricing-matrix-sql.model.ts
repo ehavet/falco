@@ -23,4 +23,10 @@ export class PricingMatrixSqlModel extends Model {
 
     @Column
     pricingZone!: string
+
+    @Column
+    coverMonthlyPriceExclTax!: string
+
+    @Column
+    coverMonthlyPriceTax!: string
 }

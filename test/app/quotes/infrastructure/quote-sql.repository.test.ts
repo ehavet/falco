@@ -79,6 +79,8 @@ describe('Repository - Quote', async () => {
       expect(savedQuote.premium).to.equal('69.840000')
       expect(savedQuote.nbMonthsDue).to.equal(12)
       expect(savedQuote.startDate).to.equal('2020-01-05')
+      expect(savedQuote.termStartDate).to.equal('2020-01-05')
+      expect(savedQuote.termEndDate).to.equal('2020-01-05')
       expect(savedQuote.createdAt).to.be.an.instanceof(Date)
       expect(savedQuote.updatedAt).to.be.an.instanceof(Date)
 

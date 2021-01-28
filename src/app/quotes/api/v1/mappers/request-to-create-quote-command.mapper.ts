@@ -14,6 +14,21 @@ export function requestToCreateQuoteCommand (request: any): CreateQuoteCommand {
         type: payload.risk.property.type,
         occupancy: payload.risk.property.occupancy
       }
-    }
+    },
+    policyHolder: _resourceToPolicyHolder(payload)
+  }
+}
+
+function _resourceToPolicyHolder (payload) {
+  if (!payload.policy_holder) return undefined
+
+  return {
+    firstname: payload.policy_holder.firstname,
+    lastname: payload.policy_holder.lastname,
+    address: payload.policy_holder.address,
+    postalCode: payload.policy_holder.postal_code,
+    city: payload.policy_holder.city,
+    email: payload.policy_holder.email,
+    phoneNumber: payload.policy_holder.phone_number
   }
 }

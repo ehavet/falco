@@ -86,7 +86,10 @@ describe('Quotes - API v1 - Integration', async () => {
         nbMonthsDue: 12,
         premium: 69.84,
         specialOperationsCode: null,
-        specialOperationsCodeAppliedAt: null
+        specialOperationsCodeAppliedAt: null,
+        startDate: new Date('2020-01-05'),
+        termStartDate: new Date('2020-01-05'),
+        termEndDate: new Date('2021-01-04')
       }
 
       const expectedResourceQuote = {
@@ -127,9 +130,9 @@ describe('Quotes - API v1 - Integration', async () => {
         code: 'myPartner',
         premium: 69.84,
         nb_months_due: 12,
-        start_date: null,
-        term_start_date: null,
-        term_end_date: null
+        start_date: '2020-01-05',
+        term_start_date: '2020-01-05',
+        term_end_date: '2021-01-04'
       }
 
       beforeEach(async () => {

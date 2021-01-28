@@ -23,5 +23,6 @@ export interface CreateQuoteCommand {
         city?: string,
         email?: string,
         phoneNumber?: string,
-    }
+    },
+    startDate?: Date
 }

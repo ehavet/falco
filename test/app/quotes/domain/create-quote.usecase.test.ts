@@ -21,6 +21,7 @@ import { sumCoverMonthlyPrices } from '../../../../src/app/quotes/domain/cover-m
 
 describe('Quotes - Usecase - Create Quote', async () => {
   let createQuote: CreateQuote
+  const now = new Date('2020-04-18T10:09:08Z')
   const quoteRepository = quoteRepositoryMock()
   const partnerRepository = { getByCode: sinon.stub(), getCallbackUrl: sinon.stub(), getOperationCodes: sinon.stub() }
   const defaultCapAdviceRepository = defaultCapAdviceRepositoryStub()
@@ -77,9 +78,11 @@ describe('Quotes - Usecase - Create Quote', async () => {
     nbMonthsDue: 12,
     premium: 69.84,
     specialOperationsCode: null,
-    specialOperationsCodeAppliedAt: null
+    specialOperationsCodeAppliedAt: null,
+    startDate: now,
+    termStartDate: now,
+    termEndDate: new Date('2021-04-17')
   }
-  const now = new Date('2020-04-18T10:09:08Z')
   const pricingZoneRepository = pricingZoneRepositoryStub()
   const pricingZones: CoverPricingZone[] = [
     { zone: 'ZD1', cover: 'DDEAUX' },
@@ -182,6 +185,67 @@ describe('Quotes - Usecase - Create Quote', async () => {
 
       // Then
       expect(quote).to.deep.include({ policyHolder: expectedPolicyHolder })
+    })
+
+    describe('with the start date and term start date', async () => {
+      it('set to the given start date', async () => {
+        // Given
+        const createQuoteCommand: CreateQuoteCommand = {
+          partnerCode: 'myPartner',
+          specOpsCode: OperationCode.BLANK,
+          risk: {
+            property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT }
+          },
+          startDate: new Date('2021-01-05T17:31:95Z')
+        }
+
+        // When
+        const quote: Quote = await createQuote(createQuoteCommand)
+
+        // Then
+        expect(quote.startDate).to.deep.equal(createQuoteCommand.startDate)
+        expect(quote.termStartDate).to.deep.equal(createQuoteCommand.startDate)
+      })
+
+      it('set to now if no start date is given', async () => {
+        // Given
+        const createQuoteCommandWithNoStartDate: CreateQuoteCommand = {
+          partnerCode: 'myPartner',
+          specOpsCode: OperationCode.BLANK,
+          risk: {
+            property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT }
+          }
+        }
+
+        // When
+        const quote: Quote = await createQuote(createQuoteCommandWithNoStartDate)
+
+        // Then
+        const nowWithNoTime = new Date(now)
+        nowWithNoTime.setUTCHours(0, 0, 0, 0)
+        expect(quote.startDate).to.deep.equal(nowWithNoTime)
+        expect(quote.termStartDate).to.deep.equal(nowWithNoTime)
+      })
+    })
+
+    describe('with the term end date', async () => {
+      it('set to startDate + 1 year - 1 day by default', async () => {
+        // Given
+        const createQuoteCommand: CreateQuoteCommand = {
+          partnerCode: 'myPartner',
+          specOpsCode: OperationCode.BLANK,
+          risk: {
+            property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT }
+          },
+          startDate: new Date('2021-01-05')
+        }
+
+        // When
+        const quote: Quote = await createQuote(createQuoteCommand)
+
+        // Then
+        expect(quote.termEndDate).to.deep.equal(new Date('2022-01-04'))
+      })
     })
 
     describe('with the special operations code', async () => {
@@ -314,7 +378,8 @@ describe('Quotes - Usecase - Create Quote', async () => {
         city: 'Paris',
         email: 'june@did.com',
         phoneNumber: '+33645290841'
-      }
+      },
+      startDate: now
     }
     const pricingZones: CoverPricingZone[] = [
       { zone: 'ZD1', cover: 'DDEAUX' },

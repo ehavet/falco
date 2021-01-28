@@ -28,15 +28,12 @@ import { commonHeadersSchema } from '../../../common-api/api/common-headers.sche
 import { quoteToResource } from './mappers/quote-to-resource.mapper'
 import GetQuoteByIdQuery = GetQuoteById.GetQuoteByIdQuery
 
-const TAGS = ['api', 'quotes']
-
 export default function (container: Container): Array<ServerRoute> {
   return [
     {
       method: 'POST',
       path: '/v1/quotes',
       options: {
-        tags: TAGS,
         description: 'Create a quote',
         validate: {
           payload: quotePostRequestBodySchema
@@ -102,7 +99,6 @@ export default function (container: Container): Array<ServerRoute> {
       method: 'POST',
       path: '/v1/quotes/{id}/policy-holder/send-email-validation-email',
       options: {
-        tags: TAGS,
         description: 'send an email with a link to validate quote policy holder email address',
         validate: {
           params: Joi.object({
@@ -140,7 +136,6 @@ export default function (container: Container): Array<ServerRoute> {
       method: 'PUT',
       path: '/v1/quotes/{id}',
       options: {
-        tags: TAGS,
         description: 'Update a quote',
         validate: {
           params: Joi.object({
@@ -188,7 +183,6 @@ export default function (container: Container): Array<ServerRoute> {
       method: 'GET',
       path: '/v1/quotes/{id}',
       options: {
-        tags: TAGS,
         description: 'Gets a quote',
         validate: {
           params: Joi.object({

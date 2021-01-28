@@ -226,7 +226,8 @@ export namespace Quote {
           ...command.risk.property,
           type: propertyType,
           occupancy: occupancy
-        }
+        },
+        person: command.risk.person
       }
     }
 

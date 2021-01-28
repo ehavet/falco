@@ -51,7 +51,8 @@ describe('Quotes - Usecase - Create Quote', async () => {
         city: 'Les Ulysses',
         type: PropertyType.FLAT,
         occupancy: Occupancy.TENANT
-      }
+      },
+      person: { firstname: 'John', lastname: 'Doe' }
     },
     insurance: {
       estimate: {
@@ -117,9 +118,16 @@ describe('Quotes - Usecase - Create Quote', async () => {
       coverMonthlyPriceRepository.getAllForPartnerWithoutZone.reset()
     })
 
-    it('with the partner code and the risk', async () => {
+    it('with the partner code and the risk coming from the command', async () => {
       // When
-      const quote: Quote = await createQuote({ partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses', type: PropertyType.FLAT, occupancy: Occupancy.TENANT } } })
+      const quote: Quote = await createQuote({
+        partnerCode: 'myPartner',
+        specOpsCode: OperationCode.BLANK,
+        risk: {
+          property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses', type: PropertyType.FLAT, occupancy: Occupancy.TENANT },
+          person: { firstname: 'John', lastname: 'Doe' }
+        }
+      })
 
       // Then
       expect(quote).to.deep.include({ partnerCode: expectedQuote.partnerCode })
@@ -368,6 +376,10 @@ describe('Quotes - Usecase - Create Quote', async () => {
           city,
           type: PropertyType.FLAT,
           occupancy: Occupancy.TENANT
+        },
+        person: {
+          firstname: 'John',
+          lastname: 'Doe'
         }
       },
       policyHolder: {

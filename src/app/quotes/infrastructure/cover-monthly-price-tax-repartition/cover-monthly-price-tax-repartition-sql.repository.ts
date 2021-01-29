@@ -18,6 +18,16 @@ export class CoverMonthlyPriceTaxRepartitionSqlRepository implements CoverMonthl
 
     return toCoverMonthlyPriceTaxRepartitions(pricingMatrices)
   }
+
+  async getAllWithoutZone (partnerCode: string, roomCount: number): Promise<Array<CoverMonthlyPriceTaxRepartition>> {
+    const pricingMatrices = await CoverMonthlyPriceSqlDatasource.getWithoutZone(partnerCode, roomCount)
+
+    if (pricingMatrices.length === 0) throw new CoverMonthlyPriceTaxRepartitionNotFoundError(partnerCode)
+
+    if (isInconsistentMatrices(pricingMatrices)) throw new CoverMonthlyPriceTaxRepartitionConsistencyError(partnerCode)
+
+    return toCoverMonthlyPriceTaxRepartitions(pricingMatrices)
+  }
 }
 
 const toCoverMonthlyPriceTaxRepartitions = (pricingMatrices: PricingMatrixSqlModel[]): Array<CoverMonthlyPriceTaxRepartition> => (

@@ -3,4 +3,5 @@ import { CoverMonthlyPriceTaxRepartition } from './cover-monthly-price-tax-repar
 
 export interface CoverMonthlyPriceTaxRepartitionRepository {
     get(partnerCode: string, pricingZones: CoverPricingZone[], roomCount: number): Promise<Array<CoverMonthlyPriceTaxRepartition>>
+    getAllWithoutZone(partnerCode: string, roomCount: number): Promise<Array<CoverMonthlyPriceTaxRepartition>>
 }

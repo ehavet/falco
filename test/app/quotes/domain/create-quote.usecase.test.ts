@@ -52,7 +52,8 @@ describe('Quotes - Usecase - Create Quote', async () => {
         type: PropertyType.FLAT,
         occupancy: Occupancy.TENANT
       },
-      person: { firstname: 'John', lastname: 'Doe' }
+      person: { firstname: 'John', lastname: 'Doe' },
+      otherPeople: [{ firstname: 'Jane', lastname: 'Does' }]
     },
     insurance: {
       estimate: {
@@ -125,7 +126,8 @@ describe('Quotes - Usecase - Create Quote', async () => {
         specOpsCode: OperationCode.BLANK,
         risk: {
           property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses', type: PropertyType.FLAT, occupancy: Occupancy.TENANT },
-          person: { firstname: 'John', lastname: 'Doe' }
+          person: { firstname: 'John', lastname: 'Doe' },
+          otherPeople: [{ firstname: 'Jane', lastname: 'Does' }]
         }
       })
 
@@ -377,10 +379,8 @@ describe('Quotes - Usecase - Create Quote', async () => {
           type: PropertyType.FLAT,
           occupancy: Occupancy.TENANT
         },
-        person: {
-          firstname: 'John',
-          lastname: 'Doe'
-        }
+        person: { firstname: 'John', lastname: 'Doe' },
+        otherPeople: [{ firstname: 'Jane', lastname: 'Does' }]
       },
       policyHolder: {
         firstname: 'June',

@@ -59,7 +59,8 @@ describe('Quotes - API v1 - Integration', async () => {
             city: 'Paris',
             type: PropertyType.FLAT,
             occupancy: Occupancy.TENANT
-          }
+          },
+          person: { firstname: 'John', lastname: 'Doe' }
         },
         insurance: {
           estimate: {
@@ -103,7 +104,7 @@ describe('Quotes - API v1 - Integration', async () => {
             type: 'FLAT',
             occupancy: 'TENANT'
           },
-          person: null,
+          person: { firstname: 'John', lastname: 'Doe' },
           other_people: null
         },
         insurance: {
@@ -157,7 +158,8 @@ describe('Quotes - API v1 - Integration', async () => {
                 city: 'Paris',
                 type: 'FLAT',
                 occupancy: 'TENANT'
-              }
+              },
+              person: { firstname: 'John', lastname: 'Doe' }
             },
             policy_holder: {
               firstname: 'June',
@@ -194,7 +196,8 @@ describe('Quotes - API v1 - Integration', async () => {
             city: 'Paris',
             type: propertyTypeNotInsured,
             occupancy: Occupancy.TENANT
-          }
+          },
+          person: undefined
         }
         const specOpsCode = 'BLANK'
         sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, policyHolder: undefined, specOpsCode }).rejects(new QuoteRiskPropertyTypeNotInsurableError(propertyTypeNotInsured))
@@ -236,7 +239,8 @@ describe('Quotes - API v1 - Integration', async () => {
             city: 'Paris',
             type: PropertyType.FLAT,
             occupancy: occupancyNotInsured
-          }
+          },
+          person: undefined
         }
         const specOpsCode = 'BLANK'
         sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, policyHolder: undefined, specOpsCode }).rejects(new QuoteRiskOccupancyNotInsurableError(occupancyNotInsured))
@@ -277,7 +281,8 @@ describe('Quotes - API v1 - Integration', async () => {
             city: 'Paris',
             type: 'FLAT',
             occupancy: 'TENANT'
-          }
+          },
+          person: undefined
         }
         const specOpsCode = 'BLANK'
         sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, policyHolder: undefined, specOpsCode }).rejects(new PartnerNotFoundError(partnerCode))
@@ -310,7 +315,10 @@ describe('Quotes - API v1 - Integration', async () => {
       it('should reply with status 422', async () => {
         // Given
         const partnerCode: string = 'myPartner'
-        const risk = { property: { roomCount: 2, postalCode: undefined, city: undefined, address: undefined, type: undefined, occupancy: undefined } }
+        const risk = {
+          property: { roomCount: 2, postalCode: undefined, city: undefined, address: undefined, type: undefined, occupancy: undefined },
+          person: undefined
+        }
         const specOpsCode = 'BLANK'
         sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, policyHolder: undefined, specOpsCode }).rejects(new NoPartnerInsuranceForRiskError(partnerCode, risk))
 
@@ -500,7 +508,8 @@ describe('Quotes - API v1 - Integration', async () => {
             city: 'Paris',
             type: PropertyType.FLAT,
             occupancy: Occupancy.TENANT
-          }
+          },
+          person: undefined
         }
         sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, policyHolder: undefined, specOpsCode: invalidSpecOpsCode }).rejects(new OperationCodeNotApplicableError(invalidSpecOpsCode, partnerCode))
 

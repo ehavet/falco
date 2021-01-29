@@ -2,6 +2,7 @@ import { CreateQuoteCommand } from '../../../domain/create-quote-command'
 
 export function requestToCreateQuoteCommand (request: any): CreateQuoteCommand {
   const payload: any = request.payload
+
   return {
     partnerCode: payload.code,
     specOpsCode: payload.spec_ops_code,
@@ -13,10 +14,17 @@ export function requestToCreateQuoteCommand (request: any): CreateQuoteCommand {
         postalCode: payload.risk.property.postal_code,
         type: payload.risk.property.type,
         occupancy: payload.risk.property.occupancy
-      }
+      },
+      person: _resourceToRiskPerson(payload.risk)
     },
     policyHolder: _resourceToPolicyHolder(payload)
   }
+}
+
+function _resourceToRiskPerson (risk) {
+  if (!risk.person) return undefined
+
+  return { firstname: risk.person.firstname, lastname: risk.person.lastname }
 }
 
 function _resourceToPolicyHolder (payload) {

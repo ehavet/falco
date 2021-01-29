@@ -5,8 +5,14 @@ import { PricingZoneConsistencyError } from '../../domain/cover-pricing-zone/cov
 import { ZNOTFOUND } from '../../domain/cover'
 
 export class CoverPricingZoneSqlRepository implements CoverPricingZoneRepository {
-  async getAllForProductByLocation (productCode: string, city: string, postalCode: string): Promise<CoverPricingZone[]> {
-    const pricingZoneSql = await CoverPricingZoneSqlModel.findAll({ where: { product: productCode, city: city, postalCode: postalCode } })
+  async getAllForProductByLocation (productCode: string, city?: string, postalCode?: string): Promise<CoverPricingZone[]> {
+    const pricingZoneSql = await CoverPricingZoneSqlModel.findAll({
+      where: {
+        product: productCode,
+        city: city || null,
+        postalCode: postalCode || null
+      }
+    })
 
     if (isMissingCover(pricingZoneSql)) throw new PricingZoneConsistencyError(productCode, postalCode, city)
 

@@ -2,9 +2,11 @@ import { dateFaker, expect, sinon } from '../../../test-utils'
 import { Quote } from '../../../../src/app/quotes/domain/quote'
 import { CreateQuoteCommand } from '../../../../src/app/quotes/domain/create-quote-command'
 import {
+  QuoteRiskNumberOfRoommatesError,
   QuoteRiskOccupancyNotInsurableError,
   QuoteRiskPropertyRoomCountNotInsurableError,
-  QuoteRiskPropertyTypeNotInsurableError
+  QuoteRiskPropertyTypeNotInsurableError,
+  QuoteRiskRoommatesNotAllowedError
 } from '../../../../src/app/quotes/domain/quote.errors'
 import { CreateQuote } from '../../../../src/app/quotes/domain/create-quote.usecase'
 import { quoteRepositoryMock } from '../fixtures/quote-repository.test-doubles'
@@ -18,9 +20,12 @@ import { Occupancy } from '../../../../src/app/common-api/domain/type/occupancy'
 import { pricingZoneRepositoryStub } from '../fixtures/pricing-zone-repository.test-doubles'
 import { CoverPricingZone } from '../../../../src/app/quotes/domain/cover-pricing-zone/cover-pricing-zone'
 import { sumCoverMonthlyPrices } from '../../../../src/app/quotes/domain/cover-monthly-price/cover-monthly-price.func'
+import { Partner } from '../../../../src/app/partners/domain/partner'
+import Question = Partner.Question
 
 describe('Quotes - Usecase - Create Quote', async () => {
   let createQuote: CreateQuote
+  let partner: Partner
   const now = new Date('2020-04-18T10:09:08Z')
   const quoteRepository = quoteRepositoryMock()
   const partnerRepository = { getByCode: sinon.stub(), getCallbackUrl: sinon.stub(), getOperationCodes: sinon.stub() }
@@ -38,7 +43,6 @@ describe('Quotes - Usecase - Create Quote', async () => {
       OperationCode.FULLYEAR
     ]
   }
-  const partner = createPartnerFixture({ code: 'MyPartner', offer: partnerOffer })
   const coverMonthlyPriceRepository = coverMonthlyPriceRepositoryStub()
   const expectedQuote: Quote = {
     id: '',
@@ -94,6 +98,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
 
   beforeEach(() => {
     dateFaker.setCurrentDate(now)
+    partner = createPartnerFixture({ code: 'myPartner', offer: partnerOffer })
     partnerRepository.getByCode.withArgs('myPartner').returns(partner)
     createQuote = CreateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository, coverMonthlyPriceRepository, pricingZoneRepository)
     pricingZoneRepository.getAllForProductByLocation.resolves(pricingZones)
@@ -414,6 +419,141 @@ describe('Quotes - Usecase - Create Quote', async () => {
     const saveSpy = quoteRepository.save.getCall(0)
     expectedQuote.id = quote.id
     return expect(saveSpy).to.have.been.calledWith(expectedQuote)
+  })
+
+  it('should throw an error if there are roommates but the partner does not allow it', async () => {
+    // Given
+    const questions: Array<Question> = [
+      { code: Partner.Question.QuestionCode.ROOMMATE, applicable: false },
+      {
+        code: Partner.Question.QuestionCode.ROOM_COUNT,
+        toAsk: true,
+        options: [
+          { value: 1 },
+          { value: 2 }
+        ],
+        defaultNextStep: Partner.Question.QuestionCode.ADDRESS,
+        defaultValue: 1
+      },
+      {
+        code: Partner.Question.QuestionCode.PROPERTY_TYPE,
+        toAsk: false,
+        defaultValue: PropertyType.FLAT,
+        defaultNextStep: Partner.Question.QuestionCode.ADDRESS
+      },
+      {
+        code: Partner.Question.QuestionCode.OCCUPANCY,
+        toAsk: false,
+        defaultValue: Occupancy.TENANT,
+        defaultNextStep: Partner.Question.QuestionCode.ADDRESS
+      }
+    ]
+    partner.questions = questions
+
+    const createQuoteCommand: CreateQuoteCommand = {
+      partnerCode: 'myPartner',
+      specOpsCode: OperationCode.BLANK,
+      risk: {
+        property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses', type: PropertyType.FLAT, occupancy: Occupancy.TENANT },
+        otherPeople: [{ firstname: 'Jane', lastname: 'Does' }]
+      }
+    }
+
+    // When
+    const quotePromise = createQuote(createQuoteCommand)
+
+    // Then
+    return expect(quotePromise).to.be.rejectedWith(QuoteRiskRoommatesNotAllowedError, '2 room(s) property does not allow roommates')
+  })
+
+  it('should throw an error if the partner allows roommates but there are more roommates than allowed', async () => {
+    // Given
+    const questions: Array<Question> = [
+      { code: Partner.Question.QuestionCode.ROOMMATE, applicable: true, maximumNumbers: [{ roomCount: 2, value: 1 }] },
+      {
+        code: Partner.Question.QuestionCode.ROOM_COUNT,
+        toAsk: true,
+        options: [
+          { value: 1 },
+          { value: 2 }
+        ],
+        defaultNextStep: Partner.Question.QuestionCode.ADDRESS,
+        defaultValue: 1
+      },
+      {
+        code: Partner.Question.QuestionCode.PROPERTY_TYPE,
+        toAsk: false,
+        defaultValue: PropertyType.FLAT,
+        defaultNextStep: Partner.Question.QuestionCode.ADDRESS
+      },
+      {
+        code: Partner.Question.QuestionCode.OCCUPANCY,
+        toAsk: false,
+        defaultValue: Occupancy.TENANT,
+        defaultNextStep: Partner.Question.QuestionCode.ADDRESS
+      }
+    ]
+    partner.questions = questions
+
+    const createQuoteCommand: CreateQuoteCommand = {
+      partnerCode: 'myPartner',
+      specOpsCode: OperationCode.BLANK,
+      risk: {
+        property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses', type: PropertyType.FLAT, occupancy: Occupancy.TENANT },
+        otherPeople: [{ firstname: 'Jane', lastname: 'Does' }, { firstname: 'Jene', lastname: 'Done' }]
+      }
+    }
+
+    // When
+    const quotePromise = createQuote(createQuoteCommand)
+
+    // Then
+    return expect(quotePromise).to.be.rejectedWith(QuoteRiskNumberOfRoommatesError, '2 room(s) property allows a maximum of 1 roommate(s)')
+  })
+
+  it('should throw an error if the partner allows roommates but no limitation is found for the property room count', async () => {
+    // Given
+    const questions: Array<Question> = [
+      { code: Partner.Question.QuestionCode.ROOMMATE, applicable: true, maximumNumbers: [{ roomCount: 1, value: 0 }] },
+      {
+        code: Partner.Question.QuestionCode.ROOM_COUNT,
+        toAsk: true,
+        options: [
+          { value: 1 },
+          { value: 2 }
+        ],
+        defaultNextStep: Partner.Question.QuestionCode.ADDRESS,
+        defaultValue: 1
+      },
+      {
+        code: Partner.Question.QuestionCode.PROPERTY_TYPE,
+        toAsk: false,
+        defaultValue: PropertyType.FLAT,
+        defaultNextStep: Partner.Question.QuestionCode.ADDRESS
+      },
+      {
+        code: Partner.Question.QuestionCode.OCCUPANCY,
+        toAsk: false,
+        defaultValue: Occupancy.TENANT,
+        defaultNextStep: Partner.Question.QuestionCode.ADDRESS
+      }
+    ]
+    partner.questions = questions
+
+    const createQuoteCommand: CreateQuoteCommand = {
+      partnerCode: 'myPartner',
+      specOpsCode: OperationCode.BLANK,
+      risk: {
+        property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses', type: PropertyType.FLAT, occupancy: Occupancy.TENANT },
+        otherPeople: [{ firstname: 'Jane', lastname: 'Does' }, { firstname: 'Jene', lastname: 'Done' }]
+      }
+    }
+
+    // When
+    const quotePromise = createQuote(createQuoteCommand)
+
+    // Then
+    return expect(quotePromise).to.be.rejectedWith(QuoteRiskRoommatesNotAllowedError, '2 room(s) property does not allow roommates')
   })
 
   it('should throw an error if the property type is not insured by the partner', async () => {

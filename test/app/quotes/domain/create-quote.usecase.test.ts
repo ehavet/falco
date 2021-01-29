@@ -109,7 +109,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
     pricingZoneRepository.getAllForProductByLocation.reset()
   })
 
-  describe('should return the quote', async () => {
+  describe('should create a quote', async () => {
     beforeEach(() => {
       quoteRepository.save.resolves()
       defaultCapAdviceRepository.get.withArgs('myPartner', 2).resolves({ value: 6000 })
@@ -141,7 +141,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
       expect(quote).to.deep.include({ risk: expectedQuote.risk })
     })
 
-    it('with the risk.property.type provided by default by partner if not provided in command', async () => {
+    it('with the property type provided by default by partner if not provided in command', async () => {
       // When
       const quote: Quote = await createQuote({ partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses', occupancy: Occupancy.TENANT } } })
 
@@ -149,7 +149,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
       expect(quote.risk.property.type).to.be.equal(PropertyType.FLAT)
     })
 
-    it('with the default occupancy provided by partner if not provided in command', async () => {
+    it('with the occupancy provided by default by partner if not provided in command', async () => {
       // When
       const quote: Quote = await createQuote({ partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses', type: PropertyType.FLAT } } })
 
@@ -200,6 +200,40 @@ describe('Quotes - Usecase - Create Quote', async () => {
 
       // Then
       expect(quote).to.deep.include({ policyHolder: expectedPolicyHolder })
+    })
+
+    it('with the nbDueMonths set to 12 by default', async () => {
+      // Given
+      const createQuoteCommand: CreateQuoteCommand = {
+        partnerCode: 'myPartner',
+        specOpsCode: OperationCode.BLANK,
+        risk: {
+          property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT }
+        }
+      }
+
+      // When
+      const quote: Quote = await createQuote(createQuoteCommand)
+
+      // Then
+      expect(quote.nbMonthsDue).to.equal(12)
+    })
+
+    it('with the premium set to computed monthlyPrice * nbMonthsDue(12 by default)', async () => {
+      // Given
+      const createQuoteCommand: CreateQuoteCommand = {
+        partnerCode: 'myPartner',
+        specOpsCode: OperationCode.BLANK,
+        risk: {
+          property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT }
+        }
+      }
+
+      // When
+      const quote: Quote = await createQuote(createQuoteCommand)
+
+      // Then
+      expect(quote.premium).to.equal(69.84)
     })
 
     describe('with the start date and term start date', async () => {

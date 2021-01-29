@@ -30,7 +30,7 @@ export namespace CreateQuote {
         const { productCode } = partner.offer
         const defaultCapAdvice = await defaultCapAdviceRepository.get(partnerCode, roomCount)
         const coverPricingZones: CoverPricingZone[] = await coverPricingZoneRepository.getAllForProductByLocation(productCode, city, postalCode)
-        const coverMonthlyPrices: CoverMonthlyPrice[] = await QuoteFunc.getCoverMonthlyPricesTemp(coverMonthlyPriceRepository, coverPricingZones, partnerCode, roomCount)
+        const coverMonthlyPrices: CoverMonthlyPrice[] = await QuoteFunc.getCoverMonthlyPricesFromPricingZones(coverMonthlyPriceRepository, coverPricingZones, partnerCode, roomCount)
         const quote: Quote = Quote.create(createQuoteCommand, partner, defaultCapAdvice, coverMonthlyPrices)
         await quoteRepository.save(quote)
         return quote

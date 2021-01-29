@@ -21,7 +21,7 @@ export const getCoverMonthlyPrices = async (
   return coverMonthlyPriceRepository.getAllForPartnerByPricingZone(partnerCode, coverPricingZones, roomCount)
 }
 
-export const getCoverMonthlyPricesTemp = async (
+export const getCoverMonthlyPricesFromPricingZones = async (
   coverMonthlyPriceRepository: CoverMonthlyPriceRepository,
   coverPricingZones: CoverPricingZone[],
   partnerCode: string,

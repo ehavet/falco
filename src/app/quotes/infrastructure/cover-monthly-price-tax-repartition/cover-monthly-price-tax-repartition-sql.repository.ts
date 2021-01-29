@@ -7,9 +7,11 @@ import {
   CoverMonthlyPriceTaxRepartitionNotFoundError
 } from '../../domain/cover-monthly-price-tax-repartition/cover-monthly-price-tax-repartition.error'
 import * as CoverMonthlyPriceSqlDatasource from '../datasource/cover-monthly-price-sql.datasource'
+import { ZNOTFOUND } from '../../domain/cover-pricing-zone/pricing-zone'
 
 export class CoverMonthlyPriceTaxRepartitionSqlRepository implements CoverMonthlyPriceTaxRepartitionRepository {
-  async getAll (partnerCode: string, pricingZones: CoverPricingZone[], roomCount: number): Promise<Array<CoverMonthlyPriceTaxRepartition>> {
+  async getAll (partnerCode: string, coverPricingZones: CoverPricingZone[], roomCount: number): Promise<Array<CoverMonthlyPriceTaxRepartition>> {
+    const pricingZones = coverPricingZones.map(coverPricingZone => coverPricingZone.zone)
     const pricingMatrices = await CoverMonthlyPriceSqlDatasource.getAllByPricingZone(partnerCode, pricingZones, roomCount)
 
     if (pricingMatrices.length === 0) throw new CoverMonthlyPriceTaxRepartitionNotFoundError(partnerCode)
@@ -20,7 +22,7 @@ export class CoverMonthlyPriceTaxRepartitionSqlRepository implements CoverMonthl
   }
 
   async getAllWithoutZone (partnerCode: string, roomCount: number): Promise<Array<CoverMonthlyPriceTaxRepartition>> {
-    const pricingMatrices = await CoverMonthlyPriceSqlDatasource.getAllWithoutZone(partnerCode, roomCount)
+    const pricingMatrices = await CoverMonthlyPriceSqlDatasource.getAllByPricingZone(partnerCode, [ZNOTFOUND], roomCount)
 
     if (pricingMatrices.length === 0) throw new CoverMonthlyPriceTaxRepartitionNotFoundError(partnerCode)
 

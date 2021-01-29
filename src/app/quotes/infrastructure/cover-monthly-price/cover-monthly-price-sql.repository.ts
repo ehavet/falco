@@ -9,7 +9,7 @@ const DEFAULT_COVER_MONTHLY_PRICE = '0'
 
 export class CoverMonthlyPriceSqlRepository implements CoverMonthlyPriceRepository {
   async getAllForPartnerByPricingZone (partnerCode: string, pricingZones: CoverPricingZone[], roomCount: number): Promise<Array<CoverMonthlyPrice>> {
-    const pricingMatrices : PricingMatrixSqlModel[] = await CoverMonthlyPriceSqlDatasource.getByPricingZone(partnerCode, pricingZones, roomCount)
+    const pricingMatrices : PricingMatrixSqlModel[] = await CoverMonthlyPriceSqlDatasource.getAllByPricingZone(partnerCode, pricingZones, roomCount)
 
     if (pricingMatrices.length === 0) throw new CoverMonthlyPriceNotFoundError(partnerCode)
 
@@ -19,7 +19,7 @@ export class CoverMonthlyPriceSqlRepository implements CoverMonthlyPriceReposito
   }
 
   async getAllForPartnerWithoutZone (partnerCode: string, roomCount: number): Promise<Array<CoverMonthlyPrice>> {
-    const pricingMatrices: PricingMatrixSqlModel[] = await CoverMonthlyPriceSqlDatasource.getWithoutZone(partnerCode, roomCount)
+    const pricingMatrices: PricingMatrixSqlModel[] = await CoverMonthlyPriceSqlDatasource.getAllWithoutZone(partnerCode, roomCount)
 
     if (pricingMatrices.length === 0) throw new CoverMonthlyPriceNotFoundError(partnerCode)
 

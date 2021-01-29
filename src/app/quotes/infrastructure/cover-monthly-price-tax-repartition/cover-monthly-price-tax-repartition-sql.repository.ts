@@ -9,8 +9,8 @@ import {
 import * as CoverMonthlyPriceSqlDatasource from '../datasource/cover-monthly-price-sql.datasource'
 
 export class CoverMonthlyPriceTaxRepartitionSqlRepository implements CoverMonthlyPriceTaxRepartitionRepository {
-  async get (partnerCode: string, pricingZones: CoverPricingZone[], roomCount: number): Promise<Array<CoverMonthlyPriceTaxRepartition>> {
-    const pricingMatrices = await CoverMonthlyPriceSqlDatasource.getByPricingZone(partnerCode, pricingZones, roomCount)
+  async getAll (partnerCode: string, pricingZones: CoverPricingZone[], roomCount: number): Promise<Array<CoverMonthlyPriceTaxRepartition>> {
+    const pricingMatrices = await CoverMonthlyPriceSqlDatasource.getAllByPricingZone(partnerCode, pricingZones, roomCount)
 
     if (pricingMatrices.length === 0) throw new CoverMonthlyPriceTaxRepartitionNotFoundError(partnerCode)
 
@@ -20,7 +20,7 @@ export class CoverMonthlyPriceTaxRepartitionSqlRepository implements CoverMonthl
   }
 
   async getAllWithoutZone (partnerCode: string, roomCount: number): Promise<Array<CoverMonthlyPriceTaxRepartition>> {
-    const pricingMatrices = await CoverMonthlyPriceSqlDatasource.getWithoutZone(partnerCode, roomCount)
+    const pricingMatrices = await CoverMonthlyPriceSqlDatasource.getAllWithoutZone(partnerCode, roomCount)
 
     if (pricingMatrices.length === 0) throw new CoverMonthlyPriceTaxRepartitionNotFoundError(partnerCode)
 

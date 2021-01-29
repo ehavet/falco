@@ -20,7 +20,7 @@ describe('Quotes - Infra - CoverMonthlyPriceTaxRepartitionSql Repository', async
     await dbTestUtils.closeDB()
   })
 
-  describe('#get', async () => {
+  describe('#getAll', async () => {
     afterEach(async () => {
       await PricingMatrixSqlModel.destroy({ where: { partner: partnerCode } })
     })
@@ -41,7 +41,7 @@ describe('Quotes - Infra - CoverMonthlyPriceTaxRepartitionSql Repository', async
       await PricingMatrixSqlModel.bulkCreate(pricingMatrixFixture)
 
       // When
-      const coverMonthlyPriceTaxRepartitions = await coverMonthlyPriceTaxRepartitionSqlRepository.get(partnerCode, pricingZones, 1)
+      const coverMonthlyPriceTaxRepartitions = await coverMonthlyPriceTaxRepartitionSqlRepository.getAll(partnerCode, pricingZones, 1)
 
       // Then
       expect(coverMonthlyPriceTaxRepartitions).to.deep.equal([
@@ -59,7 +59,7 @@ describe('Quotes - Infra - CoverMonthlyPriceTaxRepartitionSql Repository', async
       ]
       await PricingMatrixSqlModel.bulkCreate(pricingMatrixFixture)
       // When
-      const promise = coverMonthlyPriceTaxRepartitionSqlRepository.get('myOtherPartner', pricingZones, 1)
+      const promise = coverMonthlyPriceTaxRepartitionSqlRepository.getAll('myOtherPartner', pricingZones, 1)
 
       // Then
       return expect(promise).to.be.rejectedWith(CoverMonthlyPriceTaxRepartitionNotFoundError)
@@ -77,7 +77,7 @@ describe('Quotes - Infra - CoverMonthlyPriceTaxRepartitionSql Repository', async
       await PricingMatrixSqlModel.bulkCreate(pricingMatrixFixture)
 
       // When
-      const promise = coverMonthlyPriceTaxRepartitionSqlRepository.get(partnerCode, pricingZones, 1)
+      const promise = coverMonthlyPriceTaxRepartitionSqlRepository.getAll(partnerCode, pricingZones, 1)
 
       // Then
       return expect(promise).to.be.rejectedWith(CoverMonthlyPriceTaxRepartitionConsistencyError)

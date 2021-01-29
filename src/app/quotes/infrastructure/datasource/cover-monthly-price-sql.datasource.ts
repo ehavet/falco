@@ -2,7 +2,7 @@ import { CoverPricingZone } from '../../domain/cover-pricing-zone/cover-pricing-
 import { PricingMatrixSqlModel } from '../cover-monthly-price/pricing-matrix-sql.model'
 import { ZNOTFOUND } from '../../domain/cover'
 
-export const getByPricingZone = async (partnerCode: string, pricingZones: CoverPricingZone[], roomCount: number): Promise<Array<PricingMatrixSqlModel>> => {
+export const getAllByPricingZone = async (partnerCode: string, pricingZones: CoverPricingZone[], roomCount: number): Promise<Array<PricingMatrixSqlModel>> => {
   return PricingMatrixSqlModel.findAll(
     {
       where: {
@@ -14,7 +14,7 @@ export const getByPricingZone = async (partnerCode: string, pricingZones: CoverP
     })
 }
 
-export const getWithoutZone = async (partnerCode: string, roomCount: number): Promise<Array<PricingMatrixSqlModel>> => {
+export const getAllWithoutZone = async (partnerCode: string, roomCount: number): Promise<Array<PricingMatrixSqlModel>> => {
   return PricingMatrixSqlModel.findAll(
     {
       where: {

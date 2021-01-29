@@ -3,21 +3,15 @@ import { PricingMatrixSqlModel } from './pricing-matrix-sql.model'
 import { CoverMonthlyPriceConsistencyError, CoverMonthlyPriceNotFoundError } from '../../domain/cover-monthly-price/cover-monthly-price.error'
 import { CoverMonthlyPriceRepository } from '../../domain/cover-monthly-price/cover-monthly-price.repository'
 import { CoverPricingZone } from '../../domain/cover-pricing-zone/cover-pricing-zone'
-import { ZNOTFOUND } from '../../domain/cover'
+import * as CoverMonthlyPriceSqlDatasource from '../datasource/cover-monthly-price-sql.datasource'
+import { ZNOTFOUND } from '../../domain/cover-pricing-zone/pricing-zone'
 
 const DEFAULT_COVER_MONTHLY_PRICE = '0'
 
 export class CoverMonthlyPriceSqlRepository implements CoverMonthlyPriceRepository {
-  async getAllForPartnerByPricingZone (partnerCode: string, pricingZones: CoverPricingZone[], roomCount: number): Promise<Array<CoverMonthlyPrice>> {
-    const pricingMatrices = await PricingMatrixSqlModel.findAll(
-      {
-        where: {
-          partner: partnerCode,
-          roomCount,
-          pricingZone: pricingZones.map(pricingZone => pricingZone.zone)
-        },
-        raw: true
-      })
+  async getAllForPartnerByPricingZone (partnerCode: string, coverPricingZones: CoverPricingZone[], roomCount: number): Promise<Array<CoverMonthlyPrice>> {
+    const pricingZones = coverPricingZones.map(coverPricingZone => coverPricingZone.zone)
+    const pricingMatrices : PricingMatrixSqlModel[] = await CoverMonthlyPriceSqlDatasource.getAllByPricingZone(partnerCode, pricingZones, roomCount)
 
     if (pricingMatrices.length === 0) throw new CoverMonthlyPriceNotFoundError(partnerCode)
 
@@ -27,15 +21,7 @@ export class CoverMonthlyPriceSqlRepository implements CoverMonthlyPriceReposito
   }
 
   async getAllForPartnerWithoutZone (partnerCode: string, roomCount: number): Promise<Array<CoverMonthlyPrice>> {
-    const pricingMatrices: PricingMatrixSqlModel[] = await PricingMatrixSqlModel.findAll(
-      {
-        where: {
-          partner: partnerCode,
-          roomCount,
-          pricingZone: ZNOTFOUND
-        },
-        raw: true
-      })
+    const pricingMatrices: PricingMatrixSqlModel[] = await CoverMonthlyPriceSqlDatasource.getAllByPricingZone(partnerCode, [ZNOTFOUND], roomCount)
 
     if (pricingMatrices.length === 0) throw new CoverMonthlyPriceNotFoundError(partnerCode)
 

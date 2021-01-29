@@ -6,8 +6,9 @@ import { Partner } from '../../partners/domain/partner'
 import { DefaultCapAdviceRepository } from './default-cap-advice/default-cap-advice.repository'
 import { CoverMonthlyPriceRepository } from './cover-monthly-price/cover-monthly-price.repository'
 import { CoverPricingZoneRepository } from './cover-pricing-zone/cover-pricing-zone.repository'
+import { CoverPricingZone } from './cover-pricing-zone/cover-pricing-zone'
+import * as QuoteFunc from './quote.func'
 import { CoverMonthlyPrice } from './cover-monthly-price/cover-monthly-price'
-import { getCoverMonthlyPrices } from './quote.func'
 
 export interface CreateQuote {
     (createQuoteCommand: CreateQuoteCommand): Promise<Quote>
@@ -20,7 +21,7 @@ export namespace CreateQuote {
       partnerRepository: PartnerRepository,
       defaultCapAdviceRepository: DefaultCapAdviceRepository,
       coverMonthlyPriceRepository: CoverMonthlyPriceRepository,
-      pricingZoneRepository: CoverPricingZoneRepository
+      coverPricingZoneRepository: CoverPricingZoneRepository
     ): CreateQuote {
       return async (createQuoteCommand: CreateQuoteCommand): Promise<Quote> => {
         const partnerCode = createQuoteCommand.partnerCode
@@ -28,7 +29,8 @@ export namespace CreateQuote {
         const partner: Partner = await partnerRepository.getByCode(partnerCode)
         const { productCode } = partner.offer
         const defaultCapAdvice = await defaultCapAdviceRepository.get(partnerCode, roomCount)
-        const coverMonthlyPrices: Array<CoverMonthlyPrice> = await getCoverMonthlyPrices(coverMonthlyPriceRepository, pricingZoneRepository, productCode, partnerCode, roomCount, city, postalCode)
+        const coverPricingZones: CoverPricingZone[] = await coverPricingZoneRepository.getAllForProductByLocation(productCode, city, postalCode)
+        const coverMonthlyPrices: CoverMonthlyPrice[] = await QuoteFunc.getCoverMonthlyPricesFromPricingZones(coverMonthlyPriceRepository, coverPricingZones, partnerCode, roomCount)
         const quote: Quote = Quote.create(createQuoteCommand, partner, defaultCapAdvice, coverMonthlyPrices)
         await quoteRepository.save(quote)
         return quote

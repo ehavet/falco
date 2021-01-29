@@ -82,10 +82,12 @@ describe('Quotes - Usecase - Create Quote', async () => {
     dateFaker.setCurrentDate(now)
     partnerRepository.getByCode.withArgs('myPartner').returns(partner)
     createQuote = CreateQuote.factory(quoteRepository, partnerRepository, defaultCapAdviceRepository, coverMonthlyPriceRepository, pricingZoneRepository)
+    pricingZoneRepository.getAllForProductByLocation.resolves(pricingZones)
   })
 
   afterEach(() => {
     quoteRepository.save.reset()
+    pricingZoneRepository.getAllForProductByLocation.reset()
   })
 
   describe('should return the quote', async () => {

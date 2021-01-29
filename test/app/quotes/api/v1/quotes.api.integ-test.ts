@@ -59,7 +59,8 @@ describe('Quotes - API v1 - Integration', async () => {
             city: 'Paris',
             type: PropertyType.FLAT,
             occupancy: Occupancy.TENANT
-          }
+          },
+          person: { firstname: 'John', lastname: 'Doe' }
         },
         insurance: {
           estimate: {
@@ -74,11 +75,22 @@ describe('Quotes - API v1 - Integration', async () => {
           contractualTerms: '/path/to/contractual/terms',
           ipid: '/path/to/ipid'
         },
-        policyHolder: {},
+        policyHolder: {
+          firstname: 'June',
+          lastname: 'Did',
+          address: '74 avenue des églantines',
+          postalCode: '75011',
+          city: 'Paris',
+          email: 'june@did.com',
+          phoneNumber: '+33645290841'
+        },
         nbMonthsDue: 12,
         premium: 69.84,
         specialOperationsCode: null,
-        specialOperationsCodeAppliedAt: null
+        specialOperationsCodeAppliedAt: null,
+        startDate: new Date('2020-01-05'),
+        termStartDate: new Date('2020-01-05'),
+        termEndDate: new Date('2021-01-04')
       }
 
       const expectedResourceQuote = {
@@ -91,12 +103,14 @@ describe('Quotes - API v1 - Integration', async () => {
             city: 'Paris',
             type: 'FLAT',
             occupancy: 'TENANT'
-          }
+          },
+          person: { firstname: 'John', lastname: 'Doe' },
+          other_people: null
         },
         insurance: {
           monthly_price: 5.82,
           default_deductible: 150,
-          default_ceiling: 7000,
+          default_cap: 7000,
           currency: 'EUR',
           simplified_covers: ['ACDDE', 'ACVOL'],
           product_code: 'APP658',
@@ -104,14 +118,32 @@ describe('Quotes - API v1 - Integration', async () => {
           contractual_terms: '/path/to/contractual/terms',
           ipid: '/path/to/ipid'
         },
+        policy_holder: {
+          firstname: 'June',
+          lastname: 'Did',
+          address: '74 avenue des églantines',
+          postal_code: '75011',
+          city: 'Paris',
+          email: 'june@did.com',
+          phone_number: '+33645290841',
+          email_validated_at: null
+        },
         code: 'myPartner',
-        special_operations_code: null,
-        special_operations_code_applied_at: null
+        premium: 69.84,
+        nb_months_due: 12,
+        start_date: '2020-01-05',
+        term_start_date: '2020-01-05',
+        term_end_date: '2021-01-04'
       }
 
       beforeEach(async () => {
         // Given
-        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode: 'myPartner', specOpsCode: 'BLANK', risk: quote.risk }).resolves(quote)
+        sinon.stub(container, 'CreateQuote').withArgs({
+          partnerCode: 'myPartner',
+          specOpsCode: 'BLANK',
+          risk: quote.risk,
+          policyHolder: quote.policyHolder
+        }).resolves(quote)
 
         // When
         response = await httpServer.api()
@@ -126,7 +158,17 @@ describe('Quotes - API v1 - Integration', async () => {
                 city: 'Paris',
                 type: 'FLAT',
                 occupancy: 'TENANT'
-              }
+              },
+              person: { firstname: 'John', lastname: 'Doe' }
+            },
+            policy_holder: {
+              firstname: 'June',
+              lastname: 'Did',
+              address: '74 avenue des églantines',
+              postal_code: '75011',
+              city: 'Paris',
+              email: 'june@did.com',
+              phone_number: '+33645290841'
             }
           })
           .set('X-Consumer-Username', 'myPartner')
@@ -154,10 +196,11 @@ describe('Quotes - API v1 - Integration', async () => {
             city: 'Paris',
             type: propertyTypeNotInsured,
             occupancy: Occupancy.TENANT
-          }
+          },
+          person: undefined
         }
         const specOpsCode = 'BLANK'
-        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, specOpsCode }).rejects(new QuoteRiskPropertyTypeNotInsurableError(propertyTypeNotInsured))
+        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, policyHolder: undefined, specOpsCode }).rejects(new QuoteRiskPropertyTypeNotInsurableError(propertyTypeNotInsured))
 
         // When
         response = await httpServer.api()
@@ -196,10 +239,11 @@ describe('Quotes - API v1 - Integration', async () => {
             city: 'Paris',
             type: PropertyType.FLAT,
             occupancy: occupancyNotInsured
-          }
+          },
+          person: undefined
         }
         const specOpsCode = 'BLANK'
-        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, specOpsCode }).rejects(new QuoteRiskOccupancyNotInsurableError(occupancyNotInsured))
+        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, policyHolder: undefined, specOpsCode }).rejects(new QuoteRiskOccupancyNotInsurableError(occupancyNotInsured))
 
         // When
         response = await httpServer.api()
@@ -237,10 +281,11 @@ describe('Quotes - API v1 - Integration', async () => {
             city: 'Paris',
             type: 'FLAT',
             occupancy: 'TENANT'
-          }
+          },
+          person: undefined
         }
         const specOpsCode = 'BLANK'
-        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, specOpsCode }).rejects(new PartnerNotFoundError(partnerCode))
+        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, policyHolder: undefined, specOpsCode }).rejects(new PartnerNotFoundError(partnerCode))
 
         // When
         response = await httpServer.api()
@@ -270,9 +315,12 @@ describe('Quotes - API v1 - Integration', async () => {
       it('should reply with status 422', async () => {
         // Given
         const partnerCode: string = 'myPartner'
-        const risk = { property: { roomCount: 2, postalCode: undefined, city: undefined, address: undefined, type: undefined, occupancy: undefined } }
+        const risk = {
+          property: { roomCount: 2, postalCode: undefined, city: undefined, address: undefined, type: undefined, occupancy: undefined },
+          person: undefined
+        }
         const specOpsCode = 'BLANK'
-        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, specOpsCode }).rejects(new NoPartnerInsuranceForRiskError(partnerCode, risk))
+        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, policyHolder: undefined, specOpsCode }).rejects(new NoPartnerInsuranceForRiskError(partnerCode, risk))
 
         // When
         response = await httpServer.api()
@@ -429,7 +477,7 @@ describe('Quotes - API v1 - Integration', async () => {
         expect(response).to.have.property('statusCode', 400)
       })
 
-      it('Should reply with status 400 when the code postal is invalid', async () => {
+      it('should reply with status 400 when the code postal is invalid', async () => {
         response = await httpServer.api()
           .post('/v1/quotes')
           .send({
@@ -448,7 +496,7 @@ describe('Quotes - API v1 - Integration', async () => {
         expect(response).to.have.property('statusCode', 400)
       })
 
-      it('Should reply with status 422 when special operations code is not applicable for selected partner', async () => {
+      it('should reply with status 422 when special operations code is not applicable for selected partner', async () => {
         // Given
         const invalidSpecOpsCode = '!Nv4l!D'
         const partnerCode = 'demo-student'
@@ -460,9 +508,10 @@ describe('Quotes - API v1 - Integration', async () => {
             city: 'Paris',
             type: PropertyType.FLAT,
             occupancy: Occupancy.TENANT
-          }
+          },
+          person: undefined
         }
-        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, specOpsCode: invalidSpecOpsCode }).rejects(new OperationCodeNotApplicableError(invalidSpecOpsCode, partnerCode))
+        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, policyHolder: undefined, specOpsCode: invalidSpecOpsCode }).rejects(new OperationCodeNotApplicableError(invalidSpecOpsCode, partnerCode))
 
         // When
         response = await httpServer.api()

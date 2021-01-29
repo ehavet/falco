@@ -13,6 +13,20 @@ export interface CreateQuoteCommand {
             city?: string,
             type?: PropertyType,
             occupancy?: Occupancy
+        },
+        person?: {
+            firstname: string,
+            lastname: string
         }
-    }
+    },
+    policyHolder?: {
+        firstname?: string,
+        lastname?: string,
+        address?: string,
+        postalCode?: string,
+        city?: string,
+        email?: string,
+        phoneNumber?: string,
+    },
+    startDate?: Date
 }

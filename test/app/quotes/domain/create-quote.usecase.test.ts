@@ -21,6 +21,7 @@ import { sumCoverMonthlyPrices } from '../../../../src/app/quotes/domain/cover-m
 
 describe('Quotes - Usecase - Create Quote', async () => {
   let createQuote: CreateQuote
+  const now = new Date('2020-04-18T10:09:08Z')
   const quoteRepository = quoteRepositoryMock()
   const partnerRepository = { getByCode: sinon.stub(), getCallbackUrl: sinon.stub(), getOperationCodes: sinon.stub() }
   const defaultCapAdviceRepository = defaultCapAdviceRepositoryStub()
@@ -50,7 +51,8 @@ describe('Quotes - Usecase - Create Quote', async () => {
         city: 'Les Ulysses',
         type: PropertyType.FLAT,
         occupancy: Occupancy.TENANT
-      }
+      },
+      person: { firstname: 'John', lastname: 'Doe' }
     },
     insurance: {
       estimate: {
@@ -65,12 +67,23 @@ describe('Quotes - Usecase - Create Quote', async () => {
       contractualTerms: '/path/to/contractual/terms',
       ipid: '/path/to/ipid'
     },
+    policyHolder: {
+      firstname: 'June',
+      lastname: 'Did',
+      address: '74 avenue des églantines',
+      postalCode: '75011',
+      city: 'Paris',
+      email: 'june@did.com',
+      phoneNumber: '+33645290841'
+    },
     nbMonthsDue: 12,
     premium: 69.84,
     specialOperationsCode: null,
-    specialOperationsCodeAppliedAt: null
+    specialOperationsCodeAppliedAt: null,
+    startDate: now,
+    termStartDate: now,
+    termEndDate: new Date('2021-04-17')
   }
-  const now = new Date('2020-04-18T10:09:08Z')
   const pricingZoneRepository = pricingZoneRepositoryStub()
   const pricingZones: CoverPricingZone[] = [
     { zone: 'ZD1', cover: 'DDEAUX' },
@@ -105,9 +118,16 @@ describe('Quotes - Usecase - Create Quote', async () => {
       coverMonthlyPriceRepository.getAllForPartnerWithoutZone.reset()
     })
 
-    it('with the partner code and the risk', async () => {
+    it('with the partner code and the risk coming from the command', async () => {
       // When
-      const quote: Quote = await createQuote({ partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses', type: PropertyType.FLAT, occupancy: Occupancy.TENANT } } })
+      const quote: Quote = await createQuote({
+        partnerCode: 'myPartner',
+        specOpsCode: OperationCode.BLANK,
+        risk: {
+          property: { roomCount: 2, address: '15 Rue Des Amandiers', postalCode: '91110', city: 'Les Ulysses', type: PropertyType.FLAT, occupancy: Occupancy.TENANT },
+          person: { firstname: 'John', lastname: 'Doe' }
+        }
+      })
 
       // Then
       expect(quote).to.deep.include({ partnerCode: expectedQuote.partnerCode })
@@ -148,7 +168,95 @@ describe('Quotes - Usecase - Create Quote', async () => {
       expect(quote).to.deep.include({ insurance: expectedInsurance })
     })
 
-    describe('with thue special operations code', async () => {
+    it('with the policy holder if specified', async () => {
+      // Given
+      const createQuoteCommand: CreateQuoteCommand = {
+        partnerCode: 'myPartner',
+        specOpsCode: OperationCode.BLANK,
+        risk: {
+          property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT }
+        },
+        policyHolder: {
+          firstname: 'June',
+          lastname: 'Did',
+          address: '74 avenue des églantines',
+          postalCode: '75011',
+          city: 'Paris',
+          email: 'june@did.com',
+          phoneNumber: '+33645290841'
+        }
+      }
+      const expectedPolicyHolder = expectedQuote.policyHolder
+
+      // When
+      const quote: Quote = await createQuote(createQuoteCommand)
+
+      // Then
+      expect(quote).to.deep.include({ policyHolder: expectedPolicyHolder })
+    })
+
+    describe('with the start date and term start date', async () => {
+      it('set to the given start date', async () => {
+        // Given
+        const createQuoteCommand: CreateQuoteCommand = {
+          partnerCode: 'myPartner',
+          specOpsCode: OperationCode.BLANK,
+          risk: {
+            property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT }
+          },
+          startDate: new Date('2021-01-05T17:31:95Z')
+        }
+
+        // When
+        const quote: Quote = await createQuote(createQuoteCommand)
+
+        // Then
+        expect(quote.startDate).to.deep.equal(createQuoteCommand.startDate)
+        expect(quote.termStartDate).to.deep.equal(createQuoteCommand.startDate)
+      })
+
+      it('set to now if no start date is given', async () => {
+        // Given
+        const createQuoteCommandWithNoStartDate: CreateQuoteCommand = {
+          partnerCode: 'myPartner',
+          specOpsCode: OperationCode.BLANK,
+          risk: {
+            property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT }
+          }
+        }
+
+        // When
+        const quote: Quote = await createQuote(createQuoteCommandWithNoStartDate)
+
+        // Then
+        const nowWithNoTime = new Date(now)
+        nowWithNoTime.setUTCHours(0, 0, 0, 0)
+        expect(quote.startDate).to.deep.equal(nowWithNoTime)
+        expect(quote.termStartDate).to.deep.equal(nowWithNoTime)
+      })
+    })
+
+    describe('with the term end date', async () => {
+      it('set to startDate + 1 year - 1 day by default', async () => {
+        // Given
+        const createQuoteCommand: CreateQuoteCommand = {
+          partnerCode: 'myPartner',
+          specOpsCode: OperationCode.BLANK,
+          risk: {
+            property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT }
+          },
+          startDate: new Date('2021-01-05')
+        }
+
+        // When
+        const quote: Quote = await createQuote(createQuoteCommand)
+
+        // Then
+        expect(quote.termEndDate).to.deep.equal(new Date('2022-01-04'))
+      })
+    })
+
+    describe('with the special operations code', async () => {
       it('SEMESTER1 setting the number of months due to 5', async () => {
         // Given
         const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.SEMESTER1, risk: { property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT } } }
@@ -268,8 +376,22 @@ describe('Quotes - Usecase - Create Quote', async () => {
           city,
           type: PropertyType.FLAT,
           occupancy: Occupancy.TENANT
+        },
+        person: {
+          firstname: 'John',
+          lastname: 'Doe'
         }
-      }
+      },
+      policyHolder: {
+        firstname: 'June',
+        lastname: 'Did',
+        address: '74 avenue des églantines',
+        postalCode: '75011',
+        city: 'Paris',
+        email: 'june@did.com',
+        phoneNumber: '+33645290841'
+      },
+      startDate: now
     }
     const pricingZones: CoverPricingZone[] = [
       { zone: 'ZD1', cover: 'DDEAUX' },

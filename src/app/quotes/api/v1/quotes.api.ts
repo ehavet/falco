@@ -3,15 +3,17 @@ import Joi from 'joi'
 import * as HttpErrorSchema from '../../../common-api/HttpErrorSchema'
 import { ServerRoute } from '@hapi/hapi'
 import { CreateQuoteCommand } from '../../domain/create-quote-command'
-import { createdQuoteToResource } from './created-quote-to-resource.mapper'
 import { Container } from '../../quote.container'
 import { PartnerNotFoundError } from '../../../partners/domain/partner.errors'
 import {
   NoPartnerInsuranceForRiskError,
-  QuoteNotFoundError, QuotePartnerOwnershipError,
+  QuoteNotFoundError,
+  QuotePartnerOwnershipError,
   QuotePolicyHolderEmailNotFoundError,
-  QuoteRiskNumberOfRoommatesError, QuoteRiskOccupancyNotInsurableError,
-  QuoteRiskPropertyRoomCountNotInsurableError, QuoteRiskPropertyTypeNotInsurableError,
+  QuoteRiskNumberOfRoommatesError,
+  QuoteRiskOccupancyNotInsurableError,
+  QuoteRiskPropertyRoomCountNotInsurableError,
+  QuoteRiskPropertyTypeNotInsurableError,
   QuoteRiskRoommatesNotAllowedError,
   QuoteStartDateConsistencyError
 } from '../../domain/quote.errors'
@@ -23,7 +25,6 @@ import { quotePostRequestBodySchema } from './schemas/quotes-post-request.schema
 import { requestToUpdateQuoteCommand } from './mappers/request-to-update-quote-command.mapper'
 import { requestToCreateQuoteCommand } from './mappers/request-to-create-quote-command.mapper'
 import { GetQuoteById } from '../../domain/get-quote-by-id.usecase'
-import { POSTALCODE_REGEX } from '../../../common-api/domain/regexp'
 import { commonHeadersSchema } from '../../../common-api/api/common-headers.schema'
 import { quoteToResource } from './mappers/quote-to-resource.mapper'
 import GetQuoteByIdQuery = GetQuoteById.GetQuoteByIdQuery
@@ -40,33 +41,7 @@ export default function (container: Container): Array<ServerRoute> {
         },
         response: {
           status: {
-            201: Joi.object({
-              id: Joi.string().description('Quote id').example('DU6C73X'),
-              code: Joi.string().description('Code').example('myCode'),
-              special_operations_code: Joi.string().allow(null).description('Operation special code applied').example('CODEPROMO1'),
-              special_operations_code_applied_at: Joi.date().allow(null).description('Application date of operation special code').example('1957-03-02T10:09:09.000'),
-              risk: Joi.object({
-                property: Joi.object({
-                  room_count: Joi.number().integer().description('Property number of rooms').example(3),
-                  address: Joi.string().optional().description('Property address').example('112 rue du chêne rouge'),
-                  postal_code: Joi.string().optional().regex(POSTALCODE_REGEX).description('Property postal code').example('95470'),
-                  city: Joi.string().optional().max(50).description('Property city').example('Corbeil-Essonnes'),
-                  type: Joi.string().optional().description('The type of property').example('FLAT'),
-                  occupancy: Joi.string().optional().description('The occupancy of the property').example('TENANT')
-                }).description('Risks regarding the property').label('Risk.Property')
-              }).description('Risks').label('Risk'),
-              insurance: Joi.object({
-                monthly_price: Joi.number().precision(2).description('Monthly price').example(5.43),
-                default_deductible: Joi.number().precision(2).integer().description('Default deductible').example(150),
-                default_ceiling: Joi.number().precision(2).description('Default ceiling').example(5000),
-                currency: Joi.string().description('Monthly price currency').example('EUR'),
-                simplified_covers: Joi.array().items(Joi.string()).description('Simplified covers').example(['ACDDE', 'ACVOL']),
-                product_code: Joi.string().description('Product code').example('MRH-Loc-Etud'),
-                product_version: Joi.string().description('Date of the product').example('v2020-02-01'),
-                contractual_terms: Joi.string().description('Link to the Contractual Terms document').example('http://link/to.ct'),
-                ipid: Joi.string().description('Link to the IPID document').example('http://link/to.ipid')
-              }).description('Insurance').label('Quote.Insurance')
-            }).label('Quote'),
+            201: quoteResponseBodySchema,
             400: HttpErrorSchema.badRequestSchema,
             404: HttpErrorSchema.notFoundSchema,
             422: HttpErrorSchema.unprocessableEntitySchema,
@@ -78,7 +53,7 @@ export default function (container: Container): Array<ServerRoute> {
         const createQuoteCommand: CreateQuoteCommand = requestToCreateQuoteCommand(request)
         try {
           const quote = await container.CreateQuote(createQuoteCommand)
-          const quoteAsResource = createdQuoteToResource(quote)
+          const quoteAsResource = quoteToResource(quote)
           return h.response(quoteAsResource).code(201)
         } catch (error) {
           if (error instanceof PartnerNotFoundError) {

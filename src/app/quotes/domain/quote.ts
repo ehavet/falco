@@ -77,17 +77,19 @@ export namespace Quote {
 
       const nbMonthsDue = DEFAULT_NUMBER_MONTHS_DUE
 
-      const quote = {
+      const quote: Quote = {
         id: nextId(),
         partnerCode: command.partnerCode,
         risk: risk,
         insurance: insurance,
+        policyHolder: command.policyHolder,
         specialOperationsCode: undefined,
         specialOperationsCodeAppliedAt: undefined,
         nbMonthsDue: nbMonthsDue,
         premium: Amount.multiply(nbMonthsDue, insurance.estimate.monthlyPrice)
       }
 
+      _applyStartDate(quote, command.startDate)
       _applyOperationCode(quote, partner.offer.operationCodes, command.specOpsCode)
 
       return quote
@@ -224,7 +226,8 @@ export namespace Quote {
           ...command.risk.property,
           type: propertyType,
           occupancy: occupancy
-        }
+        },
+        person: command.risk.person
       }
     }
 

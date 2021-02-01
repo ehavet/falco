@@ -105,7 +105,7 @@ describe('Quotes - API v1 - Integration', async () => {
             occupancy: 'TENANT'
           },
           person: { firstname: 'John', lastname: 'Doe' },
-          other_people: null
+          other_people: []
         },
         insurance: {
           monthly_price: 5.82,

@@ -16,7 +16,9 @@ function swaggerOptions (config: Map<string, any>) : RegisterOptions {
       }
     },
     basePath: `${config.get('FALCO_API_URL_PREFIX')}`,
-    grouping: 'tags'
+    grouping: 'tags',
+    definitionPrefix: 'useLabel',
+    reuseDefinitions: false
   }
 }
 

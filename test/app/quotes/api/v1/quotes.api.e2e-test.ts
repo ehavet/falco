@@ -59,7 +59,7 @@ describe('Quotes - API v1 - E2E', async () => {
             occupancy: 'TENANT'
           },
           person: null,
-          other_people: null
+          other_people: []
         },
         insurance: {
           monthly_price: 3.83,
@@ -128,7 +128,7 @@ describe('Quotes - API v1 - E2E', async () => {
             firstname: 'John',
             lastname: 'Doe'
           },
-          other_people: null
+          other_people: []
         },
         insurance: {
           monthly_price: 3.83,

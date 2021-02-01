@@ -248,14 +248,14 @@ export const expectedSubscriptionValidationEmailMessage: string =
         '                            <tr>\n' +
         '                                <td style="padding: 20px; font-family: sans-serif; font-size: 15px; line-height: 20px; color: #333333;">\n' +
         '                                    <h1 style="margin: 0 0 10px 0; font-family: sans-serif; font-size: 25px; line-height: 30px; color: #2C2B94; font-weight: normal;">Votre appartement est assuré&nbsp;!</h1>\n' +
-        '                                    <p style="margin: 0 0 10px 0;">Merci d’avoir choisi Appenin pour assurer votre logement étudiant.\n' +
+        '                                    <p style="margin: 0 0 10px 0;">Merci d’avoir choisi Appenin pour assurer votre logement.\n' +
         '                                    </p>\n' +
         '                                    <p style="margin: 0 0 10px 0;">Vous trouverez ci-joint vos documents contractuels et en particulier votre attestation d’assurance.\n' +
         '                                    </p>\n' +
         '                                    <p style="margin: 0 0 10px 0;">Pour toutes vos questions, rendez-vous sur la page\n' +
         '                                    « Nous contacter » de vos conditions générales... ou sur appenin.fr.\n' +
         '                                    </p>\n' +
-        '                                    <p style="margin: 0;">L’équipe Appenin vous souhaite un bon emménagement et une belle réussite dans vos études !\n' +
+        '                                    <p style="margin: 0;">L’équipe Appenin vous souhaite un bon emménagement !\n' +
         '                                    </p>\n' +
         '                                </td>\n' +
         '                            </tr>\n' +
@@ -285,11 +285,11 @@ export const expectedSubscriptionValidationEmailMessage: string =
         '                           <tr>\n' +
         '                                 <td style="padding: 20px; font-family: sans-serif; font-size: 15px; line-height: 20px; color: #666666;">\n' +
         '                                     <h1 style="margin: 0 0 10px 0; font-family: sans-serif; font-size: 25px; line-height: 30px; color: #8180BF; font-weight: normal;">Your home is now insured!</h1>\n' +
-        '                                     <p style="margin: 0 0 10px 0;">Thank you for choosing Appenin to insure your student accommodation.\n' +
+        '                                     <p style="margin: 0 0 10px 0;">Thank you for choosing Appenin to insure your accommodation.\n' +
         '                                     </p>\n' +
         '                                     <p style="margin: 0 0 10px 0;">Please find attached your contractual documents, including your insurance certificate.</p>\n' +
         '                                     <p style="margin: 0 0 10px 0;">If you have any questions or concerns, please go to the page "Contact us" of your general conditions... or on appenin.fr.\n' +
-        '                                     <p style="margin: 0;">The Appenin team wishes you a safe and smooth move in and great success in your studies!\n' +
+        '                                     <p style="margin: 0;">The Appenin team wishes you a safe and smooth move in!\n' +
         '                                 </td>\n' +
         '                             </tr>\n' +
         '                             <tr>\n' +

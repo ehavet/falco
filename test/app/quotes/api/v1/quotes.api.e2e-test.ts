@@ -97,7 +97,7 @@ describe('Quotes - API v1 - E2E', async () => {
           postal_code: '75011',
           city: 'Paris',
           email: 'june@did.com',
-          phone_number: '+33645290841'
+          phone_number: '+33 6 45 29 08 41'
         },
         start_date: new Date('2020-01-05T00:00:00Z')
       }
@@ -145,7 +145,7 @@ describe('Quotes - API v1 - E2E', async () => {
           postal_code: '75011',
           city: 'Paris',
           email: 'june@did.com',
-          phone_number: '+33645290841',
+          phone_number: '+33 6 45 29 08 41',
           email_validated_at: null
         },
         nb_months_due: 12,
@@ -241,7 +241,7 @@ describe('Quotes - API v1 - E2E', async () => {
         postal_code: '91100',
         city: 'Neo Kyukamura',
         email: 'jean.lapin@email.com',
-        phone_number: '+33684205510'
+        phone_number: '+33 6 84 20 55 10'
       }
     }
 
@@ -324,7 +324,7 @@ describe('Quotes - API v1 - E2E', async () => {
           email: 'jean.lapin@email.com',
           firstname: 'Jeannot',
           lastname: 'Lapin',
-          phone_number: '+33684205510',
+          phone_number: '+33 6 84 20 55 10',
           postal_code: '91100',
           email_validated_at: null
         },

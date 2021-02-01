@@ -28,6 +28,6 @@ export const quotePostRequestBodySchema: Joi.ObjectSchema = Joi.object({
   }).required().description('Risks').label('Risk'),
   policy_holder: Joi.object({
     email: Joi.string().email().required().description('Contact email').example('john.doe@email.com'),
-    phone_number: Joi.string().required().max(15).description('Contact phone number').example('+33684205510')
+    phone_number: Joi.string().required().max(30).description('Contact phone number').example('+33684205510')
   }).optional().description('Policy holder contact')
 }).options({ stripUnknown: true })

@@ -160,7 +160,7 @@ describe('Quotes - API v0 - E2E', async () => {
         postal_code: '91100',
         city: 'Neo Kyukamura',
         email: 'jean.lapin@email.com',
-        phone_number: '+33684205510'
+        phone_number: '+33 6 84 20 55 10'
       }
     }
 
@@ -243,7 +243,7 @@ describe('Quotes - API v0 - E2E', async () => {
           email: 'jean.lapin@email.com',
           firstname: 'Jeannot',
           lastname: 'Lapin',
-          phone_number: '+33684205510',
+          phone_number: '+33 6 84 20 55 10',
           postal_code: '91100',
           email_validated_at: null
         },

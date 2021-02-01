@@ -43,7 +43,7 @@ const contactSchema: Joi.ObjectSchema = Joi.object({
   firstname: Joi.string().required().max(100).description('Holder firstname').example('John'),
   lastname: Joi.string().required().max(100).description('Holder lastname').example('Doe'),
   email: Joi.string().email().required().description('Holder email').example('john.doe@email.com'),
-  phone_number: Joi.string().required().max(15).description('Holder phone number').example('+33684205510'),
+  phone_number: Joi.string().required().max(30).description('Holder phone number').example('+33684205510'),
   email_validated_at: Joi.date().description('Email validation date').example('2020-04-25T10:09:09.000')
 })
 

@@ -72,7 +72,10 @@ describe('Policies - API v1 - E2E', async () => {
       await quoteRepository.save(createQuoteFixture())
       const quote: Quote = await quoteRepository.update(createQuoteFixture({
         partnerCode: 'studyo',
-        policyHolder: createQuotePolicyHolderFixture({ emailValidatedAt: now })
+        policyHolder: createQuotePolicyHolderFixture({
+          emailValidatedAt: now,
+          phoneNumber: '+33 6 84 20 55 10'
+        })
       }))
       requestParams.quote_id = quote.id
 
@@ -130,7 +133,7 @@ describe('Policies - API v1 - E2E', async () => {
           postal_code: '91100',
           city: 'Kyukamura',
           email: 'jeanjean@email.com',
-          phone_number: '+33684205510',
+          phone_number: '+33 6 84 20 55 10',
           email_validated_at: '2020-04-18T00:00:00.000Z'
         },
         nb_months_due: 12,

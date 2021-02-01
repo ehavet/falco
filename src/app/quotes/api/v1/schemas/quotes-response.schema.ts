@@ -42,7 +42,7 @@ export const quoteResponseBodySchema: Joi.ObjectSchema = Joi.object({
     postal_code: Joi.string().allow(null).regex(POSTALCODE_REGEX).description('Property postal code').example('95470'),
     city: Joi.string().allow(null).max(50).description('Property city').example('Corbeil-Essonnes'),
     email: Joi.string().email().allow(null).description('Policy holder email').example('john.doe@email.com'),
-    phone_number: Joi.string().max(15).allow(null).description('Policy holder phone number').example('+33684205510'),
+    phone_number: Joi.string().max(30).allow(null).description('Policy holder phone number').example('+33684205510'),
     email_validated_at: Joi.date().allow(null).description('Email validation date').example('2020-04-25T10:09:09.000')
   }).optional().allow(null).description('Policy holder contact'),
   start_date: Joi.date().allow(null).description('Start date').example('2020-04-26'),

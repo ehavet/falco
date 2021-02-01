@@ -63,7 +63,13 @@ describe('Policies - API v0 - E2E', async () => {
     const now = new Date('2020-04-18T00:00:00Z')
     const productCode = 'APP999'
     const partnerCode = 'demo-student'
-    const requestParams: any = createPolicyApiRequestFixture({ code: partnerCode })
+    const requestParams: any = createPolicyApiRequestFixture({
+      code: partnerCode,
+      contact: {
+        email: 'jeandupont@email.com',
+        phone_number: '+33 6 84 20 55 10'
+      }
+    })
 
     beforeEach(async () => {
       // Given
@@ -147,7 +153,7 @@ describe('Policies - API v0 - E2E', async () => {
           postal_code: '75000',
           city: 'Paris',
           email: 'jeandupont@email.com',
-          phone_number: '+33684205510'
+          phone_number: '+33 6 84 20 55 10'
         },
         nb_months_due: 12,
         premium: 45.96,

@@ -30,7 +30,7 @@ export const quotePostRequestBodySchema: Joi.ObjectSchema = Joi.object({
     firstname: Joi.string().required().allow(null).max(100).description('Policy holder firstname').example('John'),
     lastname: Joi.string().required().allow(null).max(100).description('Policy holder lastname').example('Dong'),
     email: Joi.string().email().required().allow(null).description('Policy holder email').example('john.dong@email.com'),
-    phone_number: Joi.string().required().allow(null).max(15).description('Policy holder phone number').example('+33684205510'),
+    phone_number: Joi.string().required().allow(null).max(30).description('Policy holder phone number').example('+33684205510'),
     address: Joi.string().required().allow(null).max(100).description('Policy holder address').example('112 rue du chêne rouge'),
     postal_code: Joi.string().required().regex(POSTALCODE_REGEX).allow(null).description('Policy holder postal code').example('95470'),
     city: Joi.string().required().allow(null).max(50).description('Policy holder city').example('Corbeil-Essonnes')

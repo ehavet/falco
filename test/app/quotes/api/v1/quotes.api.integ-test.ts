@@ -131,6 +131,8 @@ describe('Quotes - API v1 - Integration', async () => {
         code: 'myPartner',
         premium: 69.84,
         nb_months_due: 12,
+        special_operations_code: null,
+        special_operations_code_applied_at: null,
         start_date: '2020-01-05',
         term_start_date: '2020-01-05',
         term_end_date: '2021-01-04'
@@ -140,7 +142,7 @@ describe('Quotes - API v1 - Integration', async () => {
         // Given
         sinon.stub(container, 'CreateQuote').withArgs({
           partnerCode: 'myPartner',
-          specOpsCode: 'BLANK',
+          specOpsCode: undefined,
           risk: quote.risk,
           policyHolder: quote.policyHolder
         }).resolves(quote)
@@ -199,7 +201,7 @@ describe('Quotes - API v1 - Integration', async () => {
           },
           person: undefined
         }
-        const specOpsCode = 'BLANK'
+        const specOpsCode = undefined
         sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, policyHolder: undefined, specOpsCode }).rejects(new QuoteRiskPropertyTypeNotInsurableError(propertyTypeNotInsured))
 
         // When
@@ -242,7 +244,7 @@ describe('Quotes - API v1 - Integration', async () => {
           },
           person: undefined
         }
-        const specOpsCode = 'BLANK'
+        const specOpsCode = undefined
         sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, policyHolder: undefined, specOpsCode }).rejects(new QuoteRiskOccupancyNotInsurableError(occupancyNotInsured))
 
         // When
@@ -274,21 +276,33 @@ describe('Quotes - API v1 - Integration', async () => {
         // Given
         const partnerCode: string = 'myPartner'
         const risk = {
-          property: { roomCount: 2, postalCode: undefined, city: undefined, address: undefined, type: undefined, occupancy: undefined },
+          property: { roomCount: 2, address: '52 Rue Beaubourg', postalCode: '75019', city: 'Paris', type: PropertyType.FLAT, occupancy: Occupancy.TENANT },
           person: undefined
         }
-        const specOpsCode = 'BLANK'
+        const specOpsCode = undefined
         sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, policyHolder: undefined, specOpsCode }).rejects(new NoPartnerInsuranceForRiskError(partnerCode, risk))
 
         // When
         response = await httpServer.api()
           .post('/v1/quotes')
-          .send({ code: partnerCode, risk: { property: { room_count: 2 } } })
+          .send({
+            code: partnerCode,
+            risk: {
+              property: {
+                room_count: 2,
+                address: '52 Rue Beaubourg',
+                postal_code: '75019',
+                city: 'Paris',
+                type: PropertyType.FLAT,
+                occupancy: Occupancy.TENANT
+              }
+            }
+          })
           .set('X-Consumer-Username', partnerCode)
 
         // Then
         expect(response).to.have.property('statusCode', 422)
-        expect(response.body).to.have.property('message', 'Partner with code myPartner does not have an insurance for risk {"property":{"roomCount":2}}')
+        expect(response.body).to.have.property('message', 'Partner with code myPartner does not have an insurance for risk {"property":{"roomCount":2,"address":"52 Rue Beaubourg","postalCode":"75019","city":"Paris","type":"FLAT","occupancy":"TENANT"}}')
       })
     })
 
@@ -298,7 +312,7 @@ describe('Quotes - API v1 - Integration', async () => {
       const productCode = 'APP999'
       const postalCode = '76523'
       const risk = {
-        property: { roomCount: 2, postalCode: undefined, city: undefined, address: undefined, type: undefined, occupancy: undefined },
+        property: { roomCount: 2, address: '52 Rue Beaubourg', postalCode: '75019', city: 'Paris', type: PropertyType.FLAT, occupancy: Occupancy.TENANT },
         person: undefined
       }
       const requestParams = {
@@ -306,8 +320,11 @@ describe('Quotes - API v1 - Integration', async () => {
         risk: {
           property: {
             room_count: 2,
+            address: '52 Rue Beaubourg',
             city,
-            postalCode
+            postal_code: postalCode,
+            type: PropertyType.FLAT,
+            occupancy: Occupancy.TENANT
           }
         }
       }
@@ -318,7 +335,7 @@ describe('Quotes - API v1 - Integration', async () => {
         { instance: new CoverMonthlyPriceNotFoundError(partnerCode), expectedStatus: 500 },
         { instance: new CoverMonthlyPriceConsistencyError(partnerCode), expectedStatus: 500 },
         { instance: new PartnerNotFoundError(partnerCode), expectedStatus: 404, expectedMessage: `Could not find partner with code : ${partnerCode}` },
-        { instance: new NoPartnerInsuranceForRiskError(partnerCode, risk), expectedStatus: 422, expectedMessage: 'Partner with code myPartner does not have an insurance for risk {"property":{"roomCount":2}}' },
+        { instance: new NoPartnerInsuranceForRiskError(partnerCode, risk), expectedStatus: 422, expectedMessage: 'Partner with code myPartner does not have an insurance for risk {"property":{"roomCount":2,"address":"52 Rue Beaubourg","postalCode":"75019","city":"Paris","type":"FLAT","occupancy":"TENANT"}}' },
         { instance: new QuoteRiskPropertyRoomCountNotInsurableError(2), expectedStatus: 422, expectedMessage: '2 room(s) property is not insurable' },
         { instance: new OperationCodeNotApplicableError('SEMESTER33', partnerCode), expectedStatus: 422, expectedMessage: `The operation code SEMESTER33 is not applicable for partner : ${partnerCode}` },
         { instance: new QuoteStartDateConsistencyError(), expectedStatus: 422, expectedMessage: 'Start date cannot be earlier than today' },
@@ -649,6 +666,8 @@ describe('Quotes - API v1 - Integration', async () => {
         },
         nb_months_due: 12,
         premium: 120,
+        special_operations_code: null,
+        special_operations_code_applied_at: null,
         start_date: '2020-01-05',
         term_start_date: '2020-01-05',
         term_end_date: '2021-01-05'
@@ -920,6 +939,8 @@ describe('Quotes - API v1 - Integration', async () => {
         },
         premium: 69.84,
         nb_months_due: 12,
+        special_operations_code: null,
+        special_operations_code_applied_at: null,
         start_date: '2020-01-05',
         term_end_date: '2020-01-05',
         term_start_date: '2020-01-05'

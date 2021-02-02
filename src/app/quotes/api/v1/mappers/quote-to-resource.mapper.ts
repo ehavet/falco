@@ -13,7 +13,9 @@ export function quoteToResource (quote: Quote) {
     term_start_date: quote.termStartDate ? dayjs(quote.termStartDate).format('YYYY-MM-DD') : null,
     term_end_date: quote.termEndDate ? dayjs(quote.termEndDate).format('YYYY-MM-DD') : null,
     premium: quote.premium,
-    nb_months_due: quote.nbMonthsDue
+    nb_months_due: quote.nbMonthsDue,
+    special_operations_code: quote.specialOperationsCode ?? null,
+    special_operations_code_applied_at: quote.specialOperationsCodeAppliedAt ?? null
   }
 }
 

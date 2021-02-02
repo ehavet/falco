@@ -45,6 +45,8 @@ export const quoteResponseBodySchema: Joi.ObjectSchema = Joi.object({
     phone_number: Joi.string().max(30).allow(null).description('Policy holder phone number').example('+33684205510'),
     email_validated_at: Joi.date().allow(null).description('Email validation date').example('2020-04-25T10:09:09.000')
   }).optional().allow(null).description('Policy holder contact'),
+  special_operations_code: Joi.string().allow(null).description('Special operation code applied').example('CODEPROMO1'),
+  special_operations_code_applied_at: Joi.date().allow(null).description('Application date of operation special code').example('1957-03-02T10:09:09.000'),
   start_date: Joi.date().allow(null).description('Start date').example('2020-04-26'),
   term_start_date: Joi.date().allow(null).description('Term start date').example('2020-04-26'),
   term_end_date: Joi.date().allow(null).description('Term end date').example('2021-04-25'),

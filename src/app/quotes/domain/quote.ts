@@ -71,9 +71,9 @@ export namespace Quote {
       partner: Partner,
       defaultCapAdvice: DefaultCapAdvice,
       coverMonthlyPrices: Array<CoverMonthlyPrice>): Quote {
-      const risk: Risk = _buildRisk(command, partner)
+      const risk: Quote.Risk = _buildRisk(command, partner)
 
-      const insurance: Insurance = getInsurance(partner.offer, defaultCapAdvice, coverMonthlyPrices)
+      const insurance: Quote.Insurance = getInsurance(partner.offer, defaultCapAdvice, coverMonthlyPrices)
 
       const nbMonthsDue = DEFAULT_NUMBER_MONTHS_DUE
 
@@ -204,7 +204,10 @@ export namespace Quote {
       The correct rule is : risk.property.type is mandatory and should be given on quote creation.
       It should be implemented that way for POST v1/quotes */
       const propertyType = command.risk.property.type ?? PartnerFunc.getDefaultPropertyType(partner)
+
+      const numberOfRoommates: number|null = command.risk.otherPeople ? command.risk.otherPeople.length : null
       const roomCount = command.risk.property.roomCount
+
       if (!PartnerFunc.isPropertyTypeInsurable(partner, propertyType)) {
         throw new QuoteRiskPropertyTypeNotInsurableError(propertyType)
       }
@@ -221,13 +224,23 @@ export namespace Quote {
       if (!PartnerFunc.isPropertyRoomCountCovered(partner, roomCount)) {
         throw new QuoteRiskPropertyRoomCountNotInsurableError(roomCount)
       }
+
+      if (numberOfRoommates) {
+        if (!PartnerFunc.isPropertyAllowNumberOfRoommates(partner, numberOfRoommates, command.risk)) {
+          const maxRoommatesForProperty: number = PartnerFunc.getMaxNumberOfRoommatesForProperty(partner, command.risk)
+          if (maxRoommatesForProperty === 0) { throw new QuoteRiskRoommatesNotAllowedError(roomCount) }
+          throw new QuoteRiskNumberOfRoommatesError(maxRoommatesForProperty, roomCount)
+        }
+      }
+
       return {
         property: {
           ...command.risk.property,
           type: propertyType,
           occupancy: occupancy
         },
-        person: command.risk.person
+        person: command.risk.person,
+        otherPeople: command.risk.otherPeople
       }
     }
 

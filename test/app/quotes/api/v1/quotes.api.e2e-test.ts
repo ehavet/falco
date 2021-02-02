@@ -75,6 +75,8 @@ describe('Quotes - API v1 - E2E', async () => {
         policy_holder: null,
         nb_months_due: 12,
         premium: 45.96,
+        special_operations_code: null,
+        special_operations_code_applied_at: null,
         start_date: '2020-04-18',
         term_start_date: '2020-04-18',
         term_end_date: '2021-04-17'
@@ -99,7 +101,8 @@ describe('Quotes - API v1 - E2E', async () => {
           email: 'june@did.com',
           phone_number: '+33 6 45 29 08 41'
         },
-        start_date: new Date('2020-01-05T00:00:00Z')
+        start_date: new Date('2020-01-05T00:00:00Z'),
+        spec_ops_code: 'SEMESTER1'
       }
 
       // When
@@ -148,48 +151,13 @@ describe('Quotes - API v1 - E2E', async () => {
           phone_number: '+33 6 45 29 08 41',
           email_validated_at: null
         },
-        nb_months_due: 12,
-        premium: 45.96,
-        start_date: '2020-04-18',
-        term_start_date: '2020-04-18',
-        term_end_date: '2021-04-17'
-      })
-    })
-
-    it.skip('should return the quote with special operations code', async () => {
-      // Given
-      await clearPricingZoneSqlFixture()
-      await clearPricingMatrixSqlFixture()
-      // When
-      response = await httpServer.api()
-        .post('/v1/quotes')
-        .send({ code: partnerCode, risk: { property: { room_count: 2, type: PropertyType.FLAT, occupancy: 'TENANT' } }, spec_ops_code: 'SEMESTER1' })
-        .set('X-Consumer-Username', partnerCode)
-
-      // Then
-      expect(response.body).to.deep.equal({
-        id: response.body.id,
-        risk: {
-          property: {
-            room_count: 2,
-            type: PropertyType.FLAT,
-            occupancy: Occupancy.TENANT
-          }
-        },
-        insurance: {
-          monthly_price: 7.5,
-          currency: 'EUR',
-          default_deductible: 120,
-          default_ceiling: 5000.00,
-          simplified_covers: ['ACDDE', 'ACINCEX', 'ACVOL', 'ACASSHE', 'ACDEFJU', 'ACRC'],
-          product_code: productCode,
-          product_version: '2020-09-11',
-          contractual_terms: '/docs/Appenin_Conditions_Generales_assurance_habitation_APP999.pdf',
-          ipid: '/docs/Appenin_Document_Information_assurance_habitation_APP999.pdf'
-        },
+        nb_months_due: 5,
+        premium: 19.15,
         special_operations_code: 'SEMESTER1',
         special_operations_code_applied_at: '2020-04-18T10:09:08.000Z',
-        code: partnerCode
+        start_date: '2020-04-18',
+        term_start_date: '2020-04-18',
+        term_end_date: '2020-09-17'
       })
     })
 
@@ -349,6 +317,8 @@ describe('Quotes - API v1 - E2E', async () => {
             occupancy: 'TENANT'
           }
         },
+        special_operations_code: null,
+        special_operations_code_applied_at: null,
         start_date: '2020-03-05',
         term_end_date: '2021-03-04',
         term_start_date: '2020-03-05'
@@ -425,6 +395,8 @@ describe('Quotes - API v1 - E2E', async () => {
         },
         premium: 69.84,
         nb_months_due: 12,
+        special_operations_code: null,
+        special_operations_code_applied_at: null,
         start_date: '2020-01-05',
         term_end_date: '2020-01-05',
         term_start_date: '2020-01-05'

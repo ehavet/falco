@@ -17,7 +17,8 @@ export interface CreateQuoteCommand {
         person?: {
             firstname: string,
             lastname: string
-        }
+        },
+        otherPeople?: Array<{ firstname: string, lastname: string }>
     },
     policyHolder?: {
         firstname?: string,

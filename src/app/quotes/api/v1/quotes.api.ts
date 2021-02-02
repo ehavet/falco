@@ -56,17 +56,21 @@ export default function (container: Container): Array<ServerRoute> {
           const quoteAsResource = quoteToResource(quote)
           return h.response(quoteAsResource).code(201)
         } catch (error) {
-          if (error instanceof PartnerNotFoundError) {
-            throw Boom.notFound(error.message)
+          switch (true) {
+            case error instanceof PartnerNotFoundError:
+              throw Boom.notFound(error.message)
+            case error instanceof NoPartnerInsuranceForRiskError:
+            case error instanceof QuoteRiskPropertyRoomCountNotInsurableError:
+            case error instanceof OperationCodeNotApplicableError:
+            case error instanceof QuoteStartDateConsistencyError:
+            case error instanceof QuoteRiskRoommatesNotAllowedError:
+            case error instanceof QuoteRiskNumberOfRoommatesError:
+            case error instanceof QuoteRiskPropertyTypeNotInsurableError:
+            case error instanceof QuoteRiskOccupancyNotInsurableError:
+              throw Boom.badData(error.message)
+            default:
+              throw Boom.internal(error)
           }
-          if (error instanceof NoPartnerInsuranceForRiskError ||
-              error instanceof OperationCodeNotApplicableError ||
-              error instanceof QuoteRiskPropertyTypeNotInsurableError ||
-              error instanceof QuoteRiskOccupancyNotInsurableError) {
-            throw Boom.badData(error.message)
-          }
-
-          throw Boom.internal(error.message)
         }
       }
     },

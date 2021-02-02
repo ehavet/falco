@@ -189,6 +189,56 @@ describe('Quotes - API v1 - Integration', async () => {
       })
     })
 
+    it('should accept a minimal quote with only the partner code and the risk on the property and all other fields set to null', async () => {
+      // Given
+      const quoteRisk = {
+        property: {
+          roomCount: 2,
+          address: '52 Rue Beaubourg',
+          postalCode: '75003',
+          city: 'Paris',
+          type: 'FLAT',
+          occupancy: 'TENANT'
+        },
+        person: undefined,
+        otherPeople: undefined
+      }
+      const containerMock = sinon.mock(container)
+      containerMock.expects('CreateQuote').withArgs({
+        partnerCode: 'myPartner',
+        specOpsCode: undefined,
+        risk: quoteRisk,
+        policyHolder: undefined,
+        startDate: undefined
+      }).resolves()
+
+      // When
+      await httpServer.api()
+        .post('/v1/quotes')
+        .send({
+          code: 'myPartner',
+          risk: {
+            property: {
+              room_count: 2,
+              address: '52 Rue Beaubourg',
+              postal_code: '75003',
+              city: 'Paris',
+              type: 'FLAT',
+              occupancy: 'TENANT'
+            },
+            person: null,
+            other_people: null
+          },
+          policy_holder: null,
+          special_operations_code: null,
+          start_date: null
+        })
+        .set('X-Consumer-Username', 'myPartner')
+
+      // Then
+      containerMock.verify()
+    })
+
     describe('when then quote is created with property.type', () => {
       it('should reply with status 422 when type is equal to house', async () => {
         // Given
@@ -756,6 +806,56 @@ describe('Quotes - API v1 - Integration', async () => {
       it('should return updated quote', async () => {
         expect(response.body).to.deep.equal(expectedQuoteResource)
       })
+    })
+
+    it('should accept a minimal quote with only the partner code and the risk on the property and all other fields set to null', async () => {
+      // Given
+      const quoteRisk = {
+        property: {
+          roomCount: 2,
+          address: '52 Rue Beaubourg',
+          postalCode: '75003',
+          city: 'Paris',
+          type: 'FLAT',
+          occupancy: 'TENANT'
+        },
+        person: undefined,
+        otherPeople: undefined
+      }
+      const containerMock = sinon.mock(container)
+      containerMock.expects('CreateQuote').withArgs({
+        partnerCode: 'myPartner',
+        specOpsCode: undefined,
+        risk: quoteRisk,
+        policyHolder: undefined,
+        startDate: undefined
+      }).resolves()
+
+      // When
+      await httpServer.api()
+        .post('/v1/quotes')
+        .send({
+          code: 'myPartner',
+          risk: {
+            property: {
+              room_count: 2,
+              address: '52 Rue Beaubourg',
+              postal_code: '75003',
+              city: 'Paris',
+              type: 'FLAT',
+              occupancy: 'TENANT'
+            },
+            person: null,
+            other_people: null
+          },
+          policy_holder: null,
+          special_operations_code: null,
+          start_date: null
+        })
+        .set('X-Consumer-Username', 'myPartner')
+
+      // Then
+      containerMock.verify()
     })
 
     describe('when the usecase throw an error', async () => {

@@ -20,13 +20,12 @@ import {
 import { UpdateQuoteCommand } from '../../domain/update-quote-command'
 import { OperationCodeNotApplicableError } from '../../../policies/domain/operation-code.errors'
 import { quoteResponseBodySchema } from './schemas/quotes-response.schema'
-import { quotePutRequestBodySchema } from './schemas/quotes-put-request.schema'
-import { quotePostRequestBodySchema } from './schemas/quotes-post-request.schema'
 import { requestToUpdateQuoteCommand } from './mappers/request-to-update-quote-command.mapper'
 import { requestToCreateQuoteCommand } from './mappers/request-to-create-quote-command.mapper'
 import { GetQuoteById } from '../../domain/get-quote-by-id.usecase'
 import { commonHeadersSchema } from '../../../common-api/api/common-headers.schema'
 import { quoteToResource } from './mappers/quote-to-resource.mapper'
+import { quotePostRequestBodySchema, quotePutRequestBodySchema } from './schemas/quotes-request.schema'
 import GetQuoteByIdQuery = GetQuoteById.GetQuoteByIdQuery
 
 export default function (container: Container): Array<ServerRoute> {

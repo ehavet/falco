@@ -20,7 +20,8 @@ export function requestToCreateQuoteCommand (request: any): CreateQuoteCommand {
         return { firstname: person.firstname, lastname: person.lastname }
       }) : undefined
     },
-    policyHolder: _resourceToPolicyHolder(payload)
+    policyHolder: _resourceToPolicyHolder(payload),
+    startDate: payload.start_date ? new Date(payload.start_date) : undefined
   }
 }
 

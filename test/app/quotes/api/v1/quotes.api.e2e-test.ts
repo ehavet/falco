@@ -101,7 +101,7 @@ describe('Quotes - API v1 - E2E', async () => {
           email: 'june@did.com',
           phone_number: '+33 6 45 29 08 41'
         },
-        start_date: new Date('2020-01-05T00:00:00Z'),
+        start_date: new Date('2020-04-20T00:00:00Z'),
         spec_ops_code: 'SEMESTER1'
       }
 
@@ -152,9 +152,9 @@ describe('Quotes - API v1 - E2E', async () => {
         premium: 19.15,
         special_operations_code: 'SEMESTER1',
         special_operations_code_applied_at: '2020-04-18T10:09:08.000Z',
-        start_date: '2020-04-18',
-        term_start_date: '2020-04-18',
-        term_end_date: '2020-09-17'
+        start_date: '2020-04-20',
+        term_start_date: '2020-04-20',
+        term_end_date: '2020-09-19'
       })
     })
 

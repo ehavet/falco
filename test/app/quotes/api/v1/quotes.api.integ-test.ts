@@ -145,7 +145,8 @@ describe('Quotes - API v1 - Integration', async () => {
           partnerCode: 'myPartner',
           specOpsCode: undefined,
           risk: quote.risk,
-          policyHolder: quote.policyHolder
+          policyHolder: quote.policyHolder,
+          startDate: new Date('2021-01-15')
         }).resolves(quote)
 
         // When
@@ -173,7 +174,8 @@ describe('Quotes - API v1 - Integration', async () => {
               city: 'Paris',
               email: 'june@did.com',
               phone_number: '+33645290841'
-            }
+            },
+            start_date: '2021-01-15'
           })
           .set('X-Consumer-Username', 'myPartner')
       })
@@ -205,7 +207,7 @@ describe('Quotes - API v1 - Integration', async () => {
           otherPeople: undefined
         }
         const specOpsCode = undefined
-        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, policyHolder: undefined, specOpsCode }).rejects(new QuoteRiskPropertyTypeNotInsurableError(propertyTypeNotInsured))
+        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, policyHolder: undefined, specOpsCode, startDate: undefined }).rejects(new QuoteRiskPropertyTypeNotInsurableError(propertyTypeNotInsured))
 
         // When
         response = await httpServer.api()
@@ -249,7 +251,7 @@ describe('Quotes - API v1 - Integration', async () => {
           otherPeople: undefined
         }
         const specOpsCode = undefined
-        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, policyHolder: undefined, specOpsCode }).rejects(new QuoteRiskOccupancyNotInsurableError(occupancyNotInsured))
+        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, policyHolder: undefined, specOpsCode, startDate: undefined }).rejects(new QuoteRiskOccupancyNotInsurableError(occupancyNotInsured))
 
         // When
         response = await httpServer.api()
@@ -285,7 +287,7 @@ describe('Quotes - API v1 - Integration', async () => {
           otherPeople: undefined
         }
         const specOpsCode = undefined
-        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, policyHolder: undefined, specOpsCode }).rejects(new NoPartnerInsuranceForRiskError(partnerCode, risk))
+        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, policyHolder: undefined, specOpsCode, startDate: undefined }).rejects(new NoPartnerInsuranceForRiskError(partnerCode, risk))
 
         // When
         response = await httpServer.api()
@@ -443,7 +445,7 @@ describe('Quotes - API v1 - Integration', async () => {
           person: undefined,
           otherPeople: undefined
         }
-        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, policyHolder: undefined, specOpsCode: invalidSpecOpsCode }).rejects(new OperationCodeNotApplicableError(invalidSpecOpsCode, partnerCode))
+        sinon.stub(container, 'CreateQuote').withArgs({ partnerCode, risk, policyHolder: undefined, specOpsCode: invalidSpecOpsCode, startDate: undefined }).rejects(new OperationCodeNotApplicableError(invalidSpecOpsCode, partnerCode))
 
         // When
         response = await httpServer.api()

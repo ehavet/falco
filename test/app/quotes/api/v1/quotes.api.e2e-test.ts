@@ -124,11 +124,8 @@ describe('Quotes - API v1 - E2E', async () => {
             type: 'FLAT',
             occupancy: 'TENANT'
           },
-          person: {
-            firstname: 'John',
-            lastname: 'Doe'
-          },
-          other_people: []
+          person: { firstname: 'John', lastname: 'Doe' },
+          other_people: [{ firstname: 'Jane', lastname: 'Does' }]
         },
         insurance: {
           monthly_price: 3.83,

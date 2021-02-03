@@ -18,7 +18,13 @@ function swaggerOptions (config: Map<string, any>) : RegisterOptions {
     basePath: `${config.get('FALCO_API_URL_PREFIX')}`,
     grouping: 'tags',
     definitionPrefix: 'useLabel',
-    reuseDefinitions: false
+    reuseDefinitions: false,
+    tags: [
+      {
+        name: '1 - Quotes',
+        description: 'Those endpoints should be used first in order to create a quote. The quote can be created partially and then filled-up the the PUT endpoint. Once the quote is complete, it can be used to create a policy.'
+      }
+    ]
   }
 }
 

@@ -8,7 +8,8 @@ import { UnauthenticatedEventError } from '../../domain/payment-processor.errors
 import { Stripe } from 'stripe'
 import { requestToConfirmPaymentIntentCommand } from './mappers/create-confirm-payment-intent-command.mapper'
 
-const TAGS = ['api', 'payment-processor']
+const TAGS = ['api', '4 - Payment Processor']
+
 export default function (container: Container): Array<ServerRoute> {
   return [
     {

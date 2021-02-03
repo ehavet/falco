@@ -28,7 +28,7 @@ import { quoteToResource } from './mappers/quote-to-resource.mapper'
 import { quotePostRequestBodySchema, quotePutRequestBodySchema } from './schemas/quotes-request.schema'
 import GetQuoteByIdQuery = GetQuoteById.GetQuoteByIdQuery
 
-const TAGS = ['api', 'quotes']
+const TAGS = ['api', '1 - Quotes']
 
 export default function (container: Container): Array<ServerRoute> {
   return [

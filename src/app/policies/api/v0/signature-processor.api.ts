@@ -6,13 +6,21 @@ import { resourceToDomain } from './mappers/signature-request-event-resource-to-
 import * as Boom from '@hapi/boom'
 import * as HttpErrorSchema from '../../../common-api/HttpErrorSchema'
 
+const TAGS = ['api', '3 - Signature Processor']
+
 export default function (container: Container): Array<ServerRoute> {
   return [
     {
       method: 'POST',
       path: '/internal/v0/signature-processor/event-handler/',
       options: {
+        tags: TAGS,
         description: 'Listen for signature processor notifications',
+        plugins: {
+          'hapi-swagger': {
+            deprecated: true
+          }
+        },
         payload: {
           output: 'data',
           parse: true,

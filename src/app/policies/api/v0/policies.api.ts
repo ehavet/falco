@@ -36,7 +36,7 @@ import { ApplySpecialOperationCodeCommand } from '../../domain/apply-special-ope
 import { PartnerNotFoundError } from '../../../partners/domain/partner.errors'
 import { ApplyStartDateOnPolicyCommand } from '../../domain/apply-start-date-on-policy.usecase'
 
-const TAGS = ['api', 'policies']
+const TAGS = ['api', '2 - Policies']
 
 export default function (container: Container): Array<ServerRoute> {
   return [
@@ -46,6 +46,11 @@ export default function (container: Container): Array<ServerRoute> {
       options: {
         tags: TAGS,
         description: 'Create a payment intent',
+        plugins: {
+          'hapi-swagger': {
+            deprecated: true
+          }
+        },
         validate: {
           params: Joi.object({
             id: Joi.string().min(1).max(100).required()
@@ -100,6 +105,11 @@ export default function (container: Container): Array<ServerRoute> {
       options: {
         tags: TAGS,
         description: 'Creates a policy',
+        plugins: {
+          'hapi-swagger': {
+            deprecated: true
+          }
+        },
         validate: {
           payload: createPolicyRequestSchema
         },
@@ -142,6 +152,11 @@ export default function (container: Container): Array<ServerRoute> {
       options: {
         tags: TAGS,
         description: 'Gets a policy',
+        plugins: {
+          'hapi-swagger': {
+            deprecated: true
+          }
+        },
         validate: {
           params: Joi.object({
             id: Joi.string().min(12).max(12).required().description('Policy id').example('APP365094241')
@@ -194,10 +209,11 @@ export default function (container: Container): Array<ServerRoute> {
         },
         plugins: {
           'hapi-swagger': {
+            deprecated: true,
             responses: {
               201: {
                 description: 'Certificate',
-                schema: Joi.binary().label('Certificate ')
+                schema: Joi.binary().label('Certificate')
               }
             }
           }
@@ -244,6 +260,7 @@ export default function (container: Container): Array<ServerRoute> {
         },
         plugins: {
           'hapi-swagger': {
+            deprecated: true,
             responses: {
               201: {
                 description: 'Specific Terms document',
@@ -279,6 +296,11 @@ export default function (container: Container): Array<ServerRoute> {
       options: {
         tags: TAGS,
         description: 'Create a signature request',
+        plugins: {
+          'hapi-swagger': {
+            deprecated: true
+          }
+        },
         validate: {
           params: Joi.object({
             id: Joi.string().min(12).max(12).required().description('Policy id').example('APP365094241')
@@ -325,6 +347,11 @@ export default function (container: Container): Array<ServerRoute> {
       options: {
         tags: TAGS,
         description: 'Apply a special operation code on policy',
+        plugins: {
+          'hapi-swagger': {
+            deprecated: true
+          }
+        },
         validate: {
           params: Joi.object({
             id: Joi.string().min(12).max(12).required()
@@ -379,6 +406,11 @@ export default function (container: Container): Array<ServerRoute> {
       options: {
         tags: TAGS,
         description: 'Apply start date update changes on policy',
+        plugins: {
+          'hapi-swagger': {
+            deprecated: true
+          }
+        },
         validate: {
           params: Joi.object({
             id: Joi.string().min(12).max(12).required()

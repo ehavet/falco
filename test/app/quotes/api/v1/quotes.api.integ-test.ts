@@ -233,7 +233,6 @@ describe('Quotes - API v1 - Integration', async () => {
           special_operations_code: null,
           start_date: null
         })
-        .set('X-Consumer-Username', 'myPartner')
 
       // Then
       containerMock.verify()
@@ -685,7 +684,7 @@ describe('Quotes - API v1 - Integration', async () => {
       })
     })
 
-    it('should accept a minimal quote with only the partner code and the risk on the property and all other fields set to null', async () => {
+    it('should accept to update a quote with only the risk on the property and all other fields set to null', async () => {
       // Given
       const quoteRisk = {
         property: {
@@ -700,8 +699,8 @@ describe('Quotes - API v1 - Integration', async () => {
         otherPeople: undefined
       }
       const containerMock = sinon.mock(container)
-      containerMock.expects('CreateQuote').withArgs({
-        partnerCode: 'myPartner',
+      containerMock.expects('UpdateQuote').withArgs({
+        id: 'UD65X3',
         specOpsCode: undefined,
         risk: quoteRisk,
         policyHolder: undefined,
@@ -710,9 +709,8 @@ describe('Quotes - API v1 - Integration', async () => {
 
       // When
       await httpServer.api()
-        .post('/v1/quotes')
+        .put('/v1/quotes/UD65X3')
         .send({
-          code: 'myPartner',
           risk: {
             property: {
               room_count: 2,
@@ -729,7 +727,6 @@ describe('Quotes - API v1 - Integration', async () => {
           special_operations_code: null,
           start_date: null
         })
-        .set('X-Consumer-Username', 'myPartner')
 
       // Then
       containerMock.verify()

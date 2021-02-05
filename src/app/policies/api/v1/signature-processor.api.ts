@@ -6,7 +6,8 @@ import { resourceToDomain } from './mappers/signature-request-event-resource-to-
 import * as Boom from '@hapi/boom'
 import * as HttpErrorSchema from '../../../common-api/HttpErrorSchema'
 
-const TAGS = ['api', 'signature-processor']
+const TAGS = ['api', '3 - Signature Processor']
+
 export default function (container: Container): Array<ServerRoute> {
   return [
     {

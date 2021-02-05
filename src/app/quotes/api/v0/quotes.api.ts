@@ -28,7 +28,7 @@ import { commonHeadersSchema } from '../../../common-api/api/common-headers.sche
 import { quoteToResource } from './mappers/quote-to-resource.mapper'
 import GetQuoteByIdQuery = GetQuoteById.GetQuoteByIdQuery
 
-const TAGS = ['api', 'quotes']
+const TAGS = ['api', '1 - Quotes']
 
 export default function (container: Container): Array<ServerRoute> {
   return [
@@ -38,6 +38,11 @@ export default function (container: Container): Array<ServerRoute> {
       options: {
         tags: TAGS,
         description: 'Create a quote',
+        plugins: {
+          'hapi-swagger': {
+            deprecated: true
+          }
+        },
         validate: {
           payload: quotePostRequestBodySchema
         },
@@ -104,6 +109,11 @@ export default function (container: Container): Array<ServerRoute> {
       options: {
         tags: TAGS,
         description: 'send an email with a link to validate quote policy holder email address',
+        plugins: {
+          'hapi-swagger': {
+            deprecated: true
+          }
+        },
         validate: {
           params: Joi.object({
             id: Joi.string().min(6).max(12).required().description('Quote id').example('DU6C73X')
@@ -142,6 +152,11 @@ export default function (container: Container): Array<ServerRoute> {
       options: {
         tags: TAGS,
         description: 'Update a quote',
+        plugins: {
+          'hapi-swagger': {
+            deprecated: true
+          }
+        },
         validate: {
           params: Joi.object({
             id: Joi.string().min(6).max(12).required().description('Quote id').example('DU6C73X')
@@ -190,6 +205,11 @@ export default function (container: Container): Array<ServerRoute> {
       options: {
         tags: TAGS,
         description: 'Gets a quote',
+        plugins: {
+          'hapi-swagger': {
+            deprecated: true
+          }
+        },
         validate: {
           params: Joi.object({
             id: Joi.string().min(6).max(12).required().description('Quote id').example('DU6C73X')

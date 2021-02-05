@@ -15,9 +15,13 @@ export function requestToCreateQuoteCommand (request: any): CreateQuoteCommand {
         type: payload.risk.property.type,
         occupancy: payload.risk.property.occupancy
       },
-      person: _resourceToRiskPerson(payload.risk)
+      person: _resourceToRiskPerson(payload.risk),
+      otherPeople: payload.risk.other_people ? payload.risk.other_people.map(person => {
+        return { firstname: person.firstname, lastname: person.lastname }
+      }) : undefined
     },
-    policyHolder: _resourceToPolicyHolder(payload)
+    policyHolder: _resourceToPolicyHolder(payload),
+    startDate: payload.start_date ? new Date(payload.start_date) : undefined
   }
 }
 

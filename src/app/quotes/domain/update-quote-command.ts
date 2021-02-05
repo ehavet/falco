@@ -36,9 +36,7 @@ export namespace UpdateQuoteCommand.Risk {
         type?: PropertyType,
         occupancy?: Occupancy
     }
-}
 
-export namespace UpdateQuoteCommand.Risk {
     export interface Person {
         firstname: string,
         lastname: string

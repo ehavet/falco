@@ -20,14 +20,15 @@ import {
 import { UpdateQuoteCommand } from '../../domain/update-quote-command'
 import { OperationCodeNotApplicableError } from '../../../policies/domain/operation-code.errors'
 import { quoteResponseBodySchema } from './schemas/quotes-response.schema'
-import { quotePutRequestBodySchema } from './schemas/quotes-put-request.schema'
-import { quotePostRequestBodySchema } from './schemas/quotes-post-request.schema'
 import { requestToUpdateQuoteCommand } from './mappers/request-to-update-quote-command.mapper'
 import { requestToCreateQuoteCommand } from './mappers/request-to-create-quote-command.mapper'
 import { GetQuoteById } from '../../domain/get-quote-by-id.usecase'
 import { commonHeadersSchema } from '../../../common-api/api/common-headers.schema'
 import { quoteToResource } from './mappers/quote-to-resource.mapper'
+import { quotePostRequestBodySchema, quotePutRequestBodySchema } from './schemas/quotes-request.schema'
 import GetQuoteByIdQuery = GetQuoteById.GetQuoteByIdQuery
+
+const TAGS = ['api', '1 - Quotes']
 
 export default function (container: Container): Array<ServerRoute> {
   return [
@@ -35,6 +36,7 @@ export default function (container: Container): Array<ServerRoute> {
       method: 'POST',
       path: '/v1/quotes',
       options: {
+        tags: TAGS,
         description: 'Create a quote',
         validate: {
           payload: quotePostRequestBodySchema
@@ -78,6 +80,7 @@ export default function (container: Container): Array<ServerRoute> {
       method: 'POST',
       path: '/v1/quotes/{id}/policy-holder/send-email-validation-email',
       options: {
+        tags: TAGS,
         description: 'send an email with a link to validate quote policy holder email address',
         validate: {
           params: Joi.object({
@@ -115,6 +118,7 @@ export default function (container: Container): Array<ServerRoute> {
       method: 'PUT',
       path: '/v1/quotes/{id}',
       options: {
+        tags: TAGS,
         description: 'Update a quote',
         validate: {
           params: Joi.object({
@@ -162,6 +166,7 @@ export default function (container: Container): Array<ServerRoute> {
       method: 'GET',
       path: '/v1/quotes/{id}',
       options: {
+        tags: TAGS,
         description: 'Gets a quote',
         validate: {
           params: Joi.object({

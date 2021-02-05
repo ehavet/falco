@@ -72,7 +72,7 @@ describe('Usecase - Send a validation link to an email address', async () => {
     })
   })
 
-  it('should generate a callbackUrl on Appenin front if no callbackUrl is given', async () => {
+  it('should generate a callbackUrl on Appenin front with policy_id if no callbackUrl is given', async () => {
     // GIVEN
     const emailValidationQuery: EmailValidationQuery = {
       email: 'albert.hofmann@science.org',
@@ -91,6 +91,37 @@ describe('Usecase - Send a validation link to an email address', async () => {
       callbackUrl: 'http://front-ulr.fr/en/partnerCode/synthese?policy_id=APP746312047',
       expiredAt: new Date('2021-02-12T00:00:00.000Z'),
       policyId: 'APP746312047'
+    }
+    const sendValidationLinkToEmailAddress: SendValidationLinkToEmailAddress =
+        SendValidationLinkToEmailAddress.factory(encrypter, mailer, config, templateEngine)
+
+    // WHEN
+    await sendValidationLinkToEmailAddress(emailValidationQuery)
+
+    // THEN
+    sinon.assert.calledWithExactly(encrypter.encrypt, JSON.stringify(validationTokenPayloadFr))
+    sinon.assert.calledWithExactly(encrypter.encrypt, JSON.stringify(validationTokenPayloadEn))
+  })
+
+  it('should generate a callbackUrl on Appenin front with quote_id if no callbackUrl is given', async () => {
+    // GIVEN
+    const emailValidationQuery: EmailValidationQuery = {
+      email: 'albert.hofmann@science.org',
+      callbackUrl: '',
+      partnerCode: 'partnerCode',
+      quoteId: '4FD8D2M'
+    }
+    const validationTokenPayloadFr: ValidationTokenPayload = {
+      email: 'albert.hofmann@science.org',
+      callbackUrl: 'http://front-ulr.fr/fr/partnerCode/synthese?id=4FD8D2M',
+      expiredAt: new Date('2021-02-12T00:00:00.000Z'),
+      quoteId: '4FD8D2M'
+    }
+    const validationTokenPayloadEn: ValidationTokenPayload = {
+      email: 'albert.hofmann@science.org',
+      callbackUrl: 'http://front-ulr.fr/en/partnerCode/synthese?id=4FD8D2M',
+      expiredAt: new Date('2021-02-12T00:00:00.000Z'),
+      quoteId: '4FD8D2M'
     }
     const sendValidationLinkToEmailAddress: SendValidationLinkToEmailAddress =
         SendValidationLinkToEmailAddress.factory(encrypter, mailer, config, templateEngine)

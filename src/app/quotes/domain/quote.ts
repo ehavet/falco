@@ -71,9 +71,9 @@ export namespace Quote {
       partner: Partner,
       defaultCapAdvice: DefaultCapAdvice,
       coverMonthlyPrices: Array<CoverMonthlyPrice>): Quote {
-      const risk: Quote.Risk = _buildRisk(command, partner)
+      const risk: Quote.Risk = Quote.Risk.build(command.risk, partner)
 
-      const insurance: Quote.Insurance = getInsurance(partner.offer, defaultCapAdvice, coverMonthlyPrices)
+      const insurance: Quote.Insurance = Quote.Insurance.build(partner.offer, defaultCapAdvice, coverMonthlyPrices)
 
       const nbMonthsDue = DEFAULT_NUMBER_MONTHS_DUE
 
@@ -100,8 +100,8 @@ export namespace Quote {
       command: UpdateQuoteCommand, partnerAvailableCodes: Array<OperationCode>,
       defaultCapAdvice: DefaultCapAdvice,
       coverMonthlyPrices: Array<CoverMonthlyPrice>): Quote {
-      quote.risk = _buildQuoteRisk(command.risk, partner)
-      quote.insurance = getInsurance(partner.offer, defaultCapAdvice, coverMonthlyPrices)
+      quote.risk = Quote.Risk.build(command.risk, partner)
+      quote.insurance = Quote.Insurance.build(partner.offer, defaultCapAdvice, coverMonthlyPrices)
       quote.policyHolder = Quote.PolicyHolder.build(command.policyHolder, quote.policyHolder)
       _applyStartDate(quote, command.startDate)
       _applyOperationCode(quote, partnerAvailableCodes, command.specOpsCode)
@@ -113,49 +113,6 @@ export namespace Quote {
         return quote
     }
 
-    function _buildQuoteRisk (risk: UpdateQuoteCommand.Risk, partner: Partner) {
-      const roomCount: number = risk.property.roomCount
-      const numberOfRoommates: number|null = risk.otherPeople ? risk.otherPeople?.length : null
-
-      if (!PartnerFunc.isPropertyTypeInsurable(partner, risk.property.type)) {
-        throw new QuoteRiskPropertyTypeNotInsurableError(risk.property.type!)
-      }
-
-      if (!PartnerFunc.isOccupancyInsurable(partner, risk.property.occupancy)) {
-        throw new QuoteRiskOccupancyNotInsurableError(risk.property.occupancy!)
-      }
-
-      if (!PartnerFunc.isPropertyRoomCountCovered(partner, roomCount)) {
-        throw new QuoteRiskPropertyRoomCountNotInsurableError(roomCount)
-      }
-
-      if (numberOfRoommates) {
-        if (!PartnerFunc.isPropertyAllowNumberOfRoommates(partner, numberOfRoommates, risk)) {
-          const maxRoommatesForProperty: number = PartnerFunc.getMaxNumberOfRoommatesForProperty(partner, risk)
-          if (maxRoommatesForProperty === 0) { throw new QuoteRiskRoommatesNotAllowedError(roomCount) }
-          throw new QuoteRiskNumberOfRoommatesError(maxRoommatesForProperty, roomCount)
-        }
-      }
-
-      return {
-        property: {
-          roomCount: risk.property.roomCount,
-          address: risk.property.address ? risk.property.address : undefined,
-          postalCode: risk.property.postalCode ? risk.property.postalCode : undefined,
-          city: risk.property.city ? risk.property.city : undefined,
-          type: risk.property.type ? risk.property.type : undefined,
-          occupancy: risk.property.occupancy ? risk.property.occupancy : undefined
-        },
-        person: risk.person ? {
-          firstname: risk.person.firstname,
-          lastname: risk.person.lastname
-        } : undefined,
-        otherPeople: risk.otherPeople ? risk.otherPeople.map(person => {
-          return { firstname: person.firstname, lastname: person.lastname }
-        }) : undefined
-      }
-    }
-
     export function applyNbMonthsDue (quote: Quote, nbMonthsDue: number): void {
       quote.premium = Amount.multiply(nbMonthsDue, quote.insurance.estimate.monthlyPrice)
       quote.nbMonthsDue = nbMonthsDue
@@ -165,7 +122,7 @@ export namespace Quote {
       }
     }
 
-    export function setSpecialOperationCode (quote: Quote, newOperationsCode: OperationCode | null = null): void {
+    function _setSpecialOperationCode (quote: Quote, newOperationsCode: OperationCode | null = null): void {
       const hasPreviouslyAppliedOperationCode: boolean = !!quote.specialOperationsCode
       quote.specialOperationsCodeAppliedAt = hasPreviouslyAppliedOperationCode || newOperationsCode ? new Date() : null
       quote.specialOperationsCode = newOperationsCode
@@ -198,70 +155,6 @@ export namespace Quote {
       return dayjs(date).utc()
     }
 
-    function _buildRisk (command: CreateQuoteCommand, partner: Partner) : Risk {
-      /* WARNING : the following line has to be removed for v1 :
-      risk.property.type is optionnal on endpoint POST v0/quotes, so we have to retrieve it from partner.
-      The correct rule is : risk.property.type is mandatory and should be given on quote creation.
-      It should be implemented that way for POST v1/quotes */
-      const propertyType = command.risk.property.type ?? PartnerFunc.getDefaultPropertyType(partner)
-
-      const numberOfRoommates: number|null = command.risk.otherPeople ? command.risk.otherPeople.length : null
-      const roomCount = command.risk.property.roomCount
-
-      if (!PartnerFunc.isPropertyTypeInsurable(partner, propertyType)) {
-        throw new QuoteRiskPropertyTypeNotInsurableError(propertyType)
-      }
-
-      /* WARNING : the following line has to be removed for v1 :
-      risk.property.occupancy is optionnal on endpoint POST v0/quotes, so we have to retrieve it from partner.
-      The correct rule is : risk.property.occupancy is mandatory and should be given on quote creation.
-      It should be implemented that way for POST v1/quotes */
-      const occupancy = command.risk.property.occupancy ?? PartnerFunc.getDefaultOccupancy(partner)
-      if (!PartnerFunc.isOccupancyInsurable(partner, occupancy)) {
-        throw new QuoteRiskOccupancyNotInsurableError(occupancy)
-      }
-
-      if (!PartnerFunc.isPropertyRoomCountCovered(partner, roomCount)) {
-        throw new QuoteRiskPropertyRoomCountNotInsurableError(roomCount)
-      }
-
-      if (numberOfRoommates) {
-        if (!PartnerFunc.isPropertyAllowNumberOfRoommates(partner, numberOfRoommates, command.risk)) {
-          const maxRoommatesForProperty: number = PartnerFunc.getMaxNumberOfRoommatesForProperty(partner, command.risk)
-          if (maxRoommatesForProperty === 0) { throw new QuoteRiskRoommatesNotAllowedError(roomCount) }
-          throw new QuoteRiskNumberOfRoommatesError(maxRoommatesForProperty, roomCount)
-        }
-      }
-
-      return {
-        property: {
-          ...command.risk.property,
-          type: propertyType,
-          occupancy: occupancy
-        },
-        person: command.risk.person,
-        otherPeople: command.risk.otherPeople
-      }
-    }
-
-    export function getInsurance (partnerOffer: Partner.Offer, defaultCapAdvice: DefaultCapAdvice, coverMonthlyPrices: Array<CoverMonthlyPrice>): Insurance {
-      const monthlyPrice = sumCoverMonthlyPrices(coverMonthlyPrices)
-
-      return <Insurance>{
-        estimate: {
-          monthlyPrice,
-          defaultDeductible: partnerOffer.defaultDeductible,
-          defaultCeiling: defaultCapAdvice.value
-        },
-        simplifiedCovers: partnerOffer.simplifiedCovers,
-        currency: 'EUR',
-        productCode: partnerOffer.productCode,
-        productVersion: partnerOffer.productVersion,
-        contractualTerms: partnerOffer.contractualTerms,
-        ipid: partnerOffer.ipid
-      }
-    }
-
     export function nextId (): string {
       return generate({ length: 7, charset: 'alphanumeric', readable: true, capitalization: 'uppercase' })
     }
@@ -284,15 +177,15 @@ export namespace Quote {
           case OperationCode.SEMESTER1:
           case OperationCode.SEMESTER2:
             Quote.applyNbMonthsDue(quote, 5)
-            setSpecialOperationCode(quote, operationCode)
+            _setSpecialOperationCode(quote, operationCode)
             break
           case OperationCode.FULLYEAR:
             Quote.applyNbMonthsDue(quote, 10)
-            setSpecialOperationCode(quote, operationCode)
+            _setSpecialOperationCode(quote, operationCode)
             break
           case OperationCode.BLANK:
             Quote.applyNbMonthsDue(quote, 12)
-            setSpecialOperationCode(quote, null)
+            _setSpecialOperationCode(quote, null)
         }
       } else {
         throw new OperationCodeNotApplicableError(codeToApply!, quote.partnerCode)
@@ -331,6 +224,60 @@ export namespace Quote.Risk {
         firstname: string,
         lastname: string
     }
+
+    export function build (risk: CreateQuoteCommand.Risk | UpdateQuoteCommand.Risk, partner: Partner) : Risk {
+      /* WARNING : the following line has to be removed for v1 :
+        risk.property.type is optionnal on endpoint POST v0/quotes, so we have to retrieve it from partner.
+        The correct rule is : risk.property.type is mandatory and should be given on quote creation.
+        It should be implemented that way for POST v1/quotes */
+      const propertyType = risk.property.type ?? PartnerFunc.getDefaultPropertyType(partner)
+
+      const numberOfRoommates: number|null = risk.otherPeople ? risk.otherPeople.length : null
+      const roomCount = risk.property.roomCount
+
+      if (!PartnerFunc.isPropertyTypeInsurable(partner, propertyType)) {
+        throw new QuoteRiskPropertyTypeNotInsurableError(propertyType)
+      }
+
+      /* WARNING : the following line has to be removed for v1 :
+        risk.property.occupancy is optionnal on endpoint POST v0/quotes, so we have to retrieve it from partner.
+        The correct rule is : risk.property.occupancy is mandatory and should be given on quote creation.
+        It should be implemented that way for POST v1/quotes */
+      const occupancy = risk.property.occupancy ?? PartnerFunc.getDefaultOccupancy(partner)
+      if (!PartnerFunc.isOccupancyInsurable(partner, occupancy)) {
+        throw new QuoteRiskOccupancyNotInsurableError(occupancy)
+      }
+
+      if (!PartnerFunc.isPropertyRoomCountCovered(partner, roomCount)) {
+        throw new QuoteRiskPropertyRoomCountNotInsurableError(roomCount)
+      }
+
+      if (numberOfRoommates) {
+        if (!PartnerFunc.isPropertyAllowNumberOfRoommates(partner, numberOfRoommates, risk)) {
+          const maxRoommatesForProperty: number = PartnerFunc.getMaxNumberOfRoommatesForProperty(partner, risk)
+          if (maxRoommatesForProperty === 0) { throw new QuoteRiskRoommatesNotAllowedError(roomCount) }
+          throw new QuoteRiskNumberOfRoommatesError(maxRoommatesForProperty, roomCount)
+        }
+      }
+
+      return {
+        property: {
+          roomCount: risk.property.roomCount,
+          address: risk.property.address ?? undefined,
+          postalCode: risk.property.postalCode ?? undefined,
+          city: risk.property.city ?? undefined,
+          type: propertyType,
+          occupancy: occupancy
+        },
+        person: risk.person ? {
+          firstname: risk.person.firstname,
+          lastname: risk.person.lastname
+        } : undefined,
+        otherPeople: risk.otherPeople ? risk.otherPeople.map(person => {
+          return { firstname: person.firstname, lastname: person.lastname }
+        }) : undefined
+      }
+    }
 }
 
 export namespace Quote.Insurance {
@@ -341,6 +288,24 @@ export namespace Quote.Insurance {
     }
 
     export type SimplifiedCover = string
+
+    export function build (partnerOffer: Partner.Offer, defaultCapAdvice: DefaultCapAdvice, coverMonthlyPrices: Array<CoverMonthlyPrice>): Insurance {
+      const monthlyPrice = sumCoverMonthlyPrices(coverMonthlyPrices)
+
+      return <Insurance>{
+        estimate: {
+          monthlyPrice,
+          defaultDeductible: partnerOffer.defaultDeductible,
+          defaultCeiling: defaultCapAdvice.value
+        },
+        simplifiedCovers: partnerOffer.simplifiedCovers,
+        currency: 'EUR',
+        productCode: partnerOffer.productCode,
+        productVersion: partnerOffer.productVersion,
+        contractualTerms: partnerOffer.contractualTerms,
+        ipid: partnerOffer.ipid
+      }
+    }
 }
 
 export namespace Quote.PolicyHolder {

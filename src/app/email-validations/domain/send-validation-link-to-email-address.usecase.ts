@@ -92,6 +92,6 @@ function _getCallbackUrl (query: EmailValidationQuery, locale: string, config: V
   if (query.policyId) {
     return `${config.frontUrl}/${locale}/${query.partnerCode}/${config.frontCallbackPageRoute}?policy_id=${query.policyId}`
   } else {
-    return `${config.frontUrl}/${locale}/${query.partnerCode}/${config.frontCallbackPageRoute}?quote_id=${query.quoteId}`
+    return `${config.frontUrl}/${locale}/${query.partnerCode}/${config.frontCallbackPageRoute}?id=${query.quoteId}`
   }
 }

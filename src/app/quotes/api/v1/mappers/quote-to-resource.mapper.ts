@@ -1,7 +1,6 @@
 import { Quote } from '../../../domain/quote'
 import dayjs from '../../../../../libs/dayjs'
 
-// This mapper should be the reference for all the endpoints returning a quote
 export function quoteToResource (quote: Quote) {
   return {
     id: quote.id,
@@ -23,24 +22,34 @@ function _toRisk (risk: Quote.Risk) {
   return {
     property: {
       room_count: risk.property.roomCount,
-      address: risk.property.address ? risk.property.address : null,
-      postal_code: risk.property.postalCode ? risk.property.postalCode : null,
-      city: risk.property.city ? risk.property.city : null,
-      type: risk.property.type ? risk.property.type : null,
-      occupancy: risk.property.occupancy ? risk.property.occupancy : null
+      address: risk.property.address ?? null,
+      postal_code: risk.property.postalCode ?? null,
+      city: risk.property.city ?? null,
+      type: risk.property.type ?? null,
+      occupancy: risk.property.occupancy ?? null
     },
-    person: risk.person ? {
-      firstname: risk.person.firstname,
-      lastname: risk.person.lastname
-    } : null,
-    other_people: risk.otherPeople ? _toOtherPeople(risk.otherPeople) : null
+    person: risk.person ? _toPerson(risk.person) : null,
+    other_people: risk.otherPeople ? _toOtherPeople(risk.otherPeople) : []
   }
 }
 
 function _toOtherPeople (otherInsured: Quote.Risk.Person[]) {
   return otherInsured.map(insured => {
-    return { firstname: insured.firstname, lastname: insured.lastname }
-  })
+    return _toPerson(insured)
+  }).filter(insured => insured != null)
+}
+
+function _toPerson (person) {
+  // Because right now we save empty persons/otherPeople in database, we have to do this check here so that they are not returned within the payload
+  // The quoteRepository should be fixed in a near future and then this condition removed
+  if (person.firstname || person.lastname) {
+    return {
+      firstname: person.firstname,
+      lastname: person.lastname
+    }
+  }
+
+  return null
 }
 
 function _toInsurance (insurance: Quote.Insurance) {
@@ -59,13 +68,13 @@ function _toInsurance (insurance: Quote.Insurance) {
 
 function _toPolicyHolder (policyHolder: Quote.PolicyHolder) {
   return {
-    firstname: policyHolder.firstname ? policyHolder.firstname : null,
-    lastname: policyHolder.lastname ? policyHolder.lastname : null,
-    address: policyHolder.address ? policyHolder.address : null,
-    postal_code: policyHolder.postalCode ? policyHolder.postalCode : null,
-    city: policyHolder.city ? policyHolder.city : null,
-    email: policyHolder.email ? policyHolder.email : null,
-    phone_number: policyHolder.phoneNumber ? policyHolder.phoneNumber : null,
-    email_validated_at: policyHolder.emailValidatedAt ? policyHolder.emailValidatedAt : null
+    firstname: policyHolder.firstname ?? null,
+    lastname: policyHolder.lastname ?? null,
+    address: policyHolder.address ?? null,
+    postal_code: policyHolder.postalCode ?? null,
+    city: policyHolder.city ?? null,
+    email: policyHolder.email ?? null,
+    phone_number: policyHolder.phoneNumber ?? null,
+    email_validated_at: policyHolder.emailValidatedAt ?? null
   }
 }

@@ -36,7 +36,7 @@ import { PartnerNotFoundError } from '../../../partners/domain/partner.errors'
 import { ApplyStartDateOnPolicyCommand } from '../../domain/apply-start-date-on-policy.usecase'
 import { commonHeadersSchema } from '../../../common-api/api/common-headers.schema'
 
-const TAGS = ['api', 'policies']
+const TAGS = ['api', '2 - Policies']
 
 export default function (container: Container): Array<ServerRoute> {
   return [

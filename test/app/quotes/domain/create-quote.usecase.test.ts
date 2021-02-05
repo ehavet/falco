@@ -298,7 +298,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
     })
 
     describe('with the special operations code', async () => {
-      it('SEMESTER1 setting the number of months due to 5', async () => {
+      it('SEMESTER1 setting the number of months due to 5 and computing the new premium', async () => {
         // Given
         const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.SEMESTER1, risk: { property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT } } }
 
@@ -314,7 +314,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
         })
       })
 
-      it('SEMESTER2 setting the number of months due to 5', async () => {
+      it('SEMESTER2 setting the number of months due to 5 and computing the new premium', async () => {
         // Given
         const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.SEMESTER2, risk: { property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT } } }
 
@@ -330,7 +330,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
         })
       })
 
-      it('FULLYEAR setting the number of months due to 10', async () => {
+      it('FULLYEAR setting the number of months due to 10 and computing the new premium', async () => {
         // Given
         const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.FULLYEAR, risk: { property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT } } }
 
@@ -346,7 +346,7 @@ describe('Quotes - Usecase - Create Quote', async () => {
         })
       })
 
-      it('BLANK setting the number of months due to 12', async () => {
+      it('BLANK setting the number of months due to 12 and computing the new premium', async () => {
         // Given
         const createQuoteCommand: CreateQuoteCommand = { partnerCode: 'myPartner', specOpsCode: OperationCode.BLANK, risk: { property: { roomCount: 2, type: PropertyType.FLAT, occupancy: Occupancy.TENANT } } }
 

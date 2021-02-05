@@ -36,14 +36,20 @@ function _toRisk (risk: Quote.Risk) {
 function _toOtherPeople (otherInsured: Quote.Risk.Person[]) {
   return otherInsured.map(insured => {
     return _toPerson(insured)
-  })
+  }).filter(insured => insured != null)
 }
 
 function _toPerson (person) {
-  return {
-    firstname: person.firstname,
-    lastname: person.lastname
+  // Because right now we save empty persons/otherPeople in database, we have to do this check here so that they are not returned within the payload
+  // The quoteRepository should be fixed in a near future and then this condition removed
+  if (person.firstname || person.lastname) {
+    return {
+      firstname: person.firstname,
+      lastname: person.lastname
+    }
   }
+
+  return null
 }
 
 function _toInsurance (insurance: Quote.Insurance) {

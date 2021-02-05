@@ -15,13 +15,13 @@ export class StripeEventAuthenticator implements PaymentEventAuthenticator {
       try {
         const parsedPayload = JSON.parse(rawPayload)
         // eslint-disable-next-line camelcase
-        const isDemoStudent = Partner.isRelatedToADemoPartner(parsedPayload.data?.object?.metadata?.partner_code)
-        if (isDemoStudent) {
+        const isDemoPartner = Partner.isRelatedToADemoPartner(parsedPayload.data?.object?.metadata?.partner_code)
+        if (isDemoPartner) {
           return await this.#config.stripe.TestClient.webhooks
             .constructEvent(
               rawPayload,
               signature,
-              this.#config.eventHandlerSecret
+              this.#config.eventHandlerSecretTest
             )
         } else {
           return await this.#config.stripe.LiveClient.webhooks

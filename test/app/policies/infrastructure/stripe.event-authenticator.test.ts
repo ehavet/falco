@@ -10,7 +10,8 @@ describe('StripeEventAuthenticator', async () => {
         LiveClient: { webhooks: { constructEvent: sinon.stub() } },
         TestClient: { webhooks: { constructEvent: sinon.stub() } }
       },
-      eventHandlerSecret: '3v3ntH4ndl13rS3cr3t'
+      eventHandlerSecret: '3v3ntH4ndl13rS3cr3t',
+      eventHandlerSecretTest: '3v3ntH4ndl13rS3cr3tT35t'
     } as any
     const eventAuthenticator: StripeEventAuthenticator = new StripeEventAuthenticator(stripeConfig)
 
@@ -43,7 +44,7 @@ describe('StripeEventAuthenticator', async () => {
       stripeConfig.stripe.TestClient.webhooks.constructEvent.withArgs(
         rawEventPayload,
         headerSignature,
-        '3v3ntH4ndl13rS3cr3t'
+        '3v3ntH4ndl13rS3cr3tT35t'
       ).resolves(event)
 
       const response = await eventAuthenticator.parse(rawEventPayload, headerSignature)
